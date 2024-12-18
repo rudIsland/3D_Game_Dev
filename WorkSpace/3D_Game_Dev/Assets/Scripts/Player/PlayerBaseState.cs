@@ -1,7 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.InputSystem.XR;
 
 /*
  * 플레이어 기본 상태 정의
@@ -11,6 +9,7 @@ using UnityEngine.InputSystem.XR;
 public class PlayerBaseState : State
 {
     protected PlayerStateMachine stateMachine;
+    Vector3 moveVector; //플레이어 이동
 
     public PlayerBaseState(PlayerStateMachine playerStateMachine)
     {
@@ -30,23 +29,21 @@ public class PlayerBaseState : State
         {
             return;
         }
-   
-        Vector3 inputDirection = new Vector3(stateMachine.joystick.Horizontal, 0f, stateMachine.joystick.Vertical); // 조이스틱 입력
-        if (inputDirection.magnitude >= 0.1f) // 입력이 있을 경우
-        {
-            // 입력 방향을 기준으로 캐릭터의 이동 방향 설정
-            Vector3 moveDir = stateMachine.transform.right * inputDirection.x + stateMachine.transform.forward * inputDirection.z;
-            Debug.Log("이동합니다.");
-            // 실제 이동
-            stateMachine.characterController.Move(moveDir * stateMachine.moveSpeed * deltaTime);
 
-            // 캐릭터 회전
-            stateMachine.transform.rotation = Quaternion.Slerp(
-                stateMachine.transform.rotation,
-                Quaternion.LookRotation(moveDir),
-                stateMachine.rotateSpeed * deltaTime
-            );
-        }
+        //조이스틱 입력을 받는다.
+        float moveX = stateMachine.joystick.Horizontal;
+        float moveZ = stateMachine.joystick.Vertical;
+        
+        //이동할 Vector값 계산
+        moveVector = new Vector3(moveX, 0f, moveZ) * stateMachine.moveSpeed * deltaTime; // 조이스틱 입력
+
+        //stateMachine.rigid.MovePosition(stateMachine.rigid.position + moveVector);
+        stateMachine.characterController.Move(moveVector);
+
+        Quaternion dirQuat = Quaternion.LookRotation(moveVector);
+        Quaternion moveQuat = Quaternion.Slerp(stateMachine.rigid.rotation, dirQuat, stateMachine.rotateSpeed);
+        stateMachine.rigid.MoveRotation(moveQuat);
+        
     }
 
 
