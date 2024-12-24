@@ -274,6 +274,7 @@ namespace StarterAssets
             // update animator if using character
             if (_hasAnimator)
             {
+                Debug.Log("속도: " + _animator.GetFloat("Speed"));
                 _animator.SetFloat(_animIDSpeed, _animationBlend);
                 _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
             }
