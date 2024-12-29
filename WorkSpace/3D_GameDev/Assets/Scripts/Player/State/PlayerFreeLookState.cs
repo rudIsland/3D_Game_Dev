@@ -10,7 +10,6 @@ using UnityEngine.Windows;
  */
 public class PlayerFreeLookState : PlayerBaseState
 {
-    readonly int Move_Speed = Animator.StringToHash("Speed");
 
     public PlayerFreeLookState(PlayerStateMachine stateMachine) : base(stateMachine)
     {
@@ -42,11 +41,12 @@ public class PlayerFreeLookState : PlayerBaseState
         // 이동 처리
         Move(CalculateMove(deltaTime), deltaTime);
 
-        // 중력 처리
+        // 중력, 점프 처리
         JumpAndGravity(deltaTime);
         GroundedCheck();
 
         // 애니메이션 업데이트
+        Debug.Log($"스프린트: {stateMachine.inputReader.onSprint}");
         UpdateAnimation(deltaTime);
     }
 
@@ -58,7 +58,7 @@ public class PlayerFreeLookState : PlayerBaseState
         // 수직 속도 적용
         stateMachine.verticalVelocity += stateMachine.gravity * deltaTime;
 
-        Vector3 direction = new Vector3(stateMachine.inputReader.moveInput.x, 0, stateMachine.inputReader.moveInput.y).normalized;
+        Vector3 direction = new Vector3(input.x, 0, input.y).normalized;
 
         if (direction.magnitude < 0.1f) return Vector3.zero;
 
@@ -80,16 +80,16 @@ public class PlayerFreeLookState : PlayerBaseState
     {
         // 이동 입력의 크기 계산 (애니메이션 재생 속도에 사용)
         float inputMagnitude = stateMachine.inputReader.moveInput.magnitude;
-
+        
         // 이동 애니메이션 처리
         if (inputMagnitude == 0)
         { //0f로 Idle
-            stateMachine.animator.SetFloat(Move_Speed, 0f, stateMachine.animationDampTime, deltaTime);
+            stateMachine.animator.SetFloat(stateMachine._animIDSpeed, 0f, stateMachine.animationDampTime, deltaTime);
         }
         else
         { //2번째 목표값을 걷기 or 달리기 속도로 지정후 재생
             float targetSpeed = stateMachine.inputReader.onSprint ? stateMachine.sprintSpeed : stateMachine.moveSpeed;
-            stateMachine.animator.SetFloat(Move_Speed, targetSpeed, stateMachine.animationDampTime, deltaTime);
+            stateMachine.animator.SetFloat(stateMachine._animIDSpeed, targetSpeed, stateMachine.animationDampTime, deltaTime);
         }
 
         //점프

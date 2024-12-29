@@ -55,11 +55,15 @@ public class PlayerInputReader : MonoBehaviour, PlayerControls.IPlayerActions
     {
         if (context.performed)
         {
+            // 스프린트 활성화
             onSprint = true;
+            Debug.Log("스프린트 시작");
         }
-        else
+        else if (context.canceled)
         {
+            // 스프린트 비활성화
             onSprint = false;
+            Debug.Log("스프린트 종료");
         }
     }
 }
