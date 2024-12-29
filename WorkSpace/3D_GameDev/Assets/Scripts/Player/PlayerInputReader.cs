@@ -9,6 +9,7 @@ public class PlayerInputReader : MonoBehaviour, PlayerControls.IPlayerActions
 
     public Vector2 lookInput; //바라보기 방향 벡터
     public Vector2 moveInput; //움직일 방향 벡터 -1 or 1
+    public bool isMove = false;
     public event Action jumpPressed;
     public bool onSprint = false;
 
@@ -44,10 +45,12 @@ public class PlayerInputReader : MonoBehaviour, PlayerControls.IPlayerActions
         if (context.performed)
         {
             moveInput = context.ReadValue<Vector2>();
+            isMove = true;
         }
         else if (context.canceled)
         {
             moveInput = Vector2.zero; // 입력 중지 시 초기화
+            isMove = false;
         }
     }
 

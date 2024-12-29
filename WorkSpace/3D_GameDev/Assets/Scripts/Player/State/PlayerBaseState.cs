@@ -55,42 +55,74 @@ public class PlayerBaseState : State
 
     public override void Tick(float deltaTime)
     {
-        // 입력값 기반으로 이동 방향 계산
-        Vector3 movement = CalculateMove();
 
-        // 이동 로직 호출
-        if (movement.magnitude > 0.1f)
-            Move(movement, deltaTime); // 입력이 있을 때만 이동
+        // 이동 처리
+        Move(CalculateMove(deltaTime), deltaTime);
 
-
-        // 지면 상태 확인
+        // 중력, 점프 처리
+        //JumpAndGravity(deltaTime);
         //GroundedCheck();
+
+        // 애니메이션 업데이트
+        //Debug.Log($"스프린트: {stateMachine.inputReader.onSprint}");
+        UpdateAnimation(deltaTime);
     }
 
-    private Vector3 CalculateMove()
+    private Vector3 CalculateMove(float deltaTime)
     {
-        // 입력값 가져오기
-        Vector2 input = stateMachine.inputReader.moveInput; //input의 vector2의 x y값을 가져옴.
+        // 입력값 가져오기 (PlayerInputReader에서 입력값 받기)
+        Vector2 input = stateMachine.inputReader.moveInput;
 
-        // 입력값이 없으면 정지 상태로 설정
-        if (input == Vector2.zero) return Vector3.zero;
+        // 수직 속도 적용
+        stateMachine.verticalVelocity += stateMachine.gravity * deltaTime;
 
-        // 입력값을 XZ 평면에서 이동 벡터로 변환
-        return new Vector3(input.x, 0, input.y).normalized; //y값을 z값으로 새 vector3로 정의하여 리턴
-    }
+        Vector3 direction = new Vector3(input.x, 0, input.y).normalized;
 
-    private void GroundedCheck()
-    {
-        // set sphere position, with offset
-        Vector3 spherePosition = new Vector3(stateMachine.transform.position.x, stateMachine.transform.position.y - stateMachine.GroundedOffset,
-            stateMachine.transform.position.z);
-        stateMachine.Grounded = Physics.CheckSphere(spherePosition, stateMachine.GroundedRadius, stateMachine.GroundLayers,
-            QueryTriggerInteraction.Ignore);
-
-        // update animator if using character
-        if (stateMachine.animator)
+        if (direction.magnitude < 0.1f)
         {
-            stateMachine.animator.SetBool(stateMachine._animIDGrounded, stateMachine.Grounded);
+            return Vector3.zero;
         }
+        
+
+        //회전 계산
+        Quaternion targetRotation = Quaternion.LookRotation(direction); //회전할 목표 방향을 쿼터니언으로 짐벌락 방지
+        //Lerp로 부드럽게 회전 시키도록
+        stateMachine.transform.rotation = Quaternion.Lerp(
+            stateMachine.transform.rotation, //현재 위치
+            targetRotation, //목표 위치
+            stateMachine.rotateSpeed * deltaTime * 1f //시간 10f*0.06*1f = 0.16f (60fps 기준 0.16씩 회전)
+        );
+
+
+        // 입력값을 XZ 평면에서 월드 좌표로 변환
+        return direction;
     }
+
+    private void UpdateAnimation(float deltaTime)
+    {
+        // 이동 입력의 크기 계산 (애니메이션 재생 속도에 사용)
+        float inputMagnitude = stateMachine.inputReader.moveInput.magnitude;
+
+        // 이동 애니메이션 처리
+        if (inputMagnitude == 0)
+        { //0f로 Idle
+            stateMachine.animator.SetFloat(stateMachine._animIDSpeed, 0f, stateMachine.animationDampTime, deltaTime);
+        }
+        else
+        { //2번째 목표값을 걷기 or 달리기 속도로 지정후 재생
+            float targetSpeed = stateMachine.inputReader.onSprint ? stateMachine.sprintSpeed : stateMachine.moveSpeed;
+            stateMachine.animator.SetFloat(stateMachine._animIDSpeed, targetSpeed, stateMachine.animationDampTime, deltaTime);
+        }
+
+        //점프
+        if (stateMachine.Grounded && stateMachine.verticalVelocity < 0.0f)
+        {
+            stateMachine.animator.SetBool(stateMachine._animIDJump, false);
+        }
+
+
+        //애니메이션 재생 속도 제어(매개변수 StringtoHash아이디, 목표 값, 도달까지 걸리는 시간(감쇠 시간), 프레임의 델타 시간
+        stateMachine.animator.SetFloat(stateMachine._animIDMotionSpeed, inputMagnitude, stateMachine.animationDampTime, deltaTime);
+    }
+
 }

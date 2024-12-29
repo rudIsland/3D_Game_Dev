@@ -46,7 +46,6 @@ public class PlayerFreeLookState : PlayerBaseState
         GroundedCheck();
 
         // 애니메이션 업데이트
-        Debug.Log($"스프린트: {stateMachine.inputReader.onSprint}");
         UpdateAnimation(deltaTime);
     }
 
@@ -76,131 +75,131 @@ public class PlayerFreeLookState : PlayerBaseState
         return direction;
     }
 
+    //private void UpdateAnimation(float deltaTime)
+    //{
+    //    // 이동 입력의 크기 계산 (애니메이션 재생 속도에 사용)
+    //    float inputMagnitude = stateMachine.inputReader.moveInput.magnitude;
+
+    //    // 이동 애니메이션 처리
+    //    if (inputMagnitude == 0)
+    //    { //0f로 Idle
+    //        stateMachine.animator.SetFloat(stateMachine._animIDSpeed, 0f, stateMachine.animationDampTime, deltaTime);
+    //    }
+    //    else
+    //    { //2번째 목표값을 걷기 or 달리기 속도로 지정후 재생
+    //        float targetSpeed = stateMachine.inputReader.onSprint ? stateMachine.sprintSpeed : stateMachine.moveSpeed;
+    //        stateMachine.animator.SetFloat(stateMachine._animIDSpeed, targetSpeed, stateMachine.animationDampTime, deltaTime);
+    //    }
+
+    //    //점프
+    //    if (stateMachine.Grounded && stateMachine.verticalVelocity < 0.0f)
+    //    {
+    //        stateMachine.animator.SetBool(stateMachine._animIDJump, false);
+    //    }
+
+
+    //    //애니메이션 재생 속도 제어(매개변수 StringtoHash아이디, 목표 값, 도달까지 걸리는 시간(감쇠 시간), 프레임의 델타 시간
+    //    stateMachine.animator.SetFloat(stateMachine._animIDMotionSpeed, inputMagnitude, stateMachine.animationDampTime, deltaTime);
+    //}
+
     private void UpdateAnimation(float deltaTime)
     {
-        // 이동 입력의 크기 계산 (애니메이션 재생 속도에 사용)
+        // 입력값 크기 가져오기
         float inputMagnitude = stateMachine.inputReader.moveInput.magnitude;
-        
-        // 이동 애니메이션 처리
-        if (inputMagnitude == 0)
-        { //0f로 Idle
-            stateMachine.animator.SetFloat(stateMachine._animIDSpeed, 0f, stateMachine.animationDampTime, deltaTime);
-        }
-        else
-        { //2번째 목표값을 걷기 or 달리기 속도로 지정후 재생
-            float targetSpeed = stateMachine.inputReader.onSprint ? stateMachine.sprintSpeed : stateMachine.moveSpeed;
-            stateMachine.animator.SetFloat(stateMachine._animIDSpeed, targetSpeed, stateMachine.animationDampTime, deltaTime);
-        }
 
-        //점프
-        if (stateMachine.Grounded && stateMachine.verticalVelocity < 0.0f)
+        // 목표 속도 계산
+        float targetSpeed = stateMachine.inputReader.onSprint ? stateMachine.sprintSpeed : stateMachine.moveSpeed;
+
+        // _animationBlend를 목표 속도로 부드럽게 변경
+        stateMachine._animationBlend = Mathf.Lerp(
+            stateMachine._animationBlend,
+            inputMagnitude > 0 ? targetSpeed : 0f,
+            deltaTime * stateMachine.SpeedChangeRate
+        );
+
+        // 부동소수점 문제 방지 (작은 값은 0으로 설정)
+        if (Mathf.Abs(stateMachine._animationBlend) < 0.01f)
         {
-            // 착지 애니메이션 처리
-            if (stateMachine.animator)
-            {
-                stateMachine.animator.SetBool(stateMachine._animIDJump, false);
-            }
+            stateMachine._animationBlend = 0f;
         }
 
+        // MotionSpeed 계산 (아날로그 여부 확인)
+        float motionSpeed = stateMachine.inputReader.isMove ? inputMagnitude : (inputMagnitude > 0 ? 1f : 0f);
 
-        //애니메이션 재생 속도 제어(매개변수 StringtoHash아이디, 목표 값, 도달까지 걸리는 시간(감쇠 시간), 프레임의 델타 시간
-        stateMachine.animator.SetFloat(stateMachine._animIDMotionSpeed, inputMagnitude, stateMachine.animationDampTime, deltaTime);
+        if(motionSpeed > 1f) motionSpeed = 1f;
+
+        // 애니메이터에 값 적용
+        stateMachine.animator.SetFloat(stateMachine._animIDSpeed, stateMachine._animationBlend);
+        stateMachine.animator.SetFloat(stateMachine._animIDMotionSpeed, motionSpeed);
     }
 
+    //지면인지 확인
     private void GroundedCheck()
     {
-        // set sphere position, with offset
-        Vector3 spherePosition = new Vector3(stateMachine.transform.position.x, stateMachine.transform.position.y - stateMachine.GroundedOffset,
-            stateMachine.transform.position.z);
-        stateMachine.Grounded = Physics.CheckSphere(spherePosition, stateMachine.GroundedRadius, stateMachine.GroundLayers,
-            QueryTriggerInteraction.Ignore);
- 
-        // update animator if using character
-        if (stateMachine.animator)
+        // 충돌 검사 위치 계산
+        Vector3 spherePosition = new Vector3(
+            stateMachine.transform.position.x,
+            stateMachine.transform.position.y - stateMachine.GroundedOffset,
+            stateMachine.transform.position.z
+        );
+
+        // Physics.CheckSphere를 사용하여 지면 감지
+        stateMachine.Grounded = Physics.CheckSphere(spherePosition, 
+            stateMachine.GroundedRadius, stateMachine.GroundLayers);
+
+        // 애니메이션 파라미터 업데이트
+        if (stateMachine.animator != null)
         {
             stateMachine.animator.SetBool(stateMachine._animIDGrounded, stateMachine.Grounded);
         }
-    }
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Vector3 spherePosition = new Vector3(stateMachine.transform.position.x, stateMachine.transform.position.y - stateMachine.GroundedOffset, stateMachine.transform.position.z);
-        Gizmos.DrawWireSphere(spherePosition, stateMachine.GroundedRadius);
+
+        // 상태를 디버그로 출력
+        //Debug.Log($"IsGrounded: {stateMachine.Grounded}");
     }
 
+    //중력 적용
+    private void JumpAndGravity(float deltaTime)
+    {
+        if (stateMachine.Grounded)
+        {
+            // 착지 상태 처리
+            stateMachine.verticalVelocity = Mathf.Max(stateMachine.verticalVelocity, -2f);
+
+            if (stateMachine.animator.GetBool(stateMachine._animIDJump)) // 점프 중이라면
+            {
+                stateMachine.animator.SetBool(stateMachine._animIDJump, false); // 착지 애니메이션 활성화
+                Debug.Log("착지 완료");
+            }
+        }
+        else
+        {
+            // 공중 상태 처리
+            stateMachine.verticalVelocity += stateMachine.gravity * deltaTime;
+
+            if (!stateMachine.animator.GetBool(stateMachine._animIDJump)) // 착지 상태라면
+            {
+                stateMachine.animator.SetBool(stateMachine._animIDJump, true); // 공중 애니메이션 활성화
+                Debug.Log("점프 중");
+            }
+        }
+
+        // 수직 이동 적용
+        Vector3 movement = new Vector3(0.0f, stateMachine.verticalVelocity, 0.0f);
+        stateMachine.characterController.Move(movement * deltaTime);
+    }
+
+    //점프
     public override void Jump()
     {
-        // 점프 속도 계산
         stateMachine.verticalVelocity = Mathf.Sqrt(stateMachine.jumpHeight * -2f * stateMachine.gravity);
 
-        // 점프 애니메이션 활성화
         if (stateMachine.animator)
         {
-            stateMachine.animator.SetBool(stateMachine._animIDJump, true);
+            stateMachine.animator.SetBool(stateMachine._animIDJump, true); // 점프 애니메이션 트리거
         }
 
         Debug.Log("점프 실행");
     }
 
-    private void JumpAndGravity(float deltaTime)
-    {
-        if (stateMachine.Grounded)
-        {
-            // 지면에 있을 때 속도 초기화
-            stateMachine.verticalVelocity = Mathf.Max(stateMachine.verticalVelocity, -2f);
-
-            // 점프 입력 처리
-            if (stateMachine.inputJump && stateMachine.jumpTimeout <= 0.0f)
-            {
-                stateMachine.verticalVelocity = Mathf.Sqrt(stateMachine.jumpHeight * -2f * stateMachine.gravity);
-
-                if (stateMachine.animator)
-                {
-                    Debug.Log("FreeLook점프!");
-                    stateMachine.animator.SetBool(stateMachine._animIDJump, true);
-                }
-            }
-        }
-        else
-        {
-            // 중력 적용
-            stateMachine.verticalVelocity += stateMachine.gravity * deltaTime;
-
-            if (stateMachine.animator)
-            {
-                Debug.Log("FreeLook점프끝.");
-                stateMachine.animator.SetBool(stateMachine._animIDJump, false);
-            }
-        }
-
-        // 수직 속도를 캐릭터 이동에 반영
-        stateMachine.characterController.Move(new Vector3(0.0f, stateMachine.verticalVelocity, 0.0f) * deltaTime);
-
-        // 대기 시간 감소
-        if (stateMachine.jumpTimeout > 0.0f)
-        {
-            stateMachine.jumpTimeout -= deltaTime;
-        }
-    }
-
-    private void OnFootstep(AnimationEvent animationEvent)
-    {
-        if (animationEvent.animatorClipInfo.weight > 0.5f)
-        {
-            if (stateMachine.FootstepAudioClips.Length > 0)
-            {
-                var index = Random.Range(0, stateMachine.FootstepAudioClips.Length);
-                AudioSource.PlayClipAtPoint(stateMachine.FootstepAudioClips[index], stateMachine.transform.TransformPoint(stateMachine.characterController.center), stateMachine.FootstepAudioVolume);
-            }
-        }
-    }
-
-    private void OnLand(AnimationEvent animationEvent)
-    {
-        if (animationEvent.animatorClipInfo.weight > 0.5f)
-        {
-            AudioSource.PlayClipAtPoint(stateMachine.LandingAudioClip, stateMachine.transform.TransformPoint(stateMachine.characterController.center), stateMachine.FootstepAudioVolume);
-        }
-    }
 
 }
