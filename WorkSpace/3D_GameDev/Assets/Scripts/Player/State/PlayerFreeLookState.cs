@@ -23,8 +23,7 @@ public class PlayerFreeLookState : PlayerBaseState
         {
             stateMachine.inputReader.jumpPressed += stateMachine.OnJumpPressed;
         }
-        _jumpTimeoutDelta = stateMachine.JumpTimeout;
-        _fallTimeoutDelta = stateMachine.FallTimeout;
+        _jumpTimeoutDelta = stateMachine.JumpTimeout; //점프 텀 시간 할당
     }
 
     public override void Exit()
@@ -49,7 +48,7 @@ public class PlayerFreeLookState : PlayerBaseState
         // 이동 처리
         Move(CalculateMove(deltaTime), deltaTime);
         // 애니메이션 업데이트
-        UpdateAnimation(deltaTime);
+        UpdateMoveAnimation(deltaTime);
     }
 
     private Vector3 CalculateMove(float deltaTime)
@@ -78,34 +77,9 @@ public class PlayerFreeLookState : PlayerBaseState
         return direction;
     }
 
-    //private void UpdateAnimation(float deltaTime)
-    //{
-    //    // 이동 입력의 크기 계산 (애니메이션 재생 속도에 사용)
-    //    float inputMagnitude = stateMachine.inputReader.moveInput.magnitude;
 
-    //    // 이동 애니메이션 처리
-    //    if (inputMagnitude == 0)
-    //    { //0f로 Idle
-    //        stateMachine.animator.SetFloat(stateMachine._animIDSpeed, 0f, stateMachine.animationDampTime, deltaTime);
-    //    }
-    //    else
-    //    { //2번째 목표값을 걷기 or 달리기 속도로 지정후 재생
-    //        float targetSpeed = stateMachine.inputReader.onSprint ? stateMachine.sprintSpeed : stateMachine.moveSpeed;
-    //        stateMachine.animator.SetFloat(stateMachine._animIDSpeed, targetSpeed, stateMachine.animationDampTime, deltaTime);
-    //    }
-
-    //    //점프
-    //    if (stateMachine.Grounded && stateMachine.verticalVelocity < 0.0f)
-    //    {
-    //        stateMachine.animator.SetBool(stateMachine._animIDJump, false);
-    //    }
-
-
-    //    //애니메이션 재생 속도 제어(매개변수 StringtoHash아이디, 목표 값, 도달까지 걸리는 시간(감쇠 시간), 프레임의 델타 시간
-    //    stateMachine.animator.SetFloat(stateMachine._animIDMotionSpeed, inputMagnitude, stateMachine.animationDampTime, deltaTime);
-    //}
-
-    private void UpdateAnimation(float deltaTime)
+    //이동 애니메이션
+    private void UpdateMoveAnimation(float deltaTime)
     {
         // 입력값 크기 가져오기
         float inputMagnitude = stateMachine.inputReader.moveInput.magnitude;
@@ -155,48 +129,13 @@ public class PlayerFreeLookState : PlayerBaseState
         {
             stateMachine.animator.SetBool(stateMachine._animIDGrounded, stateMachine.Grounded);
         }
-
-        // 상태를 디버그로 출력
-        //Debug.Log($"IsGrounded: {stateMachine.Grounded}");
     }
 
-    //중력 적용
-    /*private void JumpAndGravity(float deltaTime)
-    {
-        if (stateMachine.Grounded)
-        {
-            // 착지 상태 처리
-            stateMachine.verticalVelocity = Mathf.Max(stateMachine.verticalVelocity, -2f);
-
-            if (stateMachine.animator.GetBool(stateMachine._animIDJump)) // 점프 중이라면
-            {
-                stateMachine.animator.SetBool(stateMachine._animIDJump, false); // 착지 애니메이션 활성화
-                Debug.Log("착지 완료");
-            }
-        }
-        else
-        {
-            // 공중 상태 처리
-            stateMachine.verticalVelocity += stateMachine.gravity * deltaTime;
-
-            if (!stateMachine.animator.GetBool(stateMachine._animIDJump)) // 착지 상태라면
-            {
-                stateMachine.animator.SetBool(stateMachine._animIDJump, true); // 공중 애니메이션 활성화
-                Debug.Log("점프 중");
-            }
-        }
-
-        // 수직 이동 적용
-        Vector3 movement = new Vector3(0.0f, stateMachine.verticalVelocity, 0.0f);
-        stateMachine.characterController.Move(movement * deltaTime);
-    }*/
-
+    //점프와 중력
     private void JumpAndGravity()
     {
         if (stateMachine.Grounded)
         {
-            // 땅에 닿아 있는 경우
-            _fallTimeoutDelta = stateMachine.FallTimeout;
 
             if (stateMachine._hasAnimator)
             {
@@ -210,10 +149,18 @@ public class PlayerFreeLookState : PlayerBaseState
                 stateMachine.verticalVelocity = Mathf.Max(stateMachine.verticalVelocity, -2f); // 급격한 변화 방지
             }
 
+            // 점프 쿨다운 적용
+            if (_jumpTimeoutDelta > 0.0f)
+            {
+                _jumpTimeoutDelta -= Time.deltaTime;
+            }
+
             // 점프 처리
-            if (stateMachine.jump)
+            if (stateMachine.jump && _jumpTimeoutDelta <= 0.0f)
             {
                 stateMachine.jump = false; // 점프 입력 초기화
+                _jumpTimeoutDelta = stateMachine.JumpTimeout; // 쿨다운 초기화
+
                 stateMachine.verticalVelocity = Mathf.Sqrt(stateMachine.jumpHeight * -2f * stateMachine.gravity);
                 if (stateMachine.animator)
                 {
@@ -228,6 +175,18 @@ public class PlayerFreeLookState : PlayerBaseState
             {
                 stateMachine.verticalVelocity += stateMachine.gravity * Time.deltaTime;
             }
+
+            // 떨어지고 있는지 확인하여 FreeFall 애니메이션 활성화
+            if (!stateMachine.jump && stateMachine.verticalVelocity < 0.0f)
+            {
+                if (stateMachine._hasAnimator)
+                {
+                    stateMachine.animator.SetBool(stateMachine._animIDFreeFall, true);
+                }
+            }
+
+            // 점프 쿨다운 초기화
+            _jumpTimeoutDelta = stateMachine.JumpTimeout;
         }
 
         // 캐릭터 수직 이동 처리

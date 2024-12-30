@@ -14,29 +14,30 @@ public class PlayerStateMachine : BaseStateMachine
     public float sprintSpeed = 5.333f; //달리기 속도
     public float rotateSpeed = 10.0f; //회전속도
     public float animationDampTime = 0.2f; //애니메이션 도달시간 짧을수록 빠르게 도달
-    public bool jump = false;
+    public bool jump = false; //점프여부
 
     //점프
-    public float jumpHeight = 1.2f; // 점프 높이
+    public float jumpHeight = 1.5f; // 점프 높이
 
     public float GroundedOffset = 0.15f; //지면까지 offset
     public float GroundedRadius = 0.20f; //지면 원 지름
 
-    public float JumpTimeout = 0.50f; //점프 타임아웃
-    public float FallTimeout = 0.15f; //낙하 타임아웃
+    public float JumpTimeout = 2.0f; //착지 후 점프 방지 쿨타임
 
     public float gravity = -15f; // 중력 값
     public float verticalVelocity; // 현재 수직 속도
-    public float terminalVelocity = 53.0f;
+    public float terminalVelocity = 53.0f; //낙하 최대 속도
 
     public bool Grounded = true; //땅에 붙어있는지 여부
     public LayerMask GroundLayers; //레이어마스크
 
+    [Header("오디오")]
     //오디오
     public AudioClip LandingAudioClip;
     public AudioClip[] FootstepAudioClips;
     [Range(0, 1)] public float FootstepAudioVolume = 0.5f;
 
+    [Header("애니메이션")]
     //애니메이션
     public bool _hasAnimator;
     public float SpeedChangeRate = 10f; //Speed파라미터 바뀌는 속도 증가시킬 값
