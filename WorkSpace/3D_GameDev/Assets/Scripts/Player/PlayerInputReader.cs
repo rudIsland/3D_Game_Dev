@@ -10,6 +10,7 @@ public class PlayerInputReader : MonoBehaviour, PlayerControls.IPlayerActions
     public Vector2 lookInput; //바라보기 방향 벡터
     public Vector2 moveInput; //움직일 방향 벡터 -1 or 1
     public bool isMove = false;
+    public bool isJump = false;
     public event Action jumpPressed;
     public bool onSprint = false;
 
@@ -28,6 +29,7 @@ public class PlayerInputReader : MonoBehaviour, PlayerControls.IPlayerActions
         {
             //Debug.Log("점프");
             jumpPressed?.Invoke();
+            isJump = true;
         }
     }
 

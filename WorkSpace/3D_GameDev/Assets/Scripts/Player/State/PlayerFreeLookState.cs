@@ -10,11 +10,10 @@ using UnityEngine.Windows;
  */
 public class PlayerFreeLookState : PlayerBaseState
 {
+    private float _jumpTimeoutDelta;
+    private float _fallTimeoutDelta;
 
-    public PlayerFreeLookState(PlayerStateMachine stateMachine) : base(stateMachine)
-    {
-
-    }
+    public PlayerFreeLookState(PlayerStateMachine stateMachine) : base(stateMachine) {}
 
     public override void Enter()
     {
@@ -24,6 +23,8 @@ public class PlayerFreeLookState : PlayerBaseState
         {
             stateMachine.inputReader.jumpPressed += stateMachine.OnJumpPressed;
         }
+        _jumpTimeoutDelta = stateMachine.JumpTimeout;
+        _fallTimeoutDelta = stateMachine.FallTimeout;
     }
 
     public override void Exit()
@@ -38,13 +39,15 @@ public class PlayerFreeLookState : PlayerBaseState
 
     public override void Tick(float deltaTime)
     {
-        // 이동 처리
-        Move(CalculateMove(deltaTime), deltaTime);
 
         // 중력, 점프 처리
-        JumpAndGravity(deltaTime);
+        JumpAndGravity();
+
+        //지면 체크
         GroundedCheck();
 
+        // 이동 처리
+        Move(CalculateMove(deltaTime), deltaTime);
         // 애니메이션 업데이트
         UpdateAnimation(deltaTime);
     }
@@ -145,7 +148,7 @@ public class PlayerFreeLookState : PlayerBaseState
 
         // Physics.CheckSphere를 사용하여 지면 감지
         stateMachine.Grounded = Physics.CheckSphere(spherePosition, 
-            stateMachine.GroundedRadius, stateMachine.GroundLayers);
+            stateMachine.GroundedRadius, stateMachine.GroundLayers, QueryTriggerInteraction.Ignore);
 
         // 애니메이션 파라미터 업데이트
         if (stateMachine.animator != null)
@@ -158,7 +161,7 @@ public class PlayerFreeLookState : PlayerBaseState
     }
 
     //중력 적용
-    private void JumpAndGravity(float deltaTime)
+    /*private void JumpAndGravity(float deltaTime)
     {
         if (stateMachine.Grounded)
         {
@@ -186,19 +189,56 @@ public class PlayerFreeLookState : PlayerBaseState
         // 수직 이동 적용
         Vector3 movement = new Vector3(0.0f, stateMachine.verticalVelocity, 0.0f);
         stateMachine.characterController.Move(movement * deltaTime);
+    }*/
+
+    private void JumpAndGravity()
+    {
+        if (stateMachine.Grounded)
+        {
+            // 땅에 닿아 있는 경우
+            _fallTimeoutDelta = stateMachine.FallTimeout;
+
+            if (stateMachine._hasAnimator)
+            {
+                stateMachine.animator.SetBool(stateMachine._animIDJump, false);
+                stateMachine.animator.SetBool(stateMachine._animIDFreeFall, false);
+            }
+
+            // 수직 속도 초기화 (낙하 속도 제한)
+            if (stateMachine.verticalVelocity < 0.0f)
+            {
+                stateMachine.verticalVelocity = Mathf.Max(stateMachine.verticalVelocity, -2f); // 급격한 변화 방지
+            }
+
+            // 점프 처리
+            if (stateMachine.jump)
+            {
+                stateMachine.jump = false; // 점프 입력 초기화
+                stateMachine.verticalVelocity = Mathf.Sqrt(stateMachine.jumpHeight * -2f * stateMachine.gravity);
+                if (stateMachine.animator)
+                {
+                    stateMachine.animator.SetBool(stateMachine._animIDJump, true);
+                }
+            }
+        }
+        else
+        {
+            // 공중에 있는 경우 중력 적용
+            if (stateMachine.verticalVelocity > stateMachine.terminalVelocity)
+            {
+                stateMachine.verticalVelocity += stateMachine.gravity * Time.deltaTime;
+            }
+        }
+
+        // 캐릭터 수직 이동 처리
+        Vector3 verticalMovement = new Vector3(0.0f, stateMachine.verticalVelocity, 0.0f);
+        stateMachine.characterController.Move(verticalMovement * Time.deltaTime);
     }
 
     //점프
     public override void Jump()
     {
-        stateMachine.verticalVelocity = Mathf.Sqrt(stateMachine.jumpHeight * -2f * stateMachine.gravity);
-
-        if (stateMachine.animator)
-        {
-            stateMachine.animator.SetBool(stateMachine._animIDJump, true); // 점프 애니메이션 트리거
-        }
-
-        Debug.Log("점프 실행");
+        stateMachine.jump = true;
     }
 
 

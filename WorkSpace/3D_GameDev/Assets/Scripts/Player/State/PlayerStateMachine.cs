@@ -14,6 +14,7 @@ public class PlayerStateMachine : BaseStateMachine
     public float sprintSpeed = 5.333f; //달리기 속도
     public float rotateSpeed = 10.0f; //회전속도
     public float animationDampTime = 0.2f; //애니메이션 도달시간 짧을수록 빠르게 도달
+    public bool jump = false;
 
     //점프
     public float jumpHeight = 1.2f; // 점프 높이
@@ -21,8 +22,12 @@ public class PlayerStateMachine : BaseStateMachine
     public float GroundedOffset = 0.15f; //지면까지 offset
     public float GroundedRadius = 0.20f; //지면 원 지름
 
+    public float JumpTimeout = 0.50f; //점프 타임아웃
+    public float FallTimeout = 0.15f; //낙하 타임아웃
+
     public float gravity = -15f; // 중력 값
     public float verticalVelocity; // 현재 수직 속도
+    public float terminalVelocity = 53.0f;
 
     public bool Grounded = true; //땅에 붙어있는지 여부
     public LayerMask GroundLayers; //레이어마스크
@@ -33,6 +38,7 @@ public class PlayerStateMachine : BaseStateMachine
     [Range(0, 1)] public float FootstepAudioVolume = 0.5f;
 
     //애니메이션
+    public bool _hasAnimator;
     public float SpeedChangeRate = 10f; //Speed파라미터 바뀌는 속도 증가시킬 값
     public float _animationBlend; //Speed 파라미터 설정시킬 값
     public readonly int _animIDGrounded = Animator.StringToHash("Grounded"); //땅에 있는지
@@ -44,6 +50,8 @@ public class PlayerStateMachine : BaseStateMachine
     private void Start()
     {
         SwitchState(new PlayerFreeLookState(this));
+
+        _hasAnimator = TryGetComponent(out animator);
     }
     private void OnEnable()
     {
@@ -69,8 +77,6 @@ public class PlayerStateMachine : BaseStateMachine
 
     public void OnLand(AnimationEvent animationEvent)
     {
-        Debug.Log("OnLand 이벤트 호출!");
-
         // 필요시 착지 효과음 재생
         if (animationEvent.animatorClipInfo.weight > 0.5f)
         {
