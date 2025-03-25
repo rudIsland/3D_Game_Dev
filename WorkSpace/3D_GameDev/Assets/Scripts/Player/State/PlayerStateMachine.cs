@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -73,6 +74,14 @@ public class PlayerStateMachine : BaseStateMachine
             {
                 baseState.Jump();
             }
+        }
+    }
+
+    public void OnTargetPressed()
+    {
+        if (currentState is PlayerBaseState baseState)
+        {
+            baseState.Target();
         }
     }
 

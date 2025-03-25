@@ -38,10 +38,9 @@ public class PlayerBaseState : State
         }
     }
 
-    public virtual void Jump()
-    {   
-     
-    }
+    public virtual void Jump() {   }
+
+    public virtual void Target() { }
 
     public override void Enter()
     {

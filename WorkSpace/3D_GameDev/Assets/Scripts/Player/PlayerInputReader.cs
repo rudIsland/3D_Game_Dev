@@ -13,6 +13,9 @@ public class PlayerInputReader : MonoBehaviour, PlayerControls.IPlayerActions
     public bool isJump = false;
     public event Action jumpPressed;
     public bool onSprint = false;
+    public bool isAttack = false;
+    public bool isTarget = false;
+    public event Action TargetPressed;
 
     void Start()
     {
@@ -56,6 +59,14 @@ public class PlayerInputReader : MonoBehaviour, PlayerControls.IPlayerActions
         }
     }
 
+    public void OnAttack(InputAction.CallbackContext context)
+    {
+        if(context.performed && !isJump)
+        {
+            isAttack = true;
+        }
+    }
+
     public void OnSprint(InputAction.CallbackContext context)
     {
         if (context.performed)
@@ -69,6 +80,17 @@ public class PlayerInputReader : MonoBehaviour, PlayerControls.IPlayerActions
             // 스프린트 비활성화
             onSprint = false;
             Debug.Log("스프린트 종료");
+        }
+    }
+
+
+    public void OnTarget(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            isTarget = !isTarget; // Toggle 방식
+            TargetPressed?.Invoke();
+            Debug.Log($"Target Mode: {isTarget}");
         }
     }
 }

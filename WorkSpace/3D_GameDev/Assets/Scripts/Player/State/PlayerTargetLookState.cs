@@ -1,24 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using UnityEngine.InputSystem.LowLevel;
-using UnityEngine.InputSystem.XR;
-using UnityEngine.Windows;
 
-/*
- * 자유시점 상태
- */
-public class PlayerFreeLookState : PlayerBaseState
+public class PlayerTargetLookState : PlayerBaseState
 {
     private float _jumpTimeoutDelta;
     //private float _fallTimeoutDelta;
 
-    public PlayerFreeLookState(PlayerStateMachine stateMachine) : base(stateMachine) {}
+    public PlayerTargetLookState(PlayerStateMachine stateMachine) : base(stateMachine) { }
 
     public override void Enter()
     {
-        Debug.Log("FreeLook진입");
+        Debug.Log("TargetLook진입");
         // 입력 이벤트 구독
         if (stateMachine.inputReader != null)
         {
@@ -30,7 +23,7 @@ public class PlayerFreeLookState : PlayerBaseState
 
     public override void Exit()
     {
-        Debug.Log("FreeLook나가기");
+        Debug.Log("TargetLook나가기");
         // 입력 이벤트 구독
         if (stateMachine.inputReader != null)
         {
@@ -56,9 +49,9 @@ public class PlayerFreeLookState : PlayerBaseState
 
     public override void Target()
     {
-        if (stateMachine.inputReader.isTarget) //타겟팅이 풀리면 나가기
-        { 
-            stateMachine.SwitchState(new PlayerTargetLookState(stateMachine));
+        if (!stateMachine.inputReader.isTarget) //타겟팅이 풀리면 나가기
+        {
+            stateMachine.SwitchState(new PlayerFreeLookState(stateMachine));
             return;
         }
     }
@@ -115,7 +108,7 @@ public class PlayerFreeLookState : PlayerBaseState
         // MotionSpeed 계산 (아날로그 여부 확인)
         float motionSpeed = stateMachine.inputReader.isMove ? inputMagnitude : (inputMagnitude > 0 ? 1f : 0f);
 
-        if(motionSpeed > 1f) motionSpeed = 1f;
+        if (motionSpeed > 1f) motionSpeed = 1f;
 
         // 애니메이터에 값 적용
         stateMachine.animator.SetFloat(stateMachine._animIDSpeed, stateMachine._animationBlend);
@@ -133,7 +126,7 @@ public class PlayerFreeLookState : PlayerBaseState
         );
 
         // Physics.CheckSphere를 사용하여 지면 감지
-        stateMachine.Grounded = Physics.CheckSphere(spherePosition, 
+        stateMachine.Grounded = Physics.CheckSphere(spherePosition,
             stateMachine.GroundedRadius, stateMachine.GroundLayers, QueryTriggerInteraction.Ignore);
 
         // 애니메이션 파라미터 업데이트
@@ -211,6 +204,5 @@ public class PlayerFreeLookState : PlayerBaseState
     {
         stateMachine.jump = true;
     }
-
 
 }
