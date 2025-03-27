@@ -1,5 +1,7 @@
+using Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 
 /*
@@ -31,6 +33,7 @@ public class PlayerStateMachine : BaseStateMachine
 
     public bool Grounded = true; //땅에 붙어있는지 여부
     public LayerMask GroundLayers; //레이어마스크
+    public Camera playerCamera;
 
     [Header("오디오")]
     //오디오

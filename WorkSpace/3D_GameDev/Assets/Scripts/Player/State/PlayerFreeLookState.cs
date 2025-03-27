@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.Windows;
@@ -12,6 +14,7 @@ using UnityEngine.Windows;
 public class PlayerFreeLookState : PlayerBaseState
 {
     private float _jumpTimeoutDelta;
+
     //private float _fallTimeoutDelta;
 
     public PlayerFreeLookState(PlayerStateMachine stateMachine) : base(stateMachine) {}
@@ -56,7 +59,7 @@ public class PlayerFreeLookState : PlayerBaseState
 
     public override void Target()
     {
-        if (stateMachine.inputReader.isTarget) //타겟팅이 풀리면 나가기
+        if (stateMachine.inputReader.isTarget) //타겟팅되면 나가기
         { 
             stateMachine.SwitchState(new PlayerTargetLookState(stateMachine));
             return;
@@ -65,29 +68,56 @@ public class PlayerFreeLookState : PlayerBaseState
 
     private Vector3 CalculateMove(float deltaTime)
     {
-        // 입력값 가져오기 (PlayerInputReader에서 입력값 받기)
         Vector2 input = stateMachine.inputReader.moveInput;
-
-        // 수직 속도 적용
         stateMachine.verticalVelocity += stateMachine.gravity * deltaTime;
 
-        Vector3 direction = new Vector3(input.x, 0, input.y).normalized;
+        if (input.sqrMagnitude < 0.01f)
+            return Vector3.zero;
 
-        if (direction.magnitude < 0.1f) return Vector3.zero;
+        //  카메라 기준 방향 계산
+        Transform cam = Camera.main.transform;
+        Vector3 camForward = cam.forward;
+        Vector3 camRight = cam.right;
 
-        //회전 계산
-        Quaternion targetRotation = Quaternion.LookRotation(direction); //회전할 목표 방향을 쿼터니언으로 짐벌락 방지
-        //Lerp로 부드럽게 회전 시키도록
-        stateMachine.transform.rotation = Quaternion.Lerp(
-            stateMachine.transform.rotation, //현재 위치
-            targetRotation, //목표 위치
-            stateMachine.rotateSpeed * deltaTime * 1f //시간 10f*0.06*1f = 0.16f (60fps 기준 0.16씩 회전)
-        );
+        camForward.y = 0f;
+        camRight.y = 0f;
+        camForward.Normalize();
+        camRight.Normalize();
 
+        //  카메라 기준 입력 방향 계산
+        Vector3 moveDirection = camForward * input.y + camRight * input.x;
+        moveDirection.Normalize();
 
-        // 입력값을 XZ 평면에서 월드 좌표로 변환
-        return direction;
+        //  "걷기"일 때만 회전 적용
+        if (!stateMachine.inputReader.onSprint && moveDirection.sqrMagnitude > 0.01f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+            stateMachine.transform.rotation = Quaternion.Slerp(
+                stateMachine.transform.rotation,
+                targetRotation,
+                deltaTime * stateMachine.rotateSpeed
+            );
+        }
+
+        //  이동 방향
+        // - 걷기일 때는 카메라 기준
+        // - 달리기일 땐 현재 바라보는 방향
+        if (stateMachine.inputReader.onSprint)
+        {
+            return stateMachine.transform.forward;
+        }
+        else
+        {
+            return moveDirection;
+        }
     }
+
+
+
+
+
+
+
 
 
     //이동 애니메이션

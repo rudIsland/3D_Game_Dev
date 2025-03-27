@@ -23,17 +23,17 @@ public class PlayerBaseState : State
     }
 
     // 이동 로직 구현
-    protected void Move(Vector3 motion, float deltaTime)
+    protected void Move(Vector3 moveDirect, float deltaTime)
     {
-        if (motion.magnitude > 0.1f) //이동이 있을때만 실행
+        if (moveDirect.magnitude > 0.1f) //이동이 있을때만 실행
         {
             if (stateMachine.inputReader.onSprint) //달리기
             {
-                stateMachine.characterController.Move((motion * stateMachine.sprintSpeed) * deltaTime);
+                stateMachine.characterController.Move((moveDirect * stateMachine.sprintSpeed) * deltaTime);
             }
             else //걷기
             {
-                stateMachine.characterController.Move((motion * stateMachine.moveSpeed) * deltaTime);
+                stateMachine.characterController.Move((moveDirect * stateMachine.moveSpeed) * deltaTime);
             }
         }
     }
