@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,7 +6,8 @@ using UnityEngine;
 public class PlayerTargetLookState : PlayerBaseState
 {
     private float _jumpTimeoutDelta;
-    //private float _fallTimeoutDelta;
+
+    //const string TARGET_LOOK_BLEND_TREE = "TargetLookBlendTree";
 
     public PlayerTargetLookState(PlayerStateMachine stateMachine) : base(stateMachine) { }
 
@@ -19,6 +21,9 @@ public class PlayerTargetLookState : PlayerBaseState
             stateMachine.inputReader.TargetPressed += stateMachine.OnTargetPressed;
         }
         _jumpTimeoutDelta = stateMachine.JumpTimeout; //점프 텀 시간 할당
+
+
+        //stateMachine.animator.Play(TARGET_LOOK_BLEND_TREE);
     }
 
     public override void Exit()
@@ -47,13 +52,11 @@ public class PlayerTargetLookState : PlayerBaseState
         UpdateMoveAnimation(deltaTime);
     }
 
-    public override void Target()
+
+    public override void onPressedTarget()
     {
-        if (!stateMachine.inputReader.isTarget) //타겟팅이 풀리면 나가기
-        {
-            stateMachine.SwitchState(new PlayerFreeLookState(stateMachine));
-            return;
-        }
+        stateMachine.targeter.CancCel(); //타겟 해제
+        stateMachine.SwitchState(stateMachine.FreeLookState);
     }
 
     private Vector3 CalculateMove(float deltaTime)
@@ -90,19 +93,19 @@ public class PlayerTargetLookState : PlayerBaseState
         float inputMagnitude = stateMachine.inputReader.moveInput.magnitude;
 
         // 목표 속도 계산
-        float targetSpeed = stateMachine.inputReader.onSprint ? stateMachine.sprintSpeed : stateMachine.moveSpeed;
+        float targetSpeed = stateMachine.moveSpeed;
 
         // _animationBlend를 목표 속도로 부드럽게 변경
-        stateMachine._animationBlend = Mathf.Lerp(
-            stateMachine._animationBlend,
+        stateMachine._ani_SpeedValue = Mathf.Lerp(
+            stateMachine._ani_SpeedValue,
             inputMagnitude > 0 ? targetSpeed : 0f,
             deltaTime * stateMachine.SpeedChangeRate
         );
 
         // 부동소수점 문제 방지 (작은 값은 0으로 설정)
-        if (Mathf.Abs(stateMachine._animationBlend) < 0.01f)
+        if (Mathf.Abs(stateMachine._ani_SpeedValue) < 0.01f)
         {
-            stateMachine._animationBlend = 0f;
+            stateMachine._ani_SpeedValue = 0f;
         }
 
         // MotionSpeed 계산 (아날로그 여부 확인)
@@ -111,7 +114,7 @@ public class PlayerTargetLookState : PlayerBaseState
         if (motionSpeed > 1f) motionSpeed = 1f;
 
         // 애니메이터에 값 적용
-        stateMachine.animator.SetFloat(stateMachine._animIDSpeed, stateMachine._animationBlend);
+        stateMachine.animator.SetFloat(stateMachine._animIDSpeed, stateMachine._ani_SpeedValue);
         stateMachine.animator.SetFloat(stateMachine._animIDMotionSpeed, motionSpeed);
     }
 

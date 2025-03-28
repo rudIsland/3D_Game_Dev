@@ -40,7 +40,7 @@ public class PlayerBaseState : State
 
     public virtual void Jump() {   }
 
-    public virtual void Target() { }
+    public virtual void onPressedTarget() { }
 
     public override void Enter()
     {

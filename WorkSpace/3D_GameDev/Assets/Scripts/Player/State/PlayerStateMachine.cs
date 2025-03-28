@@ -45,27 +45,41 @@ public class PlayerStateMachine : BaseStateMachine
     //애니메이션
     public bool _hasAnimator;
     public float SpeedChangeRate = 10f; //Speed파라미터 바뀌는 속도 증가시킬 값
-    public float _animationBlend; //Speed 파라미터 설정시킬 값
+    public float _ani_SpeedValue; //Speed 파라미터 설정시킬 값
     public readonly int _animIDGrounded = Animator.StringToHash("Grounded"); //땅에 있는지
     public readonly int _animIDSpeed = Animator.StringToHash("Speed"); //속도
     public readonly int _animIDMotionSpeed = Animator.StringToHash("MotionSpeed"); //움직임속도
     public readonly int _animIDJump = Animator.StringToHash("Jump"); //점프
     public readonly int _animIDFreeFall = Animator.StringToHash("FreeFall");
 
+    public Targeter targeter;
+
+    public PlayerFreeLookState FreeLookState { get; private set; }
+    public PlayerTargetLookState TargetLookState { get; private set; }
+
+    private void Awake()
+    {
+        // 상태 인스턴스 미리 생성
+        FreeLookState = new PlayerFreeLookState(this);
+        TargetLookState = new PlayerTargetLookState(this);
+    }
+
     private void Start()
     {
-        SwitchState(new PlayerFreeLookState(this));
+        SwitchState(FreeLookState);
 
         _hasAnimator = TryGetComponent(out animator);
     }
     private void OnEnable()
     {
-
+        inputReader.jumpPressed += OnJumpPressed;
+        inputReader.TargetPressed += OnTargetPressed;
     }
 
     private void OnDisable()
     {
-
+        inputReader.jumpPressed -= OnJumpPressed;
+        inputReader.TargetPressed -= OnTargetPressed;
     }
 
     public void OnJumpPressed()
@@ -84,7 +98,7 @@ public class PlayerStateMachine : BaseStateMachine
     {
         if (currentState is PlayerBaseState baseState)
         {
-            baseState.Target();
+            baseState.onPressedTarget();
         }
     }
 
@@ -101,17 +115,15 @@ public class PlayerStateMachine : BaseStateMachine
             );
         }
     }
-    //private void OnDrawGizmosSelected()
-    //{
-    //    Vector3 spherePosition = new Vector3(
-    //     transform.position.x,
-    //     transform.position.y - GroundedOffset,
-    //     transform.position.z
-    // );
 
-    //    Debug.Log($"Gizmos 위치: {spherePosition}, 반지름: {GroundedRadius}");
-
-    //    Gizmos.color = Grounded ? Color.green : Color.red;
-    //    Gizmos.DrawWireSphere(spherePosition, GroundedRadius);
-    //}
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        if (targeter != null && targeter.SphereCollider != null)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(transform.position, targeter.SphereCollider.radius);
+        }
+    }
+#endif
 }

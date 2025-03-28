@@ -14,6 +14,7 @@ using UnityEngine.Windows;
 public class PlayerFreeLookState : PlayerBaseState
 {
     private float _jumpTimeoutDelta;
+    const string FREE_LOOK_BLEND_TREE = "FreeLookBlendTree";
 
     //private float _fallTimeoutDelta;
 
@@ -29,6 +30,9 @@ public class PlayerFreeLookState : PlayerBaseState
             stateMachine.inputReader.TargetPressed += stateMachine.OnTargetPressed;
         }
         _jumpTimeoutDelta = stateMachine.JumpTimeout; //점프 텀 시간 할당
+
+
+        stateMachine.animator.Play(FREE_LOOK_BLEND_TREE);
     }
 
     public override void Exit()
@@ -57,12 +61,11 @@ public class PlayerFreeLookState : PlayerBaseState
         UpdateMoveAnimation(deltaTime);
     }
 
-    public override void Target()
+    public override void onPressedTarget()
     {
-        if (stateMachine.inputReader.isTarget) //타겟팅되면 나가기
-        { 
-            stateMachine.SwitchState(new PlayerTargetLookState(stateMachine));
-            return;
+        if (stateMachine.targeter.SelectTarget())
+        {
+            stateMachine.SwitchState(stateMachine.TargetLookState);
         }
     }
 
@@ -76,17 +79,15 @@ public class PlayerFreeLookState : PlayerBaseState
 
         //  카메라 기준 방향 계산
         Transform cam = Camera.main.transform;
-        Vector3 camForward = cam.forward;
-        Vector3 camRight = cam.right;
+        Vector3 camForward = cam.forward; //월드 z축 기준 북(0,0,1) 남(0,0,-1) 동쪽(1,0,0) 서(-1,0,0)에 근접
+        Vector3 camRight = cam.right; //카메라 기준에서 월드의 오른쪽 방향
+        //ex) 북(0,0,1)을 보고있으면 오른쪽인 동(1,0,0), 동에서 오른쪽은 남(0,0,-1), 서쪽을보면 북(0,0,1)에 근접
 
-        camForward.y = 0f;
-        camRight.y = 0f;
-        camForward.Normalize();
-        camRight.Normalize();
+        camForward.y = 0f;  camRight.y = 0f; //수평유지
+        camForward.Normalize(); camRight.Normalize(); //정규화
 
         //  카메라 기준 입력 방향 계산
-        Vector3 moveDirection = camForward * input.y + camRight * input.x;
-        moveDirection.Normalize();
+        Vector3 moveDirection = (camForward * input.y + camRight * input.x).normalized;
 
         //  "걷기"일 때만 회전 적용
         if (!stateMachine.inputReader.onSprint && moveDirection.sqrMagnitude > 0.01f)
@@ -98,26 +99,31 @@ public class PlayerFreeLookState : PlayerBaseState
                 deltaTime * stateMachine.rotateSpeed
             );
         }
+        else if(stateMachine.inputReader.onSprint && input.sqrMagnitude > 0.1f) //달리기중에 입력받으면
+        {
+
+            // 캐릭터를 moveDirection 기준으로 회전
+            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+            stateMachine.transform.rotation = Quaternion.Slerp(
+                stateMachine.transform.rotation,
+                targetRotation,
+                deltaTime * stateMachine.rotateSpeed
+            );
+
+            // 이 방향으로 이동
+            return moveDirection;
+        }
 
         //  이동 방향
-        // - 걷기일 때는 카메라 기준
-        // - 달리기일 땐 현재 바라보는 방향
-        if (stateMachine.inputReader.onSprint)
+        if (stateMachine.inputReader.onSprint) //달리기일 땐 현재 바라보는 방향
         {
             return stateMachine.transform.forward;
         }
-        else
+        else //걷기일 때는 카메라 기준
         {
             return moveDirection;
         }
     }
-
-
-
-
-
-
-
 
 
     //이동 애니메이션
@@ -130,16 +136,16 @@ public class PlayerFreeLookState : PlayerBaseState
         float targetSpeed = stateMachine.inputReader.onSprint ? stateMachine.sprintSpeed : stateMachine.moveSpeed;
 
         // _animationBlend를 목표 속도로 부드럽게 변경
-        stateMachine._animationBlend = Mathf.Lerp(
-            stateMachine._animationBlend,
+        stateMachine._ani_SpeedValue = Mathf.Lerp(
+            stateMachine._ani_SpeedValue,
             inputMagnitude > 0 ? targetSpeed : 0f,
             deltaTime * stateMachine.SpeedChangeRate
         );
 
         // 부동소수점 문제 방지 (작은 값은 0으로 설정)
-        if (Mathf.Abs(stateMachine._animationBlend) < 0.01f)
+        if (Mathf.Abs(stateMachine._ani_SpeedValue) < 0.01f)
         {
-            stateMachine._animationBlend = 0f;
+            stateMachine._ani_SpeedValue = 0f;
         }
 
         // MotionSpeed 계산 (아날로그 여부 확인)
@@ -148,7 +154,7 @@ public class PlayerFreeLookState : PlayerBaseState
         if(motionSpeed > 1f) motionSpeed = 1f;
 
         // 애니메이터에 값 적용
-        stateMachine.animator.SetFloat(stateMachine._animIDSpeed, stateMachine._animationBlend);
+        stateMachine.animator.SetFloat(stateMachine._animIDSpeed, stateMachine._ani_SpeedValue);
         stateMachine.animator.SetFloat(stateMachine._animIDMotionSpeed, motionSpeed);
     }
 
@@ -212,6 +218,8 @@ public class PlayerFreeLookState : PlayerBaseState
         }
         else
         {
+            // 점프 중에는 스프린트 불가능하게 막기
+            stateMachine.inputReader.onSprint = false;
             // 공중에 있는 경우 중력 적용
             if (stateMachine.verticalVelocity > stateMachine.terminalVelocity)
             {

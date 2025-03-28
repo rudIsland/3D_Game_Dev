@@ -14,7 +14,6 @@ public class PlayerInputReader : MonoBehaviour, PlayerControls.IPlayerActions
     public event Action jumpPressed;
     public bool onSprint = false;
     public bool isAttack = false;
-    public bool isTarget = false;
     public event Action TargetPressed;
 
     void Start()
@@ -88,9 +87,7 @@ public class PlayerInputReader : MonoBehaviour, PlayerControls.IPlayerActions
     {
         if (context.performed)
         {
-            isTarget = !isTarget; // Toggle ¹æ½Ä
             TargetPressed?.Invoke();
-            Debug.Log($"Target Mode: {isTarget}");
         }
     }
 }
