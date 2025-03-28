@@ -13,17 +13,17 @@ public class PlayerStateMachine : BaseStateMachine
     public PlayerInputReader inputReader;
 
     [Header("플레이어 움직임")]
-    public float moveSpeed = 2.0f; //기본 움직임 속도
+    public float moveSpeed = 2.5f; //기본 움직임 속도
     public float sprintSpeed = 5.333f; //달리기 속도
     public float rotateSpeed = 10.0f; //회전속도
     public float animationDampTime = 0.2f; //애니메이션 도달시간 짧을수록 빠르게 도달
     public bool jump = false; //점프여부
 
     //점프
-    public float jumpHeight = 1.5f; // 점프 높이
+    public float jumpHeight = 1.0f; // 점프 높이
 
     public float GroundedOffset = 0.15f; //지면까지 offset
-    public float GroundedRadius = 0.20f; //지면 원 지름
+    public float GroundedRadius = 0.30f; //지면 원 지름
 
     public float JumpTimeout = 2.0f; //착지 후 점프 방지 쿨타임
 

@@ -218,8 +218,7 @@ public class PlayerFreeLookState : PlayerBaseState
         }
         else
         {
-            // 점프 중에는 스프린트 불가능하게 막기
-            stateMachine.inputReader.onSprint = false;
+            
             // 공중에 있는 경우 중력 적용
             if (stateMachine.verticalVelocity > stateMachine.terminalVelocity)
             {
