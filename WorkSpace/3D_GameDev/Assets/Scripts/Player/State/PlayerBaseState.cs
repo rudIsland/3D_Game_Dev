@@ -40,17 +40,9 @@ public class PlayerBaseState : State
 
     public virtual void Jump() {   }
 
-    public virtual void onPressedTarget() { }
+    public override void Enter() {  }
 
-    public override void Enter()
-    {
-        
-    }
-
-    public override void Exit()
-    {
-        
-    }
+    public override void Exit(){    }
 
     public override void Tick(float deltaTime)
     {

@@ -7,9 +7,23 @@ public class PlayerTargetLookState : PlayerBaseState
 {
     private float _jumpTimeoutDelta;
 
-    //const string TARGET_LOOK_BLEND_TREE = "TargetLookBlendTree";
+    const string TARGET_LOOK_BLEND_TREE = "TargetLookBlendTree";
+    const string TARGET_LOOK_RIGHT = "TargetingRight";
+    const string TARGET_LOOK_FOWARD = "TargetingForward";
 
     public PlayerTargetLookState(PlayerStateMachine stateMachine) : base(stateMachine) { }
+
+    public void onTargetPressed()
+    {
+        CanCel();
+    }
+
+    public void CanCel()
+    {
+        stateMachine.targeter.CanCel(); 
+
+        stateMachine.SwitchState(new PlayerFreeLookState(stateMachine));
+    }
 
     public override void Enter()
     {
@@ -18,12 +32,12 @@ public class PlayerTargetLookState : PlayerBaseState
         if (stateMachine.inputReader != null)
         {
             stateMachine.inputReader.jumpPressed += stateMachine.OnJumpPressed;
-            stateMachine.inputReader.TargetPressed += stateMachine.OnTargetPressed;
+            stateMachine.inputReader.TargetPressed += onTargetPressed;
         }
         _jumpTimeoutDelta = stateMachine.JumpTimeout; //점프 텀 시간 할당
 
 
-        //stateMachine.animator.Play(TARGET_LOOK_BLEND_TREE);
+        stateMachine.animator.Play(TARGET_LOOK_BLEND_TREE);
     }
 
     public override void Exit()
@@ -33,7 +47,7 @@ public class PlayerTargetLookState : PlayerBaseState
         if (stateMachine.inputReader != null)
         {
             stateMachine.inputReader.jumpPressed -= stateMachine.OnJumpPressed;
-            stateMachine.inputReader.TargetPressed -= stateMachine.OnTargetPressed;
+            stateMachine.inputReader.TargetPressed -= onTargetPressed;
         }
     }
 
@@ -50,13 +64,6 @@ public class PlayerTargetLookState : PlayerBaseState
         Move(CalculateMove(deltaTime), deltaTime);
         // 애니메이션 업데이트
         UpdateMoveAnimation(deltaTime);
-    }
-
-
-    public override void onPressedTarget()
-    {
-        stateMachine.targeter.CancCel(); //타겟 해제
-        stateMachine.SwitchState(stateMachine.FreeLookState);
     }
 
     private Vector3 CalculateMove(float deltaTime)
@@ -89,33 +96,31 @@ public class PlayerTargetLookState : PlayerBaseState
     //이동 애니메이션
     private void UpdateMoveAnimation(float deltaTime)
     {
-        // 입력값 크기 가져오기
-        float inputMagnitude = stateMachine.inputReader.moveInput.magnitude;
 
-        // 목표 속도 계산
-        float targetSpeed = stateMachine.moveSpeed;
-
-        // _animationBlend를 목표 속도로 부드럽게 변경
-        stateMachine._ani_SpeedValue = Mathf.Lerp(
-            stateMachine._ani_SpeedValue,
-            inputMagnitude > 0 ? targetSpeed : 0f,
-            deltaTime * stateMachine.SpeedChangeRate
-        );
-
-        // 부동소수점 문제 방지 (작은 값은 0으로 설정)
-        if (Mathf.Abs(stateMachine._ani_SpeedValue) < 0.01f)
+        //플레이어 입력(y값) 앞 뒤 입력 X
+        if (stateMachine.inputReader.moveInput.y == 0)
         {
-            stateMachine._ani_SpeedValue = 0f;
+            stateMachine.animator.SetFloat(TARGET_LOOK_FOWARD, 0f);
+        }
+        else
+        {
+            float value = stateMachine.inputReader.moveInput.y > 0 ? 1f : -1f;
+            stateMachine.animator.SetFloat(TARGET_LOOK_FOWARD, value);
         }
 
-        // MotionSpeed 계산 (아날로그 여부 확인)
-        float motionSpeed = stateMachine.inputReader.isMove ? inputMagnitude : (inputMagnitude > 0 ? 1f : 0f);
+        //플레이어 입력(x값) 오른쪽, 왼쪽 입력 X
+        if (stateMachine.inputReader.moveInput.x == 0)
+        {
+            stateMachine.animator.SetFloat(TARGET_LOOK_RIGHT, 0f);
+        }
+        else
+        {
+            float value = stateMachine.inputReader.moveInput.x > 0 ? 1f : -1f;
+            stateMachine.animator.SetFloat(TARGET_LOOK_RIGHT, value);
+        }
 
-        if (motionSpeed > 1f) motionSpeed = 1f;
 
-        // 애니메이터에 값 적용
-        stateMachine.animator.SetFloat(stateMachine._animIDSpeed, stateMachine._ani_SpeedValue);
-        stateMachine.animator.SetFloat(stateMachine._animIDMotionSpeed, motionSpeed);
+
     }
 
     //지면인지 확인

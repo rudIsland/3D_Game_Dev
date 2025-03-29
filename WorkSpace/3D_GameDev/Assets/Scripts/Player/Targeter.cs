@@ -19,7 +19,7 @@ public class Targeter : MonoBehaviour
         return true;
     }
 
-    public void CancCel()
+    public void CanCel()
     {
         currendTarget = null;
     }

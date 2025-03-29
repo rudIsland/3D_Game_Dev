@@ -27,7 +27,7 @@ public class PlayerInputReader : MonoBehaviour, PlayerControls.IPlayerActions
 
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.started)
         {
             //Debug.Log("มกวม");
             jumpPressed?.Invoke();
@@ -85,9 +85,10 @@ public class PlayerInputReader : MonoBehaviour, PlayerControls.IPlayerActions
 
     public void OnTarget(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (!context.performed)
         {
-            TargetPressed?.Invoke();
+            return;
         }
+        TargetPressed?.Invoke();
     }
 }

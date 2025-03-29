@@ -54,32 +54,25 @@ public class PlayerStateMachine : BaseStateMachine
 
     public Targeter targeter;
 
-    public PlayerFreeLookState FreeLookState { get; private set; }
-    public PlayerTargetLookState TargetLookState { get; private set; }
-
     private void Awake()
     {
-        // 상태 인스턴스 미리 생성
-        FreeLookState = new PlayerFreeLookState(this);
-        TargetLookState = new PlayerTargetLookState(this);
+
     }
 
     private void Start()
     {
-        SwitchState(FreeLookState);
+        SwitchState(new PlayerFreeLookState(this));
 
         _hasAnimator = TryGetComponent(out animator);
     }
     private void OnEnable()
     {
         inputReader.jumpPressed += OnJumpPressed;
-        inputReader.TargetPressed += OnTargetPressed;
     }
 
     private void OnDisable()
     {
         inputReader.jumpPressed -= OnJumpPressed;
-        inputReader.TargetPressed -= OnTargetPressed;
     }
 
     public void OnJumpPressed()
@@ -91,14 +84,6 @@ public class PlayerStateMachine : BaseStateMachine
             {
                 baseState.Jump();
             }
-        }
-    }
-
-    public void OnTargetPressed()
-    {
-        if (currentState is PlayerBaseState baseState)
-        {
-            baseState.onPressedTarget();
         }
     }
 

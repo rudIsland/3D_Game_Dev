@@ -27,7 +27,7 @@ public class PlayerFreeLookState : PlayerBaseState
         if (stateMachine.inputReader != null)
         {
             stateMachine.inputReader.jumpPressed += stateMachine.OnJumpPressed;
-            stateMachine.inputReader.TargetPressed += stateMachine.OnTargetPressed;
+            stateMachine.inputReader.TargetPressed += onTargetPressed;
         }
         _jumpTimeoutDelta = stateMachine.JumpTimeout; //점프 텀 시간 할당
 
@@ -42,7 +42,7 @@ public class PlayerFreeLookState : PlayerBaseState
         if (stateMachine.inputReader != null)
         {
             stateMachine.inputReader.jumpPressed -= stateMachine.OnJumpPressed;
-            stateMachine.inputReader.TargetPressed -= stateMachine.OnTargetPressed;
+            stateMachine.inputReader.TargetPressed -= onTargetPressed;
         }
     }
 
@@ -61,12 +61,14 @@ public class PlayerFreeLookState : PlayerBaseState
         UpdateMoveAnimation(deltaTime);
     }
 
-    public override void onPressedTarget()
+    public void onTargetPressed()
     {
-        if (stateMachine.targeter.SelectTarget())
+        if (!stateMachine.targeter.SelectTarget())
         {
-            stateMachine.SwitchState(stateMachine.TargetLookState);
+            return;
         }
+
+        stateMachine.SwitchState(new PlayerTargetLookState(stateMachine));
     }
 
     private Vector3 CalculateMove(float deltaTime)
