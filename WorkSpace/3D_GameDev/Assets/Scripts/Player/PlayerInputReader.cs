@@ -14,7 +14,6 @@ public class PlayerInputReader : MonoBehaviour, PlayerControls.IPlayerActions
     public event Action jumpPressed;
     public bool onSprint = false;
     public bool isAttack = false;
-    public bool isTarget = false;
     public event Action TargetPressed;
 
     void Start()
@@ -28,7 +27,7 @@ public class PlayerInputReader : MonoBehaviour, PlayerControls.IPlayerActions
 
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.started)
         {
             //Debug.Log("점프");
             jumpPressed?.Invoke();
@@ -86,11 +85,10 @@ public class PlayerInputReader : MonoBehaviour, PlayerControls.IPlayerActions
 
     public void OnTarget(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (!context.performed)
         {
-            isTarget = !isTarget; // Toggle 방식
-            TargetPressed?.Invoke();
-            Debug.Log($"Target Mode: {isTarget}");
+            return;
         }
+        TargetPressed?.Invoke();
     }
 }

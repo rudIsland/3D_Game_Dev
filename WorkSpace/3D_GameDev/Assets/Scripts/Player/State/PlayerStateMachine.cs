@@ -1,5 +1,7 @@
+using Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 
 /*
@@ -11,17 +13,17 @@ public class PlayerStateMachine : BaseStateMachine
     public PlayerInputReader inputReader;
 
     [Header("플레이어 움직임")]
-    public float moveSpeed = 2.0f; //기본 움직임 속도
+    public float moveSpeed = 2.5f; //기본 움직임 속도
     public float sprintSpeed = 5.333f; //달리기 속도
     public float rotateSpeed = 10.0f; //회전속도
     public float animationDampTime = 0.2f; //애니메이션 도달시간 짧을수록 빠르게 도달
     public bool jump = false; //점프여부
 
     //점프
-    public float jumpHeight = 1.5f; // 점프 높이
+    public float jumpHeight = 1.0f; // 점프 높이
 
     public float GroundedOffset = 0.15f; //지면까지 offset
-    public float GroundedRadius = 0.20f; //지면 원 지름
+    public float GroundedRadius = 0.30f; //지면 원 지름
 
     public float JumpTimeout = 2.0f; //착지 후 점프 방지 쿨타임
 
@@ -31,6 +33,7 @@ public class PlayerStateMachine : BaseStateMachine
 
     public bool Grounded = true; //땅에 붙어있는지 여부
     public LayerMask GroundLayers; //레이어마스크
+    public Camera playerCamera;
 
     [Header("오디오")]
     //오디오
@@ -42,12 +45,19 @@ public class PlayerStateMachine : BaseStateMachine
     //애니메이션
     public bool _hasAnimator;
     public float SpeedChangeRate = 10f; //Speed파라미터 바뀌는 속도 증가시킬 값
-    public float _animationBlend; //Speed 파라미터 설정시킬 값
+    public float _ani_SpeedValue; //Speed 파라미터 설정시킬 값
     public readonly int _animIDGrounded = Animator.StringToHash("Grounded"); //땅에 있는지
     public readonly int _animIDSpeed = Animator.StringToHash("Speed"); //속도
     public readonly int _animIDMotionSpeed = Animator.StringToHash("MotionSpeed"); //움직임속도
     public readonly int _animIDJump = Animator.StringToHash("Jump"); //점프
     public readonly int _animIDFreeFall = Animator.StringToHash("FreeFall");
+
+    public Targeter targeter;
+
+    private void Awake()
+    {
+
+    }
 
     private void Start()
     {
@@ -57,12 +67,12 @@ public class PlayerStateMachine : BaseStateMachine
     }
     private void OnEnable()
     {
-
+        inputReader.jumpPressed += OnJumpPressed;
     }
 
     private void OnDisable()
     {
-
+        inputReader.jumpPressed -= OnJumpPressed;
     }
 
     public void OnJumpPressed()
@@ -74,14 +84,6 @@ public class PlayerStateMachine : BaseStateMachine
             {
                 baseState.Jump();
             }
-        }
-    }
-
-    public void OnTargetPressed()
-    {
-        if (currentState is PlayerBaseState baseState)
-        {
-            baseState.Target();
         }
     }
 
@@ -98,17 +100,15 @@ public class PlayerStateMachine : BaseStateMachine
             );
         }
     }
-    //private void OnDrawGizmosSelected()
-    //{
-    //    Vector3 spherePosition = new Vector3(
-    //     transform.position.x,
-    //     transform.position.y - GroundedOffset,
-    //     transform.position.z
-    // );
 
-    //    Debug.Log($"Gizmos 위치: {spherePosition}, 반지름: {GroundedRadius}");
-
-    //    Gizmos.color = Grounded ? Color.green : Color.red;
-    //    Gizmos.DrawWireSphere(spherePosition, GroundedRadius);
-    //}
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        if (targeter != null && targeter.SphereCollider != null)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(transform.position, targeter.SphereCollider.radius);
+        }
+    }
+#endif
 }

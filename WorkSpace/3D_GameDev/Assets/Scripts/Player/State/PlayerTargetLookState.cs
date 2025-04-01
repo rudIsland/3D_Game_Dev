@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,9 +6,24 @@ using UnityEngine;
 public class PlayerTargetLookState : PlayerBaseState
 {
     private float _jumpTimeoutDelta;
-    //private float _fallTimeoutDelta;
+
+    const string TARGET_LOOK_BLEND_TREE = "TargetLookBlendTree";
+    const string TARGET_LOOK_RIGHT = "TargetingRight";
+    const string TARGET_LOOK_FOWARD = "TargetingForward";
 
     public PlayerTargetLookState(PlayerStateMachine stateMachine) : base(stateMachine) { }
+
+    public void onTargetPressed()
+    {
+        CanCel();
+    }
+
+    public void CanCel()
+    {
+        stateMachine.targeter.CanCel(); 
+
+        stateMachine.SwitchState(new PlayerFreeLookState(stateMachine));
+    }
 
     public override void Enter()
     {
@@ -16,9 +32,12 @@ public class PlayerTargetLookState : PlayerBaseState
         if (stateMachine.inputReader != null)
         {
             stateMachine.inputReader.jumpPressed += stateMachine.OnJumpPressed;
-            stateMachine.inputReader.TargetPressed += stateMachine.OnTargetPressed;
+            stateMachine.inputReader.TargetPressed += onTargetPressed;
         }
         _jumpTimeoutDelta = stateMachine.JumpTimeout; //점프 텀 시간 할당
+
+
+        stateMachine.animator.Play(TARGET_LOOK_BLEND_TREE);
     }
 
     public override void Exit()
@@ -28,7 +47,7 @@ public class PlayerTargetLookState : PlayerBaseState
         if (stateMachine.inputReader != null)
         {
             stateMachine.inputReader.jumpPressed -= stateMachine.OnJumpPressed;
-            stateMachine.inputReader.TargetPressed -= stateMachine.OnTargetPressed;
+            stateMachine.inputReader.TargetPressed -= onTargetPressed;
         }
     }
 
@@ -47,72 +66,75 @@ public class PlayerTargetLookState : PlayerBaseState
         UpdateMoveAnimation(deltaTime);
     }
 
-    public override void Target()
-    {
-        if (!stateMachine.inputReader.isTarget) //타겟팅이 풀리면 나가기
-        {
-            stateMachine.SwitchState(new PlayerFreeLookState(stateMachine));
-            return;
-        }
-    }
-
     private Vector3 CalculateMove(float deltaTime)
     {
-        // 입력값 가져오기 (PlayerInputReader에서 입력값 받기)
         Vector2 input = stateMachine.inputReader.moveInput;
-
-        // 수직 속도 적용
         stateMachine.verticalVelocity += stateMachine.gravity * deltaTime;
 
-        Vector3 direction = new Vector3(input.x, 0, input.y).normalized;
+        if (input.magnitude < 0.1f) return Vector3.zero;
 
-        if (direction.magnitude < 0.1f) return Vector3.zero;
+        // 카메라의 전방/우측 방향 가져오기 (Y축 제거)
+        Transform cam = Camera.main.transform;
+        Vector3 cameraForward = cam.forward;
+        Vector3 cameraRight = cam.right;
+        cameraForward.y = 0f;
+        cameraRight.y = 0f;
+        cameraForward.Normalize();
+        cameraRight.Normalize();
 
-        //회전 계산
-        Quaternion targetRotation = Quaternion.LookRotation(direction); //회전할 목표 방향을 쿼터니언으로 짐벌락 방지
-        //Lerp로 부드럽게 회전 시키도록
-        stateMachine.transform.rotation = Quaternion.Lerp(
-            stateMachine.transform.rotation, //현재 위치
-            targetRotation, //목표 위치
-            stateMachine.rotateSpeed * deltaTime * 1f //시간 10f*0.06*1f = 0.16f (60fps 기준 0.16씩 회전)
-        );
+        // 카메라 기준 이동 방향 계산
+        Vector3 direction = (cameraForward * input.y) + (cameraRight * input.x);
+        direction.Normalize();
 
+        // 타겟 방향을 바라보도록 회전 적용
+        if (stateMachine.targeter.currentTarget != null) // 타겟이 존재할 때만 회전
+        {
+            Vector3 targetDirection = stateMachine.targeter.currentTarget.transform.position - stateMachine.transform.position;
+            targetDirection.y = 0; // Y축 회전 방지
+            if (targetDirection != Vector3.zero)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+                stateMachine.transform.rotation = Quaternion.Slerp(
+                    stateMachine.transform.rotation,
+                    targetRotation,
+                    deltaTime * stateMachine.rotateSpeed // 회전 속도 조절
+                );
+            }
+        }
 
-        // 입력값을 XZ 평면에서 월드 좌표로 변환
         return direction;
     }
+
 
 
     //이동 애니메이션
     private void UpdateMoveAnimation(float deltaTime)
     {
-        // 입력값 크기 가져오기
-        float inputMagnitude = stateMachine.inputReader.moveInput.magnitude;
 
-        // 목표 속도 계산
-        float targetSpeed = stateMachine.inputReader.onSprint ? stateMachine.sprintSpeed : stateMachine.moveSpeed;
-
-        // _animationBlend를 목표 속도로 부드럽게 변경
-        stateMachine._animationBlend = Mathf.Lerp(
-            stateMachine._animationBlend,
-            inputMagnitude > 0 ? targetSpeed : 0f,
-            deltaTime * stateMachine.SpeedChangeRate
-        );
-
-        // 부동소수점 문제 방지 (작은 값은 0으로 설정)
-        if (Mathf.Abs(stateMachine._animationBlend) < 0.01f)
+        //플레이어 입력(y값) 앞 뒤 입력 X
+        if (stateMachine.inputReader.moveInput.y == 0)
         {
-            stateMachine._animationBlend = 0f;
+            stateMachine.animator.SetFloat(TARGET_LOOK_FOWARD, 0f);
+        }
+        else
+        {
+            float value = stateMachine.inputReader.moveInput.y > 0 ? 1f : -1f;
+            stateMachine.animator.SetFloat(TARGET_LOOK_FOWARD, value);
         }
 
-        // MotionSpeed 계산 (아날로그 여부 확인)
-        float motionSpeed = stateMachine.inputReader.isMove ? inputMagnitude : (inputMagnitude > 0 ? 1f : 0f);
+        //플레이어 입력(x값) 오른쪽, 왼쪽 입력 X
+        if (stateMachine.inputReader.moveInput.x == 0)
+        {
+            stateMachine.animator.SetFloat(TARGET_LOOK_RIGHT, 0f);
+        }
+        else
+        {
+            float value = stateMachine.inputReader.moveInput.x > 0 ? 1f : -1f;
+            stateMachine.animator.SetFloat(TARGET_LOOK_RIGHT, value);
+        }
 
-        if (motionSpeed > 1f) motionSpeed = 1f;
 
-        // 애니메이터에 값 적용
-        stateMachine.animator.SetFloat(stateMachine._animIDSpeed, stateMachine._animationBlend);
-        stateMachine.animator.SetFloat(stateMachine._animIDMotionSpeed, motionSpeed);
+
     }
 
     //지면인지 확인

@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.Windows;
@@ -12,6 +14,8 @@ using UnityEngine.Windows;
 public class PlayerFreeLookState : PlayerBaseState
 {
     private float _jumpTimeoutDelta;
+    const string FREE_LOOK_BLEND_TREE = "FreeLookBlendTree";
+
     //private float _fallTimeoutDelta;
 
     public PlayerFreeLookState(PlayerStateMachine stateMachine) : base(stateMachine) {}
@@ -23,9 +27,12 @@ public class PlayerFreeLookState : PlayerBaseState
         if (stateMachine.inputReader != null)
         {
             stateMachine.inputReader.jumpPressed += stateMachine.OnJumpPressed;
-            stateMachine.inputReader.TargetPressed += stateMachine.OnTargetPressed;
+            stateMachine.inputReader.TargetPressed += onTargetPressed;
         }
         _jumpTimeoutDelta = stateMachine.JumpTimeout; //점프 텀 시간 할당
+
+
+        stateMachine.animator.Play(FREE_LOOK_BLEND_TREE);
     }
 
     public override void Exit()
@@ -35,7 +42,7 @@ public class PlayerFreeLookState : PlayerBaseState
         if (stateMachine.inputReader != null)
         {
             stateMachine.inputReader.jumpPressed -= stateMachine.OnJumpPressed;
-            stateMachine.inputReader.TargetPressed -= stateMachine.OnTargetPressed;
+            stateMachine.inputReader.TargetPressed -= onTargetPressed;
         }
     }
 
@@ -54,39 +61,70 @@ public class PlayerFreeLookState : PlayerBaseState
         UpdateMoveAnimation(deltaTime);
     }
 
-    public override void Target()
+    public void onTargetPressed()
     {
-        if (stateMachine.inputReader.isTarget) //타겟팅이 풀리면 나가기
-        { 
-            stateMachine.SwitchState(new PlayerTargetLookState(stateMachine));
+        if (!stateMachine.targeter.SelectTarget())
+        {
             return;
         }
+
+        stateMachine.SwitchState(new PlayerTargetLookState(stateMachine));
     }
 
     private Vector3 CalculateMove(float deltaTime)
     {
-        // 입력값 가져오기 (PlayerInputReader에서 입력값 받기)
         Vector2 input = stateMachine.inputReader.moveInput;
-
-        // 수직 속도 적용
         stateMachine.verticalVelocity += stateMachine.gravity * deltaTime;
 
-        Vector3 direction = new Vector3(input.x, 0, input.y).normalized;
+        if (input.sqrMagnitude < 0.01f)
+            return Vector3.zero;
 
-        if (direction.magnitude < 0.1f) return Vector3.zero;
+        //  카메라 기준 방향 계산
+        Transform cam = Camera.main.transform;
+        Vector3 camForward = cam.forward; //월드 z축 기준 북(0,0,1) 남(0,0,-1) 동쪽(1,0,0) 서(-1,0,0)에 근접
+        Vector3 camRight = cam.right; //카메라 기준에서 월드의 오른쪽 방향
+        //ex) 북(0,0,1)을 보고있으면 오른쪽인 동(1,0,0), 동에서 오른쪽은 남(0,0,-1), 서쪽을보면 북(0,0,1)에 근접
 
-        //회전 계산
-        Quaternion targetRotation = Quaternion.LookRotation(direction); //회전할 목표 방향을 쿼터니언으로 짐벌락 방지
-        //Lerp로 부드럽게 회전 시키도록
-        stateMachine.transform.rotation = Quaternion.Lerp(
-            stateMachine.transform.rotation, //현재 위치
-            targetRotation, //목표 위치
-            stateMachine.rotateSpeed * deltaTime * 1f //시간 10f*0.06*1f = 0.16f (60fps 기준 0.16씩 회전)
-        );
+        camForward.y = 0f;  camRight.y = 0f; //수평유지
+        camForward.Normalize(); camRight.Normalize(); //정규화
 
+        //  카메라 기준 입력 방향 계산
+        Vector3 moveDirection = (camForward * input.y + camRight * input.x).normalized;
 
-        // 입력값을 XZ 평면에서 월드 좌표로 변환
-        return direction;
+        //  "걷기"일 때만 회전 적용
+        if (!stateMachine.inputReader.onSprint && moveDirection.sqrMagnitude > 0.01f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+            stateMachine.transform.rotation = Quaternion.Slerp(
+                stateMachine.transform.rotation,
+                targetRotation,
+                deltaTime * stateMachine.rotateSpeed
+            );
+        }
+        else if(stateMachine.inputReader.onSprint && input.sqrMagnitude > 0.1f) //달리기중에 입력받으면
+        {
+
+            // 캐릭터를 moveDirection 기준으로 회전
+            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+            stateMachine.transform.rotation = Quaternion.Slerp(
+                stateMachine.transform.rotation,
+                targetRotation,
+                deltaTime * stateMachine.rotateSpeed
+            );
+
+            // 이 방향으로 이동
+            return moveDirection;
+        }
+
+        //  이동 방향
+        if (stateMachine.inputReader.onSprint) //달리기일 땐 현재 바라보는 방향
+        {
+            return stateMachine.transform.forward;
+        }
+        else //걷기일 때는 카메라 기준
+        {
+            return moveDirection;
+        }
     }
 
 
@@ -100,16 +138,16 @@ public class PlayerFreeLookState : PlayerBaseState
         float targetSpeed = stateMachine.inputReader.onSprint ? stateMachine.sprintSpeed : stateMachine.moveSpeed;
 
         // _animationBlend를 목표 속도로 부드럽게 변경
-        stateMachine._animationBlend = Mathf.Lerp(
-            stateMachine._animationBlend,
+        stateMachine._ani_SpeedValue = Mathf.Lerp(
+            stateMachine._ani_SpeedValue,
             inputMagnitude > 0 ? targetSpeed : 0f,
             deltaTime * stateMachine.SpeedChangeRate
         );
 
         // 부동소수점 문제 방지 (작은 값은 0으로 설정)
-        if (Mathf.Abs(stateMachine._animationBlend) < 0.01f)
+        if (Mathf.Abs(stateMachine._ani_SpeedValue) < 0.01f)
         {
-            stateMachine._animationBlend = 0f;
+            stateMachine._ani_SpeedValue = 0f;
         }
 
         // MotionSpeed 계산 (아날로그 여부 확인)
@@ -118,7 +156,7 @@ public class PlayerFreeLookState : PlayerBaseState
         if(motionSpeed > 1f) motionSpeed = 1f;
 
         // 애니메이터에 값 적용
-        stateMachine.animator.SetFloat(stateMachine._animIDSpeed, stateMachine._animationBlend);
+        stateMachine.animator.SetFloat(stateMachine._animIDSpeed, stateMachine._ani_SpeedValue);
         stateMachine.animator.SetFloat(stateMachine._animIDMotionSpeed, motionSpeed);
     }
 
@@ -182,6 +220,7 @@ public class PlayerFreeLookState : PlayerBaseState
         }
         else
         {
+            
             // 공중에 있는 경우 중력 적용
             if (stateMachine.verticalVelocity > stateMachine.terminalVelocity)
             {
