@@ -68,29 +68,43 @@ public class PlayerTargetLookState : PlayerBaseState
 
     private Vector3 CalculateMove(float deltaTime)
     {
-        // 입력값 가져오기 (PlayerInputReader에서 입력값 받기)
         Vector2 input = stateMachine.inputReader.moveInput;
-
-        // 수직 속도 적용
         stateMachine.verticalVelocity += stateMachine.gravity * deltaTime;
 
-        Vector3 direction = new Vector3(input.x, 0, input.y).normalized;
+        if (input.magnitude < 0.1f) return Vector3.zero;
 
-        if (direction.magnitude < 0.1f) return Vector3.zero;
+        // 카메라의 전방/우측 방향 가져오기 (Y축 제거)
+        Transform cam = Camera.main.transform;
+        Vector3 cameraForward = cam.forward;
+        Vector3 cameraRight = cam.right;
+        cameraForward.y = 0f;
+        cameraRight.y = 0f;
+        cameraForward.Normalize();
+        cameraRight.Normalize();
 
-        //회전 계산
-        Quaternion targetRotation = Quaternion.LookRotation(direction); //회전할 목표 방향을 쿼터니언으로 짐벌락 방지
-        //Lerp로 부드럽게 회전 시키도록
-        stateMachine.transform.rotation = Quaternion.Lerp(
-            stateMachine.transform.rotation, //현재 위치
-            targetRotation, //목표 위치
-            stateMachine.rotateSpeed * deltaTime * 1f //시간 10f*0.06*1f = 0.16f (60fps 기준 0.16씩 회전)
-        );
+        // 카메라 기준 이동 방향 계산
+        Vector3 direction = (cameraForward * input.y) + (cameraRight * input.x);
+        direction.Normalize();
 
+        // 타겟 방향을 바라보도록 회전 적용
+        if (stateMachine.targeter.currentTarget != null) // 타겟이 존재할 때만 회전
+        {
+            Vector3 targetDirection = stateMachine.targeter.currentTarget.transform.position - stateMachine.transform.position;
+            targetDirection.y = 0; // Y축 회전 방지
+            if (targetDirection != Vector3.zero)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+                stateMachine.transform.rotation = Quaternion.Slerp(
+                    stateMachine.transform.rotation,
+                    targetRotation,
+                    deltaTime * stateMachine.rotateSpeed // 회전 속도 조절
+                );
+            }
+        }
 
-        // 입력값을 XZ 평면에서 월드 좌표로 변환
         return direction;
     }
+
 
 
     //이동 애니메이션
