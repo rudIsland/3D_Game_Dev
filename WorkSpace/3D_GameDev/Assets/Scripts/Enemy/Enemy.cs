@@ -8,9 +8,14 @@ public abstract class Enemy : MonoBehaviour
     [SerializeField] protected float detectRange = 10f;
     [SerializeField] protected float attackRange = 2f;
     [SerializeField] protected float moveSpeed = 3f;
+    public WeaponColider weapon;
+
+    public bool isAttacking = false;
 
     protected virtual void Start()
     {
+        weapon.gameObject.SetActive(false);
+
         SetupStats();
 
         enemyMemory = new EnemyMemory
@@ -34,4 +39,13 @@ public abstract class Enemy : MonoBehaviour
     protected abstract void SetupStats(); 
 
     protected abstract void SetupTree(); // 자식 클래스가 override
+
+    private void OnWeapon()
+    {
+        weapon.gameObject.SetActive(true);
+    }
+    private void OffWeapon()
+    {
+        weapon.gameObject.SetActive(false);
+    }
 }
