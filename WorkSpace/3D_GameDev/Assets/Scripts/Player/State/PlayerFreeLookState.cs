@@ -59,6 +59,9 @@ public class PlayerFreeLookState : PlayerBaseState
         Move(CalculateMove(deltaTime), deltaTime);
         // 애니메이션 업데이트
         UpdateMoveAnimation(deltaTime);
+
+        //공격
+        stateMachine.Attacking();
     }
 
     public void onTargetPressed()

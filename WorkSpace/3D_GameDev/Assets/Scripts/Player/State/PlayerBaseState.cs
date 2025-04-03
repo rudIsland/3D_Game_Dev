@@ -11,6 +11,7 @@ public class PlayerBaseState : State
 {
     protected PlayerStateMachine stateMachine;
     
+
     public PlayerBaseState(PlayerStateMachine playerStateMachine)
     {
         this.stateMachine = playerStateMachine;

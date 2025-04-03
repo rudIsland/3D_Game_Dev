@@ -9,7 +9,9 @@ public class WeaponColider : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            Debug.Log("무기가 플레이어를 공격!");
+            Debug.Log("적이 플레이어를 공격!");
+            Animator animator = other.GetComponent<Animator>();
+            animator.SetBool("Hit", true);
         }
     }
 }

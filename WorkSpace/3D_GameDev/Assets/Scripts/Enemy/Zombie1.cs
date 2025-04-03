@@ -7,6 +7,7 @@ public class Zombie1 : Enemy
     public Animator animator;
     public readonly int _animIDFind = Animator.StringToHash("IsFind"); //탐지
     public readonly int _animIDAttack = Animator.StringToHash("IsAttack"); //공격
+    public readonly int _animIDHit = Animator.StringToHash("IsHit"); //맞기
     public readonly int _animIDAttackRange = Animator.StringToHash("InAttackRange"); //공격
 
     //public bool isAttacking = false;
@@ -15,7 +16,7 @@ public class Zombie1 : Enemy
     protected override void SetupStats()
     {
         detectRange = 6f; //탐지범위
-        attackRange = 1.2f; //공격범위
+        attackRange = 1.0f; //공격범위
         moveSpeed = 1.5f; //이동속도
     }
 
@@ -193,5 +194,10 @@ public class Zombie1 : Enemy
     {
         animator.SetBool(_animIDAttackRange, false);
     }
-
+    private void OffHit()
+    {
+        isAttacking = false;
+        animator.SetBool(_animIDAttack, isAttacking);
+        animator.SetBool(_animIDHit, isAttacking);
+    }
 }

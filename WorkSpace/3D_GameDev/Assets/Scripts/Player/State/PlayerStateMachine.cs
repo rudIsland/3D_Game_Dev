@@ -11,6 +11,7 @@ public class PlayerStateMachine : BaseStateMachine
 {
     public CharacterController characterController;
     public PlayerInputReader inputReader;
+    public PlayerWeapon weapon;
 
     [Header("플레이어 움직임")]
     public float moveSpeed = 2.5f; //기본 움직임 속도
@@ -51,12 +52,14 @@ public class PlayerStateMachine : BaseStateMachine
     public readonly int _animIDMotionSpeed = Animator.StringToHash("MotionSpeed"); //움직임속도
     public readonly int _animIDJump = Animator.StringToHash("Jump"); //점프
     public readonly int _animIDFreeFall = Animator.StringToHash("FreeFall");
+    public readonly int _animIDHit = Animator.StringToHash("Hit");
+    public readonly int _animIDAttack = Animator.StringToHash("Attack");
 
     public Targeter targeter;
 
     private void Awake()
     {
-
+        weapon.gameObject.SetActive(false);
     }
 
     private void Start()
@@ -99,6 +102,35 @@ public class PlayerStateMachine : BaseStateMachine
                 FootstepAudioVolume
             );
         }
+    }
+
+    //-----------------------------Animation Logic
+    private void OffHit()
+    {
+        animator.SetBool(_animIDHit, false);
+    }
+
+    public void Attacking()
+    {
+        if (inputReader.isAttack)
+        {
+            animator.SetTrigger(_animIDAttack);
+        }
+    }
+
+    protected void OffAttack()
+    {
+        inputReader.isAttack = false;
+        OFFWeapon();
+    }
+
+    private void ONWeapon()
+    {
+        weapon.gameObject.SetActive(true);
+    }
+    private void OFFWeapon()
+    {
+        weapon.gameObject.SetActive(false);
     }
 
 #if UNITY_EDITOR

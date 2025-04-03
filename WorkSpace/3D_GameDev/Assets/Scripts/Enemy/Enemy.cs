@@ -40,6 +40,8 @@ public abstract class Enemy : MonoBehaviour
 
     protected abstract void SetupTree(); // 자식 클래스가 override
 
+
+    //Animation Functions
     private void OnWeapon()
     {
         weapon.gameObject.SetActive(true);
@@ -48,4 +50,5 @@ public abstract class Enemy : MonoBehaviour
     {
         weapon.gameObject.SetActive(false);
     }
+    
 }
