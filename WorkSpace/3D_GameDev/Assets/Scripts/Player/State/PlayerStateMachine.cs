@@ -54,6 +54,7 @@ public class PlayerStateMachine : BaseStateMachine
     public readonly int _animIDFreeFall = Animator.StringToHash("FreeFall");
     public readonly int _animIDHit = Animator.StringToHash("Hit");
     public readonly int _animIDAttack = Animator.StringToHash("Attack");
+   
 
     public Targeter targeter;
 
@@ -115,6 +116,7 @@ public class PlayerStateMachine : BaseStateMachine
         if (inputReader.isAttack)
         {
             animator.SetTrigger(_animIDAttack);
+            inputReader.isAttack = false;
         }
     }
 

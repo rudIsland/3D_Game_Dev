@@ -1,12 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.InputSystem.LowLevel;
-using UnityEngine.InputSystem.XR;
-using UnityEngine.Windows;
+
 
 /*
  * 자유시점 상태
@@ -48,6 +44,8 @@ public class PlayerFreeLookState : PlayerBaseState
 
     public override void Tick(float deltaTime)
     {
+        //공격
+        stateMachine.Attacking();
 
         // 중력, 점프 처리
         JumpAndGravity();
@@ -57,11 +55,26 @@ public class PlayerFreeLookState : PlayerBaseState
 
         // 이동 처리
         Move(CalculateMove(deltaTime), deltaTime);
-        // 애니메이션 업데이트
+        // 이동 애니메이션 업데이트
         UpdateMoveAnimation(deltaTime);
 
-        //공격
-        stateMachine.Attacking();
+        //Other Animation Check
+        OtherAnimaionCheck();
+
+    }
+
+
+    private void OtherAnimaionCheck()
+    {
+        // check hit anim
+        if (stateMachine.animator.GetBool(stateMachine._animIDHit))
+        {
+            if (stateMachine.weapon.gameObject.activeSelf) //weapone is Enable.. not hit motion
+            {
+                stateMachine.animator.SetBool(stateMachine._animIDHit, false);
+            }
+        }
+           
     }
 
     public void onTargetPressed()
@@ -93,6 +106,12 @@ public class PlayerFreeLookState : PlayerBaseState
 
         //  카메라 기준 입력 방향 계산
         Vector3 moveDirection = (camForward * input.y + camRight * input.x).normalized;
+
+        // If player is attacking, not move
+        if (stateMachine.animator.GetBool(stateMachine._animIDAttack))
+        {
+            return Vector3.zero;
+        }
 
         //  "걷기"일 때만 회전 적용
         if (!stateMachine.inputReader.onSprint && moveDirection.sqrMagnitude > 0.01f)
@@ -194,6 +213,7 @@ public class PlayerFreeLookState : PlayerBaseState
             {
                 stateMachine.animator.SetBool(stateMachine._animIDJump, false);
                 stateMachine.animator.SetBool(stateMachine._animIDFreeFall, false);
+                stateMachine.inputReader.isJump = false;
             }
 
             // 수직 속도 초기화 (낙하 속도 제한)
@@ -208,17 +228,14 @@ public class PlayerFreeLookState : PlayerBaseState
                 _jumpTimeoutDelta -= Time.deltaTime;
             }
 
-            // 점프 처리
-            if (stateMachine.jump && _jumpTimeoutDelta <= 0.0f)
+            // 점프 처리(점프가 가능한 상태 && 점프재사용시간 && 공격중x)
+            if (stateMachine.jump && _jumpTimeoutDelta <= 0.0f && !stateMachine.inputReader.isAttack)
             {
                 stateMachine.jump = false; // 점프 입력 초기화
                 _jumpTimeoutDelta = stateMachine.JumpTimeout; // 쿨다운 초기화
 
                 stateMachine.verticalVelocity = Mathf.Sqrt(stateMachine.jumpHeight * -2f * stateMachine.gravity);
-                if (stateMachine.animator)
-                {
-                    stateMachine.animator.SetBool(stateMachine._animIDJump, true);
-                }
+                stateMachine.animator.SetBool(stateMachine._animIDJump, true);
             }
         }
         else

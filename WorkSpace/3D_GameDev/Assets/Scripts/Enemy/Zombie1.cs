@@ -15,7 +15,7 @@ public class Zombie1 : Enemy
 
     protected override void SetupStats()
     {
-        detectRange = 6f; //탐지범위
+        detectRange = 15f; //탐지범위
         attackRange = 1.0f; //공격범위
         moveSpeed = 1.5f; //이동속도
     }
