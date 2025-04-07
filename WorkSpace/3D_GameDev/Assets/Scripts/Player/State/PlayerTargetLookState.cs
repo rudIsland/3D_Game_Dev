@@ -52,7 +52,7 @@ public class PlayerTargetLookState : PlayerBaseState
     public override void Tick(float deltaTime)
     {
         //공격
-        stateMachine.Attacking();
+        stateMachine.StartAttack();
 
         // 중력, 점프 처리
         JumpAndGravity();

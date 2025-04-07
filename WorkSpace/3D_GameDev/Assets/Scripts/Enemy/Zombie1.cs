@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Zombie1 : Enemy
 {
@@ -10,46 +11,60 @@ public class Zombie1 : Enemy
     public readonly int _animIDHit = Animator.StringToHash("IsHit"); //맞기
     public readonly int _animIDAttackRange = Animator.StringToHash("InAttackRange"); //공격
 
-    //public bool isAttacking = false;
-
-
     protected override void SetupStats()
     {
         detectRange = 15f; //탐지범위
         attackRange = 1.0f; //공격범위
-        moveSpeed = 1.5f; //이동속도
+        moveSpeed = 2.3f; //이동속도
+        angularSpeed = 180f; //회전속도
     }
+
+    protected override void Start()
+    {
+        base.Start();
+    }
+
+    protected override void Update()
+    {
+        UpdateDistanceToPlayer();
+        UpdateDetectionStatus();
+
+        UpdateAnimatorStates();
+
+        if (!enemyMemory.isPlayerDetected)
+        {
+            HandleUndetectedState();
+            return;
+        }
+
+        HandleDetectedState();
+        behaviorTree?.Evaluate();
+    }
+
 
     protected override void SetupTree()
     {
         // 탐지 트리
-        ENode detectTree = new SelectorNode(new List<ENode>
-        {
+        ENode detectTree = new SelectorNode(new List<ENode> {
             new ActionNode(CheckDetectRange)
         });
 
         // 이동 트리
-        ENode moveTree = new SelectorNode(new List<ENode>
-        {
+        ENode moveTree = new SelectorNode(new List<ENode> {
             new ActionNode(MoveToPlayer)
         });
 
         // 공격 트리
-        ENode attackTree = new SequenceNode(new List<ENode>
-        {
+        ENode attackTree = new SequenceNode(new List<ENode> {
             new ActionNode(CheckAttackRange),
-            new SelectorNode(new List<ENode>
-            {
+            new SelectorNode(new List<ENode>{
                 new ActionNode(NormalAttack)
             })
         });
 
         // 전체 트리 구성
-        behaviorTree = new SequenceNode(new List<ENode>
-        {
-            detectTree,
-            moveTree,
-            attackTree
+        behaviorTree = new SequenceNode(new List<ENode> {
+            detectTree, moveTree, attackTree
         });
     }
 
@@ -58,128 +73,155 @@ public class Zombie1 : Enemy
     //탐지
     private ESTATE CheckDetectRange()
     {
-        if (enemyMemory.isPlayerDetected)
-        {
-            //Debug.Log("플레이어 탐지됨!");
-            animator.SetBool(_animIDFind, true);
-            return ESTATE.SUCCESS;
-        }
-        //Debug.Log("플레이어 감지 실패");
-        animator.SetBool(_animIDFind, false);
-        return ESTATE.FAILED;
+        bool detected = enemyMemory.isPlayerDetected;
+
+        // 탐지 애니메이션 상태 업데이트
+        animator.SetBool(_animIDFind, detected);
+
+        return detected ? ESTATE.SUCCESS : ESTATE.FAILED;
     }
 
 
     //이동
     private ESTATE MoveToPlayer()
     {
+        //not Find, not Move
+        if (!enemyMemory.isPlayerDetected)
+        {
+            SetAgentStop(true);
+            return ESTATE.FAILED;
+        }
+
         if (enemyMemory.isInAttackRange)
         {
+            SetAgentStop(true);
             return ESTATE.SUCCESS;
         }
-        else 
-        {
-            OutOfAttackRange();
-        }
 
-        //Target Setting
-        Vector3 target = new Vector3(enemyMemory.player.position.x, transform.position.y, enemyMemory.player.position.z);
-        float distanceToPlayer = Vector3.Distance(transform.position, target); //distance
+        animator.SetBool(_animIDAttackRange, false);
 
-        //Move but, if isAttacking is true.. not MoveTowards
         if (!isAttacking)
         {
-            transform.position = Vector3.MoveTowards(transform.position, target, moveSpeed * Time.deltaTime);
+            SetAgentStop(false);
+            agent.SetDestination(enemyMemory.player.position);
         }
-
-        // Target to Rotate
-        RotateTowardsTarget(target);
-
-        // If in AttackRagne and FacingTargeting is Success
-        if (distanceToPlayer <= attackRange && IsFacingTarget(target))
-        {
-            return ESTATE.SUCCESS; // 공격 가능
-        }
-
-        //Debug.Log("이동 중...");
 
         return ESTATE.RUN;
     }
 
-
-
     //공격
-    private ESTATE CheckAttackRange() //if true -> AttackActionNode gogo
+    private ESTATE CheckAttackRange()
     {
-
-        // 회전 완료 여부 체크
-        Vector3 target = new Vector3(enemyMemory.player.position.x, transform.position.y, enemyMemory.player.position.z);
-        if (!IsFacingTarget(target))
-        {
-            RotateTowardsTarget(target); // 공격 전까지 바라보도록 함
-            return ESTATE.RUN; // 공격하지 않고 회전 유지
-        }
-
-        Debug.Log("공격 범위 안에 있음");
-        animator.SetBool(_animIDAttackRange, true);
-        return ESTATE.SUCCESS;
+        bool inRange = enemyMemory.isInAttackRange;
+        animator.SetBool(_animIDAttackRange, inRange);
+        return inRange ? ESTATE.SUCCESS : ESTATE.FAILED;
     }
 
-    // 목표 방향으로 회전 (부드러운 회전)
-    private void RotateTowardsTarget(Vector3 target)
-    {
-        if (!isAttacking)
-        {
-            Vector3 direction = (target - transform.position).normalized;
-            if (direction != Vector3.zero)
-            {
-                Quaternion targetRotation = Quaternion.LookRotation(direction);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
-            }
-        }
-    }
-
-    // 플레이어를 향하고 있는지 확인
-    private bool IsFacingTarget(Vector3 target)
-    {
-        Vector3 directionToTarget = (target - transform.position).normalized;
-        float dot = Vector3.Dot(transform.forward, directionToTarget);
-        return dot > 0.95f; // 0.95 이상이면 거의 정면을 보고 있다고 판단
-    }
 
 
     // 공격
     private ESTATE NormalAttack()
     {
+        //공격범위 안에 있는지 체크
         if (!enemyMemory.isInAttackRange)
         {
-            Debug.Log("공격 범위 벗어남!");
-            OutOfAttackRange();
+            animator.SetBool(_animIDAttackRange, false);
             return ESTATE.FAILED;
         }
 
+        // 타겟 바라보고 있는지 체크
+        if (!IsFacingTarget(enemyMemory.player.position))
+        {
+            RotateTowardsPlayer();
+            return ESTATE.RUN; // 회전 중, 공격 X
+        }
+        
+        //공격
         if (!isAttacking)
         {
-            isAttacking = true;
             NormalAttackingStart();
-            Debug.Log("공격 시작!");
         }
 
         return ESTATE.SUCCESS;
     }
 
 
-    //Animation Event Function
-    private void NormalAttackingStart() //Animation Event and Code Function
+    // --- 유틸 함수 ---
+
+    private void UpdateAnimatorStates()
+    {
+        // 탐지 실패 시 이동/회전 멈추고 애니메이션 꺼줌
+        if (!enemyMemory.isPlayerDetected)
+        {
+            if (!agent.isStopped)
+                agent.isStopped = true;
+
+            if (agent.updateRotation)
+                agent.updateRotation = false;
+
+            animator.SetBool(_animIDFind, false);
+            return;
+        }
+    }
+
+    private void SetAgentStop(bool stop)
+    {
+        if (agent.isStopped != stop)
+            agent.isStopped = stop;
+    }
+
+    private void SetAgentRotation(bool enable)
+    {
+        if (agent.updateRotation != enable)
+            agent.updateRotation = enable;
+    }
+
+    private void HandleUndetectedState()
+    {
+        SetAgentStop(true);
+        SetAgentRotation(false);
+    }
+
+    private void HandleDetectedState()
+    {
+        SetAgentStop(false);
+
+        if (enemyMemory.isInAttackRange && !isAttacking)
+        {
+            SetAgentRotation(false);
+            RotateTowardsPlayer();
+        }
+        else
+        {
+            SetAgentRotation(true);
+        }
+    }
+
+
+    // Check Facing to Target(Player)
+    private bool IsFacingTarget(Vector3 target)
+    {
+        Vector3 directionToTarget = (target - transform.position).normalized;
+        float dot = Vector3.Dot(transform.forward, directionToTarget);
+        return dot > 0.90f; // 0.90 이상이면 거의 정면을 보고 있다고 판단
+    }
+
+
+    /***************** In Animation Event Function *******************/
+    private void NormalAttackingStart()
     {
         isAttacking = true;
-        animator.SetBool(_animIDAttack, isAttacking);
+        agent.isStopped = true; // agent Stop
+        animator.SetBool(_animIDAttack, true);
     }
+
     private void NormalAttackingEnd()
     {
         isAttacking = false;
-        animator.SetBool(_animIDAttack, isAttacking);
+        agent.isStopped = false;
+        animator.SetBool(_animIDAttack, false);
     }
+
 
     private void OnWeapon()
     {
@@ -190,10 +232,6 @@ public class Zombie1 : Enemy
         weapon.gameObject.SetActive(false);
     }
 
-    private void OutOfAttackRange()
-    {
-        animator.SetBool(_animIDAttackRange, false);
-    }
     private void OffHit()
     {
         isAttacking = false;

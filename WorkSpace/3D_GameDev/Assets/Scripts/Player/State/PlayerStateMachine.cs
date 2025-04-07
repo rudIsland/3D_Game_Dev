@@ -111,7 +111,7 @@ public class PlayerStateMachine : BaseStateMachine
         animator.SetBool(_animIDHit, false);
     }
 
-    public void Attacking()
+    public void StartAttack()
     {
         if (inputReader.isAttack)
         {
@@ -120,10 +120,11 @@ public class PlayerStateMachine : BaseStateMachine
         }
     }
 
-    protected void OffAttack()
+    protected void EndAttack()
     {
         inputReader.isAttack = false;
         OFFWeapon();
+        animator.ResetTrigger(_animIDAttack); // 트리거 초기화!
     }
 
     private void ONWeapon()

@@ -60,7 +60,7 @@ public class PlayerInputReader : MonoBehaviour, PlayerControls.IPlayerActions
 
     public void OnAttack(InputAction.CallbackContext context)
     {
-        if(context.performed && !isJump)
+        if(context.started)
         {
             isAttack = true;
         }
