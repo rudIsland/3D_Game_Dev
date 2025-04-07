@@ -31,7 +31,6 @@ public class PlayerTargetLookState : PlayerBaseState
         // 입력 이벤트 구독
         if (stateMachine.inputReader != null)
         {
-            stateMachine.inputReader.jumpPressed += stateMachine.OnJumpPressed;
             stateMachine.inputReader.TargetPressed += onTargetPressed;
         }
         _jumpTimeoutDelta = stateMachine.JumpTimeout; //점프 텀 시간 할당
@@ -46,13 +45,14 @@ public class PlayerTargetLookState : PlayerBaseState
         // 입력 이벤트 구독
         if (stateMachine.inputReader != null)
         {
-            stateMachine.inputReader.jumpPressed -= stateMachine.OnJumpPressed;
             stateMachine.inputReader.TargetPressed -= onTargetPressed;
         }
     }
 
     public override void Tick(float deltaTime)
     {
+        //공격
+        stateMachine.StartAttack();
 
         // 중력, 점프 처리
         JumpAndGravity();
@@ -64,6 +64,9 @@ public class PlayerTargetLookState : PlayerBaseState
         Move(CalculateMove(deltaTime), deltaTime);
         // 애니메이션 업데이트
         UpdateMoveAnimation(deltaTime);
+
+        //Other Animation Check
+        OtherAnimaionCheck();
     }
 
     private Vector3 CalculateMove(float deltaTime)
@@ -133,7 +136,18 @@ public class PlayerTargetLookState : PlayerBaseState
             stateMachine.animator.SetFloat(TARGET_LOOK_RIGHT, value);
         }
 
+    }
 
+    private void OtherAnimaionCheck()
+    {
+        // check hit anim
+        if (stateMachine.animator.GetBool(stateMachine._animIDHit))
+        {
+            if (stateMachine.weapon.gameObject.activeSelf) //weapone is Enable.. not hit motion
+            {
+                stateMachine.animator.SetBool(stateMachine._animIDHit, false);
+            }
+        }
 
     }
 
@@ -168,6 +182,7 @@ public class PlayerTargetLookState : PlayerBaseState
             {
                 stateMachine.animator.SetBool(stateMachine._animIDJump, false);
                 stateMachine.animator.SetBool(stateMachine._animIDFreeFall, false);
+                stateMachine.inputReader.isJump = false;
             }
 
             // 수직 속도 초기화 (낙하 속도 제한)
@@ -175,28 +190,10 @@ public class PlayerTargetLookState : PlayerBaseState
             {
                 stateMachine.verticalVelocity = Mathf.Max(stateMachine.verticalVelocity, -2f); // 급격한 변화 방지
             }
-
-            // 점프 쿨다운 적용
-            if (_jumpTimeoutDelta > 0.0f)
-            {
-                _jumpTimeoutDelta -= Time.deltaTime;
-            }
-
-            // 점프 처리
-            if (stateMachine.jump && _jumpTimeoutDelta <= 0.0f)
-            {
-                stateMachine.jump = false; // 점프 입력 초기화
-                _jumpTimeoutDelta = stateMachine.JumpTimeout; // 쿨다운 초기화
-
-                stateMachine.verticalVelocity = Mathf.Sqrt(stateMachine.jumpHeight * -2f * stateMachine.gravity);
-                if (stateMachine.animator)
-                {
-                    stateMachine.animator.SetBool(stateMachine._animIDJump, true);
-                }
-            }
         }
         else
         {
+
             // 공중에 있는 경우 중력 적용
             if (stateMachine.verticalVelocity > stateMachine.terminalVelocity)
             {
@@ -224,7 +221,7 @@ public class PlayerTargetLookState : PlayerBaseState
     //점프
     public override void Jump()
     {
-        stateMachine.jump = true;
+
     }
 
 }
