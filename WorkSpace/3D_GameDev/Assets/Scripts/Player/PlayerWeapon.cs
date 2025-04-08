@@ -12,16 +12,20 @@ public class PlayerWeapon : MonoBehaviour
         {
             Debug.Log($"[디버그] 적과 충돌: {rootTransform.name}");
 
+            //animation
             Animator animator = rootTransform.GetComponent<Animator>();
             if (animator != null)
             {
                 animator.SetBool("IsHit", true);
                 Debug.Log("[디버그] 적 애니메이션 실행!");
             }
-            else
-            {
-                Debug.LogWarning("[경고] Enemy에 Animator 없음!");
-            }
+
+            //take Damage
+            CharacterStatsComponent attacker = GetComponentInParent<CharacterStatsComponent>();
+            CharacterStatsComponent defender = rootTransform.GetComponent<CharacterStatsComponent>();
+
+            DamageSystem.ApplyDamage(attacker, defender);
+
         }
     }
 

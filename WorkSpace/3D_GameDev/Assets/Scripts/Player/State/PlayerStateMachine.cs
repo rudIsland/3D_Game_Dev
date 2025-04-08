@@ -2,6 +2,7 @@ using Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.UI;
 
 
 /*
@@ -54,13 +55,17 @@ public class PlayerStateMachine : BaseStateMachine
     public readonly int _animIDFreeFall = Animator.StringToHash("FreeFall");
     public readonly int _animIDHit = Animator.StringToHash("Hit");
     public readonly int _animIDAttack = Animator.StringToHash("Attack");
-   
 
     public Targeter targeter;
+
+    public CharacterStatsComponent stats;
+
 
     private void Awake()
     {
         weapon.gameObject.SetActive(false);
+        stats = GetComponent<CharacterStatsComponent>();
+        stats.OnDeath += HandlePlayerDeath;
     }
 
     private void Start()
@@ -77,6 +82,17 @@ public class PlayerStateMachine : BaseStateMachine
     private void OnDisable()
     {
         inputReader.jumpPressed -= OnJumpPressed;
+    }
+
+    public void TakeDamage(double damage)
+    {
+        stats.TakeDamage(damage);
+    }
+
+    private void HandlePlayerDeath()
+    {
+        Debug.Log("플레이어 사망");
+        // 게임 오버 처리
     }
 
     public void OnJumpPressed()

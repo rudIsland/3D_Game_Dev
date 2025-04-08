@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.AI;
 
 public abstract class Enemy : MonoBehaviour
@@ -11,10 +12,19 @@ public abstract class Enemy : MonoBehaviour
     [SerializeField] protected float moveSpeed = 3f;
     [SerializeField] protected float angularSpeed = 180f;
 
+    public CharacterStatsComponent stats;
+
+
     public WeaponColider weapon;
     public NavMeshAgent agent;
 
     public bool isAttacking = false;
+
+    private void Awake()
+    {
+        stats = GetComponent<CharacterStatsComponent>();
+        stats.OnDeath += HandleDeath;
+    }
 
     protected virtual void Start()
     {
@@ -66,6 +76,17 @@ public abstract class Enemy : MonoBehaviour
             if (!agent.updateRotation) // 회전 꺼져 있으면 다시 켬
                 agent.updateRotation = true;
         }
+    }
+
+    public void TakeDamage(double damage)
+    {
+        stats.TakeDamage(damage);
+    }
+
+    private void HandleDeath()
+    {
+        Debug.Log("적 사망");
+        // 게임 오버 처리
     }
 
     protected void RotateTowardsPlayer()
