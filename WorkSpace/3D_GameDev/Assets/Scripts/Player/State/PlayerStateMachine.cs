@@ -59,12 +59,13 @@ public class PlayerStateMachine : BaseStateMachine
     public Targeter targeter;
 
     public CharacterStatsComponent stats;
-
+    public SteminaComponent steminaComponent;
 
     private void Awake()
     {
         weapon.gameObject.SetActive(false);
         stats = GetComponent<CharacterStatsComponent>();
+        steminaComponent = GetComponent<SteminaComponent>();
         stats.OnDeath += HandlePlayerDeath;
     }
 
@@ -72,6 +73,8 @@ public class PlayerStateMachine : BaseStateMachine
     {
         SwitchState(new PlayerFreeLookState(this));
 
+        stats.hpSlider = GameObject.Find("PlayerHP").GetComponent<Slider>();
+        stats.steminaSlider = GameObject.Find("PlayerStemina").GetComponent<Slider>();
         _hasAnimator = TryGetComponent(out animator);
     }
     private void OnEnable()

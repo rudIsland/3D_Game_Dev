@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerWeapon : MonoBehaviour
 {
+
     private void OnTriggerStay(Collider other)
     {
         Transform rootTransform = other.transform.root; // 최상위 부모 찾기

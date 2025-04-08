@@ -133,6 +133,7 @@ GameObject:
   - component: {fileID: 12191238}
   - component: {fileID: 12191237}
   - component: {fileID: 12191239}
+  - component: {fileID: 12191240}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -211,6 +212,18 @@ MonoBehaviour:
   m_DeselectOnBackgroundClick: 1
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
+--- !u!114 &12191240
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 12191235}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3a3d89c04c6f33468efd780aeb10559, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &26290908
 GameObject:
   m_ObjectHideFlags: 0
@@ -792,7 +805,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 370653821}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.09213523, y: -0.000034110963, z: 0.000003156246, w: 0.9957465}
+  m_LocalRotation: {x: 0.09213523, y: -0.00003411122, z: 0.0000031562702, w: 0.9957465}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1967,7 +1980,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 755732396}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.07400786, y: -0.000034162986, z: 0.0000025352822, w: 0.99725765}
+  m_LocalRotation: {x: 0.07400786, y: -0.000034139528, z: 0.0000025335416, w: 0.99725765}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3847,11 +3860,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stats:
-    MaxHP: 100
-    CurrentHP: 100
-    Attack: 5
-    Dex: 3
+    maxHP: 100
+    currentHP: 100
+    attack: 10
+    dex: 5
   hpSlider: {fileID: 394875242}
+  steminaSlider: {fileID: 0}
 --- !u!1 &1030534661
 GameObject:
   m_ObjectHideFlags: 0
@@ -4864,12 +4878,12 @@ PrefabInstance:
     - target: {fileID: 8944336655422409503, guid: f6d148d888ffbf54b9afe9936dfaec1f,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.000034170414
+      value: -0.000034138375
       objectReference: {fileID: 0}
     - target: {fileID: 8944336655422409503, guid: f6d148d888ffbf54b9afe9936dfaec1f,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.000002535834
+      value: 0.0000025334562
       objectReference: {fileID: 0}
     - target: {fileID: 8944336655422409503, guid: f6d148d888ffbf54b9afe9936dfaec1f,
         type: 3}
@@ -5582,7 +5596,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1748245750}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.055903967, y: -0.000034203353, z: 0.000001915098, w: 0.99843615}
+  m_LocalRotation: {x: 0.05590397, y: -0.000034202563, z: 0.000001915054, w: 0.99843615}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -7110,11 +7124,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stats:
-    MaxHP: 100
-    CurrentHP: 100
-    Attack: 5
-    Dex: 3
+    maxHP: 100
+    currentHP: 100
+    attack: 10
+    dex: 5
   hpSlider: {fileID: 1075030512}
+  steminaSlider: {fileID: 0}
 --- !u!1 &1880308876
 GameObject:
   m_ObjectHideFlags: 0
@@ -8866,11 +8881,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stats:
-    MaxHP: 100
-    CurrentHP: 100
-    Attack: 5
-    Dex: 3
+    maxHP: 100
+    currentHP: 100
+    attack: 10
+    dex: 5
   hpSlider: {fileID: 323458485}
+  steminaSlider: {fileID: 0}
 --- !u!1 &2078983968
 GameObject:
   m_ObjectHideFlags: 0
@@ -10327,11 +10343,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stats:
-    MaxHP: 100
-    CurrentHP: 100
-    Attack: 5
-    Dex: 3
+    maxHP: 100
+    currentHP: 100
+    attack: 10
+    dex: 5
   hpSlider: {fileID: 827107210}
+  steminaSlider: {fileID: 0}
 --- !u!1 &2121206684
 GameObject:
   m_ObjectHideFlags: 0
@@ -10861,6 +10878,7 @@ GameObject:
   - component: {fileID: 5866666021134896871}
   - component: {fileID: 5866666021134896872}
   - component: {fileID: 5866666021134896873}
+  - component: {fileID: 5866666021134896874}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -12441,6 +12459,7 @@ MonoBehaviour:
   _ani_SpeedValue: 0
   targeter: {fileID: 777030669}
   stats: {fileID: 0}
+  steminaComponent: {fileID: 0}
 --- !u!114 &5866666021134896871
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12575,11 +12594,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stats:
-    MaxHP: 100
-    CurrentHP: 100
-    Attack: 6
-    Dex: 5
+    maxHP: 100
+    currentHP: 100
+    attack: 10
+    dex: 5
   hpSlider: {fileID: 0}
+  steminaSlider: {fileID: 0}
+--- !u!114 &5866666021134896874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919132148858097188}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7943eab9a8098b4ea96342670d44fac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxStamina: 100
+  currentStamina: 100
+  regenRate: 5
+  regenDelay: 2
+  steminaSlider: {fileID: 0}
 --- !u!4 &5901452234962585117
 Transform:
   m_ObjectHideFlags: 0

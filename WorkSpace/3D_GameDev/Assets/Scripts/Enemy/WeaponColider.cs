@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class WeaponColider : MonoBehaviour
 {
+
     //Ãæµ¹½Ã
     private void OnTriggerEnter(Collider other)
     {
@@ -19,6 +20,7 @@ public class WeaponColider : MonoBehaviour
             CharacterStatsComponent defender = other.GetComponent<CharacterStatsComponent>();
 
             DamageSystem.ApplyDamage(attacker, defender);
+
         }
     }
 }

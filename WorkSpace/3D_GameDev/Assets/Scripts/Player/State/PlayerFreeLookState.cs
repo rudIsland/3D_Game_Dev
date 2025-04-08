@@ -12,7 +12,8 @@ public class PlayerFreeLookState : PlayerBaseState
     private float _jumpTimeoutDelta;
     const string FREE_LOOK_BLEND_TREE = "FreeLookBlendTree";
 
-    //private float _fallTimeoutDelta;
+    public float sprintStaminaCostPerSecond = 10f;
+    public float jumpStaminaCost = 20f;
 
     public PlayerFreeLookState(PlayerStateMachine stateMachine) : base(stateMachine) {}
 
@@ -123,8 +124,19 @@ public class PlayerFreeLookState : PlayerBaseState
                 deltaTime * stateMachine.rotateSpeed
             );
         }
+
         else if(stateMachine.inputReader.onSprint && input.sqrMagnitude > 0.1f) //달리기중에 입력받으면
         {
+            // if Sprint.... Cost Stemina
+            float sprintCost = sprintStaminaCostPerSecond * deltaTime;
+            if (stateMachine.steminaComponent.CanUse(sprintCost))
+            {
+                stateMachine.steminaComponent.Use(sprintCost);
+            }
+            else
+            {
+                stateMachine.inputReader.onSprint = false; // 스태미나 부족 시 달리기 중지
+            }
 
             // 캐릭터를 moveDirection 기준으로 회전
             Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
@@ -231,11 +243,22 @@ public class PlayerFreeLookState : PlayerBaseState
             // 점프 처리(점프가 가능한 상태 && 점프재사용시간 && 공격중x)
             if (stateMachine.jump && _jumpTimeoutDelta <= 0.0f && !stateMachine.inputReader.isAttack)
             {
-                stateMachine.jump = false; // 점프 입력 초기화
-                _jumpTimeoutDelta = stateMachine.JumpTimeout; // 쿨다운 초기화
+                if (stateMachine.steminaComponent != null && stateMachine.steminaComponent.CanUse(jumpStaminaCost))
+                {
+                    stateMachine.jump = false;
+                    _jumpTimeoutDelta = stateMachine.JumpTimeout;
 
-                stateMachine.verticalVelocity = Mathf.Sqrt(stateMachine.jumpHeight * -2f * stateMachine.gravity);
-                stateMachine.animator.SetBool(stateMachine._animIDJump, true);
+                    // // if jump.... Cost Stemina
+                    stateMachine.steminaComponent.Use(jumpStaminaCost);
+
+                    // 점프 처리
+                    stateMachine.verticalVelocity = Mathf.Sqrt(stateMachine.jumpHeight * -2f * stateMachine.gravity);
+                    stateMachine.animator.SetBool(stateMachine._animIDJump, true);
+                }
+                else
+                {
+                    stateMachine.jump = false; // 스태미나가 부족하면 점프 무시
+                }
             }
         }
         else

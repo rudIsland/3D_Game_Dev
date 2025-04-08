@@ -15,8 +15,8 @@ public static class DamageSystem
             return;
         }
 
-        double attack = attacker.stats.Attack;
-        double defense = defender.stats.Dex;
+        double attack = attacker.stats.attack;
+        double defense = defender.stats.dex;
 
         // RPG 스타일 데미지 공식
         double damage = attack * (100.0 / (100.0 + defense));

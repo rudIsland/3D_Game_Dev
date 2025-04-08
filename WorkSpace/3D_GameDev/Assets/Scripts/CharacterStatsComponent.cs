@@ -8,6 +8,7 @@ public class CharacterStatsComponent : MonoBehaviour
 
     [Header("UI")]
     public Slider hpSlider;
+    public Slider steminaSlider;
 
     public System.Action OnDeath;
 
@@ -29,7 +30,7 @@ public class CharacterStatsComponent : MonoBehaviour
 
     public void Heal(double amount)
     {
-        stats.CurrentHP = Mathf.Min((float)(stats.CurrentHP + amount), (float)stats.MaxHP);
+        stats.currentHP = Mathf.Min((float)(stats.currentHP + amount), (float)stats.maxHP);
         UpdateHPUI();
     }
 
@@ -37,7 +38,7 @@ public class CharacterStatsComponent : MonoBehaviour
     {
         if (hpSlider != null)
         {
-            hpSlider.value = (float)(stats.CurrentHP / stats.MaxHP);
+            hpSlider.value = (float)(stats.currentHP / stats.maxHP);
         }
     }
 }
