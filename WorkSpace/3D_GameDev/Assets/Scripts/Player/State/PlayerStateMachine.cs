@@ -20,6 +20,7 @@ public class PlayerStateMachine : BaseStateMachine
     public float rotateSpeed = 10.0f; //회전속도
     public float animationDampTime = 0.2f; //애니메이션 도달시간 짧을수록 빠르게 도달
     public bool jump = false; //점프여부
+    public bool isDead  {get; private set;}= false;
 
     //점프
     public float jumpHeight = 1.0f; // 점프 높이
@@ -55,6 +56,7 @@ public class PlayerStateMachine : BaseStateMachine
     public readonly int _animIDFreeFall = Animator.StringToHash("FreeFall");
     public readonly int _animIDHit = Animator.StringToHash("Hit");
     public readonly int _animIDAttack = Animator.StringToHash("Attack");
+    public readonly int _animIDDead = Animator.StringToHash("Dead");
 
     public Targeter targeter;
 
@@ -96,6 +98,9 @@ public class PlayerStateMachine : BaseStateMachine
     {
         Debug.Log("플레이어 사망");
         // 게임 오버 처리
+        isDead = true;
+        SwitchState(new PlayerDeadState(this));
+
     }
 
     public void OnJumpPressed()

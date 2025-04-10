@@ -10,6 +10,7 @@ public class Zombie1 : Enemy
     public readonly int _animIDAttack = Animator.StringToHash("IsAttack"); //공격
     public readonly int _animIDHit = Animator.StringToHash("IsHit"); //맞기
     public readonly int _animIDAttackRange = Animator.StringToHash("InAttackRange"); //공격
+    public readonly int _animIDDead = Animator.StringToHash("IsDead"); //죽음
 
     protected override void SetupStats()
     {
@@ -17,15 +18,19 @@ public class Zombie1 : Enemy
         attackRange = 1.0f; //공격범위
         moveSpeed = 2.3f; //이동속도
         angularSpeed = 180f; //회전속도
+        Enemystats.stats.currentHP = Enemystats.stats.maxHP;
     }
 
     protected override void Start()
     {
         base.Start();
+        Enemystats.OnDeath += HandleDeath;
     }
 
     protected override void Update()
-    {
+    {   
+        if (isDead) return;
+
         UpdateDistanceToPlayer();
         UpdateDetectionStatus();
 
@@ -166,6 +171,8 @@ public class Zombie1 : Enemy
 
     private void SetAgentStop(bool stop)
     {
+        if (!agent.enabled) return;
+
         if (agent.isStopped != stop)
             agent.isStopped = stop;
     }
@@ -207,7 +214,22 @@ public class Zombie1 : Enemy
     }
 
 
-    /***************** In Animation Event Function *******************/
+    /***************** Animation Event Function *******************/
+
+    protected override void HandleDeath()
+    {
+        Debug.Log("적 죽는중...");
+        isDead = true;
+        animator.applyRootMotion = true;
+        animator.SetTrigger(_animIDDead);
+
+        //NavMeshAgent를 비활성화하기 전에 정지 먼저 설정
+        SetAgentStop(true);
+
+        agent.enabled = false; // 이제 안전하게 비활성화
+        GetComponent<Collider>().enabled = false;
+    }
+
     private void NormalAttackingStart()
     {
         isAttacking = true;

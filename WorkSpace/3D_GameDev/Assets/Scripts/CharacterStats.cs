@@ -5,13 +5,13 @@ using UnityEngine.UI;
 public class CharacterStats
 {
     public double maxHP = 100; //HP
-    public double currentHP = 100; //current HP
+    public double currentHP; //current HP
     public double attack = 10; //Attack
     public double dex = 5; //Dex
 
-    public void TakeDamage(double amount)
+    public void TakeDamage(double damage)
     {
-        currentHP -= amount;
+        currentHP -= damage;
         currentHP = Mathf.Max((float)currentHP, 0);
     }
 

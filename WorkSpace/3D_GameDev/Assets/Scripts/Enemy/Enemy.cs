@@ -12,18 +12,19 @@ public abstract class Enemy : MonoBehaviour
     [SerializeField] protected float moveSpeed = 3f;
     [SerializeField] protected float angularSpeed = 180f;
 
-    public CharacterStatsComponent stats;
+    protected CharacterStatsComponent Enemystats;
 
 
     public WeaponColider weapon;
     public NavMeshAgent agent;
 
     public bool isAttacking = false;
+    public bool isDead = false;
 
     private void Awake()
     {
-        stats = GetComponent<CharacterStatsComponent>();
-        stats.OnDeath += HandleDeath;
+        Enemystats = GetComponent<CharacterStatsComponent>();
+        Enemystats.OnDeath += HandleDeath;
     }
 
     protected virtual void Start()
@@ -80,13 +81,12 @@ public abstract class Enemy : MonoBehaviour
 
     public void TakeDamage(double damage)
     {
-        stats.TakeDamage(damage);
+        Enemystats.TakeDamage(damage);
     }
 
-    private void HandleDeath()
+    protected virtual void HandleDeath()
     {
         Debug.Log("적 사망");
-        // 게임 오버 처리
     }
 
     protected void RotateTowardsPlayer()
@@ -113,15 +113,14 @@ public abstract class Enemy : MonoBehaviour
     //탐지범위 체크
     protected void UpdateDetectionStatus()
     {
-        enemyMemory.isPlayerDetected = enemyMemory.distanceToPlayer <= detectRange;
-        enemyMemory.isInAttackRange = enemyMemory.distanceToPlayer <= attackRange;
+        enemyMemory.isPlayerDetected = enemyMemory.distanceToPlayer <= detectRange && !GameManager.Instance.playerStateMachine.isDead;
+        enemyMemory.isInAttackRange = enemyMemory.distanceToPlayer <= attackRange && !GameManager.Instance.playerStateMachine.isDead;
     }
 
     protected abstract void SetupStats(); 
     protected abstract void SetupTree(); // 자식 클래스가 override
 
-
-    //Animation Functions
+    /*********************  Animation Functions ***********************/
     private void OnWeapon()
     {
         weapon.gameObject.SetActive(true);

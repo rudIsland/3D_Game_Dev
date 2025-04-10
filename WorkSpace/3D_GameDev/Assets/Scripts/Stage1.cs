@@ -6,7 +6,8 @@ using UnityEngine.SceneManagement;
 public class Stage1 : MonoBehaviour
 {
     // Start is called before the first frame update
-    private void Awake()
+
+    private void OnEnable()
     {
         SceneManager.LoadScene("HUD", LoadSceneMode.Additive);
     }
