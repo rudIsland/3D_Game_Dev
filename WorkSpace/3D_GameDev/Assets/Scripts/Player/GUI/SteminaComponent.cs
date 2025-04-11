@@ -9,7 +9,7 @@ public class SteminaComponent : MonoBehaviour
     public float maxStamina = 100f;
     public float currentStamina = 100f;
 
-    public float regenRate = 7.5f;      // 초당 회복량
+    public float staminaRegenPS = 7.5f;      // 초당 회복량
     public float regenDelay = 2f;     // 마지막 소비 후 회복 딜레이
 
     private float timeSinceLastUse = 0f;
@@ -47,7 +47,7 @@ public class SteminaComponent : MonoBehaviour
 
         if (timeSinceLastUse >= regenDelay && currentStamina < maxStamina)
         {
-            currentStamina += regenRate * Time.deltaTime;
+            currentStamina += staminaRegenPS * Time.deltaTime;
             currentStamina = Mathf.Min(currentStamina, maxStamina);
 
             UpdateSlider();

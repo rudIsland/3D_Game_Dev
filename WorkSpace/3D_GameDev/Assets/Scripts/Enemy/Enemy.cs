@@ -12,7 +12,9 @@ public abstract class Enemy : MonoBehaviour
     [SerializeField] protected float moveSpeed = 3f;
     [SerializeField] protected float angularSpeed = 180f;
 
-    protected CharacterStatsComponent Enemystats;
+    [Header("Ω∫≈»")]
+    [SerializeField] protected CharacterStatsComponent Enemystats;
+    [SerializeField] public LevelSystem levelSys;
 
 
     public WeaponColider weapon;
@@ -23,8 +25,12 @@ public abstract class Enemy : MonoBehaviour
 
     private void Awake()
     {
+        // Stat
         Enemystats = GetComponent<CharacterStatsComponent>();
         Enemystats.OnDeath += HandleDeath;
+
+        // Level
+        levelSys = new LevelSystem();
     }
 
     protected virtual void Start()

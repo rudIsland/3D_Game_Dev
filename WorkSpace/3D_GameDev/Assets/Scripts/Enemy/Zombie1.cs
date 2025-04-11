@@ -19,6 +19,7 @@ public class Zombie1 : Enemy
         moveSpeed = 2.3f; //이동속도
         angularSpeed = 180f; //회전속도
         Enemystats.stats.currentHP = Enemystats.stats.maxHP;
+        levelSys.level = 3;
     }
 
     protected override void Start()
@@ -239,8 +240,15 @@ public class Zombie1 : Enemy
 
     private void NormalAttackingEnd()
     {
+        if (isDead) return;
+
         isAttacking = false;
-        agent.isStopped = false;
+
+        if (agent.enabled && agent.isOnNavMesh)
+        {
+            agent.isStopped = false;
+        }
+
         animator.SetBool(_animIDAttack, false);
     }
 
