@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-//플레이어 또는 적의 상태 정보
-public class BaseStateMachine : MonoBehaviour
+//플레이어
+public class BaseStateMachine : CharacterBase
 {
     //공통 변수
     public Animator animator;
@@ -14,7 +14,6 @@ public class BaseStateMachine : MonoBehaviour
 
     //현재 상태
     public State currentState = null;
-
 
     //상태를 바꾸는 메소드
     public void SwitchState(State newState)
@@ -46,4 +45,5 @@ public class BaseStateMachine : MonoBehaviour
         currentState.Tick(Time.deltaTime);
     }
 
+    public override void ApplyDamage(double damage)  { }
 }

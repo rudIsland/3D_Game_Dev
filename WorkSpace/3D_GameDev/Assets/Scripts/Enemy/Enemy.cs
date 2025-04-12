@@ -1,8 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.AI;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 
-public abstract class Enemy : MonoBehaviour
+public abstract class Enemy : CharacterBase
 {
     public EnemyMemory enemyMemory;
     protected ENode behaviorTree;
@@ -12,26 +13,23 @@ public abstract class Enemy : MonoBehaviour
     [SerializeField] protected float moveSpeed = 3f;
     [SerializeField] protected float angularSpeed = 180f;
 
-    [Header("스탯")]
-    [SerializeField] protected EnemyStatComponent Enemystats;
+    [Header("레벨시스템")]
     [SerializeField] public LevelSystem levelSys;
 
 
-    public WeaponColider weapon;
+    public EnemyWeapon weapon;
     public NavMeshAgent agent;
 
     public bool isAttacking = false;
     public bool isDead = false;
+    public override CharacterStatsComponent statComp => GetComponent<EnemyStatComponent>();
 
     private void Awake()
     {
-        // Stat
-        Enemystats = GetComponent<EnemyStatComponent>();
-        Enemystats.OnDeath += HandleDeath;
+        OnDeath += HandleDeath;
 
         // Level
         levelSys = new LevelSystem();
-        SetupStats();
     }
 
     protected virtual void Start()
@@ -39,6 +37,9 @@ public abstract class Enemy : MonoBehaviour
         weapon.gameObject.SetActive(false);
 
         agent = GetComponent<NavMeshAgent>();
+        
+        SetupStats(); //자식에서 오버라이딩
+
         agent.speed = moveSpeed;
         agent.stoppingDistance = attackRange;
         agent.angularSpeed = angularSpeed;
@@ -84,10 +85,7 @@ public abstract class Enemy : MonoBehaviour
         }
     }
 
-    public void TakeDamage(double damage)
-    {
-        Enemystats.TakeDamage(damage);
-    }
+    public override void ApplyDamage(double damage) { } //IDamagable interface
 
     protected virtual void HandleDeath()
     {

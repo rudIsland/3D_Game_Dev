@@ -5,28 +5,14 @@ using UnityEngine.UI;
 public abstract class CharacterStatsComponent : MonoBehaviour
 {
     [Header("공통스탯")]
-    public CharacterStats stats = new CharacterStats();
+    public CharacterStats stats;
 
     [Header("공통 체력UI")]
     public Slider hpSlider;
     public TextMeshProUGUI hpText;
 
-    public System.Action OnDeath;
-
-    public void TakeDamage(double damage)
+    public void UpdateResource()
     {
-        stats.TakeDamage(damage);
-        UpdateHPUI();
-
-        if (stats.IsDead)
-        {
-            OnDeath?.Invoke(); // 죽음 콜백
-        }
-    }
-
-    public void Heal(double amount)
-    {
-        stats.currentHP = Mathf.Min((float)(stats.currentHP + amount), (float)stats.maxHP);
         UpdateHPUI();
     }
 
@@ -35,7 +21,7 @@ public abstract class CharacterStatsComponent : MonoBehaviour
         if (hpSlider != null)
         {
             hpSlider.value = (float)(stats.currentHP / stats.maxHP);
-            hpText.text = stats.currentHP.ToString()+"/"+stats.maxHP;
+            hpText.text = (int)stats.currentHP + "/" + stats.maxHP.ToString();
         }
     }
 }

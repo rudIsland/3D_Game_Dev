@@ -4,18 +4,18 @@ using UnityEngine.UI;
 
 public class PlayerStatComponent : CharacterStatsComponent
 {
-    [Header("스태미나")]
-    public float maxStamina = 100f;
-    public float currentStamina = 100f;
-
-    public float staminaRegenPS = 7.5f;      // 초당 회복량
-    public float regenDelay = 2f;     // 마지막 소비 후 회복 딜레이
-
     private float timeSinceLastUse = 0f;
 
     [Header("스테미나UI")]
     public Slider steminaSlider;
     public TextMeshProUGUI steminaText;
+
+    private PlayerStats playerStats => stats as PlayerStats;
+
+    private void Awake()
+    {
+        stats = new PlayerStats(); // 또는 인스펙터에서 EnemyStats를 넣어주기
+    }
 
     private void Start()
     {
@@ -32,8 +32,8 @@ public class PlayerStatComponent : CharacterStatsComponent
         // Stemina
         if (steminaSlider != null)
         {
-            steminaSlider.maxValue = maxStamina;
-            steminaSlider.value = currentStamina;
+            steminaSlider.maxValue = playerStats.maxStamina;
+            steminaSlider.value = playerStats.currentStamina;
         }
 
         UpdateSliderStemina();
@@ -43,12 +43,12 @@ public class PlayerStatComponent : CharacterStatsComponent
 
     public bool CanUse(float amount)
     {
-        return currentStamina >= amount;
+        return playerStats.currentStamina >= amount;
     }
 
     public void Use(float amount)
     {
-        currentStamina = Mathf.Max(currentStamina - amount, 0f);
+        playerStats.currentStamina = Mathf.Max(playerStats.currentStamina - amount, 0f);
         timeSinceLastUse = 0f;
 
         UpdateSliderStemina();
@@ -58,10 +58,10 @@ public class PlayerStatComponent : CharacterStatsComponent
     {
         timeSinceLastUse += Time.deltaTime;
 
-        if (timeSinceLastUse >= regenDelay && currentStamina < maxStamina)
+        if (timeSinceLastUse >= playerStats.regenDelay && playerStats.currentStamina < playerStats.maxStamina)
         {
-            currentStamina += staminaRegenPS * Time.deltaTime;
-            currentStamina = Mathf.Min(currentStamina, maxStamina);
+            playerStats.currentStamina += playerStats.staminaRegenPS * Time.deltaTime;
+            playerStats.currentStamina = Mathf.Min(playerStats.currentStamina, playerStats.maxStamina);
 
             UpdateSliderStemina();
         }
@@ -72,8 +72,8 @@ public class PlayerStatComponent : CharacterStatsComponent
     {
         if (steminaSlider != null)
         {
-            steminaSlider.value = currentStamina;
-            steminaText.text = ((int)currentStamina).ToString() + "/" + maxStamina;
+            steminaSlider.value = playerStats.currentStamina;
+            steminaText.text = ((int)playerStats.currentStamina).ToString() + "/" + playerStats.maxStamina;
         }
     }
 

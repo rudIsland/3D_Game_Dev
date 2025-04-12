@@ -11,8 +11,16 @@ public class EnemyGUI : MonoBehaviour
     {
         if (Camera.main != null)
         {
-            // 카메라 쪽을 바라보게 회전
-            transform.rotation = Quaternion.LookRotation(Camera.main.transform.position - transform.position);
+            if (Camera.main == null) return;
+
+            Vector3 camPosition = Camera.main.transform.position;
+            Vector3 direction = transform.position - camPosition;
+            direction.y = 0f; // 수평 방향만 고려
+
+            if (direction.sqrMagnitude > 0.001f)
+            {
+                transform.rotation = Quaternion.LookRotation(direction);
+            }
         }
     }
 
@@ -21,10 +29,11 @@ public class EnemyGUI : MonoBehaviour
         enemy = GetComponentInParent<Enemy>();
     }
 
-    private void Start()
+    public void UpdateLevel()
     {
-        Debug.Log($"[EnemyGUI] enemy.levelSys.level: {enemy.levelSys.level}");
-        levelText.text = enemy.levelSys.level.ToString();
+        if (enemy != null && levelText != null)
+        {
+            levelText.text = enemy.levelSys.level.ToString();
+        }
     }
-
 }

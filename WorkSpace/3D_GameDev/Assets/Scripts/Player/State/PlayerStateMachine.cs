@@ -20,6 +20,7 @@ public class PlayerStateMachine : BaseStateMachine
     public float rotateSpeed = 10.0f; //회전속도
     public float animationDampTime = 0.2f; //애니메이션 도달시간 짧을수록 빠르게 도달
     public bool jump = false; //점프여부
+    public bool Attacking = false;
     public bool isDead  {get; private set;}= false;
 
     //점프
@@ -60,12 +61,13 @@ public class PlayerStateMachine : BaseStateMachine
 
     public Targeter targeter;
 
-    public PlayerStatComponent stats;
+    public override CharacterStatsComponent statComp => GetComponent<PlayerStatComponent>();
+    public PlayerStatComponent PlayerStats => statComp as PlayerStatComponent;
 
+    /************************** End **************************/
     private void Awake()
     {
         weapon.gameObject.SetActive(false);
-        stats = GetComponent<PlayerStatComponent>();
     }
 
     private void Start()
@@ -83,9 +85,16 @@ public class PlayerStateMachine : BaseStateMachine
         inputReader.jumpPressed -= OnJumpPressed;
     }
 
-    public void TakeDamage(double damage)
+    public override void ApplyDamage(double damage)
     {
-        stats.TakeDamage(damage);
+        stats.currentHP -= damage;
+        stats.currentHP = Mathf.Max((float)stats.currentHP, 0);
+
+        animator.SetBool(_animIDHit, true);
+
+        CheckDie();
+
+        statComp.UpdateResource();
     }
 
     public void HandlePlayerDeath()
@@ -135,6 +144,7 @@ public class PlayerStateMachine : BaseStateMachine
         {
             animator.SetTrigger(_animIDAttack);
             inputReader.isAttack = false;
+            Attacking = true;
         }
     }
 
@@ -143,6 +153,7 @@ public class PlayerStateMachine : BaseStateMachine
         inputReader.isAttack = false;
         OFFWeapon();
         animator.ResetTrigger(_animIDAttack); // 트리거 초기화!
+        Attacking = false;
     }
 
     private void ONWeapon()

@@ -2,18 +2,12 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [System.Serializable]
-public class CharacterStats
+public abstract class CharacterStats
 {
-    public double maxHP = 100; //HP
-    public double currentHP; //current HP
-    public double attack = 10; //Attack = STR
-    public double def= 5; //Def
-
-    public void TakeDamage(double damage)
-    {
-        currentHP -= damage;
-        currentHP = Mathf.Max((float)currentHP, 0);
-    }
+    public virtual double maxHP { get; set; } = 100;
+    public virtual double currentHP { get; set; } = 100;
+    public virtual double attack { get; set; } = 10;
+    public virtual double def { get; set; } = 5;
 
     public bool IsDead => currentHP <= 0;
 }

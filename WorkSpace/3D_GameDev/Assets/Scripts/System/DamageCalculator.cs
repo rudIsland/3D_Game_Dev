@@ -1,13 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public static class DamageSystem
+public static class DamageCalculator
 {
     /// <summary>
-    /// 공격자와 피격자의 스탯을 기반으로 데미지를 계산
+    /// 공격자와 피격자의 스탯을 기반으로 데미지를 계산하여 적용합니다.
     /// </summary>
-    public static void ApplyDamage(CharacterStatsComponent attacker, CharacterStatsComponent defender)
+    public static void DamageCalculate(CharacterBase attacker, CharacterBase defender)
     {
         if (attacker == null || defender == null)
         {
@@ -18,13 +16,8 @@ public static class DamageSystem
         double attack = attacker.stats.attack;
         double defense = defender.stats.def;
 
-        // 공격력 * (100/100*방어력)
         double damage = attack * (100.0 / (100.0 + defense));
-
-        // 최소 데미지 1
         damage = Mathf.Max((float)damage, 1f);
-
-        // 데미지 적용
-        defender.TakeDamage(damage);
+        defender.ApplyDamage(damage);
     }
 }

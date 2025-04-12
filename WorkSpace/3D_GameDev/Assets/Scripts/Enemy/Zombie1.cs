@@ -18,14 +18,16 @@ public class Zombie1 : Enemy
         attackRange = 1.0f; //공격범위
         moveSpeed = 2.3f; //이동속도
         angularSpeed = 180f; //회전속도
-        Enemystats.stats.currentHP = Enemystats.stats.maxHP;
+        statComp.stats.currentHP = statComp.stats.maxHP;
         levelSys.level = 3;
+
+        GetComponentInChildren<EnemyGUI>()?.UpdateLevel();
     }
 
     protected override void Start()
     {
         base.Start();
-        Enemystats.OnDeath += HandleDeath;
+        OnDeath += HandleDeath;
     }
 
     protected override void Update()
@@ -91,7 +93,6 @@ public class Zombie1 : Enemy
     //이동
     private ESTATE MoveToPlayer()
     {
-        //not Find, not Move
         if (!enemyMemory.isPlayerDetected)
         {
             SetAgentStop(true);
@@ -138,10 +139,11 @@ public class Zombie1 : Enemy
         // 타겟 바라보고 있는지 체크
         if (!IsFacingTarget(enemyMemory.player.position))
         {
-            RotateTowardsPlayer();
-            return ESTATE.RUN; // 회전 중, 공격 X
+            if (!isAttacking)
+                RotateTowardsPlayer();
+            return ESTATE.RUN;
         }
-        
+
         //공격
         if (!isAttacking)
         {
@@ -149,6 +151,18 @@ public class Zombie1 : Enemy
         }
 
         return ESTATE.SUCCESS;
+    }
+
+    // 데미지 받기
+    public override void ApplyDamage(double damage)
+    {
+        stats.currentHP -= damage;
+        stats.currentHP = Mathf.Max((float)stats.currentHP, 0);
+        animator.SetBool(_animIDHit, true);
+
+        CheckDie();
+
+        statComp.UpdateHPUI();
     }
 
 
@@ -192,16 +206,24 @@ public class Zombie1 : Enemy
 
     private void HandleDetectedState()
     {
-        SetAgentStop(false);
-
-        if (enemyMemory.isInAttackRange && !isAttacking)
+        if (!enemyMemory.isInAttackRange)
         {
+            // 공격 범위 밖: 이동/회전 가능
+            SetAgentStop(false);
+            SetAgentRotation(true);
+        }
+        else if (!isAttacking)
+        {
+            // 공격 범위 안, 공격 전: 회전만 허용
+            SetAgentStop(true);
             SetAgentRotation(false);
             RotateTowardsPlayer();
         }
         else
         {
-            SetAgentRotation(true);
+            // 공격 중: 이동, 회전 금지
+            SetAgentStop(true);
+            SetAgentRotation(false);
         }
     }
 

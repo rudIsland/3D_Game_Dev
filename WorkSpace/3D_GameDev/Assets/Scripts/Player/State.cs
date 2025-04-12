@@ -1,8 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-
 /*
  * 가만히 있는 상태(Idle)
  * 공격중인 상태(Attacking)
