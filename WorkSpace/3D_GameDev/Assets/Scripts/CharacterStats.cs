@@ -6,8 +6,8 @@ public class CharacterStats
 {
     public double maxHP = 100; //HP
     public double currentHP; //current HP
-    public double attack = 10; //Attack
-    public double dex = 5; //Dex
+    public double attack = 10; //Attack = STR
+    public double def= 5; //Def
 
     public void TakeDamage(double damage)
     {

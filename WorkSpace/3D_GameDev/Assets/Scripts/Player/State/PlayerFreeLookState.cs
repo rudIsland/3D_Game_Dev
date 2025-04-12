@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
 
@@ -25,6 +26,7 @@ public class PlayerFreeLookState : PlayerBaseState
         {
             stateMachine.inputReader.jumpPressed += stateMachine.OnJumpPressed;
             stateMachine.inputReader.TargetPressed += onTargetPressed;
+            stateMachine.stats.OnDeath += stateMachine.HandlePlayerDeath;
         }
         _jumpTimeoutDelta = stateMachine.JumpTimeout; //점프 텀 시간 할당
 
@@ -40,6 +42,7 @@ public class PlayerFreeLookState : PlayerBaseState
         {
             stateMachine.inputReader.jumpPressed -= stateMachine.OnJumpPressed;
             stateMachine.inputReader.TargetPressed -= onTargetPressed;
+            stateMachine.stats.OnDeath -= stateMachine.HandlePlayerDeath;
         }
     }
 
@@ -129,9 +132,9 @@ public class PlayerFreeLookState : PlayerBaseState
         {
             // if Sprint.... Cost Stemina
             float sprintCost = sprintStaminaCostPerSecond * deltaTime;
-            if (stateMachine.steminaComponent.CanUse(sprintCost))
+            if (stateMachine.stats.CanUse(sprintCost))
             {
-                stateMachine.steminaComponent.Use(sprintCost);
+                stateMachine.stats.Use(sprintCost);
             }
             else
             {
@@ -243,13 +246,13 @@ public class PlayerFreeLookState : PlayerBaseState
             // 점프 처리(점프가 가능한 상태 && 점프재사용시간 && 공격중x)
             if (stateMachine.jump && _jumpTimeoutDelta <= 0.0f && !stateMachine.inputReader.isAttack)
             {
-                if (stateMachine.steminaComponent != null && stateMachine.steminaComponent.CanUse(jumpStaminaCost))
+                if (stateMachine.stats != null && stateMachine.stats.CanUse(jumpStaminaCost))
                 {
                     stateMachine.jump = false;
                     _jumpTimeoutDelta = stateMachine.JumpTimeout;
 
                     // // if jump.... Cost Stemina
-                    stateMachine.steminaComponent.Use(jumpStaminaCost);
+                    stateMachine.stats.Use(jumpStaminaCost);
 
                     // 점프 처리
                     stateMachine.verticalVelocity = Mathf.Sqrt(stateMachine.jumpHeight * -2f * stateMachine.gravity);

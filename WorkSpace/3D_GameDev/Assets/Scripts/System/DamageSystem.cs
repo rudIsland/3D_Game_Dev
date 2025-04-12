@@ -16,7 +16,7 @@ public static class DamageSystem
         }
 
         double attack = attacker.stats.attack;
-        double defense = defender.stats.dex;
+        double defense = defender.stats.def;
 
         // 공격력 * (100/100*방어력)
         double damage = attack * (100.0 / (100.0 + defense));

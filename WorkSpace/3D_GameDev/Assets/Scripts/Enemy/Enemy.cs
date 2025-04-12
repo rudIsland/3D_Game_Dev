@@ -13,7 +13,7 @@ public abstract class Enemy : MonoBehaviour
     [SerializeField] protected float angularSpeed = 180f;
 
     [Header("Ω∫≈»")]
-    [SerializeField] protected CharacterStatsComponent Enemystats;
+    [SerializeField] protected EnemyStatComponent Enemystats;
     [SerializeField] public LevelSystem levelSys;
 
 
@@ -26,18 +26,17 @@ public abstract class Enemy : MonoBehaviour
     private void Awake()
     {
         // Stat
-        Enemystats = GetComponent<CharacterStatsComponent>();
+        Enemystats = GetComponent<EnemyStatComponent>();
         Enemystats.OnDeath += HandleDeath;
 
         // Level
         levelSys = new LevelSystem();
+        SetupStats();
     }
 
     protected virtual void Start()
     {
         weapon.gameObject.SetActive(false);
-
-        SetupStats();
 
         agent = GetComponent<NavMeshAgent>();
         agent.speed = moveSpeed;

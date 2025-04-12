@@ -60,23 +60,17 @@ public class PlayerStateMachine : BaseStateMachine
 
     public Targeter targeter;
 
-    public CharacterStatsComponent stats;
-    public SteminaComponent steminaComponent;
+    public PlayerStatComponent stats;
 
     private void Awake()
     {
         weapon.gameObject.SetActive(false);
-        stats = GetComponent<CharacterStatsComponent>();
-        steminaComponent = GetComponent<SteminaComponent>();
-        stats.OnDeath += HandlePlayerDeath;
+        stats = GetComponent<PlayerStatComponent>();
     }
 
     private void Start()
     {
         SwitchState(new PlayerFreeLookState(this));
-
-        stats.hpSlider = GameObject.Find("PlayerHP").GetComponent<Slider>();
-        stats.steminaSlider = GameObject.Find("PlayerStemina").GetComponent<Slider>();
         _hasAnimator = TryGetComponent(out animator);
     }
     private void OnEnable()
@@ -94,7 +88,7 @@ public class PlayerStateMachine : BaseStateMachine
         stats.TakeDamage(damage);
     }
 
-    private void HandlePlayerDeath()
+    public void HandlePlayerDeath()
     {
         Debug.Log("플레이어 사망");
         // 게임 오버 처리

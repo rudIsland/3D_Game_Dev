@@ -4,7 +4,7 @@ using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class LevelComponent : MonoBehaviour
+public class LevelExpComponent : MonoBehaviour
 {
     public LevelSystem levelSys;
     public Slider ExpSlider;
@@ -50,8 +50,8 @@ public class LevelComponent : MonoBehaviour
             levelSys.LevelUp();
             levelSys.currentExp = saveExp;
             UpdateExpSlider();
+            gameObject.SetActive(true);
         }
     }
-
 
 }

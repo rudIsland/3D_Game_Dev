@@ -1,21 +1,17 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CharacterStatsComponent : MonoBehaviour
+public abstract class CharacterStatsComponent : MonoBehaviour
 {
-    [Header("스탯")]
+    [Header("공통스탯")]
     public CharacterStats stats = new CharacterStats();
 
-    [Header("UI")]
+    [Header("공통 체력UI")]
     public Slider hpSlider;
-    public Slider steminaSlider;
+    public TextMeshProUGUI hpText;
 
     public System.Action OnDeath;
-
-    private void Start()
-    {
-        UpdateHPUI();
-    }
 
     public void TakeDamage(double damage)
     {
@@ -34,11 +30,12 @@ public class CharacterStatsComponent : MonoBehaviour
         UpdateHPUI();
     }
 
-    private void UpdateHPUI()
+    public virtual void UpdateHPUI()
     {
         if (hpSlider != null)
         {
             hpSlider.value = (float)(stats.currentHP / stats.maxHP);
+            hpText.text = stats.currentHP.ToString()+"/"+stats.maxHP;
         }
     }
 }

@@ -9,9 +9,8 @@ public class PlayerDeadState : PlayerBaseState
     public override void Enter()
     {
         Debug.Log("DeadStateÁøÀÔ");
-
-        stateMachine.animator.SetTrigger(stateMachine._animIDDead);
         stateMachine.animator.applyRootMotion = true;
+        stateMachine.animator.SetTrigger(stateMachine._animIDDead);
     }
 
     public override void Exit()

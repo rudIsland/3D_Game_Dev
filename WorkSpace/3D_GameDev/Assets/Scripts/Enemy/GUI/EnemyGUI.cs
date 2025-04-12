@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class EnemyGUI : MonoBehaviour
 {
-    private Enemy enemy;
+    public Enemy enemy;
     public TextMeshProUGUI levelText;
     void LateUpdate()
     {
@@ -16,9 +16,14 @@ public class EnemyGUI : MonoBehaviour
         }
     }
 
-    private void Start()
+    private void Awake()
     {
         enemy = GetComponentInParent<Enemy>();
+    }
+
+    private void Start()
+    {
+        Debug.Log($"[EnemyGUI] enemy.levelSys.level: {enemy.levelSys.level}");
         levelText.text = enemy.levelSys.level.ToString();
     }
 

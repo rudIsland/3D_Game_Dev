@@ -7,7 +7,7 @@ public class Stage1 : MonoBehaviour
 {
     // Start is called before the first frame update
 
-    private void OnEnable()
+    private void Awake()
     {
         SceneManager.LoadScene("HUD", LoadSceneMode.Additive);
     }
