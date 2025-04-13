@@ -6,11 +6,13 @@ using UnityEngine;
 public class PlayerStatUIComponent : MonoBehaviour
 {
     public TextMeshProUGUI[] statText = new TextMeshProUGUI[3];
+    public TextMeshProUGUI levelText;
     public PlayerStatUI playerStatUI;
 
     private string STR_TXT = "STR: ";
     private string DEX_TXT = "DEX: ";
     private string HP_TXT = "HP: ";
+    private string LEVEL_TXT = "Level: ";
 
     private void Awake()
     {
@@ -22,6 +24,7 @@ public class PlayerStatUIComponent : MonoBehaviour
         UpdateStatText(0);
         UpdateStatText(1);
         UpdateStatText(2);
+        UpdateLevelText();
     }
 
     public void UpdateStatText(int Index)
@@ -39,5 +42,10 @@ public class PlayerStatUIComponent : MonoBehaviour
                 break;
 
         }
+    }
+
+    public void UpdateLevelText()
+    {
+        levelText.text = LEVEL_TXT+UIManager.Instance.stateMachine.levelSys.level.ToString();
     }
 }

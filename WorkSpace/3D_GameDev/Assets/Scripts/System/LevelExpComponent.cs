@@ -1,6 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.PackageManager;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,7 +9,7 @@ public class LevelExpComponent : MonoBehaviour
 
     private void Awake()
     {
-        levelSys = new LevelSystem();
+        levelSys = UIManager.Instance.stateMachine.levelSys;
         if (levelSys.ExpArray == null)
         {
             Debug.LogError("ExpArray is null!");
@@ -51,6 +49,7 @@ public class LevelExpComponent : MonoBehaviour
             levelSys.currentExp = saveExp;
             UpdateExpSlider();
             gameObject.SetActive(true);
+            UIManager.Instance.playerStatUIComp.UpdateLevelText();
         }
     }
 

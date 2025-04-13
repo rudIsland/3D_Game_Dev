@@ -9,7 +9,8 @@ public class LevelUpComponent : MonoBehaviour
 
     void Awake()
     {
-        playerStat = GameObject.Find("Player").GetComponent<PlayerStatComponent>().stats;
+        //playerStat = GameObject.Find("Player").GetComponent<PlayerStatComponent>().stats;
+        playerStat = UIManager.Instance.stateMachine.PlayerStats.stats;
         gameObject.SetActive(false);
     }
 
