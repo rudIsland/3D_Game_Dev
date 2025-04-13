@@ -4,53 +4,25 @@ using UnityEngine.UI;
 
 public class LevelExpComponent : MonoBehaviour
 {
-    public LevelSystem levelSys;
-    public Slider ExpSlider;
+    [SerializeField] private PlayerStatUIComponent playerStatUIComp;
+    [SerializeField] private Slider expSlider;
 
-    private void Awake()
+    public void SetPlayerStatUI(PlayerStatUIComponent ui)
     {
-        levelSys = UIManager.Instance.stateMachine.levelSys;
-        if (levelSys.ExpArray == null)
-        {
-            Debug.LogError("ExpArray is null!");
-            return;
-        }
-        SetExpArrayAndSlider();
+        playerStatUIComp = ui;
     }
 
-    public void SetExpArrayAndSlider()
+    public void UpdateEXPSlider()
     {
-        for (int level = 0; level < 50; level++)
+        expSlider.maxValue = playerStatUIComp.playerStatComp.playerStats.level.MaxExp;
+        expSlider.value = playerStatUIComp.playerStatComp.playerStats.level.currentExp;
+
+        if (playerStatUIComp.playerStatComp.playerStats.level.IsLevelUp && playerStatUIComp.playerStatComp.playerStats.level.TryLevelUp())
         {
-            levelSys.ExpArray[level] = Mathf.Round(100f * Mathf.Pow(level + 1, 1.5f));
-        }
-
-        ExpSlider.maxValue = levelSys.ExpArray[0];
-        ExpSlider.value = levelSys.currentExp;
-    }
-
-    public void UpdateExpSlider()
-    {
-        int nowLevel = levelSys.level;
-        ExpSlider.maxValue = levelSys.ExpArray[nowLevel - 1];
-
-        ExpSlider.value = levelSys.currentExp;
-
-        //Check levelUp
-        CheckLevelUp(nowLevel);
-    }
-
-    private void CheckLevelUp(int nowLevel)
-    {
-        if (levelSys.ExpArray[nowLevel - 1] < levelSys.currentExp)
-        {
-            float saveExp = levelSys.ExpArray[nowLevel - 1] - levelSys.currentExp;
-            levelSys.LevelUp();
-            levelSys.currentExp = saveExp;
-            UpdateExpSlider();
+            expSlider.maxValue = playerStatUIComp.playerStatComp.playerStats.level.MaxExp;
+            expSlider.value = playerStatUIComp.playerStatComp.playerStats.level.currentExp;
+            playerStatUIComp.UpdateLevelText();
             gameObject.SetActive(true);
-            UIManager.Instance.playerStatUIComp.UpdateLevelText();
         }
     }
-
 }

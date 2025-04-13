@@ -9,6 +9,13 @@ public class GameManager : MonoBehaviour
 
     public PlayerStateMachine playerStateMachine;
 
+    void Start()
+    {
+        var ui = FindObjectOfType<PlayerStatUIComponent>();
+        var player = GameObject.FindWithTag("Player").GetComponent<PlayerStatComponent>();
+        ui.Init(player);
+    }
+
     private void Awake()
     {
         if(Instance != null && Instance != this)

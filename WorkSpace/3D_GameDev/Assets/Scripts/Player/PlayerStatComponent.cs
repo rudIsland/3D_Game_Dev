@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static Cinemachine.DocumentationSortingAttribute;
 
 public class PlayerStatComponent : CharacterStatsComponent
 {
@@ -10,11 +11,11 @@ public class PlayerStatComponent : CharacterStatsComponent
     public Slider steminaSlider;
     public TextMeshProUGUI steminaText;
 
-    private PlayerStats playerStats => stats as PlayerStats;
+    public PlayerStats playerStats => stats as PlayerStats;
 
     private void Awake()
     {
-        stats = new PlayerStats(); // 또는 인스펙터에서 EnemyStats를 넣어주기
+        stats = new PlayerStats();
     }
 
     private void Start()

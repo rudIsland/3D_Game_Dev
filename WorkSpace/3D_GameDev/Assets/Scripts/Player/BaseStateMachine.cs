@@ -9,7 +9,6 @@ public class BaseStateMachine : CharacterBase
     //공통 변수
     public Animator animator;
     public int stateNum;
-    public LevelSystem levelSys;
 
     [Header("오디오")]
     //오디오
@@ -37,14 +36,6 @@ public class BaseStateMachine : CharacterBase
 
     public override CharacterStatsComponent statComp => GetComponent<PlayerStatComponent>();
     public PlayerStatComponent PlayerStats => statComp as PlayerStatComponent;
-
-    private void Awake()
-    {
-        levelSys = new LevelSystem();
-
-        // UIManager에 자신을 넘겨서 HUD에서 쓸 수 있게 한다
-        UIManager.Instance.stateMachine = this;
-    }
 
     //상태를 바꾸는 메소드
     public void SwitchState(State newState)

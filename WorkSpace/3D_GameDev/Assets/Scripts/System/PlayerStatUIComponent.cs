@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -7,45 +5,52 @@ public class PlayerStatUIComponent : MonoBehaviour
 {
     public TextMeshProUGUI[] statText = new TextMeshProUGUI[3];
     public TextMeshProUGUI levelText;
-    public PlayerStatUI playerStatUI;
 
     private string STR_TXT = "STR: ";
-    private string DEX_TXT = "DEX: ";
+    private string DEF_TXT = "DEF: ";
     private string HP_TXT = "HP: ";
     private string LEVEL_TXT = "Level: ";
 
-    private void Awake()
+    [Header("외부에서 가져올 오브젝트")]
+    public PlayerStatComponent playerStatComp;
+
+    public void Init(PlayerStatComponent comp)
     {
-        playerStatUI = new PlayerStatUI();
+        playerStatComp = comp;
+        UpdateAll();
     }
 
-    private void Start()
+    public void UpdateStatText(int index)
     {
-        UpdateStatText(0);
-        UpdateStatText(1);
-        UpdateStatText(2);
-        UpdateLevelText();
-    }
+        if (playerStatComp.playerStats == null) return;
 
-    public void UpdateStatText(int Index)
-    {
-        switch(Index)
+        switch (index)
         {
             case 0:
-                statText[0].text = STR_TXT + playerStatUI.STR.ToString();
+                statText[0].text = STR_TXT + playerStatComp.playerStats.ATK;
                 break;
             case 1:
-                statText[1].text = DEX_TXT + playerStatUI.DEF.ToString();
+                statText[1].text = DEF_TXT + playerStatComp.playerStats.DEF;
                 break;
             case 2:
-                statText[2].text = HP_TXT + playerStatUI.HP.ToString();
+                statText[2].text = HP_TXT + playerStatComp.playerStats.maxHP;
                 break;
-
         }
     }
 
     public void UpdateLevelText()
     {
-        levelText.text = LEVEL_TXT+UIManager.Instance.stateMachine.levelSys.level.ToString();
+        if (playerStatComp.playerStats != null)
+        {
+            levelText.text = LEVEL_TXT + playerStatComp.playerStats.level.currentLevel.ToString();
+        }
+    }
+
+    public void UpdateAll()
+    {
+        UpdateStatText(0);
+        UpdateStatText(1);
+        UpdateStatText(2);
+        UpdateLevelText();
     }
 }

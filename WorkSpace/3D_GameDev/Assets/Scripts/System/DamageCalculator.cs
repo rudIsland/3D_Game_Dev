@@ -13,8 +13,8 @@ public static class DamageCalculator
             return;
         }
 
-        double attack = attacker.stats.attack;
-        double defense = defender.stats.def;
+        double attack = attacker.stats.ATK;
+        double defense = defender.stats.DEF;
 
         double damage = attack * (100.0 / (100.0 + defense));
         damage = Mathf.Max((float)damage, 1f);

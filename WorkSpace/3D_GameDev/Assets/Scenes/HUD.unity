@@ -335,7 +335,6 @@ GameObject:
   - component: {fileID: 117769814}
   - component: {fileID: 117769813}
   - component: {fileID: 117769812}
-  - component: {fileID: 117769816}
   m_Layer: 5
   m_Name: PlayerHUD
   m_TagString: Untagged
@@ -419,7 +418,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1877376061}
-  - {fileID: 418820815}
   - {fileID: 340392827}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -428,23 +426,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &117769816
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 117769811}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f93b7798e0a2cc3499d4506c7ca749a8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerStatUIComp: {fileID: 1773795387}
-  levelExpComp: {fileID: 418820816}
-  levelupComp: {fileID: 884947430}
-  levelUpPanel: {fileID: 884947428}
-  stateMachine: {fileID: 0}
 --- !u!1 &147934101
 GameObject:
   m_ObjectHideFlags: 0
@@ -569,8 +550,9 @@ GameObject:
   - component: {fileID: 340392826}
   - component: {fileID: 340392825}
   - component: {fileID: 340392824}
+  - component: {fileID: 340392828}
   m_Layer: 5
-  m_Name: StatAndLevelUp
+  m_Name: StatAndLevel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -653,6 +635,7 @@ RectTransform:
   m_Children:
   - {fileID: 1773795383}
   - {fileID: 884947429}
+  - {fileID: 418820815}
   m_Father: {fileID: 117769815}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -660,6 +643,18 @@ RectTransform:
   m_AnchoredPosition: {x: 359, y: 202}
   m_SizeDelta: {x: 718, y: 404}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &340392828
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 340392823}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4b1577c26395034ca841335cbfa0e1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &398554101
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1049,7 +1044,7 @@ GameObject:
   - component: {fileID: 418820815}
   - component: {fileID: 418820816}
   m_Layer: 0
-  m_Name: Level_Exp_System
+  m_Name: Exp_System
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1064,12 +1059,12 @@ Transform:
   m_GameObject: {fileID: 418820814}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -22.19107, y: 78.75073, z: -437.20993}
+  m_LocalPosition: {x: -40.69107, y: 68.25073, z: -437.20993}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1961121636}
-  m_Father: {fileID: 117769815}
+  m_Father: {fileID: 340392827}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &418820816
 MonoBehaviour:
@@ -1083,62 +1078,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ce2be0a2a21a9948b7a1d6e1b23f0ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelSys:
-    level: 0
-    maxExp: 0
-    currentExp: 0
-    ExpArray:
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-    - 0
-  ExpSlider: {fileID: 1961121637}
+  playerStatUIComp: {fileID: 1773795387}
+  expSlider: {fileID: 1961121637}
 --- !u!1 &667542338
 GameObject:
   m_ObjectHideFlags: 0
@@ -1341,7 +1282,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 953eb132b68157c4da9988089249fda2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerStatUIComp: {fileID: 1773795387}
+  playerStatUIComp: {fileID: 0}
 --- !u!114 &884947431
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2959,6 +2900,7 @@ MonoBehaviour:
   - {fileID: 1038582173}
   - {fileID: 413827772}
   levelText: {fileID: 1531990589}
+  playerStatComp: {fileID: 0}
 --- !u!1 &1862918799
 GameObject:
   m_ObjectHideFlags: 0

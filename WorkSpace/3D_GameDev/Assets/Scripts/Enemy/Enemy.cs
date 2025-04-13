@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.AI;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
+using static Cinemachine.DocumentationSortingAttribute;
 
 public abstract class Enemy : CharacterBase
 {
@@ -13,9 +14,8 @@ public abstract class Enemy : CharacterBase
     [SerializeField] protected float moveSpeed = 3f;
     [SerializeField] protected float angularSpeed = 180f;
 
-    [Header("레벨시스템")]
-    [SerializeField] public LevelSystem levelSys;
-
+    [Header("레벨")]
+    [SerializeField] public Level level;
 
     public EnemyWeapon weapon;
     public NavMeshAgent agent;
@@ -26,18 +26,17 @@ public abstract class Enemy : CharacterBase
 
     private void Awake()
     {
-        OnDeath += HandleDeath;
+        agent = GetComponent<NavMeshAgent>();
 
+        
         // Level
-        levelSys = new LevelSystem();
+        level = new Level();
     }
 
     protected virtual void Start()
     {
         weapon.gameObject.SetActive(false);
 
-        agent = GetComponent<NavMeshAgent>();
-        
         SetupStats(); //자식에서 오버라이딩
 
         agent.speed = moveSpeed;
@@ -51,6 +50,7 @@ public abstract class Enemy : CharacterBase
             self = transform,
             player = GameObject.FindWithTag("Player").transform
         };
+
         SetupTree(); // 트리 구성은 자식이 정의
     }
 

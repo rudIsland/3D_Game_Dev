@@ -33,7 +33,7 @@ public class EnemyGUI : MonoBehaviour
     {
         if (enemy != null && levelText != null)
         {
-            levelText.text = enemy.levelSys.level.ToString();
+            levelText.text = enemy.level.currentLevel.ToString();
         }
     }
 }

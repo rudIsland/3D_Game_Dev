@@ -5,7 +5,6 @@ public class EnemyStatComponent : CharacterStatsComponent
     {
         stats = new EnemyStats();
     }
-
     private void Start()
     {
         UpdateHPUI();

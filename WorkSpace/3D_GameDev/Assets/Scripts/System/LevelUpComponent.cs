@@ -4,22 +4,29 @@ using UnityEngine;
 
 public class LevelUpComponent : MonoBehaviour
 {
-    public CharacterStats playerStat;
-    public PlayerStatUIComponent playerStatUIComp;
+    [SerializeField] private CharacterStats playerStat;
+    private PlayerStatUIComponent playerStatUIComp;
 
-    void Awake()
+    private void Start()
     {
-        //playerStat = GameObject.Find("Player").GetComponent<PlayerStatComponent>().stats;
-        playerStat = UIManager.Instance.stateMachine.PlayerStats.stats;
         gameObject.SetActive(false);
+    }
+
+    public void SetPlayerStatUI(PlayerStatUIComponent ui)
+    {
+        playerStatUIComp = ui;
+    }
+
+    public void SetPlayerStat(CharacterStats stats)
+    {
+        playerStat = stats;
     }
 
     public void UpAttack()
     {
         if (playerStat != null)
         {
-            playerStatUIComp.playerStatUI.STR += 1;
-            playerStat.attack += 2;
+            playerStat.ATK += 2;
             playerStatUIComp.UpdateStatText(0);
         }
     }
@@ -28,8 +35,7 @@ public class LevelUpComponent : MonoBehaviour
     {
         if(playerStat != null)
         {
-            playerStatUIComp.playerStatUI.STR -= 1;
-            playerStat.attack -= 2;
+            playerStat.ATK -= 2;
             playerStatUIComp.UpdateStatText(0);
         }
     }
@@ -38,8 +44,7 @@ public class LevelUpComponent : MonoBehaviour
     {
         if (playerStat != null)
         {
-            playerStatUIComp.playerStatUI.DEF += 1;
-            playerStat.def += 1;
+            playerStat.DEF += 1;
             playerStatUIComp.UpdateStatText(1);
         }
     }
@@ -48,8 +53,7 @@ public class LevelUpComponent : MonoBehaviour
     {
         if (playerStat != null)
         {
-            playerStatUIComp.playerStatUI.DEF -= 1;
-            playerStat.def -= 1;
+            playerStat.DEF -= 1;
             playerStatUIComp.UpdateStatText(1);
         }
     }
@@ -59,7 +63,6 @@ public class LevelUpComponent : MonoBehaviour
     {
         if (playerStat != null)
         {
-            playerStatUIComp.playerStatUI.HP += 1;
             playerStat.maxHP += 20;
             playerStatUIComp.UpdateStatText(2);
         }
@@ -69,7 +72,6 @@ public class LevelUpComponent : MonoBehaviour
     {
         if (playerStat != null)
         {
-            playerStatUIComp.playerStatUI.HP -= 1;
             playerStat.maxHP -= 20;
             playerStatUIComp.UpdateStatText(2);
         }

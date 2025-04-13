@@ -18,10 +18,10 @@ public class Zombie1 : Enemy
         attackRange = 1.0f; //공격범위
         moveSpeed = 2.3f; //이동속도
         angularSpeed = 180f; //회전속도
-        statComp.stats.currentHP = statComp.stats.maxHP;
-        levelSys.level = 3;
+        statComp.stats.currentHP = statComp.stats.maxHP; //현재 체력설정
+        level.SetLevel(3); //레벨설정
 
-        GetComponentInChildren<EnemyGUI>()?.UpdateLevel();
+        GetComponentInChildren<EnemyGUI>()?.UpdateLevel(); //GUI레벨설정
     }
 
     protected override void Start()

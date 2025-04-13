@@ -43,15 +43,16 @@ public class PlayerStateMachine : BaseStateMachine
     public Targeter targeter;
 
     /************************** End **************************/
+
     private void Awake()
     {
-        weapon.gameObject.SetActive(false);
+        _hasAnimator = TryGetComponent(out animator);
     }
-
     private void Start()
     {
+        weapon.gameObject.SetActive(false);
+
         SwitchState(new PlayerFreeLookState(this));
-        _hasAnimator = TryGetComponent(out animator);
     }
     private void OnEnable()
     {
