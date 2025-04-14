@@ -1,13 +1,31 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Targeter : MonoBehaviour
 {
     public SphereCollider SphereCollider;
+    [SerializeField] private float TargetRadius = 6f;
     public List<Target> targets = new List<Target>(); //¹Ù¶óº¼ Å¸°Ù ¸®½ºÆ®
 
     public Target currentTarget;
+
+    public event Action OnCurrentTargetLost;
+
+    private void Awake()
+    {
+        SphereCollider = GetComponent<SphereCollider>();
+    }
+
+    private void Start()
+    {
+        SetTargetRadius();
+    }
+
+    void SetTargetRadius()
+    {
+       SphereCollider.radius = TargetRadius;
+    }
 
     public bool SelectTarget()
     {
@@ -24,6 +42,20 @@ public class Targeter : MonoBehaviour
         currentTarget = null;
     }
 
+    public void RemoveTarget(Target target)
+    {
+        if (targets.Contains(target))
+        {
+            targets.Remove(target);
+
+            if (currentTarget == target)
+            {
+                CanCel();
+                OnCurrentTargetLost?.Invoke();
+            }
+        }
+    }
+
 
     private void OnTriggerEnter(Collider other) //Å¸°Ù Ãß°¡
     {
@@ -32,6 +64,12 @@ public class Targeter : MonoBehaviour
             return;
 
         targets.Add(target);
+
+        CharacterBase character = target.GetComponent<CharacterBase>();
+        if (character != null)
+        {
+            character.OnDeath += () => RemoveTarget(target); //»ç¸Á½Ã Á¦°Å
+        }
     }
 
     private void OnTriggerExit(Collider other) //Å¸°Ù Á¦°Å
@@ -41,5 +79,6 @@ public class Targeter : MonoBehaviour
             return;
 
         targets.Remove(target);
+        if(targets.Count < 1) OnCurrentTargetLost?.Invoke();
     }
 }

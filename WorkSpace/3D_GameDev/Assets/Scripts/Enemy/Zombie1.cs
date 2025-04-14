@@ -32,7 +32,7 @@ public class Zombie1 : Enemy
 
     protected override void Update()
     {   
-        if (isDead) return;
+        if (statComp.stats.IsDead) return;
 
         UpdateDistanceToPlayer();
         UpdateDetectionStatus();
@@ -242,7 +242,6 @@ public class Zombie1 : Enemy
     protected override void HandleDeath()
     {
         Debug.Log("적 죽는중...");
-        isDead = true;
         animator.applyRootMotion = true;
         animator.SetTrigger(_animIDDead);
 
@@ -251,6 +250,7 @@ public class Zombie1 : Enemy
 
         agent.enabled = false; // 이제 안전하게 비활성화
         GetComponent<Collider>().enabled = false;
+        GetComponent<Target>().enabled = false;
     }
 
     private void NormalAttackingStart()
@@ -262,7 +262,7 @@ public class Zombie1 : Enemy
 
     private void NormalAttackingEnd()
     {
-        if (isDead) return;
+        if (statComp.stats.IsDead) return;
 
         isAttacking = false;
 

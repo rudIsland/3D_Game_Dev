@@ -39,7 +39,6 @@ public class PlayerStateMachine : BaseStateMachine
     public LayerMask GroundLayers; //레이어마스크
     public Camera playerCamera;
 
-
     public Targeter targeter;
 
     /************************** End **************************/

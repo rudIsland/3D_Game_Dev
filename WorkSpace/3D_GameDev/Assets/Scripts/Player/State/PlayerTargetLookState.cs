@@ -33,6 +33,8 @@ public class PlayerTargetLookState : PlayerBaseState
         {
             stateMachine.inputReader.TargetPressed += onTargetPressed;
             stateMachine.OnDeath += stateMachine.HandlePlayerDeath;
+
+            stateMachine.targeter.OnCurrentTargetLost += CanCel;
         }
         _jumpTimeoutDelta = stateMachine.JumpTimeout; //점프 텀 시간 할당
 
@@ -48,6 +50,8 @@ public class PlayerTargetLookState : PlayerBaseState
         {
             stateMachine.inputReader.TargetPressed -= onTargetPressed;
             stateMachine.OnDeath -= stateMachine.HandlePlayerDeath;
+
+            stateMachine.targeter.OnCurrentTargetLost -= CanCel;
         }
     }
 
