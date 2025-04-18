@@ -5,22 +5,47 @@ using UnityEngine;
 public class Mutant : Enemy
 {
     public Animator animator;
-    public readonly int _animIDFind = Animator.StringToHash("IsFind"); //탐지
+    public readonly int _animIDWalk = Animator.StringToHash("WalkRange"); //탐지
+    public readonly int _animIDRunning = Animator.StringToHash("RunningRange"); //탐지
     public readonly int _animIDAttack = Animator.StringToHash("IsAttack"); //공격
+    public readonly int _animIDPunchRange = Animator.StringToHash("PunchRange"); //공격
+    public readonly int _animIDJumpAttack = Animator.StringToHash("JumpAttackRange"); //점프공격
+    public readonly int _animIDSwipAttack = Animator.StringToHash("SwipRange"); //점프공격
     public readonly int _animIDHit = Animator.StringToHash("IsHit"); //맞기
-    public readonly int _animIDAttackRange = Animator.StringToHash("InAttackRange"); //공격
-    public readonly int _animIDJumpAttack = Animator.StringToHash("JumpAttack"); //점프공격
     public readonly int _animIDDead = Animator.StringToHash("IsDead"); //죽음
+    
 
+    [Header("공격범위")]
     [SerializeField] private float JumpAttackRange = 8f;
     [SerializeField] private float PunchAttackRange = 1.0f;
     [SerializeField] private float SwipAttackRange = 1.5f;
+    [SerializeField] private float walkSpeed = 1.8f;
+    [SerializeField] private float runningSpeed = 2.3f;
+
+    [Header("점프공격 쿨타임")]
+    [SerializeField] private float jumpAttackCooldown = 10f;
+    private float jumpAttackTimer = 0f;
+
+    private bool canJumpAttack = false;
+    private float jumpRangeCheckTimer = 0f;
+    private readonly float jumpRangeCheckInterval = 5f;
+
+    [Header("탐지범위")]
+    [SerializeField] private float RunningArange = 10f;
+    [SerializeField] private float WalkArange = 5f;
+
+    [SerializeField] private bool isRunning = false;
+    [SerializeField] private bool isWalk = false;
+
+    [Header("탐지범위")]
+    public EnemyWeapon leftWeapon;
+    public EnemyWeapon rightWeapon;
 
     protected override void SetupStats()
     {
         detectRange = 15f; //탐지범위
         attackRange = 1.0f; //공격범위
-        moveSpeed = 2.3f; //이동속도
+        moveSpeed = runningSpeed; //이동속도
         angularSpeed = 180f; //회전속도
         statComp.stats.currentHP = statComp.stats.maxHP; //현재 체력설정
         level.SetLevel(3); //레벨설정
@@ -40,10 +65,9 @@ public class Mutant : Enemy
 
         UpdateDistanceToPlayer();
         UpdateDetectionStatus();
-
         UpdateAnimatorStates();
 
-        if (!enemyMemory.isPlayerDetected)
+        if (!isRunning && !isWalk)
         {
             HandleUndetectedState();
             return;
@@ -53,12 +77,20 @@ public class Mutant : Enemy
         behaviorTree?.Evaluate();
     }
 
+    //탐지범위 체크
+    protected override void UpdateDetectionStatus()
+    {
+        isRunning = enemyMemory.distanceToPlayer <= RunningArange && !GameManager.Instance.playerStateMachine.isDead;
+        isWalk = enemyMemory.distanceToPlayer <= WalkArange && !GameManager.Instance.playerStateMachine.isDead;
+    }
+
 
     protected override void SetupTree()
     {
         // 탐지 트리
         ENode detectTree = new SelectorNode(new List<ENode> {
-            new ActionNode(CheckDetectRange)
+            new ActionNode(CheckRunningRange),
+            new ActionNode(CheckWalkRange)
         });
 
         // 이동 트리
@@ -68,10 +100,10 @@ public class Mutant : Enemy
 
         // 공격 트리
         ENode attackTree = new SequenceNode(new List<ENode> {
-            new ActionNode(CheckAttackRange),
             new SelectorNode(new List<ENode>{
-                new ActionNode(JumpAttack),
-                new ActionNode(PunchAttack)
+                new ActionNode(SwipAttack),
+                new ActionNode(PunchAttack),
+                //new ActionNode(JumpAttack)
             })
         });
 
@@ -84,36 +116,43 @@ public class Mutant : Enemy
     // ------------------ 행동 노드 ------------------
 
     //탐지
-    private ESTATE CheckDetectRange()
+    private ESTATE CheckWalkRange()
     {
-        bool detected = enemyMemory.isPlayerDetected;
+        float dist = Vector3.Distance(transform.position, enemyMemory.player.position);
+        bool isInRange = dist <= WalkArange;
+        animator.SetBool(_animIDWalk, isInRange);
+        return isInRange ? ESTATE.SUCCESS : ESTATE.FAILED;
+    }
 
-        // 탐지 애니메이션 상태 업데이트
-        animator.SetBool(_animIDFind, detected);
-
-        return detected ? ESTATE.SUCCESS : ESTATE.FAILED;
+    private ESTATE CheckRunningRange()
+    {
+        float dist = Vector3.Distance(transform.position, enemyMemory.player.position);
+        bool isInRange = dist <= RunningArange;
+        animator.SetBool(_animIDRunning, isInRange);
+        return isInRange ? ESTATE.SUCCESS : ESTATE.FAILED;
     }
 
 
     //이동
     private ESTATE MoveToPlayer()
     {
-        if (!enemyMemory.isPlayerDetected)
+        if (!isRunning && !isWalk)
         {
+            Debug.Log("[이동] 탐지 실패 → 이동 정지");
             SetAgentStop(true);
             return ESTATE.FAILED;
         }
 
-        if (enemyMemory.isInAttackRange)
+        if (IsInPunchRange() || IsInSwipRange())
         {
+            Debug.Log("[이동] 공격범위 진입 → 이동 정지");
             SetAgentStop(true);
             return ESTATE.SUCCESS;
         }
 
-        animator.SetBool(_animIDAttackRange, false);
-
         if (!isAttacking)
         {
+            Debug.Log("[이동] 플레이어에게 이동 중");
             SetAgentStop(false);
             agent.SetDestination(enemyMemory.player.position);
         }
@@ -122,12 +161,6 @@ public class Mutant : Enemy
     }
 
     //공격
-    private ESTATE CheckAttackRange()
-    {
-        bool canAttack = IsInPunchRange() || IsInJumpRange();
-        animator.SetBool(_animIDAttackRange, canAttack);
-        return canAttack ? ESTATE.SUCCESS : ESTATE.FAILED;
-    }
 
     private bool IsInPunchRange()
     {
@@ -137,32 +170,36 @@ public class Mutant : Enemy
     private bool IsInJumpRange()
     {
         float dist = Vector3.Distance(transform.position, enemyMemory.player.position);
-        return dist > PunchAttackRange && dist <= JumpAttackRange;
+        return dist <= JumpAttackRange;
+    }
+
+    private bool IsInSwipRange()
+    {
+        float dist = Vector3.Distance(transform.position, enemyMemory.player.position);
+        return dist <= SwipAttackRange; // 겹쳐도 허용
+
     }
 
 
     // 공격
     private ESTATE PunchAttack()
     {
-        //공격범위 안에 있는지 체크
-        if (!enemyMemory.isInAttackRange)
-        {
-            animator.SetBool(_animIDAttackRange, false);
+        if (!IsInPunchRange()) 
             return ESTATE.FAILED;
-        }
 
-        // 타겟 바라보고 있는지 체크
+
         if (!IsFacingTarget(enemyMemory.player.position))
         {
-            if (!isAttacking)
-                RotateTowardsPlayer();
+            if (!isAttacking) RotateTowardsPlayer();
             return ESTATE.RUN;
         }
 
-        //공격
         if (!isAttacking)
         {
-            NormalAttackingStart();
+            isAttacking = true;
+            agent.isStopped = true;
+            animator.SetBool(_animIDAttack, true);
+            animator.SetBool(_animIDPunchRange, true);
         }
 
         return ESTATE.SUCCESS;
@@ -170,10 +207,27 @@ public class Mutant : Enemy
 
     private ESTATE JumpAttack()
     {
-        if (!IsInJumpRange()) return ESTATE.FAILED;
+        if (jumpAttackTimer > 0f)
+        {
+            Debug.Log("[공격] 점프공격 불가 (쿨타임)");
+            return ESTATE.FAILED;
+        }
+
+        if (!IsInJumpRange())
+        {
+            Debug.Log("[공격] 점프공격 거리 아님");
+            return ESTATE.FAILED;
+        }
+
+        if (!RollChance(50f))
+        {
+            Debug.Log("[공격] 점프공격 확률 실패");
+            return ESTATE.FAILED;
+        }
 
         if (!IsFacingTarget(enemyMemory.player.position))
         {
+            Debug.Log("[공격] 점프공격 회전 중");
             if (!isAttacking)
                 RotateTowardsPlayer();
             return ESTATE.RUN;
@@ -181,24 +235,41 @@ public class Mutant : Enemy
 
         if (!isAttacking)
         {
-            Debug.Log("점프 공격!");
+            Debug.Log("[공격] 점프공격 실행!");
             isAttacking = true;
             agent.isStopped = true;
-            animator.SetBool(_animIDJumpAttack, true); // ← bool로 설정
+            jumpAttackTimer = jumpAttackCooldown;
+            animator.SetBool(_animIDJumpAttack, true);
         }
 
         return ESTATE.SUCCESS;
     }
-    private void JumpAttackEnd()
+
+    private ESTATE SwipAttack()
     {
-        isAttacking = false;
-        if (agent.enabled && agent.isOnNavMesh)
+        if (!IsInSwipRange()) return ESTATE.FAILED;
+
+        if (!IsFacingTarget(enemyMemory.player.position))
         {
-            agent.isStopped = false;
+            if (!isAttacking) RotateTowardsPlayer();
+            return ESTATE.RUN;
         }
 
-        animator.SetBool(_animIDJumpAttack, false); // ← 공격 종료시 false로 리셋
+        if (!isAttacking)
+        {
+            isAttacking = true;
+            agent.isStopped = true;
+            animator.SetBool(_animIDSwipAttack, true);
+        }
+
+        return ESTATE.SUCCESS;
     }
+
+
+
+
+    /**********************************************************************************/
+
 
     // 데미지 받기
     public override void ApplyDamage(double damage)
@@ -217,19 +288,37 @@ public class Mutant : Enemy
 
     private void UpdateAnimatorStates()
     {
-        // 탐지 실패 시 이동/회전 멈추고 애니메이션 꺼줌
-        if (!enemyMemory.isPlayerDetected)
+        // 탐지 실패 → 모두 정지
+        if (!isWalk && !isRunning)
         {
-            if (!agent.isStopped)
-                agent.isStopped = true;
+            SetAgentStop(true);
+            SetAgentRotation(false);
 
-            if (agent.updateRotation)
-                agent.updateRotation = false;
+            animator.SetBool(_animIDWalk, false);
+            animator.SetBool(_animIDRunning, false);
+            return;
+        }
 
-            animator.SetBool(_animIDFind, false);
+        // 걷기 상태 → 걷기만 true
+        if (isWalk)
+        {
+            animator.SetBool(_animIDWalk, true);
+            animator.SetBool(_animIDRunning, false);
+            agent.speed = walkSpeed;
+            return;
+        }
+
+        // 달리기 상태 → 달리기만 true
+        if (isRunning)
+        {
+            animator.SetBool(_animIDRunning, true);
+            agent.speed = runningSpeed;
             return;
         }
     }
+
+
+
 
     private void SetAgentStop(bool stop)
     {
@@ -253,24 +342,18 @@ public class Mutant : Enemy
 
     private void HandleDetectedState()
     {
-        if (!enemyMemory.isInAttackRange)
+        if ((IsInPunchRange() || IsInSwipRange() || canJumpAttack) && !isAttacking)
         {
-            // 공격 범위 밖: 이동/회전 가능
-            SetAgentStop(false);
-            SetAgentRotation(true);
-        }
-        else if (!isAttacking)
-        {
-            // 공격 범위 안, 공격 전: 회전만 허용
-            SetAgentStop(true);
             SetAgentRotation(false);
             RotateTowardsPlayer();
         }
+        else if (isAttacking)
+        {
+            SetAgentRotation(false);
+        }
         else
         {
-            // 공격 중: 이동, 회전 금지
-            SetAgentStop(true);
-            SetAgentRotation(false);
+            SetAgentRotation(true);
         }
     }
 
@@ -294,6 +377,7 @@ public class Mutant : Enemy
 
         //NavMeshAgent를 비활성화하기 전에 정지 먼저 설정
         SetAgentStop(true);
+        agent.speed = moveSpeed; // ← 속도 리셋 (선택)
 
         agent.enabled = false; // 이제 안전하게 비활성화
         GetComponent<Collider>().enabled = false;
@@ -303,7 +387,8 @@ public class Mutant : Enemy
     private void NormalAttackingStart()
     {
         isAttacking = true;
-        agent.isStopped = true; // agent Stop
+        agent.isStopped = true;
+        SetAgentRotation(false); // ← 회전도 끊음
         animator.SetBool(_animIDAttack, true);
     }
 
@@ -316,6 +401,7 @@ public class Mutant : Enemy
         if (agent.enabled && agent.isOnNavMesh)
         {
             agent.isStopped = false;
+            SetAgentRotation(true); // ← 회전 다시 허용
         }
 
         animator.SetBool(_animIDAttack, false);
@@ -327,5 +413,24 @@ public class Mutant : Enemy
         isAttacking = false;
         animator.SetBool(_animIDAttack, isAttacking);
         animator.SetBool(_animIDHit, isAttacking);
+    }
+
+    public void OnLeftWeapon()
+    {
+        leftWeapon.gameObject.SetActive(true);
+    }
+    public void OnRightWeapon()
+    {
+        rightWeapon.gameObject.SetActive(true);
+    }
+    public void OffWeapon()
+    {
+        leftWeapon.gameObject.SetActive(false);
+        rightWeapon.gameObject.SetActive(false);
+    }
+
+    private bool RollChance(float percent)
+    {
+        return Random.Range(0f, 100f) <= percent;
     }
 }

@@ -12,6 +12,8 @@ public class Zombie1 : Enemy
     public readonly int _animIDAttackRange = Animator.StringToHash("InAttackRange"); //°ø°Ý
     public readonly int _animIDDead = Animator.StringToHash("IsDead"); //Á×À½
 
+    public EnemyWeapon weapon;
+
     protected override void SetupStats()
     {
         detectRange = 15f; //Å½Áö¹üÀ§
@@ -28,6 +30,8 @@ public class Zombie1 : Enemy
     {
         base.Start();
         OnDeath += HandleDeath;
+
+        weapon.gameObject.SetActive(false);
     }
 
     protected override void Update()
@@ -48,7 +52,6 @@ public class Zombie1 : Enemy
         HandleDetectedState();
         behaviorTree?.Evaluate();
     }
-
 
     protected override void SetupTree()
     {
@@ -279,5 +282,14 @@ public class Zombie1 : Enemy
         isAttacking = false;
         animator.SetBool(_animIDAttack, isAttacking);
         animator.SetBool(_animIDHit, isAttacking);
+    }
+
+    public void OnWeapon()
+    {
+        weapon.gameObject.SetActive(true);
+    }
+    public void OffWeapon()
+    {
+        weapon.gameObject.SetActive(false);
     }
 }

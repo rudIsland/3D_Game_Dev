@@ -17,7 +17,6 @@ public abstract class Enemy : CharacterBase
     [Header("레벨")]
     [SerializeField] public Level level;
 
-    public EnemyWeapon weapon;
     public NavMeshAgent agent;
 
     public bool isAttacking = false;
@@ -35,7 +34,6 @@ public abstract class Enemy : CharacterBase
 
     protected virtual void Start()
     {
-        weapon.gameObject.SetActive(false);
 
         SetupStats(); //자식에서 오버라이딩
 
@@ -114,7 +112,7 @@ public abstract class Enemy : CharacterBase
     }
 
     //탐지범위 체크
-    protected void UpdateDetectionStatus()
+    protected virtual void UpdateDetectionStatus()
     {
         enemyMemory.isPlayerDetected = enemyMemory.distanceToPlayer <= detectRange && !GameManager.Instance.playerStateMachine.isDead;
         enemyMemory.isInAttackRange = enemyMemory.distanceToPlayer <= attackRange && !GameManager.Instance.playerStateMachine.isDead;
@@ -124,13 +122,6 @@ public abstract class Enemy : CharacterBase
     protected abstract void SetupTree(); // 자식 클래스가 override
 
     /*********************  Animation Functions ***********************/
-    public void OnWeapon()
-    {
-        weapon.gameObject.SetActive(true);
-    }
-    public void OffWeapon()
-    {
-        weapon.gameObject.SetActive(false);
-    }
+
     
 }
