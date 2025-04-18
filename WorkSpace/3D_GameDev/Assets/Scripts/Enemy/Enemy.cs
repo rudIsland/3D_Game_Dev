@@ -124,11 +124,11 @@ public abstract class Enemy : CharacterBase
     protected abstract void SetupTree(); // 자식 클래스가 override
 
     /*********************  Animation Functions ***********************/
-    private void OnWeapon()
+    public void OnWeapon()
     {
         weapon.gameObject.SetActive(true);
     }
-    private void OffWeapon()
+    public void OffWeapon()
     {
         weapon.gameObject.SetActive(false);
     }

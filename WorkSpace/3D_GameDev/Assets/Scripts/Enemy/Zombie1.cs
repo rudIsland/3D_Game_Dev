@@ -274,16 +274,6 @@ public class Zombie1 : Enemy
         animator.SetBool(_animIDAttack, false);
     }
 
-
-    private void OnWeapon()
-    {
-        weapon.gameObject.SetActive(true);
-    }
-    private void OffWeapon()
-    {
-        weapon.gameObject.SetActive(false);
-    }
-
     private void OffHit()
     {
         isAttacking = false;

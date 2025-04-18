@@ -685,7 +685,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 032708904497e104a8624d32a3738647,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.3341228
+      value: -9.29
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 032708904497e104a8624d32a3738647,
         type: 3}
@@ -695,7 +695,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 032708904497e104a8624d32a3738647,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -25.89887
+      value: -28.79
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 032708904497e104a8624d32a3738647,
         type: 3}
@@ -1140,7 +1140,7 @@ RectTransform:
   m_Father: {fileID: 1932806193}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -1442,7 +1442,7 @@ Transform:
   m_GameObject: {fileID: 446903216}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.000000014791348, z: 0.0000000012976684, w: 1}
-  m_LocalPosition: {x: -0.00000010879144, y: 0.00000059604645, z: 3.354102}
+  m_LocalPosition: {x: 0.12790656, y: -0.2270093, z: 15.6698265}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1503,7 +1503,7 @@ RectTransform:
   m_Father: {fileID: 1253026905}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -3870,7 +3870,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 4f5a071c6c6ce6c4aa40851481b9a1ca,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4f5a071c6c6ce6c4aa40851481b9a1ca,
         type: 3}
@@ -5460,7 +5460,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1217472553}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.22975299, y: 0.000000017717934, z: -0.000000004466936, w: 0.973249}
+  m_LocalRotation: {x: 0.06350985, y: -0.104975834, z: 0.006717908, w: 0.99242204}
   m_LocalPosition: {x: 0, y: 2.3999999, z: -7.87}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -7121,7 +7121,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 4f5a071c6c6ce6c4aa40851481b9a1ca,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4f5a071c6c6ce6c4aa40851481b9a1ca,
         type: 3}
@@ -8800,8 +8800,95 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 735f3128ef0bec342a2acc21545a986e,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1727129552}
   m_SourcePrefab: {fileID: 100100000, guid: 735f3128ef0bec342a2acc21545a986e, type: 3}
+--- !u!1 &1727129551 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 735f3128ef0bec342a2acc21545a986e,
+    type: 3}
+  m_PrefabInstance: {fileID: 1727129550}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1727129552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1727129551}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 357e30746337cae42b4fc89b2f6040ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectRange: 10
+  attackRange: 2
+  moveSpeed: 3
+  angularSpeed: 180
+  level:
+    expArray:
+    - 100
+    - 283
+    - 520
+    - 800
+    - 1118
+    - 1470
+    - 1852
+    - 2263
+    - 2700
+    - 3162
+    - 3648
+    - 4157
+    - 4687
+    - 5238
+    - 5809
+    - 6400
+    - 7009
+    - 7637
+    - 8282
+    - 8944
+    - 9623
+    - 10319
+    - 11030
+    - 11758
+    - 12500
+    - 13257
+    - 14030
+    - 14816
+    - 15617
+    - 16432
+    - 17260
+    - 18102
+    - 18957
+    - 19825
+    - 20706
+    - 21600
+    - 22506
+    - 23425
+    - 24355
+    - 25298
+    - 26253
+    - 27219
+    - 28197
+    - 29186
+    - 30187
+    - 31199
+    - 32222
+    - 33255
+    - 34300
+    - 35355
+    currentLevel: 1
+    currentExp: 0
+  weapon: {fileID: 0}
+  agent: {fileID: 0}
+  isAttacking: 0
+  animator: {fileID: 0}
+  JumpAttackRange: 8
+  PunchAttackRange: 1
+  SwipAttackRange: 1.5
 --- !u!1 &1748245750
 GameObject:
   m_ObjectHideFlags: 3
@@ -9905,7 +9992,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 4f5a071c6c6ce6c4aa40851481b9a1ca,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4f5a071c6c6ce6c4aa40851481b9a1ca,
         type: 3}
@@ -10707,7 +10794,7 @@ RectTransform:
   m_Father: {fileID: 1239991499}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -11198,7 +11285,7 @@ RectTransform:
   m_Father: {fileID: 767956378}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -12016,7 +12103,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 4f5a071c6c6ce6c4aa40851481b9a1ca,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4f5a071c6c6ce6c4aa40851481b9a1ca,
         type: 3}
