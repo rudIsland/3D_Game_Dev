@@ -20,6 +20,7 @@ public abstract class Enemy : CharacterBase
     public NavMeshAgent agent;
 
     public bool isAttacking = false;
+
     //public bool isDead = false;
     public override CharacterStatsComponent statComp => GetComponent<EnemyStatComponent>();
 
