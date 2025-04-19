@@ -91,7 +91,7 @@ public abstract class Enemy : CharacterBase
         Debug.Log("Àû »ç¸Á");
     }
 
-    protected void RotateTowardsPlayer()
+    protected virtual void RotateTowardsPlayer()
     {
         Vector3 direction = (enemyMemory.player.position - transform.position).normalized;
         direction.y = 0f;

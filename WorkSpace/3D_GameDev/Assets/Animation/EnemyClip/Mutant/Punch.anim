@@ -46047,7 +46047,7 @@ AnimationClip:
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 0
   m_Events:
-  - time: 0
+  - time: 0.1
     functionName: NormalAttackingStart
     data: 
     objectReferenceParameter: {fileID: 0}
@@ -46068,7 +46068,7 @@ AnimationClip:
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 1
+  - time: 1.0666667
     functionName: NormalAttackingEnd
     data: 
     objectReferenceParameter: {fileID: 0}

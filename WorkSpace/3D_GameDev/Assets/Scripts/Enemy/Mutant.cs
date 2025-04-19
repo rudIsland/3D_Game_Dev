@@ -13,33 +13,32 @@ public class Mutant : Enemy
 
     public Animator animator;
     public readonly int _animIDIdle = Animator.StringToHash("Idle"); //서있기
+    public readonly int _animIDHit = Animator.StringToHash("IsHit"); //탐지
     public readonly int _animIDWalk = Animator.StringToHash("WalkRange"); //탐지
     public readonly int _animIDRunning = Animator.StringToHash("RunningRange"); //탐지
     public readonly int _animIDAttack = Animator.StringToHash("IsAttack"); //공격
-    public readonly int _animIDAttackIndex = Animator.StringToHash("AttackIndex"); //공격
-    public readonly int _animIDHit = Animator.StringToHash("IsHit"); //맞기
+    public readonly int _animIDAttackIndex = Animator.StringToHash("AttackIndex"); //공격번호
     public readonly int _animIDDead = Animator.StringToHash("IsDead"); //죽음
     public readonly int _animIDAttackTrigger = Animator.StringToHash("AttackTrigger"); //공격 트리거
-    public readonly int _animIDHitTrigger = Animator.StringToHash("HitTrigger"); //공격 트리거
 
     private const int ATTACK_JUMP = 1;
     private const int ATTACK_PUNCH = 2;
     private const int ATTACK_SWIP = 3;
 
     [Header("공격범위")]
-    [SerializeField] private float JumpAttackRange = 5f;
+    [SerializeField] private float JumpAttackRange = 3f;
     [SerializeField] private float PunchAttackRange = 1.0f;
     [SerializeField] private float SwipAttackRange = 2f;
     [SerializeField] private bool isJumpAttackRange = false;
     [SerializeField] private bool isPunchAttackRange = false;
     [SerializeField] private bool isSwipAttackRange = false;
 
-    [SerializeField] private float walkSpeed = 1.8f;
-    [SerializeField] private float runningSpeed = 2.3f;
+    [SerializeField] private float walkSpeed = 2f;
+    [SerializeField] private float runningSpeed = 3f;
 
     [Header("공격 확률")]
     [SerializeField] private float jumpAttackChance = 0.5f;  // 50% 확률
-    [SerializeField] private float punchAttackChance = 0.6f; // 60% 확률
+    [SerializeField] private float SwipAttackChance = 0.6f; // 60% 확률
 
     [Header("점프공격 쿨타임")]
     [SerializeField] private float jumpAttackCooldown = 5f;
@@ -187,11 +186,21 @@ public class Mutant : Enemy
     private ESTATE SelectAndPerformAttack()
     {
         float jumpWeight = 0f;
-        float swipWeight = 2f;
-        float punchWeight = 1f;
+        float swipWeight = 1f;
+        float punchWeight = 2f;
 
+        // 점프 공격 조건 + 거리 기반 가중치 감소
         if (isJumpAttackRange && jumpAttackTimer <= 0f)
-            jumpWeight = 5f + 15f;
+        {
+            float distance = enemyMemory.distanceToPlayer;
+
+            if (distance <= 1.5f)
+                jumpWeight = 1f;
+            else if (distance <= 2.5f)
+                jumpWeight = 5f;
+            else
+                jumpWeight = 15f;
+        }
 
         if (isSwipAttackRange)
             swipWeight += 10f;
@@ -209,9 +218,9 @@ public class Mutant : Enemy
 
         roll -= jumpWeight;
         if (roll <= swipWeight)
-            return SwipAttack();
+            return PunchAttack();
 
-        return PunchAttack();
+        return SwipAttack();
     }
 
     // 공격
@@ -220,12 +229,6 @@ public class Mutant : Enemy
         if (!isPunchAttackRange)
         {
             Debug.Log("[공격] 펀치 공격 실패: 범위 아님");
-            return ESTATE.FAILED;
-        }
-
-        if (!RollChance(punchAttackChance))
-        {
-            Debug.Log("[공격] 펀치 공격 실패: 확률 실패");
             return ESTATE.FAILED;
         }
 
@@ -239,8 +242,7 @@ public class Mutant : Enemy
         if (!isAttacking)
         {
             Debug.Log("[공격] 펀치 공격 시작");
-            isAttacking = true;
-            agent.isStopped = true;
+            NormalAttackingStart(); //원래 없는건데 추가해봄 너무 피격이 쉬워서
 
             animator.SetInteger(_animIDAttackIndex, ATTACK_PUNCH);
             animator.SetTrigger(_animIDAttackTrigger);
@@ -263,10 +265,10 @@ public class Mutant : Enemy
 
         if (!isAttacking)
         {
-            isAttacking = true;
             isJumpAttacking = true;
             jumpAttackTimer = jumpAttackCooldown;
 
+            NormalAttackingStart(); //원래 없는건데 추가해봄 너무 피격이 쉬워서
             agent.isStopped = true;
             agent.updatePosition = false;
             agent.updateRotation = false;
@@ -285,6 +287,12 @@ public class Mutant : Enemy
             return ESTATE.FAILED;
         }
 
+        if (!RollChance(SwipAttackChance))
+        {
+            Debug.Log("[공격] 스윕 공격 실패: 확률 실패");
+            return ESTATE.FAILED;
+        }
+
         if (!IsFacingTarget(enemyMemory.player.position))
         {
             Debug.Log("[공격] 스윕 공격 회전 중...");
@@ -295,7 +303,7 @@ public class Mutant : Enemy
         if (!isAttacking)
         {
             Debug.Log("[공격] 스윕 공격 시작");
-            NormalAttackingStart();
+            NormalAttackingStart(); //원래 없는건데 추가해봄 너무 피격이 쉬워서
 
             animator.SetInteger(_animIDAttackIndex, ATTACK_SWIP);
             animator.SetTrigger(_animIDAttackTrigger);
@@ -316,11 +324,10 @@ public class Mutant : Enemy
         stats.currentHP -= damage;
         stats.currentHP = Mathf.Max((float)stats.currentHP, 0);
 
-        if(!isAttacking) {
-        animator.SetTrigger(_animIDHitTrigger);
-        animator.SetBool(_animIDHit, true);
+        if (!isAttacking)
+        {
+            animator.SetBool(_animIDHit,true);
         }
-
         CheckDie();
 
         statComp.UpdateHPUI();
@@ -360,8 +367,6 @@ public class Mutant : Enemy
             return;
         }
     }
-
-
 
 
     private void SetAgentStop(bool stop)
@@ -432,7 +437,10 @@ public class Mutant : Enemy
     {
         isAttacking = true;
         animator.applyRootMotion = true;
-        agent.isStopped = true;
+        if (agent != null && agent.enabled && agent.isOnNavMesh)
+        {
+            agent.isStopped = true;
+        }
         animator.SetBool(_animIDAttack, true);
     }
 
@@ -442,9 +450,10 @@ public class Mutant : Enemy
 
         isAttacking = false;
 
-        if (agent.enabled && agent.isOnNavMesh)
+        if (agent != null && agent.enabled && agent.isOnNavMesh)
         {
             agent.isStopped = false;
+
             if (isJumpAttacking)
             {
                 agent.updatePosition = true;
@@ -462,9 +471,8 @@ public class Mutant : Enemy
     private void OffHit()
     {
         isAttacking = false;
-        animator.ResetTrigger(_animIDHitTrigger);
+        animator.SetBool(_animIDHit, false);
         animator.SetBool(_animIDAttack, isAttacking);
-        animator.SetBool(_animIDHit, isAttacking);
     }
 
     public void OnLeftWeapon()
