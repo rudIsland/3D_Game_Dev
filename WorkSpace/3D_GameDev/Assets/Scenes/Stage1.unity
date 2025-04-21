@@ -747,7 +747,7 @@ Transform:
   m_GameObject: {fileID: 112054675}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 470, y: 1, z: 9.5}
+  m_LocalPosition: {x: 556.6, y: 1, z: 23}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6519,6 +6519,18 @@ PrefabInstance:
       value: Grave 5
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 03159b956172d644a9aec8d1d5a12060, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 03159b956172d644a9aec8d1d5a12060, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 03159b956172d644a9aec8d1d5a12060, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 03159b956172d644a9aec8d1d5a12060, type: 3}
       propertyPath: m_LocalPosition.x
       value: 569.40356
       objectReference: {fileID: 0}
@@ -6724,6 +6736,18 @@ PrefabInstance:
     - target: {fileID: 100000, guid: 03159b956172d644a9aec8d1d5a12060, type: 3}
       propertyPath: m_Name
       value: Grave 5 (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 03159b956172d644a9aec8d1d5a12060, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 03159b956172d644a9aec8d1d5a12060, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 03159b956172d644a9aec8d1d5a12060, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 03159b956172d644a9aec8d1d5a12060, type: 3}
       propertyPath: m_LocalPosition.x
@@ -10112,6 +10136,18 @@ PrefabInstance:
       value: Church Supplies 1
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 232d8e7e536dd9e449396e1ebb224baa, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 232d8e7e536dd9e449396e1ebb224baa, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 232d8e7e536dd9e449396e1ebb224baa, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 232d8e7e536dd9e449396e1ebb224baa, type: 3}
       propertyPath: m_LocalPosition.x
       value: 531.8097
       objectReference: {fileID: 0}
@@ -11517,6 +11553,18 @@ PrefabInstance:
     - target: {fileID: 100000, guid: 03159b956172d644a9aec8d1d5a12060, type: 3}
       propertyPath: m_Name
       value: Grave 5 (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 03159b956172d644a9aec8d1d5a12060, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 03159b956172d644a9aec8d1d5a12060, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 03159b956172d644a9aec8d1d5a12060, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 03159b956172d644a9aec8d1d5a12060, type: 3}
       propertyPath: m_LocalPosition.x
@@ -13174,13 +13222,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1904511094}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 581, y: 165, z: 0}
+  m_LocalRotation: {x: 0.7092184, y: -0, z: -0, w: 0.70498896}
+  m_LocalPosition: {x: 565.993, y: 145.027, z: 98.759}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90.341, y: 0, z: 0}
 --- !u!1001 &1915115148
 PrefabInstance:
   m_ObjectHideFlags: 0

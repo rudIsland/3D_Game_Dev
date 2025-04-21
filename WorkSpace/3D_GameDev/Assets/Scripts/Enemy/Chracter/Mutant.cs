@@ -11,7 +11,6 @@ public class Mutant : Enemy
         Punch
     }
 
-    public Animator animator;
     public readonly int _animIDIdle = Animator.StringToHash("Idle"); //¼­ÀÖ±â
     public readonly int _animIDHit = Animator.StringToHash("IsHit"); //Å½Áö
     public readonly int _animIDWalk = Animator.StringToHash("WalkRange"); //Å½Áö

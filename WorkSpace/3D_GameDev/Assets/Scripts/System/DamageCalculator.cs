@@ -16,8 +16,14 @@ public static class DamageCalculator
         double attack = attacker.stats.ATK;
         double defense = defender.stats.DEF;
 
-        double damage = attack * (100.0 / (100.0 + defense));
-        damage = Mathf.Max((float)damage, 1f);
+        const double reductionRate = 0.01; // DEF 1당 1% 감소
+        const double minRate = 0.2;        // 최소 데미지 비율 20%
+
+        double reduction = defense * reductionRate;
+        double finalRate = Mathf.Max(1f - (float)reduction, (float)minRate); // float으로 클램프 처리
+
+        double damage = attack * finalRate;
+        damage = Mathf.Max((float)damage, 1f); // 최소 1 데미지
         defender.ApplyDamage(damage);
     }
 }

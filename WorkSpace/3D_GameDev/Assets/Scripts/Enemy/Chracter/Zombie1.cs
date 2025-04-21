@@ -5,7 +5,6 @@ using UnityEngine.AI;
 public class Zombie1 : Enemy
 {
 
-    public Animator animator;
     public readonly int _animIDFind = Animator.StringToHash("IsFind"); //탐지
     public readonly int _animIDAttack = Animator.StringToHash("IsAttack"); //공격
     public readonly int _animIDHit = Animator.StringToHash("IsHit"); //맞기

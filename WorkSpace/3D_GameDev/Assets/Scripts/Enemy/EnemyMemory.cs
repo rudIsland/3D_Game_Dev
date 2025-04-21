@@ -8,4 +8,5 @@ public class EnemyMemory
     public float distanceToPlayer; //플레이어와의 거리
     public bool isPlayerDetected; //플레이어 탐지여부
     public bool isInAttackRange; //공격범위 여부
+
 }

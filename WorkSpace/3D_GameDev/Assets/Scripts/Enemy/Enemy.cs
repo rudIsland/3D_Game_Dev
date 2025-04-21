@@ -6,6 +6,7 @@ using static Cinemachine.DocumentationSortingAttribute;
 
 public abstract class Enemy : CharacterBase
 {
+    public Animator animator;
     public EnemyMemory enemyMemory;
     protected ENode behaviorTree;
 
@@ -24,9 +25,10 @@ public abstract class Enemy : CharacterBase
     //public bool isDead = false;
     public override CharacterStatsComponent statComp => GetComponent<EnemyStatComponent>();
 
-    private void Awake()
+    protected virtual void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
+        animator = GetComponent<Animator>();
 
         
         // Level
