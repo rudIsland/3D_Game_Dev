@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Fighter : Enemy
 {
@@ -21,7 +22,7 @@ public class Fighter : Enemy
     [Header("탐지범위")]
     private float DectectedRange = 7f;
     private float FightDectectedRange = 4.5f;
-    private float FightRange = 2f;
+    private float FightRange = 1.55f;
     [SerializeField] private bool isDecteced;
 
     // 공격 관련 타이머 & 범위
@@ -32,7 +33,7 @@ public class Fighter : Enemy
     private float HookRange = 1.2f;
     private float JapRange = 1.0f;
     private float LowKickRange = 1.0f;
-    private float StepForwardRange = 1.5f;
+    //private float StepForwardRange = 1.5f;
 
     private const int ATTACK_JAP = 1;
     private const int ATTACK_LOWKICK = 2;
@@ -54,6 +55,8 @@ public class Fighter : Enemy
     protected override void Start()
     {
         base.Start();
+        SetupStats();
+
         OnDeath += HandleDeath; //죽음 델리게이트
         LeftHandWeapon.gameObject.SetActive(false);
         RightHandWeapon.gameObject.SetActive(false);
@@ -64,19 +67,56 @@ public class Fighter : Enemy
     // Update is called once per frame
     protected override void Update()
     {
-        if(stats.IsDead) return; //죽으면 리턴
+        if (stats.IsDead) return;
 
-        UpdateDistanceToPlayer(); //플레이어와의 거리 계산
+        UpdateDistanceToPlayer();
+        HandleDetectedState();
+        
 
+        if (jumpAttackTimer > 0f)
+            jumpAttackTimer -= Time.deltaTime;
 
         behaviorTree?.Evaluate();
     }
 
+    private void HandleDetectedState()
+    {
+        if (!(FightRange >= enemyMemory.distanceToPlayer))
+        {
+            // 공격 범위 밖: 이동/회전 가능
+            SetAgentStop(false);
+            SetAgentRotation(true);
+        }
+        else if (!isAttacking)
+        {
+            // 공격 범위 안, 공격 전: 회전만 허용
+            SetAgentStop(true);
+            SetAgentRotation(false);
+            RotateTowardsPlayer();
+        }
+        else
+        {
+            // 공격 중: 이동, 회전 금지
+            SetAgentStop(true);
+            SetAgentRotation(false);
+        }
+    }
+
+
+    protected override void RotateTowardsPlayer()
+    {
+        Vector3 direction = (enemyMemory.player.position - transform.position).normalized;
+        direction.y = 0;
+        if (direction == Vector3.zero) return;
+
+        Quaternion targetRotation = Quaternion.LookRotation(direction);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 15f);
+    }
 
     protected override void SetupStats()
     {
         detectRange = DectectedRange; //탐지범위
-        attackRange = 1.0f; //공격범위
+        attackRange = FightRange; //공격범위
         moveSpeed = 1.5f; //이동속도
         angularSpeed = 180f; //회전속도
 
@@ -97,9 +137,10 @@ public class Fighter : Enemy
             new ActionNode(DectectedPlayer),
         });
 
+        // SetupTree() 수정
         ENode attackAndMoveTree = new SelectorNode(new List<ENode> {
-             new ActionNode(FightSelector),
-             new ActionNode(MoveToPlayer)
+            new ActionNode(FightSelector),
+            new ActionNode(MoveToPlayer)
         });
 
         // 전체 트리 구성
@@ -132,59 +173,46 @@ public class Fighter : Enemy
 
     }
 
-    private ESTATE PlayAttack(int attackIndex)
+    private ESTATE FacePlayerCheck()
     {
-        if (isAttacking) return ESTATE.SUCCESS;
+        if (isAttacking) return ESTATE.SUCCESS; // 공격 중이면 회전 금지
 
-        if (!IsFacingTarget(enemyMemory.player.position))
-        {
-            RotateTowardsPlayer();
-            return ESTATE.RUN;
-        }
-
-        isAttacking = true;
-
-        if (agent.enabled && agent.isOnNavMesh)
-            agent.isStopped = true;
-
-        if (attackIndex == ATTACK_FLYKICK)
-            jumpAttackTimer = 3f;
-
-        animator.SetInteger(_animIDAttackIndex, attackIndex);
-        animator.SetTrigger(_animIDAttackTrigger); // 전제: AnyState → StepForward → 공격 상태들로 넘어감
-
-        return ESTATE.SUCCESS;
+    if (!IsFacingTarget(enemyMemory.player.position))
+    {
+        RotateTowardsPlayer();
+        return ESTATE.RUN;
     }
-
+    return ESTATE.SUCCESS;
+    }
 
     private ESTATE FightSelector()
     {
         float flyKickWeight = 0f;
-        float japCrossWeight = 1f;
-        float hookWeight = 1f;
-        float kickWeight = 1f;
-        float japWeight = 1f;
-        float lowKickWeight = 1f;
+        float japCrossWeight = 2f;
+        float hookWeight = 2f;
+        float kickWeight = 2f;
+        float japWeight = 2f;
+        float lowKickWeight = 2f;
 
         float distance = enemyMemory.distanceToPlayer;
 
         if (distance <= JapRange)
-            japWeight += 10f;
+            japWeight += 8f;
 
         if (distance <= LowKickRange)
-            lowKickWeight += 10f;
+            lowKickWeight += 8f;
 
         if (distance <= HookRange)
-            hookWeight += 10f;
+            hookWeight += 8f;
 
         if (distance <= KickRange)
-            kickWeight += 10f;
+            kickWeight += 8f;
 
         if (distance <= JapCrossRange)
-            japCrossWeight += 10f;
+            japCrossWeight += 8f;
 
         if (distance <= FlyKickRange && jumpAttackTimer <= 0f)
-            flyKickWeight = 15f;
+            flyKickWeight = 5f;
 
         float totalWeight = flyKickWeight + japCrossWeight + hookWeight + kickWeight + japWeight + lowKickWeight;
         if (totalWeight <= 0f) return ESTATE.FAILED;
@@ -192,25 +220,25 @@ public class Fighter : Enemy
         float roll = Random.Range(0f, totalWeight);
 
         if (roll <= flyKickWeight)
-            return PlayAttack(ATTACK_FLYKICK);
+            return FlyKickAttack();
 
         roll -= flyKickWeight;
         if (roll <= japCrossWeight)
-            return PlayAttack(ATTACK_JABCROSS);
+            return JapCrossAttack();
 
         roll -= japCrossWeight;
         if (roll <= hookWeight)
-            return PlayAttack(ATTACK_HOOK);
+            return HookAttack();
 
         roll -= hookWeight;
         if (roll <= kickWeight)
-            return PlayAttack(ATTACK_KICK);
+            return KickAttack();
 
         roll -= kickWeight;
         if (roll <= lowKickWeight)
-            return PlayAttack(ATTACK_LOWKICK);
+            return LowKickAttack();
 
-        return PlayAttack(ATTACK_JAP);
+        return JapAttack();
     }
 
 
@@ -235,7 +263,8 @@ public class Fighter : Enemy
         // 공격 실패 후 이동
         Debug.Log("[이동] 플레이어에게 이동 중");
         SetAgentStop(false);
-        agent.SetDestination(enemyMemory.player.position);
+        if (agent.enabled && agent.isOnNavMesh)
+            agent.SetDestination(enemyMemory.player.position);
 
         return ESTATE.RUN;
     }
@@ -245,7 +274,7 @@ public class Fighter : Enemy
     private ESTATE JapCrossAttack()
     {
         // 공격 조건 검사 후 애니메이션 재생
-        if (! (JapCrossRange <= enemyMemory.distanceToPlayer))
+        if (! (JapCrossRange >= enemyMemory.distanceToPlayer))
         {
             Debug.Log("[공격] 잽크로스 공격 실패: 범위 아님");
             return ESTATE.FAILED;
@@ -263,8 +292,8 @@ public class Fighter : Enemy
             Debug.Log("[공격] 잽크로스 공격 시작");
             NormalAttackingStart(); //원래 없는건데 추가해봄 너무 피격이 쉬워서
 
-            //animator.SetInteger(_animIDAttackIndex, ATTACK_PUNCH);
-            //animator.SetTrigger(_animIDAttackTrigger);
+            animator.SetInteger(_animIDAttackIndex, ATTACK_JABCROSS);
+            animator.SetTrigger(_animIDAttackTrigger);
         }
 
         return ESTATE.SUCCESS;
@@ -273,7 +302,7 @@ public class Fighter : Enemy
     private ESTATE KickAttack()
     {
         // 공격 조건 검사 후 애니메이션 재생
-        if (!(KickRange <= enemyMemory.distanceToPlayer))
+        if (!(KickRange >= enemyMemory.distanceToPlayer))
         {
             Debug.Log("[공격] 킥 공격 실패: 범위 아님");
             return ESTATE.FAILED;
@@ -291,8 +320,8 @@ public class Fighter : Enemy
             Debug.Log("[공격] 킥 공격 시작");
             NormalAttackingStart(); //원래 없는건데 추가해봄 너무 피격이 쉬워서
 
-            //animator.SetInteger(_animIDAttackIndex, ATTACK_PUNCH);
-            //animator.SetTrigger(_animIDAttackTrigger);
+            animator.SetInteger(_animIDAttackIndex, ATTACK_KICK);
+            animator.SetTrigger(_animIDAttackTrigger);
         }
         return ESTATE.SUCCESS;
     }
@@ -300,7 +329,7 @@ public class Fighter : Enemy
     private ESTATE FlyKickAttack()
     {
         // 공격 조건 검사 후 애니메이션 재생
-        if (!(FlyKickRange <= enemyMemory.distanceToPlayer))
+        if (!(FlyKickRange >= enemyMemory.distanceToPlayer))
         {
             Debug.Log("[공격] 플라이킥 공격 실패: 범위 아님");
             return ESTATE.FAILED;
@@ -317,9 +346,60 @@ public class Fighter : Enemy
         {
             Debug.Log("[공격] 플라이킥 공격 시작");
             NormalAttackingStart(); //원래 없는건데 추가해봄 너무 피격이 쉬워서
+            jumpAttackTimer = 3f;
+            animator.SetInteger(_animIDAttackIndex, ATTACK_FLYKICK);
+            animator.SetTrigger(_animIDAttackTrigger);
+        }
+        return ESTATE.SUCCESS;
+    }
 
-            //animator.SetInteger(_animIDAttackIndex, ATTACK_PUNCH);
-            //animator.SetTrigger(_animIDAttackTrigger);
+    private ESTATE HookAttack()
+    {
+        if (!(HookRange >= enemyMemory.distanceToPlayer)) return ESTATE.FAILED;
+        if (!IsFacingTarget(enemyMemory.player.position))
+        {
+            if (!isAttacking) RotateTowardsPlayer();
+            return ESTATE.RUN;
+        }
+        if (!isAttacking)
+        {
+            NormalAttackingStart();
+            animator.SetInteger(_animIDAttackIndex, ATTACK_HOOK);
+            animator.SetTrigger(_animIDAttackTrigger);
+        }
+        return ESTATE.SUCCESS;
+    }
+
+    private ESTATE LowKickAttack()
+    {
+        if (!(LowKickRange >= enemyMemory.distanceToPlayer)) return ESTATE.FAILED;
+        if (!IsFacingTarget(enemyMemory.player.position))
+        {
+            if (!isAttacking) RotateTowardsPlayer();
+            return ESTATE.RUN;
+        }
+        if (!isAttacking)
+        {
+            NormalAttackingStart();
+            animator.SetInteger(_animIDAttackIndex, ATTACK_LOWKICK);
+            animator.SetTrigger(_animIDAttackTrigger);
+        }
+        return ESTATE.SUCCESS;
+    }
+
+    private ESTATE JapAttack()
+    {
+        if (!(JapRange >= enemyMemory.distanceToPlayer)) return ESTATE.FAILED;
+        if (!IsFacingTarget(enemyMemory.player.position))
+        {
+            if (!isAttacking) RotateTowardsPlayer();
+            return ESTATE.RUN;
+        }
+        if (!isAttacking)
+        {
+            NormalAttackingStart();
+            animator.SetInteger(_animIDAttackIndex, ATTACK_JAP);
+            animator.SetTrigger(_animIDAttackTrigger);
         }
         return ESTATE.SUCCESS;
     }
@@ -389,7 +469,7 @@ public class Fighter : Enemy
     {
         Vector3 directionToTarget = (target - transform.position).normalized;
         float dot = Vector3.Dot(transform.forward, directionToTarget);
-        return dot > 0.90f; // 0.90 이상이면 거의 정면을 보고 있다고 판단
+        return dot > 0.98f; // 0.95 이상이면 거의 정면을 보고 있다고 판단
     }
 
     private void SetAgentStop(bool stop)
