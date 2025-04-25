@@ -65,10 +65,10 @@ public class Mutant : Enemy
 
         level.SetLevel(3); //레벨설정
 
-        stats.maxHP = 500;
-        stats.ATK = 25f;
-        stats.DEF = 15f;
-        statComp.stats.currentHP = statComp.stats.maxHP; //현재 체력설정
+        enemyStat.maxHP = 500;
+        enemyStat.ATK = 25f;
+        enemyStat.DEF = 15f;
+        enemyStat.currentHP = enemyStat.maxHP; //현재 체력설정
 
         GetComponentInChildren<EnemyGUI>()?.UpdateLevel(); //GUI레벨설정
     }
@@ -83,7 +83,7 @@ public class Mutant : Enemy
 
     protected override void Update()
     {
-        if (statComp.stats.IsDead) return;
+        if (enemyStat.IsDead) return;
         JumpAttackCoolTime();
 
         UpdateDistanceToPlayer(); //플레이어와의 거리 계산
@@ -110,11 +110,11 @@ public class Mutant : Enemy
     //탐지범위 체크
     protected override void UpdateDetectionStatus()
     {
-        isRunning = enemyMemory.distanceToPlayer <= RunningArange && !GameManager.Instance.playerStateMachine.isDead;
-        isWalk = enemyMemory.distanceToPlayer <= WalkArange && !GameManager.Instance.playerStateMachine.isDead;
-        isJumpAttackRange = enemyMemory.distanceToPlayer <= JumpAttackRange && !GameManager.Instance.playerStateMachine.isDead;
-        isPunchAttackRange = enemyMemory.distanceToPlayer <= PunchAttackRange && !GameManager.Instance.playerStateMachine.isDead;
-        isSwipAttackRange = enemyMemory.distanceToPlayer <= SwipAttackRange && !GameManager.Instance.playerStateMachine.isDead;
+        isRunning = enemyMemory.distanceToPlayer <= RunningArange && !GameManager.Instance.player.isDead;
+        isWalk = enemyMemory.distanceToPlayer <= WalkArange && !GameManager.Instance.player.isDead;
+        isJumpAttackRange = enemyMemory.distanceToPlayer <= JumpAttackRange && !GameManager.Instance.player.isDead;
+        isPunchAttackRange = enemyMemory.distanceToPlayer <= PunchAttackRange && !GameManager.Instance.player.isDead;
+        isSwipAttackRange = enemyMemory.distanceToPlayer <= SwipAttackRange && !GameManager.Instance.player.isDead;
     }
 
 
@@ -320,16 +320,17 @@ public class Mutant : Enemy
     // 데미지 받기
     public override void ApplyDamage(double damage)
     {
-        stats.currentHP -= damage;
-        stats.currentHP = Mathf.Max((float)stats.currentHP, 0);
+        enemyStat.currentHP -= damage;
+        enemyStat.currentHP = Mathf.Max((float)enemyStat.currentHP, 0);
 
         if (!isAttacking)
         {
             animator.SetBool(_animIDHit,true);
         }
+
         CheckDie();
 
-        statComp.UpdateHPUI();
+        UpdateHPUI();
     }
 
 
@@ -445,7 +446,7 @@ public class Mutant : Enemy
 
     private void NormalAttackingEnd()
     {
-        if (statComp.stats.IsDead) return;
+        if (enemyStat.IsDead) return;
 
         isAttacking = false;
 

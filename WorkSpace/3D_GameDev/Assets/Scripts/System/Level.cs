@@ -20,6 +20,7 @@ public class Level
     public void AddExp(float exp)
     {
         currentExp += exp;
+        Debug.Log($"현재 경험치량: {currentExp} / {MaxExp}");
     }
 
     public void LevelUp()

@@ -655,6 +655,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4b1577c26395034ca841335cbfa0e1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  expSlider: {fileID: 1961121637}
+  NowLevel: {fileID: 1531990589}
+  HPText: {fileID: 413827772}
+  ATKText: {fileID: 1595535294}
+  DEFText: {fileID: 1038582173}
+  levelUpPanel: {fileID: 884947428}
 --- !u!1001 &398554101
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -787,7 +793,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 884947430}
+      objectReference: {fileID: 0}
     - target: {fileID: 7667690142607145297, guid: cded22d7ad355df4a9a5b46d8863b857,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
@@ -1042,7 +1048,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 418820815}
-  - component: {fileID: 418820816}
   m_Layer: 0
   m_Name: Exp_System
   m_TagString: Untagged
@@ -1066,20 +1071,6 @@ Transform:
   - {fileID: 1961121636}
   m_Father: {fileID: 340392827}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &418820816
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 418820814}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ce2be0a2a21a9948b7a1d6e1b23f0ca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerStatUIComp: {fileID: 1773795387}
-  expSlider: {fileID: 1961121637}
 --- !u!1 &667542338
 GameObject:
   m_ObjectHideFlags: 0
@@ -1239,8 +1230,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 884947429}
-  - component: {fileID: 884947430}
-  - component: {fileID: 884947431}
   m_Layer: 5
   m_Name: LevelUpUI
   m_TagString: Untagged
@@ -1270,32 +1259,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 420, y: 110}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &884947430
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 884947428}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 953eb132b68157c4da9988089249fda2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerStatUIComp: {fileID: 0}
---- !u!114 &884947431
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 884947428}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 724f4ab61d4dd4643872faff4f85018b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  levelUpComponent: {fileID: 884947430}
 --- !u!224 &1023431159 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3376163906230727283, guid: cded22d7ad355df4a9a5b46d8863b857,
@@ -1846,7 +1809,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 884947430}
+      objectReference: {fileID: 0}
     - target: {fileID: 7667690142607145297, guid: cded22d7ad355df4a9a5b46d8863b857,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
@@ -2788,7 +2751,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1773795383}
   - component: {fileID: 1773795385}
-  - component: {fileID: 1773795387}
   - component: {fileID: 1773795384}
   - component: {fileID: 1773795386}
   m_Layer: 5
@@ -2883,24 +2845,6 @@ MonoBehaviour:
   m_Spacing: {x: 0, y: 0}
   m_Constraint: 0
   m_ConstraintCount: 2
---- !u!114 &1773795387
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1773795382}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f7f1e03314214144b467cc55c25590e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  statText:
-  - {fileID: 1595535294}
-  - {fileID: 1038582173}
-  - {fileID: 413827772}
-  levelText: {fileID: 1531990589}
-  playerStatComp: {fileID: 0}
 --- !u!1 &1862918799
 GameObject:
   m_ObjectHideFlags: 0
@@ -2983,7 +2927,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 884947430}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: StatSystemComponent, Assembly-CSharp
         m_MethodName: CloseLevelPanel
         m_Mode: 1
@@ -3118,6 +3062,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1877376061}
+  - component: {fileID: 1877376062}
   m_Layer: 0
   m_Name: PlayerResource
   m_TagString: Untagged
@@ -3143,6 +3088,22 @@ Transform:
   - {fileID: 1128593909}
   m_Father: {fileID: 117769815}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1877376062
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1877376060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1cadde000276bb4a9aef8f1c7e24b3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hpSlider: {fileID: 36246309}
+  hpText: {fileID: 1559925536}
+  staminaSlider: {fileID: 1240053736}
+  staminaText: {fileID: 1577045168}
 --- !u!1 &1961121635
 GameObject:
   m_ObjectHideFlags: 0
@@ -3470,7 +3431,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 884947430}
+      objectReference: {fileID: 0}
     - target: {fileID: 7667690142607145297, guid: cded22d7ad355df4a9a5b46d8863b857,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState

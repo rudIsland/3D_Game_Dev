@@ -62,6 +62,9 @@ public class PlayerFreeLookState : PlayerBaseState
         // 이동 애니메이션 업데이트
         UpdateMoveAnimation(deltaTime);
 
+        //가만히 있으면 스테미나 회복 업데이트 
+        stateMachine.UpStemina();
+
         //Other Animation Check
         OtherAnimaionCheck();
 
@@ -132,9 +135,10 @@ public class PlayerFreeLookState : PlayerBaseState
         {
             // if Sprint.... Cost Stemina
             float sprintCost = sprintStaminaCostPerSecond * deltaTime;
-            if (stateMachine.PlayerStats.CanUse(sprintCost))
+            if (stateMachine.playerStat.CanUse(sprintCost))
             {
-                stateMachine.PlayerStats.Use(sprintCost);
+                stateMachine.playerStat.Use(sprintCost);
+                GameManager.Instance.Resource.UpdateStaminaUI();
             }
             else
             {
@@ -246,13 +250,14 @@ public class PlayerFreeLookState : PlayerBaseState
             // 점프 처리(점프가 가능한 상태 && 점프재사용시간 && 공격중x)
             if (stateMachine.jump && _jumpTimeoutDelta <= 0.0f && !stateMachine.inputReader.isAttack)
             {
-                if (stateMachine.statComp != null && stateMachine.PlayerStats.CanUse(jumpStaminaCost))
+                if (stateMachine.playerStat != null && stateMachine.playerStat.CanUse(jumpStaminaCost))
                 {
                     stateMachine.jump = false;
                     _jumpTimeoutDelta = stateMachine.JumpTimeout;
 
                     // if jump.... Cost Stemina
-                    stateMachine.PlayerStats.Use(jumpStaminaCost);
+                    stateMachine.playerStat.Use(jumpStaminaCost);
+                    GameManager.Instance.Resource.UpdateStaminaUI();
 
                     // 점프 처리
                     stateMachine.verticalVelocity = Mathf.Sqrt(stateMachine.jumpHeight * -2f * stateMachine.gravity);

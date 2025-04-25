@@ -19,8 +19,11 @@ public class Zombie1 : Enemy
         attackRange = 1.0f; //공격범위
         moveSpeed = 2.3f; //이동속도
         angularSpeed = 180f; //회전속도
-        statComp.stats.currentHP = statComp.stats.maxHP; //현재 체력설정
-        level.SetLevel(3); //레벨설정
+        enemyStat.currentHP = enemyStat.maxHP; //현재 체력설정
+
+        //레벨
+        level.SetLevel(3);
+        deathEXP = 130;
 
         GetComponentInChildren<EnemyGUI>()?.UpdateLevel(); //GUI레벨설정
     }
@@ -35,7 +38,7 @@ public class Zombie1 : Enemy
 
     protected override void Update()
     {   
-        if (statComp.stats.IsDead) return;
+        if (enemyStat.IsDead) return;
 
         UpdateDistanceToPlayer();
         UpdateDetectionStatus();
@@ -158,13 +161,13 @@ public class Zombie1 : Enemy
     // 데미지 받기
     public override void ApplyDamage(double damage)
     {
-        stats.currentHP -= damage;
-        stats.currentHP = Mathf.Max((float)stats.currentHP, 0);
+        enemyStat.currentHP -= damage;
+        enemyStat.currentHP = Mathf.Max((float)enemyStat.currentHP, 0);
         animator.SetBool(_animIDHit, true);
 
         CheckDie();
 
-        statComp.UpdateHPUI();
+        UpdateHPUI();
     }
 
 
@@ -253,6 +256,8 @@ public class Zombie1 : Enemy
         agent.enabled = false; // 이제 안전하게 비활성화
         GetComponent<Collider>().enabled = false;
         GetComponent<Target>().enabled = false;
+
+        base.HandleDeath();
     }
 
     private void NormalAttackingStart()
@@ -264,7 +269,7 @@ public class Zombie1 : Enemy
 
     private void NormalAttackingEnd()
     {
-        if (statComp.stats.IsDead) return;
+        if (enemyStat.IsDead) return;
 
         isAttacking = false;
 

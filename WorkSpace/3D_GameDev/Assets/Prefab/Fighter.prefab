@@ -86,7 +86,7 @@ GameObject:
   - component: {fileID: 603587907019264416}
   - component: {fileID: 8638232658166746187}
   m_Layer: 8
-  m_Name: HP_Bar
+  m_Name: HP_Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -582,7 +582,7 @@ GameObject:
   - component: {fileID: 6023938991666379946}
   - component: {fileID: 5581338119029002468}
   m_Layer: 8
-  m_Name: hp_Text
+  m_Name: HP_Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1453,10 +1453,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 032708904497e104a8624d32a3738647,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 9073883810447283070}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 032708904497e104a8624d32a3738647,
-        type: 3}
-      insertIndex: -1
       addedObject: {fileID: 2198553913104225134}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 032708904497e104a8624d32a3738647,
         type: 3}
@@ -1552,25 +1548,13 @@ MonoBehaviour:
     currentExp: 0
   agent: {fileID: 0}
   isAttacking: 0
+  hpSlider: {fileID: 8638232658166746187}
+  hpText: {fileID: 5581338119029002468}
   isDecteced: 0
   LeftHandWeapon: {fileID: 6995037820952417372}
   RightHandWeapon: {fileID: 7376331169877251308}
   LeftFootWeapon: {fileID: 1564046549316418371}
   RightFootWeapon: {fileID: 2722264303881330551}
---- !u!114 &9073883810447283070
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 436224338963821434}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9529b1b90e5172348af4e6f253813f81, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hpSlider: {fileID: 8638232658166746187}
-  hpText: {fileID: 5581338119029002468}
 --- !u!195 &2198553913104225134
 NavMeshAgent:
   m_ObjectHideFlags: 0

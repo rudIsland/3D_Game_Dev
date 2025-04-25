@@ -67,7 +67,7 @@ public class Fighter : Enemy
     // Update is called once per frame
     protected override void Update()
     {
-        if (stats.IsDead) return;
+        if (enemyStat.IsDead) return;
 
         UpdateDistanceToPlayer();
         HandleDetectedState();
@@ -122,10 +122,10 @@ public class Fighter : Enemy
 
         level.SetLevel(20); //레벨설정
 
-        stats.maxHP = 1000;
-        stats.ATK = 40f;
-        stats.DEF = 30f;
-        statComp.stats.currentHP = statComp.stats.maxHP; //현재 체력설정
+        enemyStat.maxHP = 1000;
+        enemyStat.ATK = 40f;
+        enemyStat.DEF = 30f;
+        enemyStat.currentHP = enemyStat.maxHP; //현재 체력설정
 
         GetComponentInChildren<EnemyGUI>()?.UpdateLevel(); //GUI레벨설정
     }
@@ -152,7 +152,7 @@ public class Fighter : Enemy
 
     private ESTATE DectectedPlayer()
     {
-        if (GameManager.Instance.playerStateMachine.isDead) return ESTATE.FAILED;
+        if (GameManager.Instance.player.isDead) return ESTATE.FAILED;
 
         float distance = enemyMemory.distanceToPlayer;
 
@@ -450,7 +450,7 @@ public class Fighter : Enemy
 
     private void NormalAttackingEnd()
     {
-        if (statComp.stats.IsDead) return;
+        if (enemyStat.IsDead) return;
 
         isAttacking = false;
 
@@ -489,8 +489,8 @@ public class Fighter : Enemy
     // 데미지 받기
     public override void ApplyDamage(double damage)
     {
-        stats.currentHP -= damage;
-        stats.currentHP = Mathf.Max((float)stats.currentHP, 0);
+        enemyStat.currentHP -= damage;
+        enemyStat.currentHP = Mathf.Max((float)enemyStat.currentHP, 0);
 
         //if (!isAttacking)
         //{
@@ -498,6 +498,6 @@ public class Fighter : Enemy
         //}
         CheckDie();
 
-        statComp.UpdateHPUI();
+        UpdateHPUI();
     }
 }

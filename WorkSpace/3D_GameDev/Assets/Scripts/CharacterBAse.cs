@@ -3,14 +3,13 @@ using UnityEngine;
 
 public abstract class CharacterBase : MonoBehaviour, IDamagable
 {
-    public virtual CharacterStatsComponent statComp => GetComponent<CharacterStatsComponent>();
-    public CharacterStats stats => statComp.stats;
+    public abstract CharacterStats Stat { get; }
 
     public System.Action OnDeath;
 
     public virtual void CheckDie()
     {
-        if (stats.currentHP <= 0)
+        if (Stat.currentHP <= 0)
         {
             OnDeath?.Invoke();
         }

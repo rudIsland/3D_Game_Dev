@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
@@ -12,8 +10,35 @@ public class PlayerStats : CharacterStats
     public float maxStamina = 100f;
     public float currentStamina = 100f;
 
-    public float staminaRegenPS = 7.5f;      // 초당 회복량
-    public float regenDelay = 2f;     // 마지막 소비 후 회복 딜레이
+    public float staminaRegenPS = 7.5f;
+    public float regenDelay = 2f;
 
-    public PlayerStats() { level = new Level(); } // level할당
+    private float timeSinceLastUse = 0f;
+
+    public PlayerStats()
+    {
+        level = new Level();
+    }
+
+    public bool CanUse(float amount)
+    {
+        return currentStamina >= amount;
+    }
+
+    public void Use(float amount)
+    {
+        currentStamina = Mathf.Max(currentStamina - amount, 0f);
+        timeSinceLastUse = 0f;
+    }
+
+    public void TickRegen(float deltaTime)
+    {
+        timeSinceLastUse += deltaTime;
+
+        if (timeSinceLastUse >= regenDelay && currentStamina < maxStamina)
+        {
+            currentStamina += staminaRegenPS * deltaTime;
+            currentStamina = Mathf.Min(currentStamina, maxStamina);
+        }
+    }
 }

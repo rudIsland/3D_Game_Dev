@@ -1,8 +1,7 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.AI;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
-using static Cinemachine.DocumentationSortingAttribute;
 
 public abstract class Enemy : CharacterBase
 {
@@ -15,15 +14,36 @@ public abstract class Enemy : CharacterBase
     [SerializeField] protected float moveSpeed = 3f;
     [SerializeField] protected float angularSpeed = 180f;
 
-    [Header("레벨")]
+    [Header("레벨 and 경험치")]
     [SerializeField] public Level level;
+    protected float deathEXP;
+
+    [Header("공통 스탯")]
+    [SerializeField] private EnemyStats EnemyStat = new EnemyStats(); // Inspector에 표시됨
+    public override CharacterStats Stat => EnemyStat; //부모전용
+    public EnemyStats enemyStat => EnemyStat;        //자식에서 접근용
 
     public NavMeshAgent agent;
 
     public bool isAttacking = false;
 
-    //public bool isDead = false;
-    public override CharacterStatsComponent statComp => GetComponent<EnemyStatComponent>();
+    [Header("공통 체력UI")]
+    public Slider hpSlider;
+    public TextMeshProUGUI hpText;
+
+    public void UpdateResource()
+    {
+        UpdateHPUI();
+    }
+
+    public virtual void UpdateHPUI()
+    {
+        if (hpSlider != null)
+        {
+            hpSlider.value = (float)(enemyStat.currentHP / enemyStat.maxHP);
+            hpText.text = (int)enemyStat.currentHP + "/" + enemyStat.maxHP.ToString();
+        }
+    }
 
     protected virtual void Awake()
     {
@@ -52,6 +72,7 @@ public abstract class Enemy : CharacterBase
             player = GameObject.FindWithTag("Player").transform
         };
 
+        UpdateHPUI();
         SetupTree(); // 트리 구성은 자식이 정의
     }
 
@@ -91,6 +112,8 @@ public abstract class Enemy : CharacterBase
     protected virtual void HandleDeath()
     {
         Debug.Log("적 사망");
+        //플레이어에게 경험치 넣기
+        GameManager.Instance.getPlayerExpKillEnemy(deathEXP);
     }
 
     protected virtual void RotateTowardsPlayer()
@@ -117,8 +140,8 @@ public abstract class Enemy : CharacterBase
     //탐지범위 체크
     protected virtual void UpdateDetectionStatus()
     {
-        enemyMemory.isPlayerDetected = enemyMemory.distanceToPlayer <= detectRange && !GameManager.Instance.playerStateMachine.isDead;
-        enemyMemory.isInAttackRange = enemyMemory.distanceToPlayer <= attackRange && !GameManager.Instance.playerStateMachine.isDead;
+        enemyMemory.isPlayerDetected = enemyMemory.distanceToPlayer <= detectRange && !GameManager.Instance.player.isDead;
+        enemyMemory.isInAttackRange = enemyMemory.distanceToPlayer <= attackRange && !GameManager.Instance.player.isDead;
     }
 
     protected abstract void SetupStats(); 

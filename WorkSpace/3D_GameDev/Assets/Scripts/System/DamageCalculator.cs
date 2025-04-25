@@ -13,8 +13,8 @@ public static class DamageCalculator
             return;
         }
 
-        double attack = attacker.stats.ATK;
-        double defense = defender.stats.DEF;
+        double attack = attacker.Stat.ATK;
+        double defense = defender.Stat.DEF;
 
         const double reductionRate = 0.01; // DEF 1당 1% 감소
         const double minRate = 0.2;        // 최소 데미지 비율 20%
