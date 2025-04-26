@@ -63,7 +63,7 @@ public class PlayerFreeLookState : PlayerBaseState
         UpdateMoveAnimation(deltaTime);
 
         //가만히 있으면 스테미나 회복 업데이트 
-        stateMachine.UpStemina();
+        stateMachine.RegenStemina();
 
         //Other Animation Check
         OtherAnimaionCheck();

@@ -593,6 +593,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 2784195021611603705, guid: 0778755e239b86e41a8792529d00c89f,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2797510864051456673, guid: 0778755e239b86e41a8792529d00c89f,
         type: 3}
       propertyPath: m_Layer
@@ -1165,8 +1170,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 370653821}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.093285225, y: 0.0029239848, z: -0.00027396035, w: 0.9956351}
-  m_LocalPosition: {x: 0, y: 0.00000011920929, z: 0}
+  m_LocalRotation: {x: 0.093285225, y: 0.0029239848, z: -0.0002739604, w: 0.99563515}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2339,8 +2344,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 755732396}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.07515969, y: 0.002928484, z: -0.0002207292, w: 0.9971672}
-  m_LocalPosition: {x: 0, y: 0.00000011920929, z: 0}
+  m_LocalRotation: {x: 0.0751597, y: 0.0029284842, z: -0.00022072927, w: 0.9971672}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -5544,6 +5549,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: MainCamera
       objectReference: {fileID: 0}
+    - target: {fileID: 8944336655422409498, guid: f6d148d888ffbf54b9afe9936dfaec1f,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8944336655422409503, guid: f6d148d888ffbf54b9afe9936dfaec1f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -7862,8 +7872,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1748245750}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.05705726, y: 0.0029320063, z: -0.00016756594, w: 0.99836665}
-  m_LocalPosition: {x: 0, y: 0.00000011920929, z: 0}
+  m_LocalRotation: {x: 0.05705727, y: 0.0029320065, z: -0.00016756596, w: 0.99836665}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -8796,7 +8806,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2018555984
 Transform:
   m_ObjectHideFlags: 0
@@ -12495,6 +12505,70 @@ MonoBehaviour:
   _hasAnimator: 0
   SpeedChangeRate: 10
   _ani_SpeedValue: 0
+  stat:
+    serializedMaxHP: 100
+    serializedCurrentHP: 100
+    serializedATK: 1000
+    serializedDEF: 5
+    level:
+      expArray:
+      - 100
+      - 283
+      - 520
+      - 800
+      - 1118
+      - 1470
+      - 1852
+      - 2263
+      - 2700
+      - 3162
+      - 3648
+      - 4157
+      - 4687
+      - 5238
+      - 5809
+      - 6400
+      - 7009
+      - 7637
+      - 8282
+      - 8944
+      - 9623
+      - 10319
+      - 11030
+      - 11758
+      - 12500
+      - 13257
+      - 14030
+      - 14816
+      - 15617
+      - 16432
+      - 17260
+      - 18102
+      - 18957
+      - 19825
+      - 20706
+      - 21600
+      - 22506
+      - 23425
+      - 24355
+      - 25298
+      - 26253
+      - 27219
+      - 28197
+      - 29186
+      - 30187
+      - 31199
+      - 32222
+      - 33255
+      - 34300
+      - 35355
+      currentLevel: 1
+      currentExp: 0
+    maxStamina: 100
+    currentStamina: 100
+    staminaRegenPS: 7.5
+    regenDelay: 2
+    statPoint: 0
   targeter: {fileID: 777030669}
 --- !u!114 &5866666021134896871
 MonoBehaviour:
@@ -13226,6 +13300,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mutant
       objectReference: {fileID: 0}
+    - target: {fileID: 1244723615872555030, guid: 80e31e2174001b0419ccd1573b2ff33a,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1501400987370950690, guid: 80e31e2174001b0419ccd1573b2ff33a,
         type: 3}
       propertyPath: m_AnchorMax.x
@@ -13640,6 +13719,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Fighter
+      objectReference: {fileID: 0}
+    - target: {fileID: 436224338963821434, guid: 9e80d9b35a103ff43b29f6285988d35f,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 956477349906426304, guid: 9e80d9b35a103ff43b29f6285988d35f,
         type: 3}

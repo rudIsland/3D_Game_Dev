@@ -3,6 +3,17 @@ using UnityEngine;
 [System.Serializable]
 public class PlayerStats : CharacterStats
 {
+    [Header("스탯")]
+    [SerializeField] private double serializedMaxHP = 100;
+    [SerializeField] private double serializedCurrentHP = 100;
+    [SerializeField] private double serializedATK = 1000;
+    [SerializeField] private double serializedDEF = 5;
+
+    public override double maxHP { get => serializedMaxHP; set => serializedMaxHP = value; }
+    public override double currentHP { get => serializedCurrentHP; set => serializedCurrentHP = value; }
+    public override double ATK { get => serializedATK; set => serializedATK = value; }
+    public override double DEF { get => serializedDEF; set => serializedDEF = value; }
+
     [Header("레벨")]
     public Level level;
 
@@ -14,6 +25,8 @@ public class PlayerStats : CharacterStats
     public float regenDelay = 2f;
 
     private float timeSinceLastUse = 0f;
+
+    public int statPoint = 0;
 
     public PlayerStats()
     {
@@ -41,4 +54,38 @@ public class PlayerStats : CharacterStats
             currentStamina = Mathf.Min(currentStamina, maxStamina);
         }
     }
+
+    public void AddExp(float exp)
+    {
+        level.currentExp += exp;
+        Debug.Log($"현재 경험치량: {level.currentExp} / {level.MaxExp}");
+
+        while (level.currentLevel < Level.MaxLevel && level.currentExp >= level.expArray[level.currentLevel - 1])
+        {
+            level.currentExp -= level.expArray[level.currentLevel - 1];
+            level.currentLevel++;
+
+            HandleLevelUp(); // 레벨업 처리 여기서 한 번에
+        }
+
+        level.currentExp = Mathf.Max(0, level.currentExp);
+    }
+
+    private void HandleLevelUp()
+    {
+        statPoint += 1; // 스탯 포인트 지급
+        LevelUpHeal();  // 체력 회복
+        GameManager.Instance.Resource.UpdateHPUI(); // 체력 슬라이더 즉시 갱신
+
+        // 레벨업 UI, 퍼스 호출
+        GameManager.Instance.levelStatSystem.OpenLevelPanel();
+        GameManager.Instance.levelStatSystem.UpdateEXP_StatUI();
+        GameManager.Instance.onLevelUp?.Invoke();
+    }
+
+    public void LevelUpHeal()
+    {
+        currentHP = maxHP;
+    }
+
 }

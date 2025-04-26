@@ -18,6 +18,7 @@ public class Fighter : Enemy
     public readonly int _animIDFight = Animator.StringToHash("Fight"); //공격모션 범위
     public readonly int _animIDAttackIndex = Animator.StringToHash("AttackIndex"); //공격모션 범위
     public readonly int _animIDAttackTrigger = Animator.StringToHash("AttackTrigger"); //공격모션 범위
+    public readonly int _animIDDead = Animator.StringToHash("IsDead"); //죽음
 
     [Header("탐지범위")]
     private float DectectedRange = 7f;
@@ -126,6 +127,7 @@ public class Fighter : Enemy
         enemyStat.ATK = 40f;
         enemyStat.DEF = 30f;
         enemyStat.currentHP = enemyStat.maxHP; //현재 체력설정
+        deathEXP = 150000;
 
         GetComponentInChildren<EnemyGUI>()?.UpdateLevel(); //GUI레벨설정
     }
@@ -464,6 +466,22 @@ public class Fighter : Enemy
     }
 
     /****************************** Agent And 검사 Logic  ************************************/
+
+    protected override void HandleDeath()
+    {
+        Debug.Log("적 죽는중...");
+        animator.applyRootMotion = true;
+        animator.SetTrigger(_animIDDead);
+
+        //NavMeshAgent를 비활성화하기 전에 정지 먼저 설정
+        SetAgentStop(true);
+
+        agent.enabled = false; // 이제 안전하게 비활성화
+        GetComponent<Collider>().enabled = false;
+        GetComponent<Target>().enabled = false;
+
+        base.HandleDeath();
+    }
 
     private bool IsFacingTarget(Vector3 target)
     {

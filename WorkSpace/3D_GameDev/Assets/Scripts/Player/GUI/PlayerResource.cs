@@ -41,9 +41,10 @@ public class PlayerResource : MonoBehaviour
         staminaText.text = $"{(int)Stats.currentStamina} / {Stats.maxStamina}";
     }
 
-    public void UpdateAll()
+    public void UpdateResourceAll()
     {
         UpdateHPUI();
         UpdateStaminaUI();
     }
+
 }

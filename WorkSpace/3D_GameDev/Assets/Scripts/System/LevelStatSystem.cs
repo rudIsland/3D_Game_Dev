@@ -18,26 +18,12 @@ public class LevelStatSystem : MonoBehaviour
 
     private void Start()
     {
-        UpdateAllUI();
+        UpdateEXP_StatUI();
 
         levelUpPanel.SetActive(false); // 시작 시 비활성화
     }
 
-    public void UpdateExpUI()
-    {
-        if (Player == null || Stats == null) return;
-
-        expSlider.maxValue = Stats.level.MaxExp;
-        expSlider.value = Stats.level.currentExp;
-
-        if (Stats.level.IsLevelUp && Stats.level.TryLevelUp())
-        {
-            levelUpPanel.SetActive(true);
-            UpdateAllUI();
-        }
-    }
-
-    public void UpdateAllUI()
+    public void UpdateEXP_StatUI()
     {
         if (Player == null || Stats == null) return;
 
@@ -53,106 +39,41 @@ public class LevelStatSystem : MonoBehaviour
     public void IncreaseAttack()
     {
         Stats.ATK += 2;
-        UpdateAllUI();
-    }
-
-    public void DecreaseAttack()
-    {
-        Stats.ATK -= 2;
-        UpdateAllUI();
+        Stats.statPoint -= 1;
+        CheckLevelUpFinish();
     }
 
     public void IncreaseDefense()
     {
         Stats.DEF += 1;
-        UpdateAllUI();
-    }
-
-    public void DecreaseDefense()
-    {
-        Stats.DEF -= 1;
-        UpdateAllUI();
+        Stats.statPoint -= 1;
+        CheckLevelUpFinish();
     }
 
     public void IncreaseHP()
     {
         Stats.maxHP += 20;
-        UpdateAllUI();
+        Stats.statPoint -= 1;
+        CheckLevelUpFinish();
     }
 
-    public void DecreaseHP()
+    private void CheckLevelUpFinish()
     {
-        Stats.maxHP -= 20;
-        UpdateAllUI();
-    }
-
-    public void HideLevelUpPanel()
-    {
-        levelUpPanel.SetActive(false);
-    }
-
-    public void TriggerLevelUpUI()
-    {
-        UpdateExpUI(); // 외부에서 호출 시 레벨업 갱신
-    }
-
-    public void UpAttack()
-    {
-        if (Stats != null)
+        if (Stats.statPoint <= 0)
         {
-            Stats.ATK += 2;
-            UpdateAllUI();
-        }
-    }
-
-    public void DownAttack()
-    {
-        if (Stats != null)
-        {
-            Stats.ATK -= 2;
-            UpdateAllUI();
-        }
-    }
-
-    public void UpDef()
-    {
-        if (Stats != null)
-        {
-            Stats.DEF += 1;
-            UpdateAllUI();
-        }
-    }
-
-    public void DownDef()
-    {
-        if (Stats != null)
-        {
-            Stats.DEF -= 1;
-            UpdateAllUI();
-        }
-    }
-
-
-    public void UpHP()
-    {
-        if (Stats != null)
-        {
-            Stats.maxHP += 20;
-            UpdateAllUI();
-        }
-    }
-
-    public void DownHP()
-    {
-        if (Stats != null)
-        {
-            Stats.maxHP -= 20;
-            UpdateAllUI();
+            UpdateEXP_StatUI();
+            CloseLevelPanel();
         }
     }
 
     public void CloseLevelPanel()
     {
-        gameObject.SetActive(false);
+        levelUpPanel.SetActive(false);
+        GameManager.Instance.ContinueGame();
+    }
+
+    public void OpenLevelPanel()
+    {
+        levelUpPanel.SetActive(true);
     }
 }

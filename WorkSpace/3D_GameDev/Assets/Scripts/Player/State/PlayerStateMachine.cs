@@ -65,7 +65,7 @@ public class PlayerStateMachine : CharacterBase
     public State currentState = null;
 
     //½ºÅÈ
-    private PlayerStats stat = new PlayerStats();
+    [SerializeField]private PlayerStats stat = new PlayerStats();
     public override CharacterStats Stat => stat;
     public PlayerStats playerStat => stat;
 
@@ -76,7 +76,15 @@ public class PlayerStateMachine : CharacterBase
 
     private void Awake()
     {
+        //GameManager Setting
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.player = this;
+        }
+
+
         _hasAnimator = TryGetComponent(out animator);
+
     }
     private void Start()
     {
@@ -125,7 +133,7 @@ public class PlayerStateMachine : CharacterBase
         currentState.Enter();
     }
 
-    public void UpStemina()
+    public void RegenStemina()
     {
         playerStat.TickRegen(Time.deltaTime);
         GameManager.Instance.Resource.UpdateStaminaUI();

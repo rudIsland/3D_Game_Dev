@@ -21,31 +21,23 @@ public class Level
     {
         currentExp += exp;
         Debug.Log($"현재 경험치량: {currentExp} / {MaxExp}");
+
+        while (currentLevel < MaxLevel && currentExp >= expArray[currentLevel - 1])
+        {
+            currentExp -= expArray[currentLevel - 1]; // 현재 레벨의 필요 경험치만큼 빼고
+            currentLevel++; // 레벨업
+        }
+
+        currentExp = Mathf.Max(0, currentExp); // 혹시 음수 방지
     }
 
-    public void LevelUp()
+    public void LevelUp_EXP()
     {
         if (currentLevel < MaxLevel)
         {
             currentExp -= MaxExp;
             currentLevel++;
         }
-    }
-
-    public void GainExpFromMonster(int baseExp, int monsterLevel, int playerLevel)
-    {
-        float multiplier = Mathf.Clamp(1f + (monsterLevel - playerLevel) * 0.1f, 0.5f, 2f);
-        AddExp(baseExp * multiplier);
-    }
-
-    public bool TryLevelUp()
-    {
-        if (IsLevelUp)
-        {
-            LevelUp();
-            return true;
-        }
-        return false;
     }
 
     public void SetLevel(int level)
