@@ -40,28 +40,28 @@ public class LevelStatSystem : MonoBehaviour
     {
         Stats.ATK += 2;
         Stats.statPoint -= 1;
-        CheckLevelUpFinish();
+        UpdateLevelUp();
     }
 
     public void IncreaseDefense()
     {
         Stats.DEF += 1;
         Stats.statPoint -= 1;
-        CheckLevelUpFinish();
+        UpdateLevelUp();
     }
 
     public void IncreaseHP()
     {
         Stats.maxHP += 20;
         Stats.statPoint -= 1;
-        CheckLevelUpFinish();
+        UpdateLevelUp();
     }
 
-    private void CheckLevelUpFinish()
+    private void UpdateLevelUp()
     {
+        UpdateEXP_StatUI();
         if (Stats.statPoint <= 0)
         {
-            UpdateEXP_StatUI();
             CloseLevelPanel();
         }
     }

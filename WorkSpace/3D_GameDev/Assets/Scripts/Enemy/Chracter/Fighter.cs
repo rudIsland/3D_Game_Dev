@@ -119,7 +119,7 @@ public class Fighter : Enemy
         detectRange = DectectedRange; //탐지범위
         attackRange = FightRange; //공격범위
         moveSpeed = 1.5f; //이동속도
-        angularSpeed = 180f; //회전속도
+        angularSpeed = 260f; //회전속도
 
         level.SetLevel(20); //레벨설정
 

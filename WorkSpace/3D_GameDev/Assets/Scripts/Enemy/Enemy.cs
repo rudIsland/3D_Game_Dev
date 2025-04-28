@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.AI;
+using System.Collections;
 
 public abstract class Enemy : CharacterBase
 {
@@ -114,6 +115,15 @@ public abstract class Enemy : CharacterBase
         Debug.Log("적 사망");
         //플레이어에게 경험치 넣기
         GameManager.Instance.getPlayerExpKillEnemy(deathEXP);
+
+        StartCoroutine(DestroyEnemy()); // StartCoroutine으로 바꿔야 한다!
+    }
+
+    private IEnumerator DestroyEnemy()
+    {
+        yield return new WaitForSeconds(5f);
+
+        Destroy(gameObject);
     }
 
     protected virtual void RotateTowardsPlayer()

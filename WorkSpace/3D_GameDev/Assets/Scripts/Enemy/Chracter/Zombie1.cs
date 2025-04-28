@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -258,6 +259,7 @@ public class Zombie1 : Enemy
         GetComponent<Target>().enabled = false;
 
         base.HandleDeath();
+
     }
 
     private void NormalAttackingStart()

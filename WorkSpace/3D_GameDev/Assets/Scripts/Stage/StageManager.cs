@@ -24,6 +24,8 @@ public class StageManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        SceneManager.LoadScene("HUD", LoadSceneMode.Additive);
     }
 
     public void MoveToStage(string nextStageName)

@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -11,6 +13,10 @@ public class GameManager : MonoBehaviour
     public LevelStatSystem levelStatSystem { get; set; }
 
     public Action onLevelUp;
+
+    public TextMeshProUGUI enemyCountTxt;
+    public int EnemyCount = 0;
+    public int currentEnemyCount = 0;
 
     private void Awake()
     {
@@ -28,12 +34,26 @@ public class GameManager : MonoBehaviour
     {
         // GetComponent
         player = GameObject.Find("Player").GetComponent<PlayerStateMachine>();
+
+        ResetEnemyCount();
     }
 
+    public void ResetEnemyCount()
+    {
+        currentEnemyCount = GameObject.FindGameObjectsWithTag("Enemy").Count();
+        EnemyCount = currentEnemyCount;
+        enemyCountTxt.text = $"{currentEnemyCount} / {EnemyCount} ";
+    }
+
+    public void UpdateEnemyCount()
+    {
+        enemyCountTxt.text = $"{currentEnemyCount -= 1} / {EnemyCount} ";
+    }
 
     public void getPlayerExpKillEnemy(float exp)
     {
         player.playerStat.AddExp(exp);
+        UpdateEnemyCount();
     }
 
     public void GameReset()
