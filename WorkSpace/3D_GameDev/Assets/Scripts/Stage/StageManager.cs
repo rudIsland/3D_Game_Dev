@@ -10,22 +10,23 @@ public class StageManager : MonoBehaviour
 
     [SerializeField] private readonly string SPAWN_POINT_TAGNAME = "SpawnPoint";
 
-    public string CurrentStageName { get; private set; }
+    public string CurrentStageName;
 
     private void Awake()
     {
-        CurrentStageName = SceneManager.GetActiveScene().name;
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(gameObject); // 씬 넘어가도 유지
         }
         else
         {
-            Destroy(gameObject);
+            Destroy(gameObject); // 중복 방지
         }
 
-        SceneManager.LoadScene("HUD", LoadSceneMode.Additive);
+        CurrentStageName = SceneManager.GetActiveScene().name;
+
+        //SceneManager.LoadScene("01_HUD", LoadSceneMode.Additive);
     }
 
     public void MoveToStage(string nextStageName)
@@ -59,5 +60,9 @@ public class StageManager : MonoBehaviour
         {
             Debug.LogWarning($"[StageManager] Spawn point not found in stage '{nextStageName}'.");
         }
+        yield return null;
+
+        GameManager.Instance.ResetEnemyCount();
     }
+
 }

@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,54 +14,72 @@ public class LevelStatSystem : MonoBehaviour
     [SerializeField] private TextMeshProUGUI DEFText;
     [SerializeField] private GameObject levelUpPanel;
 
-    private PlayerStateMachine Player => GameManager.Instance.player;
-    private PlayerStats Stats => Player.playerStat;
+    private PlayerStateMachine player;
+    private PlayerStats stats;
 
     private void Start()
     {
+        FindPlayerObject();
+
         UpdateEXP_StatUI();
 
         levelUpPanel.SetActive(false); // 시작 시 비활성화
     }
 
+    private void FindPlayerObject()
+    {
+        player = FindObjectOfType<PlayerStateMachine>();
+    }
+
+    public void LevelStatInit(PlayerStateMachine p)
+    {
+        player = p;
+        stats = player.playerStat;
+
+        UpdateEXP_StatUI();
+        levelUpPanel.SetActive(false);
+    }
+
     public void UpdateEXP_StatUI()
     {
-        if (Player == null || Stats == null) return;
+        if (player == null || stats == null) return;
 
-        expSlider.maxValue = Stats.level.MaxExp;
-        expSlider.value = Stats.level.currentExp;
+        expSlider.maxValue = stats.level.MaxExp;
+        expSlider.value = stats.level.currentExp;
 
-        NowLevel.text = $"LEVEL: {Stats.level.currentLevel}";
-        HPText.text = $"HP: {Stats.maxHP}";
-        ATKText.text = $"ATK: {Stats.ATK}";
-        DEFText.text = $"DEF: {Stats.DEF}";
+        NowLevel.text = $"LEVEL: {stats.level.currentLevel}";
+        HPText.text = $"HP: {stats.maxHP}";
+        ATKText.text = $"ATK: {stats.ATK}";
+        DEFText.text = $"DEF: {stats.DEF}";
     }
 
     public void IncreaseAttack()
     {
-        Stats.ATK += 2;
-        Stats.statPoint -= 1;
+        stats.ATK += 2;
+        stats.statPoint -= 1;
         UpdateLevelUp();
     }
 
     public void IncreaseDefense()
     {
-        Stats.DEF += 1;
-        Stats.statPoint -= 1;
+        stats.DEF += 1;
+        stats.statPoint -= 1;
         UpdateLevelUp();
     }
 
     public void IncreaseHP()
     {
-        Stats.maxHP += 20;
-        Stats.statPoint -= 1;
+        stats.maxHP += 20;
+        stats.statPoint -= 1;
         UpdateLevelUp();
+        stats.LevelUpHeal();  // 체력 회복
+        GameManager.Instance.Resource.UpdateHPUI();
     }
 
     private void UpdateLevelUp()
     {
         UpdateEXP_StatUI();
-        if (Stats.statPoint <= 0)
+        if (stats.statPoint <= 0)
         {
             CloseLevelPanel();
         }

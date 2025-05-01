@@ -14,31 +14,38 @@ public class PlayerResource : MonoBehaviour
     [SerializeField] private Slider staminaSlider;
     [SerializeField] private TextMeshProUGUI staminaText;
 
-    private PlayerStateMachine Player => GameManager.Instance.player;
-    private PlayerStats Stats => Player.playerStat;
+
+    private PlayerStats stats;
+
 
     private void Start()
     {
+        FindPlayerObject();
+
         UpdateHPUI();
         UpdateStaminaUI();
+    }
+    private void FindPlayerObject()
+    {
+        stats = FindObjectOfType<PlayerStateMachine>().playerStat;
     }
 
     public void UpdateHPUI()
     {
-        if (Stats == null) return;
+        if (stats == null) return;
 
-        hpSlider.maxValue = (float)Stats.maxHP;
-        hpSlider.value = (float)Stats.currentHP;
-        hpText.text = $"{(int)Stats.currentHP} / {Stats.maxHP}";
+        hpSlider.maxValue = (float)stats.maxHP;
+        hpSlider.value = (float)stats.currentHP;
+        hpText.text = $"{(int)stats.currentHP} / {stats.maxHP}";
     }
 
     public void UpdateStaminaUI()
     {
-        if (Stats == null) return;
+        if (stats == null) return;
 
-        staminaSlider.maxValue = (float)Stats.maxStamina;
-        staminaSlider.value = (float)Stats.currentStamina;
-        staminaText.text = $"{(int)Stats.currentStamina} / {Stats.maxStamina}";
+        staminaSlider.maxValue = (float)stats.maxStamina;
+        staminaSlider.value = (float)stats.currentStamina;
+        staminaText.text = $"{(int)stats.currentStamina} / {stats.maxStamina}";
     }
 
     public void UpdateResourceAll()

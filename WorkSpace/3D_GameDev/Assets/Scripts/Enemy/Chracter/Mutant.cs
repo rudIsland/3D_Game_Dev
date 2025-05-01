@@ -111,11 +111,12 @@ public class Mutant : Enemy
     //탐지범위 체크
     protected override void UpdateDetectionStatus()
     {
-        isRunning = enemyMemory.distanceToPlayer <= RunningArange && !GameManager.Instance.player.isDead;
-        isWalk = enemyMemory.distanceToPlayer <= WalkArange && !GameManager.Instance.player.isDead;
-        isJumpAttackRange = enemyMemory.distanceToPlayer <= JumpAttackRange && !GameManager.Instance.player.isDead;
-        isPunchAttackRange = enemyMemory.distanceToPlayer <= PunchAttackRange && !GameManager.Instance.player.isDead;
-        isSwipAttackRange = enemyMemory.distanceToPlayer <= SwipAttackRange && !GameManager.Instance.player.isDead;
+       // if (!GameManager.Instance.player.isDead) return; 
+        isRunning = enemyMemory.distanceToPlayer <= RunningArange;
+        isWalk = enemyMemory.distanceToPlayer <= WalkArange;
+        isJumpAttackRange = enemyMemory.distanceToPlayer <= JumpAttackRange;
+        isPunchAttackRange = enemyMemory.distanceToPlayer <= PunchAttackRange;
+        isSwipAttackRange = enemyMemory.distanceToPlayer <= SwipAttackRange;
     }
 
 

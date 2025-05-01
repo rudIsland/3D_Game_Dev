@@ -7963,7 +7963,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 546904383}
-  - component: {fileID: 546904384}
   m_Layer: 0
   m_Name: EnemySpawn
   m_TagString: Untagged
@@ -8001,19 +8000,6 @@ Transform:
   - {fileID: 2115229783}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &546904384
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 546904382}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 57e563c2901edc147937140d4787f0b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SpawnerList: {fileID: 0}
 --- !u!1 &551402753
 GameObject:
   m_ObjectHideFlags: 0
@@ -22384,7 +22370,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1525994145}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a3a3d89c04c6f33468efd780aeb10559, type: 3}
   m_Name: 

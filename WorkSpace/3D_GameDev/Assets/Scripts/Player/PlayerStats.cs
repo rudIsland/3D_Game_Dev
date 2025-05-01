@@ -33,6 +33,21 @@ public class PlayerStats : CharacterStats
         level = new Level();
     }
 
+    public PlayerStats getDefaultPlayerStat()
+    {
+        PlayerStats DefaultStats = new PlayerStats();
+        DefaultStats.maxHP = 100;
+        DefaultStats.currentHP = 100;
+        DefaultStats.ATK = 100;
+        DefaultStats.DEF = 5;
+        DefaultStats.level.currentLevel = 1;
+        DefaultStats.level.currentExp = 0;
+        DefaultStats.statPoint = 0;
+        DefaultStats.currentStamina = maxStamina;
+
+        return DefaultStats;
+    }
+
     public bool CanUse(float amount)
     {
         return currentStamina >= amount;

@@ -69,20 +69,12 @@ public class PlayerStateMachine : CharacterBase
     public override CharacterStats Stat => stat;
     public PlayerStats playerStat => stat;
 
-
     public Targeter targeter;
 
     /************************** End **************************/
 
     private void Awake()
     {
-        //GameManager Setting
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.player = this;
-        }
-
-
         _hasAnimator = TryGetComponent(out animator);
 
     }
@@ -92,6 +84,8 @@ public class PlayerStateMachine : CharacterBase
 
         SwitchState(new PlayerFreeLookState(this));
     }
+
+
     private void Update()
     {
         currentState.Tick(Time.deltaTime);
@@ -101,11 +95,13 @@ public class PlayerStateMachine : CharacterBase
     private void OnEnable()
     {
         inputReader.jumpPressed += OnJumpPressed;
+        Enemy.OnEnemyKilled += playerStat.AddExp;
     }
 
     private void OnDisable()
     {
         inputReader.jumpPressed -= OnJumpPressed;
+        Enemy.OnEnemyKilled -= playerStat.AddExp;
     }
 
     //상태를 바꾸는 메소드

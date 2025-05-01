@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.AI;
 using System.Collections;
+using System;
 
 public abstract class Enemy : CharacterBase
 {
@@ -31,6 +32,8 @@ public abstract class Enemy : CharacterBase
     [Header("공통 체력UI")]
     public Slider hpSlider;
     public TextMeshProUGUI hpText;
+
+    public static event Action<float> OnEnemyKilled; // 경험치 전달 이벤트
 
     public void UpdateResource()
     {
@@ -114,7 +117,8 @@ public abstract class Enemy : CharacterBase
     {
         Debug.Log("적 사망");
         //플레이어에게 경험치 넣기
-        GameManager.Instance.getPlayerExpKillEnemy(deathEXP);
+        // 경험치 이벤트 발생
+        OnEnemyKilled?.Invoke(deathEXP);
 
         StartCoroutine(DestroyEnemy()); // StartCoroutine으로 바꿔야 한다!
     }
@@ -150,8 +154,9 @@ public abstract class Enemy : CharacterBase
     //탐지범위 체크
     protected virtual void UpdateDetectionStatus()
     {
-        enemyMemory.isPlayerDetected = enemyMemory.distanceToPlayer <= detectRange && !GameManager.Instance.player.isDead;
-        enemyMemory.isInAttackRange = enemyMemory.distanceToPlayer <= attackRange && !GameManager.Instance.player.isDead;
+        // if (!GameManager.Instance.player.isDead) return; 
+        enemyMemory.isPlayerDetected = enemyMemory.distanceToPlayer <= detectRange;
+        enemyMemory.isInAttackRange = enemyMemory.distanceToPlayer <= attackRange;
     }
 
     protected abstract void SetupStats(); 

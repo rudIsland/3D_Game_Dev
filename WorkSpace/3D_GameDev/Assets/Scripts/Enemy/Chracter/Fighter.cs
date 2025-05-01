@@ -154,7 +154,7 @@ public class Fighter : Enemy
 
     private ESTATE DectectedPlayer()
     {
-        if (GameManager.Instance.player.isDead) return ESTATE.FAILED;
+        //if (GameManager.Instance.player.isDead) return ESTATE.FAILED;
 
         float distance = enemyMemory.distanceToPlayer;
 
