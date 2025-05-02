@@ -1,22 +1,31 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 public static class SaveSystem
 {
-    private const string PATH = "Assets/Resources/savedData.asset";
+    private const string PATH = "Assets/Scripts/Resources/savedData.asset";
 
-    public static void SaveToAsset(PlayerStats stats)
+    public static bool HasSavedData()
+    {
+        SavedData data = Resources.Load<SavedData>("savedData");
+        return data != null && !string.IsNullOrEmpty(data.StageName);
+
+    }
+    public static void SaveData()
     {
 #if UNITY_EDITOR
-        string assetPath = $"Assets/Resources/savedData.asset";
-        SavedData data = AssetDatabase.LoadAssetAtPath<SavedData>(assetPath);
+        SavedData data = AssetDatabase.LoadAssetAtPath<SavedData>(PATH);
         if (data == null)
         {
             Debug.LogError("SavedData asset not found.");
             return;
         }
+
+        PlayerStats stats = new PlayerStats();
 
         data.maxHP = stats.maxHP;
         data.currentHP = stats.currentHP;
@@ -29,21 +38,28 @@ public static class SaveSystem
         data.statPoint = stats.statPoint;
         data.StageName = StageManager.Instance.CurrentStageName;
 
-        EditorUtility.SetDirty(data); // 변경사항 저장
+        EditorUtility.SetDirty(data);
         AssetDatabase.SaveAssets();
-        Debug.Log("Saved to ScriptableObject.");
+        Debug.Log("Saved current game state.");
 #endif
     }
 
-    public static SavedData LoadFromAsset(PlayerStats stats)
+    public static void LoadAndContinue()
     {
-        SavedData data = Resources.Load<SavedData>(PATH);
+        if (!HasSavedData())
+        {
+            Debug.LogWarning("저장된 데이터가 없습니다.");
+            return;
+        }
+
+        SavedData data = Resources.Load<SavedData>("savedData");
         if (data == null)
         {
             Debug.LogError("SavedData.asset not found in Resources.");
-            return null;
+            return;
         }
 
+        PlayerStats stats = new PlayerStats();
         stats.maxHP = data.maxHP;
         stats.currentHP = data.currentHP;
         stats.ATK = data.ATK;
@@ -53,10 +69,11 @@ public static class SaveSystem
         stats.maxStamina = data.maxStamina;
         stats.currentStamina = data.currentStamina;
         stats.statPoint = data.statPoint;
-        StageManager.Instance.CurrentStageName = data.StageName;
 
-        Debug.Log("Loaded from ScriptableObject.");
+        // 스테이지 이동
+        SceneManager.LoadScene("01_HUD", LoadSceneMode.Additive);
+        StageManager.Instance.MoveToStage(data.StageName);
 
-        return data;
+        Debug.Log("Game state loaded and continued.");
     }
 }

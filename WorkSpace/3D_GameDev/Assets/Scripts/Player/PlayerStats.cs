@@ -30,22 +30,26 @@ public class PlayerStats : CharacterStats
 
     public PlayerStats()
     {
+        maxHP = 100;
+        currentHP = 100;
+        maxStamina = 100;
+        currentStamina = 100;
         level = new Level();
+        ATK = 10;
+        DEF = 5;
+        statPoint = 0;
     }
 
-    public PlayerStats getDefaultPlayerStat()
+    public void ResetToDefault()
     {
-        PlayerStats DefaultStats = new PlayerStats();
-        DefaultStats.maxHP = 100;
-        DefaultStats.currentHP = 100;
-        DefaultStats.ATK = 100;
-        DefaultStats.DEF = 5;
-        DefaultStats.level.currentLevel = 1;
-        DefaultStats.level.currentExp = 0;
-        DefaultStats.statPoint = 0;
-        DefaultStats.currentStamina = maxStamina;
-
-        return DefaultStats;
+        maxHP = 100;
+        currentHP = 100;
+        maxStamina = 100;
+        currentStamina = 100;
+        level = new Level();
+        ATK = 10;
+        DEF = 5;
+        statPoint = 0;
     }
 
     public bool CanUse(float amount)
@@ -90,11 +94,11 @@ public class PlayerStats : CharacterStats
     {
         statPoint += 1; // 스탯 포인트 지급
         LevelUpHeal();  // 체력 회복
-        GameManager.Instance.Resource.UpdateHPUI(); // 체력 슬라이더 즉시 갱신
+        UIManager.Instance.playerResource.UpdateHPUI(); // 체력 슬라이더 즉시 갱신
 
         // 레벨업 UI, 퍼스 호출
-        GameManager.Instance.levelStatSystem.OpenLevelPanel();
-        GameManager.Instance.levelStatSystem.UpdateEXP_StatUI();
+        UIManager.Instance.levelStatSystem.OpenLevelPanel();
+        UIManager.Instance.levelStatSystem.UpdateEXP_StatUI();
         GameManager.Instance.onLevelUp?.Invoke();
     }
 

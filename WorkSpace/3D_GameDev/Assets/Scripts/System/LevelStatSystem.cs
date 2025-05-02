@@ -73,7 +73,7 @@ public class LevelStatSystem : MonoBehaviour
         stats.statPoint -= 1;
         UpdateLevelUp();
         stats.LevelUpHeal();  // 체력 회복
-        GameManager.Instance.Resource.UpdateHPUI();
+        UIManager.Instance.playerResource.UpdateHPUI();
     }
 
     private void UpdateLevelUp()

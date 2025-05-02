@@ -138,7 +138,7 @@ public class PlayerFreeLookState : PlayerBaseState
             if (stateMachine.playerStat.CanUse(sprintCost))
             {
                 stateMachine.playerStat.Use(sprintCost);
-                GameManager.Instance.Resource.UpdateStaminaUI();
+                UIManager.Instance.playerResource.UpdateStaminaUI();
             }
             else
             {
@@ -257,7 +257,7 @@ public class PlayerFreeLookState : PlayerBaseState
 
                     // if jump.... Cost Stemina
                     stateMachine.playerStat.Use(jumpStaminaCost);
-                    GameManager.Instance.Resource.UpdateStaminaUI();
+                    UIManager.Instance.playerResource.UpdateStaminaUI();
 
                     // 점프 처리
                     stateMachine.verticalVelocity = Mathf.Sqrt(stateMachine.jumpHeight * -2f * stateMachine.gravity);

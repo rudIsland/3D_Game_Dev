@@ -6,6 +6,8 @@ public class Player : MonoBehaviour
 {
     public static Player Instance { get; private set; }
 
+    public PlayerStateMachine playerStateMachine { get; private set; }
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -16,5 +18,7 @@ public class Player : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
+        
+        playerStateMachine = GetComponentInChildren<PlayerStateMachine>();
     }
 }

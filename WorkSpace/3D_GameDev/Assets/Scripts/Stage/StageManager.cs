@@ -17,11 +17,6 @@ public class StageManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // 씬 넘어가도 유지
-        }
-        else
-        {
-            Destroy(gameObject); // 중복 방지
         }
 
         CurrentStageName = SceneManager.GetActiveScene().name;
@@ -36,20 +31,20 @@ public class StageManager : MonoBehaviour
 
     private IEnumerator TransitionStage(string nextStageName)
     {
-        if (player == null)
-        {
-            player = GameObject.FindGameObjectWithTag("Player");
-        }
         if (!string.IsNullOrEmpty(CurrentStageName))
         {
             yield return SceneManager.UnloadSceneAsync(CurrentStageName);
             Debug.Log($"[StageManager] Unloaded: {CurrentStageName}");
         }
 
-        yield return SceneManager.LoadSceneAsync(nextStageName, LoadSceneMode.Additive);
+        yield return SceneManager.LoadSceneAsync(nextStageName);
         CurrentStageName = nextStageName;
         Debug.Log($"[StageManager] Loaded: {nextStageName}");
 
+        if (player == null)
+        {
+            player = GameObject.FindGameObjectWithTag("Player");
+        }
         GameObject spawn = GameObject.FindWithTag(SPAWN_POINT_TAGNAME);
         if (spawn != null && player != null)
         {

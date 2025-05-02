@@ -132,7 +132,7 @@ public class PlayerStateMachine : CharacterBase
     public void RegenStemina()
     {
         playerStat.TickRegen(Time.deltaTime);
-        GameManager.Instance.Resource.UpdateStaminaUI();
+        UIManager.Instance.playerResource.UpdateStaminaUI();
     }
 
     public override void ApplyDamage(double damage)
@@ -143,7 +143,7 @@ public class PlayerStateMachine : CharacterBase
         animator.SetBool(_animIDHit, true);
         CheckDie();
 
-        GameManager.Instance.Resource.UpdateHPUI(); // 체력 UI 갱신
+        UIManager.Instance.playerResource.UpdateHPUI(); // 체력 UI 갱신
     }
 
 

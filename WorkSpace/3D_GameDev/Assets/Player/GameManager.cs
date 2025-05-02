@@ -13,8 +13,8 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     //public PlayerStateMachine player;
-    public PlayerResource Resource { get; set; }
-    public LevelStatSystem levelStatSystem { get; set; }
+    //public PlayerResource Resource { get; set; }
+    //public LevelStatSystem levelStatSystem { get; set; }
 
     public GameObject ESCPanel;
 
@@ -93,12 +93,6 @@ public class GameManager : MonoBehaviour
         Debug.Log("게임 계속하기");
     }
 
-
-    public void SaveGame(PlayerStats stats)
-    {
-        SaveSystem.SaveToAsset(stats);
-    }
-
     //void OnApplicationQuit()
     //{
     //    SaveSystem.SaveToAsset(this);
@@ -110,65 +104,22 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("새 게임 시작");
 
-        //초기화된 스탯을 갖고
-        //PlayerStats DefaultStats = new PlayerStats();
-        //DefaultStats.maxHP = 100;
-        //DefaultStats.currentHP = 100;
-        //DefaultStats.ATK = 100;
-        //DefaultStats.DEF = 5;
-        //DefaultStats.level.currentLevel = 1;
-        //DefaultStats.level.currentExp = 0;
-        //DefaultStats.statPoint = 0;
-        //DefaultStats.currentStamina = 100;
+        // 기본 스탯 초기화
+        PlayerStats stats = new PlayerStats();
+        stats.ResetToDefault();
 
-        //해당 스탯으로 Save시킨 후
-        //SaveSystem.SaveToAsset(DefaultStats);
+        SaveSystem.SaveData(); // 저장
 
-        //HUD씬을 불러온 후 씬을 이동한다.
+        // UIManager가 포함된 HUD 씬 먼저 로드
+        SceneManager.LoadSceneAsync("01_HUD", LoadSceneMode.Additive);
+        SceneManager.LoadSceneAsync("001_Main");
 
-        // 먼저 StageManager가 있는 씬을 로드
-        SceneManager.LoadScene("01_HUD", LoadSceneMode.Additive); // 예시
-
-        // 그 다음 HUD와 스테이지 씬을 순서대로
-        StageManager.Instance.MoveToStage("1_Stage");
-        //SceneManager.LoadScene("1_Stage", LoadSceneMode.Additive);
     }
 
     public void ContinueBtn()
     {
         Debug.Log("이어하기 시작");
-
-        StartCoroutine(LoadContinueRoutine());
-    }
-
-    private IEnumerator LoadContinueRoutine()
-    {
-        // 1. PlayerScene 로드
-        AsyncOperation playerSceneLoad = SceneManager.LoadSceneAsync("Sample", LoadSceneMode.Additive);
-        yield return playerSceneLoad;
-
-        // 2. PlayerStateMachine 찾기
-        var player = GameObject.FindWithTag("Player")?.GetComponent<PlayerStateMachine>();
-        if (player == null)
-        {
-            Debug.LogError("플레이어를 찾을 수 없습니다.");
-            yield break;
-        }
-
-        // 3. 스탯 로드 및 저장된 스테이지 이름 확보
-        SavedData data = SaveSystem.LoadFromAsset(player.playerStat);
-        if (data == null)
-        {
-            Debug.LogError("세이브 데이터를 불러올 수 없습니다.");
-            yield break;
-        }
-
-        // 4. HUD 씬 로드
-        AsyncOperation hudLoad = SceneManager.LoadSceneAsync("01_HUD", LoadSceneMode.Additive);
-        yield return hudLoad;
-
-        // 5. 저장된 스테이지 씬 로드
-        StageManager.Instance.MoveToStage(data.StageName);
+        SaveSystem.LoadAndContinue();
     }
 
     public void ExitBtn()
