@@ -190,7 +190,7 @@ public class PlayerStateMachine : CharacterBase
 
     public void StartAttack()
     {
-        if (inputReader.isAttack)
+        if (inputReader.isAttack && !GameManager.Instance.isPause)
         {
             animator.SetTrigger(_animIDAttack);
             inputReader.isAttack = false;

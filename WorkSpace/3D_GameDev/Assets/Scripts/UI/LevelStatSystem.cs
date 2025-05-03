@@ -19,25 +19,12 @@ public class LevelStatSystem : MonoBehaviour
 
     private void Start()
     {
-        FindPlayerObject();
+        player = Player.Instance.playerStateMachine;
+        stats = player.playerStat;
 
         UpdateEXP_StatUI();
 
         levelUpPanel.SetActive(false); // 시작 시 비활성화
-    }
-
-    private void FindPlayerObject()
-    {
-        player = FindObjectOfType<PlayerStateMachine>();
-    }
-
-    public void LevelStatInit(PlayerStateMachine p)
-    {
-        player = p;
-        stats = player.playerStat;
-
-        UpdateEXP_StatUI();
-        levelUpPanel.SetActive(false);
     }
 
     public void UpdateEXP_StatUI()
@@ -47,7 +34,7 @@ public class LevelStatSystem : MonoBehaviour
         expSlider.maxValue = stats.level.MaxExp;
         expSlider.value = stats.level.currentExp;
 
-        NowLevel.text = $"LEVEL: {stats.level.currentLevel}";
+        NowLevel.text = $"{stats.level.currentLevel}";
         HPText.text = $"HP: {stats.maxHP}";
         ATKText.text = $"ATK: {stats.ATK}";
         DEFText.text = $"DEF: {stats.DEF}";

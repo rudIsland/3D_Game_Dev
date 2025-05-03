@@ -1,13 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
+
 using TMPro;
 using UnityEngine;
 
 public class UIManager : MonoBehaviour
 {
-    public TextMeshProUGUI enemyCountTXt;
+    public TextMeshProUGUI clearCountTXt;
     public PlayerResource playerResource;
     public LevelStatSystem levelStatSystem;
+    public ESC_Option escOPtion;
 
     public static UIManager Instance;
     private void Awake()
@@ -22,12 +22,14 @@ public class UIManager : MonoBehaviour
             Destroy(this);
         }
 
+        escOPtion = GetComponent<ESC_Option>();
         playerResource = GetComponentInChildren<PlayerResource>();
         levelStatSystem = GetComponentInChildren<LevelStatSystem>();
+    }
 
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.enemyCountTxt = enemyCountTXt;
-        }
+    public void SetStageClearText()
+    {
+        int currentLevel = Player.Instance.playerStateMachine.playerStat.level.currentLevel;
+        clearCountTXt.text = $"{currentLevel} / {StageManager.Instance.currentStage.clearLevel} ";
     }
 }

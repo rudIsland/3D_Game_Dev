@@ -120,7 +120,7 @@ public abstract class Enemy : CharacterBase
         // 경험치 이벤트 발생
         OnEnemyKilled?.Invoke(deathEXP);
 
-        StartCoroutine(DestroyEnemy()); // StartCoroutine으로 바꿔야 한다!
+        StartCoroutine(DestroyEnemy());
     }
 
     private IEnumerator DestroyEnemy()

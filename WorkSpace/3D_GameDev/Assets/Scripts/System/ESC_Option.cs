@@ -4,13 +4,18 @@ using UnityEngine;
 
 public class ESC_Option : MonoBehaviour
 {
-    bool isPause = false;
+    public GameObject ESCPanel;
+
+    private void Awake()
+    {
+        ESCPanel.SetActive(false);
+    }
 
     private void Update()
     {
-        if (Input.GetKey(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (isPause)
+            if (GameManager.Instance.isPause)
             {
                 InGameContinue();
             }
@@ -23,19 +28,21 @@ public class ESC_Option : MonoBehaviour
 
     public void GamePause()
     {
-        isPause = true;
+        GameManager.Instance.isPause = true;
         Time.timeScale = 0f;
+        ESCPanel.SetActive(true);
     }
 
     public void InGameContinue()
     {
-        isPause = false;
+        ESCPanel.SetActive(false);
+        GameManager.Instance.isPause = false;
         Time.timeScale = 1.0f;
     }
 
     public void InGameEXIT()
     {
-
+        ESCPanel.SetActive(false);
     }
 
 }

@@ -1,12 +1,22 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.SceneManagement;
 
-public class Stage1 : MonoBehaviour
+using UnityEngine;
+
+public class Stage1 : Stage
 {
-    void Start()
+    private GameObject Wall;
+
+    protected override void Start()
     {
-        GameManager.Instance.ResetEnemyCount();
+        base.Start();
     }
+    public override void StageClearCondition()
+    {
+        int currentLevel = Player.Instance.playerStateMachine.playerStat.level.currentLevel;
+        if (currentLevel > clearLevel)
+        {
+            Wall.SetActive(false);
+            Portal.SetActive(true);
+        }
+    }
+
 }

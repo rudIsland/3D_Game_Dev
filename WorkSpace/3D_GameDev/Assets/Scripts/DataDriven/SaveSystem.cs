@@ -13,7 +13,6 @@ public static class SaveSystem
     {
         SavedData data = Resources.Load<SavedData>("savedData");
         return data != null && !string.IsNullOrEmpty(data.StageName);
-
     }
     public static void SaveData()
     {

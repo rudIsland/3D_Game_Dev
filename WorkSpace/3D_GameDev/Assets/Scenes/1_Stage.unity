@@ -22370,11 +22370,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1525994145}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a3a3d89c04c6f33468efd780aeb10559, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Portal: {fileID: 1872073933}
+  clearLevel: 9
 --- !u!1001 &1528809058
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -28124,13 +28126,19 @@ PrefabInstance:
     - target: {fileID: 5496331692731580781, guid: 0778755e239b86e41a8792529d00c89f,
         type: 3}
       propertyPath: stageSceneName
-      value: Stage2
+      value: 2_Stage
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0778755e239b86e41a8792529d00c89f, type: 3}
+--- !u!1 &1872073933 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2784195021611603705, guid: 0778755e239b86e41a8792529d00c89f,
+    type: 3}
+  m_PrefabInstance: {fileID: 1872073932}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1872538041
 PrefabInstance:
   m_ObjectHideFlags: 0

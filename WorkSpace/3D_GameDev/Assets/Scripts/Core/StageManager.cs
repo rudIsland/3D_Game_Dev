@@ -7,6 +7,7 @@ public class StageManager : MonoBehaviour
 {
     public static StageManager Instance;
     public GameObject player;
+    public Stage currentStage;
 
     [SerializeField] private readonly string SPAWN_POINT_TAGNAME = "SpawnPoint";
 
@@ -20,8 +21,6 @@ public class StageManager : MonoBehaviour
         }
 
         CurrentStageName = SceneManager.GetActiveScene().name;
-
-        //SceneManager.LoadScene("01_HUD", LoadSceneMode.Additive);
     }
 
     public void MoveToStage(string nextStageName)
@@ -55,9 +54,14 @@ public class StageManager : MonoBehaviour
         {
             Debug.LogWarning($"[StageManager] Spawn point not found in stage '{nextStageName}'.");
         }
+
+        // 현재 스테이지 스크립트 참조
+        currentStage = GameObject.FindObjectOfType<Stage>();
+        if (currentStage == null)
+            Debug.LogWarning($"[StageManager] No Stage script found in '{nextStageName}' scene.");
+
         yield return null;
 
-        GameManager.Instance.ResetEnemyCount();
     }
 
 }
