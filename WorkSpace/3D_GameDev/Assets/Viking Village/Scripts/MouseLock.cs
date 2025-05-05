@@ -3,12 +3,9 @@ using System.Collections;
 
 public class MouseLock : MonoBehaviour {
 
-	void OnApplicationFocus(bool status)
+	void Start()
 	{
-		if (status)
-		{
-			Cursor.lockState = CursorLockMode.Locked;
-			Cursor.visible = false;
-		}
-	}
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
 }

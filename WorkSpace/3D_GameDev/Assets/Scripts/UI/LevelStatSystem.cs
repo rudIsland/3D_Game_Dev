@@ -12,7 +12,7 @@ public class LevelStatSystem : MonoBehaviour
     [SerializeField] private TextMeshProUGUI HPText;
     [SerializeField] private TextMeshProUGUI ATKText;
     [SerializeField] private TextMeshProUGUI DEFText;
-    [SerializeField] private GameObject levelUpPanel;
+    public GameObject levelUpPanel;
 
     private PlayerStateMachine player;
     private PlayerStats stats;
@@ -22,22 +22,26 @@ public class LevelStatSystem : MonoBehaviour
         player = Player.Instance.playerStateMachine;
         stats = player.playerStat;
 
-        UpdateEXP_StatUI();
+        Update_StatUI();
 
         levelUpPanel.SetActive(false); // 시작 시 비활성화
     }
 
-    public void UpdateEXP_StatUI()
+    public void Update_StatUI()
     {
         if (player == null || stats == null) return;
-
-        expSlider.maxValue = stats.level.MaxExp;
-        expSlider.value = stats.level.currentExp;
+        UpdateExpSlider();
 
         NowLevel.text = $"{stats.level.currentLevel}";
         HPText.text = $"HP: {stats.maxHP}";
         ATKText.text = $"ATK: {stats.ATK}";
         DEFText.text = $"DEF: {stats.DEF}";
+    }
+
+    public void UpdateExpSlider()
+    {
+        expSlider.maxValue = stats.level.MaxExp;
+        expSlider.value = stats.level.currentExp;
     }
 
     public void IncreaseAttack()
@@ -65,7 +69,7 @@ public class LevelStatSystem : MonoBehaviour
 
     private void UpdateLevelUp()
     {
-        UpdateEXP_StatUI();
+        Update_StatUI();
         if (stats.statPoint <= 0)
         {
             CloseLevelPanel();
@@ -76,10 +80,14 @@ public class LevelStatSystem : MonoBehaviour
     {
         levelUpPanel.SetActive(false);
         GameManager.Instance.ContinueGame();
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     public void OpenLevelPanel()
     {
         levelUpPanel.SetActive(true);
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 }

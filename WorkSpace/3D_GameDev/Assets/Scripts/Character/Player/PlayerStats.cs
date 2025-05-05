@@ -87,6 +87,7 @@ public class PlayerStats : CharacterStats
             HandleLevelUp(); // 레벨업 처리 여기서 한 번에
         }
 
+        UIManager.Instance.levelStatSystem.UpdateExpSlider();
         level.currentExp = Mathf.Max(0, level.currentExp);
     }
 
@@ -98,7 +99,7 @@ public class PlayerStats : CharacterStats
 
         // 레벨업 UI, 퍼스 호출
         UIManager.Instance.levelStatSystem.OpenLevelPanel();
-        UIManager.Instance.levelStatSystem.UpdateEXP_StatUI();
+        UIManager.Instance.levelStatSystem.Update_StatUI();
         GameManager.Instance.onLevelUp?.Invoke();
     }
 
