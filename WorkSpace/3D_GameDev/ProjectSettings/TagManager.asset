@@ -4,8 +4,9 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - CinemachineTarget
+  - SpawnPoint
   - Enemy
+  - Portal
   layers:
   - Default
   - TransparentFX
@@ -14,16 +15,16 @@ TagManager:
   - Water
   - UI
   - 
-  - Player
-  - Enemy
   - 
+  - Reflection_Probes
+  - Lighting
+  - Props
+  - ReflectedInWater
+  - Ground
+  - AccessibleVolume
+  - PostProcessing
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - MainGround
   - 
   - 
   - 
