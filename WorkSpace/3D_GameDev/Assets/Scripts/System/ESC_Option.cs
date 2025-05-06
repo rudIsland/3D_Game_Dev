@@ -52,19 +52,17 @@ public class ESC_Option : MonoBehaviour
         Time.timeScale = 1.0f;
         PlayerStats savedStats = Player.Instance.playerStateMachine.playerStat;
         SaveSystem.SaveData(savedStats);
-        SceneManager.LoadScene("0_Start");
 
-        // Player ÆÄ±«
         if (Player.Instance != null)
-        {
             Destroy(Player.Instance.gameObject);
-        }
 
-        // UIManager ÆÄ±«
         if (UIManager.Instance != null)
-        {
             Destroy(UIManager.Instance.gameObject);
-        }
+
+        if (StageManager.Instance != null)
+            Destroy(StageManager.Instance.gameObject);
+
+        SceneManager.LoadScene("0_Start", LoadSceneMode.Single);
     }
 
 }

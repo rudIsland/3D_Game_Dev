@@ -265,7 +265,10 @@ public class Zombie1 : Enemy
     private void NormalAttackingStart()
     {
         isAttacking = true;
-        agent.isStopped = true; // agent Stop
+        if (agent != null && agent.enabled)
+        {
+            agent.isStopped = true;
+        }
         animator.SetBool(_animIDAttack, true);
     }
 

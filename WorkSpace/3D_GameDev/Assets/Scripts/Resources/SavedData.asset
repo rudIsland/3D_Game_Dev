@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dabcca7b19985484fb4250ef475f6aef, type: 3}
   m_Name: SavedData
   m_EditorClassIdentifier: 
-  maxHP: 100
-  currentHP: 100
+  maxHP: 160
+  currentHP: 160
   ATK: 1000
-  DEF: 5
-  level: 1
-  currentExp: 0
+  DEF: 6
+  level: 5
+  currentExp: 247
   maxStamina: 100
-  currentStamina: 88.459206
+  currentStamina: 71.155785
   statPoint: 0
   StageName: 1_Stage

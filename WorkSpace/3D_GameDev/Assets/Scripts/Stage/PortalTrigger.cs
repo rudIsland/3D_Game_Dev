@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class PortalTrigger : MonoBehaviour
 {
-    [SerializeField] private string stageSceneName;
+    [SerializeField] private string nextStageName;
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            StageManager.Instance.MoveToStage(stageSceneName);
+            StageManager.Instance.MoveToStage(nextStageName);
             Debug.Log("¿Ãµø");
         }
     }

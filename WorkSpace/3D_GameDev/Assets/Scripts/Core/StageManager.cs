@@ -18,39 +18,44 @@ public class StageManager : MonoBehaviour
         {
             Instance = this;
         }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
 
         CurrentStageName = SceneManager.GetActiveScene().name;
+    }
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Start 씬은 스폰 안 함
+        if (scene.name == "0_Start" || scene.name == "01_HUD")
+            return;
+
+        PositionPlayerToSpawn();
     }
 
     public void MoveToStage(string nextStageName)
     {
-        StartCoroutine(LoadAndPosition(nextStageName));
+        CurrentStageName = nextStageName;
+        SceneManager.LoadScene(nextStageName, LoadSceneMode.Single);
     }
 
 
-
-    private IEnumerator LoadAndPosition(string nextStageName)
+    public void PositionPlayerToSpawn()
     {
-        // 1. 씬 즉시 이동
-        SceneManager.LoadScene(nextStageName);
-        CurrentStageName = nextStageName;
-        Debug.Log($"[StageManager] Loaded: {nextStageName}");
-
-        // 2. 1프레임 대기 (씬 내 오브젝트들이 Awake 실행되도록)
-        yield return null;
-
-        // 3. 플레이어 참조 후 위치 이동
         player = GameObject.FindGameObjectWithTag("Player");
         GameObject spawn = GameObject.FindWithTag(SPAWN_POINT_TAGNAME);
 
-        if (spawn != null && player != null)
+        if (player != null && spawn != null)
         {
-            player.transform.position = spawn.transform.position;
-            player.transform.rotation = spawn.transform.rotation;
-        }
-        else
-        {
-            Debug.LogWarning($"[StageManager] Spawn point not found in stage '{nextStageName}'.");
+            player.transform.SetPositionAndRotation(spawn.transform.position, spawn.transform.rotation);
         }
     }
 

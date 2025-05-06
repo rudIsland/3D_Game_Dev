@@ -42,6 +42,20 @@ public class PlayerStats : CharacterStats
         statPoint = 0;
     }
 
+    public void ApplySavedData(SavedData data)
+    {
+        maxHP = data.maxHP;
+        currentHP = data.currentHP;
+        ATK = data.ATK;
+        DEF = data.DEF;
+        level.currentLevel = data.level;
+        level.currentExp = data.currentExp;
+        maxStamina = data.maxStamina;
+        currentStamina = data.currentStamina;
+        statPoint = data.statPoint;
+    }
+
+
     public bool CanUse(float amount)
     {
         return currentStamina >= amount;
