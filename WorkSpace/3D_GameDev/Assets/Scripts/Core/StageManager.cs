@@ -7,7 +7,6 @@ public class StageManager : MonoBehaviour
 {
     public static StageManager Instance;
     public GameObject player;
-    public Stage currentStage;
 
     [SerializeField] private readonly string SPAWN_POINT_TAGNAME = "SpawnPoint";
 
@@ -25,26 +24,25 @@ public class StageManager : MonoBehaviour
 
     public void MoveToStage(string nextStageName)
     {
-        StartCoroutine(TransitionStage(nextStageName));
+        StartCoroutine(LoadAndPosition(nextStageName));
     }
 
-    private IEnumerator TransitionStage(string nextStageName)
-    {
-        if (!string.IsNullOrEmpty(CurrentStageName))
-        {
-            yield return SceneManager.UnloadSceneAsync(CurrentStageName);
-            Debug.Log($"[StageManager] Unloaded: {CurrentStageName}");
-        }
 
-        yield return SceneManager.LoadSceneAsync(nextStageName);
+
+    private IEnumerator LoadAndPosition(string nextStageName)
+    {
+        // 1. 씬 즉시 이동
+        SceneManager.LoadScene(nextStageName);
         CurrentStageName = nextStageName;
         Debug.Log($"[StageManager] Loaded: {nextStageName}");
 
-        if (player == null)
-        {
-            player = GameObject.FindGameObjectWithTag("Player");
-        }
+        // 2. 1프레임 대기 (씬 내 오브젝트들이 Awake 실행되도록)
+        yield return null;
+
+        // 3. 플레이어 참조 후 위치 이동
+        player = GameObject.FindGameObjectWithTag("Player");
         GameObject spawn = GameObject.FindWithTag(SPAWN_POINT_TAGNAME);
+
         if (spawn != null && player != null)
         {
             player.transform.position = spawn.transform.position;
@@ -54,14 +52,6 @@ public class StageManager : MonoBehaviour
         {
             Debug.LogWarning($"[StageManager] Spawn point not found in stage '{nextStageName}'.");
         }
-
-        // 현재 스테이지 스크립트 참조
-        currentStage = GameObject.FindObjectOfType<Stage>();
-        if (currentStage == null)
-            Debug.LogWarning($"[StageManager] No Stage script found in '{nextStageName}' scene.");
-
-        yield return null;
-
     }
 
 }

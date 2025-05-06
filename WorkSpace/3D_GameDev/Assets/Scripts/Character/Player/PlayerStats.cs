@@ -1,3 +1,5 @@
+using System;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
 [System.Serializable]
@@ -29,18 +31,6 @@ public class PlayerStats : CharacterStats
     public int statPoint = 0;
 
     public PlayerStats()
-    {
-        maxHP = 100;
-        currentHP = 100;
-        maxStamina = 100;
-        currentStamina = 100;
-        level = new Level();
-        ATK = 10;
-        DEF = 5;
-        statPoint = 0;
-    }
-
-    public void ResetToDefault()
     {
         maxHP = 100;
         currentHP = 100;

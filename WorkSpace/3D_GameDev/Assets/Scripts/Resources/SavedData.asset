@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHP: 100
   currentHP: 100
-  ATK: 10
+  ATK: 1000
   DEF: 5
   level: 1
   currentExp: 0
   maxStamina: 100
-  currentStamina: 100
+  currentStamina: 88.459206
   statPoint: 0
   StageName: 1_Stage

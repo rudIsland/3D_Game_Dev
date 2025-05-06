@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ESC_Option : MonoBehaviour
 {
@@ -48,6 +49,22 @@ public class ESC_Option : MonoBehaviour
     public void InGameEXIT()
     {
         ESCPanel.SetActive(false);
+        Time.timeScale = 1.0f;
+        PlayerStats savedStats = Player.Instance.playerStateMachine.playerStat;
+        SaveSystem.SaveData(savedStats);
+        SceneManager.LoadScene("0_Start");
+
+        // Player ÆÄ±«
+        if (Player.Instance != null)
+        {
+            Destroy(Player.Instance.gameObject);
+        }
+
+        // UIManager ÆÄ±«
+        if (UIManager.Instance != null)
+        {
+            Destroy(UIManager.Instance.gameObject);
+        }
     }
 
 }

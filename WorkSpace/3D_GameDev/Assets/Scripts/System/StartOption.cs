@@ -19,14 +19,11 @@ public class StartOption : MonoBehaviour
 
         // 기본 스탯 초기화
         PlayerStats stats = new PlayerStats();
-        stats.ResetToDefault();
-
-        SaveSystem.SaveData(); // 저장
+        SaveSystem.SaveData(stats); // 저장
 
         // UIManager가 포함된 HUD 씬 먼저 로드
         SceneManager.LoadSceneAsync("01_HUD", LoadSceneMode.Additive);
-        SceneManager.LoadSceneAsync("001_Main");
-
+        StageManager.Instance.MoveToStage("001_Main");
     }
 
     public void StartScene_Continue()
@@ -34,14 +31,22 @@ public class StartOption : MonoBehaviour
         ContinueBtn_Active();
 
         Debug.Log("이어하기 시작");
-        SaveSystem.LoadAndContinue();
+
+        if (!SaveSystem.HasSavedData())
+        {
+            Debug.LogWarning("저장된 데이터가 없습니다.");
+            return;
+        }
+        SavedData data = SaveSystem.getSavedData();
+
+        StartCoroutine(SaveSystem.LoadAndContinue(data));
     }
 
     private void ContinueBtn_Active()
     {
         if (!SaveSystem.HasSavedData()) return;
 
-        SavedData data = Resources.Load<SavedData>("savedData");
+        SavedData data = SaveSystem.getSavedData();
 
         if (data.StageName == "0_Start")
             ContinueBtn.interactable = false;

@@ -22,14 +22,15 @@ public class UIManager : MonoBehaviour
             Destroy(this);
         }
 
-        escOPtion = GetComponent<ESC_Option>();
+        escOPtion = GetComponentInChildren<ESC_Option>();
         playerResource = GetComponentInChildren<PlayerResource>();
         levelStatSystem = GetComponentInChildren<LevelStatSystem>();
     }
 
     public void SetStageClearText()
     {
+        Stage currentStage = FindObjectOfType<Stage>();
         int currentLevel = Player.Instance.playerStateMachine.playerStat.level.currentLevel;
-        clearCountTXt.text = $"{currentLevel} / {StageManager.Instance.currentStage.clearLevel} ";
+        clearCountTXt.text = $"{currentLevel} / {currentStage.clearLevel} ";
     }
 }
