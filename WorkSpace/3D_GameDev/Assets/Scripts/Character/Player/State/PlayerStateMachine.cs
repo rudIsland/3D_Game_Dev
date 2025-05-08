@@ -69,7 +69,7 @@ public class PlayerStateMachine : CharacterBase
     public override CharacterStats Stat => stat;
     public PlayerStats playerStat => stat;
 
-    public Targeter targeter;
+    public PlayerTargeter targeter;
 
     /************************** End **************************/
 

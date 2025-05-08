@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class Targeter : MonoBehaviour
+public class PlayerTargeter : MonoBehaviour
 {
     public SphereCollider SphereCollider;
     [SerializeField] private float TargetRadius = 6f;
-    public List<Target> targets = new List<Target>(); //바라볼 타겟 리스트
+    public LinkedList<Target> targets = new LinkedList<Target>(); //바라볼 타겟 리스트
 
     public Target currentTarget;
 
@@ -32,7 +33,7 @@ public class Targeter : MonoBehaviour
         if(targets.Count == 0)
             return false;
 
-        currentTarget = targets[0]; //가장 첫번째 요소를 현재 타겟으로
+        currentTarget = targets.First.Value; //가장 첫번째 요소를 현재 타겟으로
 
         return true;
     }
@@ -63,7 +64,7 @@ public class Targeter : MonoBehaviour
         if (target == null)
             return;
 
-        targets.Add(target);
+        targets.AddLast(target);
 
         CharacterBase character = target.GetComponent<CharacterBase>();
         if (character != null)
