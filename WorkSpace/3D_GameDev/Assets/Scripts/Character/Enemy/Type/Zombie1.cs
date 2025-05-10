@@ -71,9 +71,7 @@ public class Zombie1 : Enemy
         // 공격 트리
         ENode attackTree = new SequenceNode(new List<ENode> {
             new ActionNode(CheckAttackRange),
-            new SelectorNode(new List<ENode>{
-                new ActionNode(NormalAttack)
-            })
+            new ActionNode(NormalAttack)
         });
 
         // 전체 트리 구성
