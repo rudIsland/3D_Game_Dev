@@ -1,85 +1,72 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
-using System.Collections;
+using System.IO;
 
-
-
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 public static class SaveSystem
 {
-    private const string PATH = "Assets/Scripts/Resources/savedData.asset";
-    private static SavedData pendingData;
+    private const string FileName = "JsonSavedData.json";
+    private static readonly string SavePath = Path.Combine(Application.persistentDataPath, FileName);
 
-    public static bool HasSavedData()
-    {
-        SavedData data = Resources.Load<SavedData>("savedData");
-        return data != null && !string.IsNullOrEmpty(data.StageName);
-    }
+    private static SavedData pendingData;
 
     public static void SaveData(PlayerStats stats)
     {
-#if UNITY_EDITOR
-        SavedData data;
 
-        data = getSavedData();
+        SavedData data = new SavedData
+        {
+            maxHP = stats.maxHP,
+            currentHP = stats.currentHP,
+            ATK = stats.ATK,
+            DEF = stats.DEF,
+            level = stats.level.currentLevel,
+            currentExp = stats.level.currentExp,
+            maxStamina = stats.maxStamina,
+            currentStamina = stats.currentStamina,
+            statPoint = stats.statPoint,
+            StageName = StageManager.Instance.CurrentStageName
+        };
 
-        data.maxHP = stats.maxHP;
-        data.currentHP = stats.currentHP;
-        data.ATK = stats.ATK;
-        data.DEF = stats.DEF;
-        data.level = stats.level.currentLevel;
-        data.currentExp = stats.level.currentExp;
-        data.maxStamina = stats.maxStamina;
-        data.currentStamina = stats.currentStamina;
-        data.statPoint = stats.statPoint;
-        data.StageName = StageManager.Instance.CurrentStageName;
+        string SaveString = JsonUtility.ToJson(data, true);
+        File.WriteAllText(SavePath, SaveString);
 
-        EditorUtility.SetDirty(data);
-        AssetDatabase.SaveAssets();
-        Debug.Log("Saved current game state.");
-#endif
+        Debug.Log("현재 상태 저장");
     }
 
-    public static void SaveData()
+    public static void SaveGameData()
     {
-#if UNITY_EDITOR
-        SavedData data;
-
-        data = getSavedData();
-
         PlayerStats stats = Player.Instance.playerStateMachine.playerStat;
+        SavedData data = new SavedData
+        {
+            maxHP = stats.maxHP,
+            currentHP = stats.currentHP,
+            ATK = stats.ATK,
+            DEF = stats.DEF,
+            level = stats.level.currentLevel,
+            currentExp = stats.level.currentExp,
+            maxStamina = stats.maxStamina,
+            currentStamina = stats.currentStamina,
+            statPoint = stats.statPoint,
+            StageName = StageManager.Instance.CurrentStageName
+        };
 
-        data.maxHP = stats.maxHP;
-        data.currentHP = stats.currentHP;
-        data.ATK = stats.ATK;
-        data.DEF = stats.DEF;
-        data.level = stats.level.currentLevel;
-        data.currentExp = stats.level.currentExp;
-        data.maxStamina = stats.maxStamina;
-        data.currentStamina = stats.currentStamina;
-        data.statPoint = stats.statPoint;
-        data.StageName = StageManager.Instance.CurrentStageName;
+        string SaveString = JsonUtility.ToJson(data, true);
+        File.WriteAllText(SavePath, SaveString);
 
-        EditorUtility.SetDirty(data);
-        AssetDatabase.SaveAssets();
-        Debug.Log("Saved current game state.");
-#endif
+        Debug.Log("현재 상태 저장");
     }
 
     public static SavedData getSavedData()
     {
-        SavedData data = AssetDatabase.LoadAssetAtPath<SavedData>(PATH);
-        if (data == null)
+        if (!File.Exists(SavePath))
         {
-            Debug.LogError("SavedData asset not found.");
-            return data;
+            Debug.Log("파일 없음!"); return null;
         }
 
-        return data;
+        // 저장된 세이브 파일 불러오기
+        string json = File.ReadAllText(SavePath);
+        Debug.Log("저장된 파일 로드됨");
+        return JsonUtility.FromJson<SavedData>(json);
     }
 
     public static void LoadAndContinue(SavedData data)
@@ -102,7 +89,7 @@ public static class SaveSystem
 
         UIManager.Instance.levelStatSystem.Update_StatUI();
 
-        Debug.Log("Game state loaded and continued.");
+        Debug.Log("현재상태로 스테이지 이동");
 
         // 이벤트 제거 & 데이터 초기화
         pendingData = null;

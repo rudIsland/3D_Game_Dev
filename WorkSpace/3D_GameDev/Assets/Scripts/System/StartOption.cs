@@ -19,6 +19,7 @@ public class StartOption : MonoBehaviour
 
         // 기본 스탯 초기화
         PlayerStats stats = new PlayerStats();
+
         SaveSystem.SaveData(stats); // 저장
 
         // HUD 씬 로드 (Additive)
@@ -31,12 +32,6 @@ public class StartOption : MonoBehaviour
     public void StartScene_Continue()
     {
         Debug.Log("이어하기 시작");
-
-        if (!SaveSystem.HasSavedData())
-        {
-            Debug.LogWarning("저장된 데이터가 없습니다.");
-            return;
-        }
 
         SavedData data = SaveSystem.getSavedData();
 
@@ -63,11 +58,10 @@ public class StartOption : MonoBehaviour
 
     private void ContinueBtn_Active()
     {
-        if (!SaveSystem.HasSavedData()) return;
 
         SavedData data = SaveSystem.getSavedData();
 
-        if (data.StageName == "0_Start")
+        if (data.StageName == "0_Start" || data.StageName == "001_Main")
             ContinueBtn.interactable = false;
         else
             ContinueBtn.interactable = true;

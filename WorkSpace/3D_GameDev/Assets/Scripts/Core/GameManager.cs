@@ -33,19 +33,20 @@ public class GameManager : MonoBehaviour
 
     void OnEnable()
     {
-        onLevelUp += PauseGame;
+        onLevelUp += LevelUpPauseGame;
     }
 
     void OnDisable()
     {
-        onLevelUp -= PauseGame;
+        onLevelUp -= LevelUpPauseGame;
     }
 
-    public void PauseGame()
+    public void LevelUpPauseGame()
     {
         isPause = true;
         Time.timeScale = 0f;
         UIManager.Instance.SetStageClearText();
+
         Debug.Log("게임 일시정지: 레벨업 발생");
     }
 

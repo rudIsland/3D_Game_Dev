@@ -93,6 +93,8 @@ public class PlayerStats : CharacterStats
 
         UIManager.Instance.levelStatSystem.UpdateExpSlider();
         level.currentExp = Mathf.Max(0, level.currentExp);
+
+        SaveSystem.SaveGameData();
     }
 
     private void HandleLevelUp()

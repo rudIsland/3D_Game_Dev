@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "savedData", menuName = "Game Data/SavedData")]
-public class SavedData : ScriptableObject
+[System.Serializable]
+public class SavedData
 {
     public double maxHP;
     public double currentHP;
@@ -13,4 +13,5 @@ public class SavedData : ScriptableObject
     public float currentStamina;
     public int statPoint;
     public string StageName;
+
 }
