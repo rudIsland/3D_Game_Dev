@@ -179,12 +179,13 @@ public class Fighter : Enemy
     {
         if (isAttacking) return ESTATE.SUCCESS; // 공격 중이면 회전 금지
 
-    if (!IsFacingTarget(enemyMemory.player.position))
-    {
-        RotateTowardsPlayer();
-        return ESTATE.RUN;
-    }
-    return ESTATE.SUCCESS;
+        if (!IsFacingTarget(enemyMemory.player.position))
+        {
+            RotateTowardsPlayer();
+            return ESTATE.RUN;
+        }
+
+        return ESTATE.SUCCESS;
     }
 
     private ESTATE FightSelector()
@@ -485,7 +486,9 @@ public class Fighter : Enemy
 
     private bool IsFacingTarget(Vector3 target)
     {
+        //Vector의 방향을 구하고 정규화(기하벡터)
         Vector3 directionToTarget = (target - transform.position).normalized;
+        //파이터 방향과 플레이어 방향으로 각도 구하기
         float dot = Vector3.Dot(transform.forward, directionToTarget);
         return dot > 0.98f; // 0.95 이상이면 거의 정면을 보고 있다고 판단
     }
