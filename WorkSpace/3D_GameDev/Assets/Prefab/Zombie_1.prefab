@@ -1903,6 +1903,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0.43015614
       objectReference: {fileID: 0}
+    - target: {fileID: 6749314087805099976, guid: 4f5a071c6c6ce6c4aa40851481b9a1ca,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.779
+      objectReference: {fileID: 0}
     - target: {fileID: 7078722787440015773, guid: 4f5a071c6c6ce6c4aa40851481b9a1ca,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -2129,6 +2134,11 @@ MonoBehaviour:
     - 35355
     currentLevel: 1
     currentExp: 0
+  EnemyStat:
+    serializedMaxHP: 100
+    serializedCurrentHP: 100
+    serializedATK: 10
+    serializedDEF: 5
   agent: {fileID: 0}
   isAttacking: 0
   hpSlider: {fileID: 7460630977535651217}
