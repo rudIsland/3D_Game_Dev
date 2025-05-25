@@ -69,6 +69,7 @@ public class Fighter : Enemy
     protected override void Update()
     {
         if (enemyStat.IsDead) return;
+        if (Player.Instance.playerStateMachine.currentState is PlayerDeadState) return;
 
         UpdateDistanceToPlayer();
         HandleDetectedState();

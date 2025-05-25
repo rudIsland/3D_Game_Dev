@@ -82,6 +82,7 @@ public abstract class Enemy : CharacterBase
 
     protected virtual void Update()
     {
+        if (Player.Instance.playerStateMachine.currentState is PlayerDeadState) return;
         UpdateDistanceToPlayer();
         UpdateDetectionStatus();
 

@@ -85,6 +85,8 @@ public class Mutant : Enemy
     protected override void Update()
     {
         if (enemyStat.IsDead) return;
+        if (Player.Instance.playerStateMachine.currentState is PlayerDeadState) return;
+
         JumpAttackCoolTime();
 
         UpdateDistanceToPlayer(); //플레이어와의 거리 계산
@@ -104,7 +106,7 @@ public class Mutant : Enemy
 
     private void JumpAttackCoolTime()
     {
-        jumpAttackTimer -= Time.deltaTime; // ← 이것만 남김
+        jumpAttackTimer -= Time.deltaTime; //시간 흐름대로 줄어들도록 설정
     }
 
 
