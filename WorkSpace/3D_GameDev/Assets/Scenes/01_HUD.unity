@@ -2254,6 +2254,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 193586354365462942, guid: e73c990533346384789fbe2c8b643f9d,
+        type: 3}
+      propertyPath: m_Lens.FarClipPlane
+      value: 300
+      objectReference: {fileID: 0}
     - target: {fileID: 1714874911139871917, guid: e73c990533346384789fbe2c8b643f9d,
         type: 3}
       propertyPath: m_FollowOffset.y
@@ -2458,6 +2463,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_TagString
       value: Untagged
+      objectReference: {fileID: 0}
+    - target: {fileID: 5283215414186415093, guid: e73c990533346384789fbe2c8b643f9d,
+        type: 3}
+      propertyPath: m_Lens.FarClipPlane
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 5593655399845308693, guid: e73c990533346384789fbe2c8b643f9d,
+        type: 3}
+      propertyPath: far clip plane
+      value: 300
       objectReference: {fileID: 0}
     - target: {fileID: 7283076763157177462, guid: e73c990533346384789fbe2c8b643f9d,
         type: 3}
