@@ -58,7 +58,7 @@ public class Mutant : Enemy
 
     protected override void SetupStats()
     {
-        detectRange = 15f; //탐지범위
+        detectRange = 10f; //탐지범위
         attackRange = 1.0f; //공격범위
         moveSpeed = runningSpeed; //이동속도
         angularSpeed = 180f; //회전속도
@@ -85,7 +85,11 @@ public class Mutant : Enemy
     protected override void Update()
     {
         if (enemyStat.IsDead) return;
-        if (Player.Instance.playerStateMachine.currentState is PlayerDeadState) return;
+        if (Player.Instance.playerStateMachine.currentState is PlayerDeadState)
+        {
+            ChangeDefaultMtl();
+            return;
+        }
 
         JumpAttackCoolTime();
 
@@ -119,6 +123,14 @@ public class Mutant : Enemy
         isJumpAttackRange = enemyMemory.distanceToPlayer <= JumpAttackRange;
         isPunchAttackRange = enemyMemory.distanceToPlayer <= PunchAttackRange;
         isSwipAttackRange = enemyMemory.distanceToPlayer <= SwipAttackRange;
+
+        if (isTarget) return; //타겟일땐 바꾸지않게
+
+        // 상태 변경된 경우만 머터리얼 바꿈
+        if (!enemyMemory.isPlayerDetected)
+        {
+            ChangeDefaultMtl();
+        }
     }
 
 
@@ -173,12 +185,15 @@ public class Mutant : Enemy
         if (isAttacking)
         {
             Debug.Log("[이동] 공격 중 → 이동 정지");
+            ChangeDetectedMtl();
             SetAgentStop(true);
             return ESTATE.SUCCESS;
         }
 
         // 공격 실패 후 이동
         Debug.Log("[이동] 플레이어에게 이동 중");
+
+        ChangeDetectedMtl();
         SetAgentStop(false);
         agent.SetDestination(enemyMemory.player.position);
 

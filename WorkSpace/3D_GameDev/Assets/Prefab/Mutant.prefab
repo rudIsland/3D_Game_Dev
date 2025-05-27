@@ -1277,10 +1277,23 @@ MonoBehaviour:
     - 35355
     currentLevel: 1
     currentExp: 0
+  EnemyStat:
+    serializedMaxHP: 100
+    serializedCurrentHP: 100
+    serializedATK: 10
+    serializedDEF: 5
   agent: {fileID: 1458045691328215316}
   isAttacking: 0
   hpSlider: {fileID: 1961302995094005881}
   hpText: {fileID: 7531099109699450250}
+  defaultMtl:
+  - {fileID: 2100000, guid: b743bb2a3bc5da74d9b0870d46a66be3, type: 2}
+  detectedMtl:
+  - {fileID: 2100000, guid: 7bce40e4f47647a47bdc4639390f44c0, type: 2}
+  TargetMtl:
+  - {fileID: 2100000, guid: 91c63ed8c2e8cf848a2eb4c30fcd97a6, type: 2}
+  currentMtl:
+  - {fileID: 0}
   JumpAttackRange: 5
   PunchAttackRange: 1
   SwipAttackRange: 2

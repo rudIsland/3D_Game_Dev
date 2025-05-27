@@ -2143,6 +2143,16 @@ MonoBehaviour:
   isAttacking: 0
   hpSlider: {fileID: 7460630977535651217}
   hpText: {fileID: 4996066783013141276}
+  defaultMtl:
+  - {fileID: 2100000, guid: 2d191485b9787c1459addb3e069a421f, type: 2}
+  - {fileID: 2100000, guid: 99615e22f83e7ae4b9e5b4efa9cbd435, type: 2}
+  detectedMtl:
+  - {fileID: 2100000, guid: 40bac2589e61e5645b4ec16b1a16291f, type: 2}
+  - {fileID: 2100000, guid: a6e101739be745247bafa5d4e652e19f, type: 2}
+  TargetMtl:
+  - {fileID: 2100000, guid: 31f35ccdcf9ea3047bd4b9c9cca77522, type: 2}
+  - {fileID: 2100000, guid: 0240ac1638e675149b7e8bf3435d907a, type: 2}
+  currentMtl: []
   weapon: {fileID: 6434762333465992132}
 --- !u!114 &512478756119801562
 MonoBehaviour:

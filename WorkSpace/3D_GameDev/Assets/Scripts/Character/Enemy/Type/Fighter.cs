@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
 public class Fighter : Enemy
 {
@@ -69,7 +70,11 @@ public class Fighter : Enemy
     protected override void Update()
     {
         if (enemyStat.IsDead) return;
-        if (Player.Instance.playerStateMachine.currentState is PlayerDeadState) return;
+        if (Player.Instance.playerStateMachine.currentState is PlayerDeadState)
+        {
+            ChangeDefaultMtl();
+            return;
+        }
 
         UpdateDistanceToPlayer();
         HandleDetectedState();
@@ -169,9 +174,13 @@ public class Fighter : Enemy
         // 가장 넓은 탐지 거리 내에 들어오면 SUCCESS 반환
         if (distance <= DectectedRange)
         {
+            ChangeDetectedMtl();
             return ESTATE.SUCCESS;
         }
 
+        // 탐지 실패 시 바로 정지
+        SetAgentStop(true);
+        ChangeDefaultMtl();
         return ESTATE.FAILED;
 
     }

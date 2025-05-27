@@ -4,6 +4,8 @@ using UnityEngine.UI;
 using UnityEngine.AI;
 using System.Collections;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 public abstract class Enemy : CharacterBase
 {
@@ -35,6 +37,16 @@ public abstract class Enemy : CharacterBase
 
     public static event Action<float> OnEnemyKilled; // 경험치 전달 이벤트
 
+    [Header("머터리얼")]
+    public Material[] defaultMtl;
+    public Material[] detectedMtl;
+    public Material[] TargetMtl;
+
+    public bool isTarget; //현재 대상이 플레이어의 타겟인지 확인
+
+
+    public Material[] currentMtl;
+
     public void UpdateResource()
     {
         UpdateHPUI();
@@ -54,7 +66,15 @@ public abstract class Enemy : CharacterBase
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
 
-        
+        //현재 머터리얼
+        currentMtl = new Material[GetComponentInChildren<SkinnedMeshRenderer>().materials.Count()];
+        defaultMtl = GetComponentInChildren<SkinnedMeshRenderer>().materials.ToArray(); // 복사본 저장
+
+        //기본 머터리얼
+        defaultMtl = new Material[GetComponentInChildren<SkinnedMeshRenderer>().materials.Count()];
+        defaultMtl = GetComponentInChildren<SkinnedMeshRenderer>().materials.ToArray(); // 복사본 저장
+
+
         // Level
         level = new Level();
     }
@@ -119,6 +139,7 @@ public abstract class Enemy : CharacterBase
         Debug.Log("적 사망");
         //플레이어에게 경험치 넣기
         // 경험치 이벤트 발생
+        ChangeDefaultMtl();
         OnEnemyKilled?.Invoke(deathEXP);
 
         StartCoroutine(DestroyEnemy());
@@ -158,6 +179,36 @@ public abstract class Enemy : CharacterBase
         // if (!GameManager.Instance.player.isDead) return; 
         enemyMemory.isPlayerDetected = enemyMemory.distanceToPlayer <= detectRange;
         enemyMemory.isInAttackRange = enemyMemory.distanceToPlayer <= attackRange;
+
+        //탐지에 대해 머터리얼 변화
+        if (enemyMemory.isPlayerDetected) ChangeDetectedMtl();
+        else ChangeDefaultMtl();
+    }
+
+    //기본 머터리얼로 변경
+    public virtual void ChangeDefaultMtl()
+    {
+        currentMtl = defaultMtl;
+        GetComponentInChildren<SkinnedMeshRenderer>().materials = defaultMtl;
+    }
+
+    //추격할때 머터리얼 변경
+    public virtual void ChangeDetectedMtl()
+    {
+        if (!isTarget)
+        {
+            currentMtl = detectedMtl;
+            GetComponentInChildren<SkinnedMeshRenderer>().materials = detectedMtl;
+        }
+    }
+
+    public virtual void ChangeTargettMtl()
+    {
+        if (isTarget)
+        {
+            currentMtl = TargetMtl;
+            GetComponentInChildren<SkinnedMeshRenderer>().materials = TargetMtl;
+        }
     }
 
     protected abstract void SetupStats(); 

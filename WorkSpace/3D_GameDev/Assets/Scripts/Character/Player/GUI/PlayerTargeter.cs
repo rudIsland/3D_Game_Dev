@@ -34,13 +34,20 @@ public class PlayerTargeter : MonoBehaviour
             return false;
 
         currentTarget = targets.First.Value; //가장 첫번째 요소를 현재 타겟으로
+        currentTarget.GetComponent<Enemy>().isTarget = true;
+        currentTarget.GetComponent<Enemy>().ChangeTargettMtl();
 
         return true;
     }
 
     public void CanCel()
     {
-        currentTarget = null;
+        if (currentTarget != null)
+        {
+            currentTarget.GetComponent<Enemy>().isTarget = false;
+            currentTarget.GetComponent<Enemy>().ChangeDefaultMtl();
+            currentTarget = null;
+        }
     }
 
     public void RemoveTarget(Target target)
@@ -48,7 +55,6 @@ public class PlayerTargeter : MonoBehaviour
         if (targets.Contains(target))
         {
             targets.Remove(target);
-
             if (currentTarget == target)
             {
                 CanCel();

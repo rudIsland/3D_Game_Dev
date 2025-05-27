@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: mtlZombie1
+  m_Name: mtl_M2_T
   m_Shader: {fileID: -6465566751694194690, guid: ae6b63e568d14aa4e82affe2eeb782f4,
     type: 3}
   m_Parent: {fileID: 0}
@@ -30,7 +30,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseTex:
-        m_Texture: {fileID: 2800000, guid: b191d34e96edcb8448d7db7f67639b8c, type: 3}
+        m_Texture: {fileID: 2800000, guid: 66967d451b6f1364f95700c2f06065dc, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -70,7 +70,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMap:
-        m_Texture: {fileID: 2800000, guid: 48e7e7724e79b3e4b8a7eebfa1d02cd9, type: 3}
+        m_Texture: {fileID: 2800000, guid: e28f2f8297137554c8544a086444e725, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:

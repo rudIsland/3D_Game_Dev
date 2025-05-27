@@ -41,7 +41,11 @@ public class Zombie1 : Enemy
     {   
         if (enemyStat.IsDead) return;
 
-        if (Player.Instance.playerStateMachine.currentState is PlayerDeadState) return;
+        if (Player.Instance.playerStateMachine.currentState is PlayerDeadState)
+        {
+            ChangeDefaultMtl();
+            return;
+        }
 
         UpdateDistanceToPlayer();
         UpdateDetectionStatus();
@@ -99,13 +103,13 @@ public class Zombie1 : Enemy
     //이동
     private ESTATE MoveToPlayer()
     {
-        if (!enemyMemory.isPlayerDetected)
+        if (!enemyMemory.isPlayerDetected) //탐지실패 -> 이동정지
         {
             SetAgentStop(true);
             return ESTATE.FAILED;
         }
 
-        if (enemyMemory.isInAttackRange)
+        if (enemyMemory.isInAttackRange) //공격중
         {
             SetAgentStop(true);
             return ESTATE.SUCCESS;
@@ -113,7 +117,7 @@ public class Zombie1 : Enemy
 
         animator.SetBool(_animIDAttackRange, false);
 
-        if (!isAttacking)
+        if (!isAttacking) //공격중이 아닐때 
         {
             SetAgentStop(false);
             agent.SetDestination(enemyMemory.player.position);

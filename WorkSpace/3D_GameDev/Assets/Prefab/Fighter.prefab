@@ -1555,6 +1555,16 @@ MonoBehaviour:
   isAttacking: 0
   hpSlider: {fileID: 8638232658166746187}
   hpText: {fileID: 5581338119029002468}
+  defaultMtl:
+  - {fileID: 2100000, guid: ab2577d9b8c2a1d4faccbd9f32586306, type: 2}
+  - {fileID: 2100000, guid: 0adfc943c4c23384eb30a1a3eafa6904, type: 2}
+  detectedMtl:
+  - {fileID: 2100000, guid: df8cd8fc771c6944aa2bd16e4418ef28, type: 2}
+  - {fileID: 2100000, guid: 7dafad952ce06d54a8f6f2374902b17b, type: 2}
+  TargetMtl:
+  - {fileID: 2100000, guid: 268332899963be442b414042329aae10, type: 2}
+  - {fileID: 2100000, guid: 50bea82a059700a4d8df42a4d1a7175b, type: 2}
+  currentMtl: []
   isDecteced: 0
   LeftHandWeapon: {fileID: 6995037820952417372}
   RightHandWeapon: {fileID: 7376331169877251308}
