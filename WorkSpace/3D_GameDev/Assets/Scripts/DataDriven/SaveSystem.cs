@@ -6,7 +6,7 @@ using System.IO;
 public static class SaveSystem
 {
     private const string FileName = "JsonSavedData.json";
-    private static readonly string SavePath = Path.Combine(Application.persistentDataPath, FileName);
+    public static readonly string SavePath = Path.Combine(Application.persistentDataPath, FileName);
 
     private static SavedData pendingData;
 
@@ -60,7 +60,9 @@ public static class SaveSystem
     {
         if (!File.Exists(SavePath))
         {
-            Debug.Log("파일 없음!"); return null;
+            Debug.Log("파일 없음!");
+
+            SaveGameData();
         }
 
         // 저장된 세이브 파일 불러오기

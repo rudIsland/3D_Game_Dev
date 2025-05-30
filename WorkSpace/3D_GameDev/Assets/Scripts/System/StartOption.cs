@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.IO;
 
 public class StartOption : MonoBehaviour
 {
     [SerializeField] Button ContinueBtn;
-
     private void Start()
     {
         ContinueBtn_Active();
@@ -61,7 +61,7 @@ public class StartOption : MonoBehaviour
 
         SavedData data = SaveSystem.getSavedData();
 
-        if (data.StageName == "0_Start" || data.StageName == "001_Main")
+        if (data.StageName == "0_Start" || data.StageName == "001_Main" || !File.Exists(SaveSystem.SavePath))
             ContinueBtn.interactable = false;
         else
             ContinueBtn.interactable = true;
