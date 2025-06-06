@@ -2152,6 +2152,10 @@ MonoBehaviour:
   TargetMtl:
   - {fileID: 2100000, guid: 31f35ccdcf9ea3047bd4b9c9cca77522, type: 2}
   - {fileID: 2100000, guid: 0240ac1638e675149b7e8bf3435d907a, type: 2}
+  DeadMtl:
+  - {fileID: 2100000, guid: fc0a3a989e776f048981de93c4730aec, type: 2}
+  - {fileID: 2100000, guid: dcc34c422b6da9c49ab8a99bce7ffc9d, type: 2}
+  isTarget: 0
   currentMtl: []
   weapon: {fileID: 6434762333465992132}
 --- !u!114 &512478756119801562

@@ -1,6 +1,8 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -27,7 +29,10 @@ public class GameManager : MonoBehaviour
     public void GameReset()
     {
         Debug.Log("게임 재시작");
-        //SceneManager.LoadScene("Sample");
+        SceneManager.LoadScene("0_Start");
+
+        // 기본 스탯 초기화
+        SaveSystem.ResetData();
     }
 
 
@@ -57,11 +62,23 @@ public class GameManager : MonoBehaviour
         Debug.Log("게임 계속하기");
     }
 
-    //void OnApplicationQuit()
-    //{
-    //    SaveSystem.SaveToAsset(this);
-    //}
+    void OnApplicationQuit()
+    {
+        SaveSystem.SaveGameData();
+    }
 
+
+    public void PlayderDead(float time)
+    {
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        UIManager.Instance.deadPanel.ActiveDeadPanel(true);
+
+        UIManager.Instance.deadPanel.ShowDeadPanel(time);
+
+    }
 
 
 }

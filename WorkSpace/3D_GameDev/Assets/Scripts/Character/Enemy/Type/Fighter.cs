@@ -133,7 +133,7 @@ public class Fighter : Enemy
         enemyStat.ATK = 40f;
         enemyStat.DEF = 30f;
         enemyStat.currentHP = enemyStat.maxHP; //현재 체력설정
-        deathEXP = 150000;
+        deathEXP = 4500;
 
         GetComponentInChildren<EnemyGUI>()?.UpdateLevel(); //GUI레벨설정
     }

@@ -1564,6 +1564,10 @@ MonoBehaviour:
   TargetMtl:
   - {fileID: 2100000, guid: 268332899963be442b414042329aae10, type: 2}
   - {fileID: 2100000, guid: 50bea82a059700a4d8df42a4d1a7175b, type: 2}
+  DeadMtl:
+  - {fileID: 2100000, guid: 985718656d7b9994f83bfcf51ea232ce, type: 2}
+  - {fileID: 2100000, guid: 3ec86473f1056c543a1a9dd92102c7f8, type: 2}
+  isTarget: 0
   currentMtl: []
   isDecteced: 0
   LeftHandWeapon: {fileID: 6995037820952417372}

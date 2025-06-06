@@ -8,7 +8,7 @@ public class PlayerStats : CharacterStats
     [Header("½ºÅÈ")]
     [SerializeField] private double serializedMaxHP = 100;
     [SerializeField] private double serializedCurrentHP = 100;
-    [SerializeField] private double serializedATK = 1000;
+    [SerializeField] private double serializedATK = 10;
     [SerializeField] private double serializedDEF = 5;
 
     public override double maxHP { get => serializedMaxHP; set => serializedMaxHP = value; }

@@ -609,9 +609,9 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": 506.0,
-            "y": -782.0,
-            "width": 130.99993896484376,
+            "x": 510.0,
+            "y": -823.0,
+            "width": 131.0,
             "height": 34.0
         }
     },
@@ -1128,8 +1128,8 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": 506.0,
-            "y": -722.0,
+            "x": 510.0,
+            "y": -763.0,
             "width": 208.0,
             "height": 435.0
         }
@@ -1676,8 +1676,8 @@
     "m_ObjectId": "75e9febd58f54c6ba090f0ecdd90681b",
     "m_Title": "BaseTexure",
     "m_Position": {
-        "x": 10.0,
-        "y": 10.0
+        "x": 245.0,
+        "y": -881.9600219726563
     }
 }
 
@@ -1987,9 +1987,9 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": 884.9999389648438,
-            "y": -588.9999389648438,
-            "width": 208.00006103515626,
+            "x": 889.0,
+            "y": -630.0,
+            "width": 208.0,
             "height": 302.0
         }
     },
@@ -3300,9 +3300,9 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": 266.0,
-            "y": -676.0,
-            "width": 141.0,
+            "x": 270.0,
+            "y": -717.0,
+            "width": 129.0,
             "height": 34.0
         }
     },

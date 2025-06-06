@@ -1292,6 +1292,9 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 7bce40e4f47647a47bdc4639390f44c0, type: 2}
   TargetMtl:
   - {fileID: 2100000, guid: 91c63ed8c2e8cf848a2eb4c30fcd97a6, type: 2}
+  DeadMtl:
+  - {fileID: 2100000, guid: 40d9345a89eb10949b40a76a61c61aff, type: 2}
+  isTarget: 0
   currentMtl:
   - {fileID: 0}
   JumpAttackRange: 5

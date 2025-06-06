@@ -69,7 +69,7 @@ public class Mutant : Enemy
         enemyStat.ATK = 25f;
         enemyStat.DEF = 15f;
         enemyStat.currentHP = enemyStat.maxHP; //현재 체력설정
-        deathEXP = 30000;
+        deathEXP = 1500;
 
         GetComponentInChildren<EnemyGUI>()?.UpdateLevel(); //GUI레벨설정
     }

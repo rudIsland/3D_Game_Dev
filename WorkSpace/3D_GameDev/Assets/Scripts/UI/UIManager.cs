@@ -8,6 +8,7 @@ public class UIManager : MonoBehaviour
     public PlayerResource playerResource;
     public LevelStatSystem levelStatSystem;
     public ESC_Option EscOption;
+    public DeadPanel deadPanel;
 
     public static UIManager Instance;
     private void Awake()
@@ -25,6 +26,7 @@ public class UIManager : MonoBehaviour
         EscOption = GetComponentInChildren<ESC_Option>();
         playerResource = GetComponentInChildren<PlayerResource>();
         levelStatSystem = GetComponentInChildren<LevelStatSystem>();
+        deadPanel = GetComponentInChildren<DeadPanel>();
     }
 
     public void SetStageClearText()

@@ -97,4 +97,28 @@ public static class SaveSystem
         pendingData = null;
         SceneManager.sceneLoaded -= OnSceneLoadedAndApplyData;
     }
+
+    //초기화
+    public static void ResetData()
+    {
+        PlayerStats stats = new PlayerStats();
+        SavedData data = new SavedData
+        {
+            maxHP = stats.maxHP,
+            currentHP = stats.currentHP,
+            ATK = stats.ATK,
+            DEF = stats.DEF,
+            level = stats.level.currentLevel,
+            currentExp = stats.level.currentExp,
+            maxStamina = stats.maxStamina,
+            currentStamina = stats.currentStamina,
+            statPoint = stats.statPoint,
+            StageName = "0_Start"
+        };
+
+        string SaveString = JsonUtility.ToJson(data, true);
+        File.WriteAllText(SavePath, SaveString);
+
+        Debug.Log("현재 상태 저장");
+    }
 }

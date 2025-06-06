@@ -1181,6 +1181,12 @@ MonoBehaviour:
   playerCamera: {fileID: 5593655399845308693}
   animator: {fileID: 1214335856033616137}
   stateNum: 0
+  playerSkin:
+  - {fileID: 2850316884544572323}
+  - {fileID: 8406611650458336384}
+  - {fileID: 6434630084099182382}
+  - {fileID: 1568856798451512820}
+  deadMtl: {fileID: 2100000, guid: b1085c266d8ec3a44a4d3fd8bfbdb012, type: 2}
   LandingAudioClip: {fileID: 8300000, guid: ff697d3070687ce4583faa0561a145a2, type: 3}
   FootstepAudioClips:
   - {fileID: 8300000, guid: 72f526a6a9890f643a88e85a61c86c8a, type: 3}
@@ -3288,7 +3294,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SphereCollider: {fileID: 0}
   TargetRadius: 6
-  targets: []
   currentTarget: {fileID: 0}
 --- !u!1 &7018573973388409330
 GameObject:

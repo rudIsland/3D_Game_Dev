@@ -4,7 +4,6 @@ using UnityEngine.UI;
 using UnityEngine.AI;
 using System.Collections;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 public abstract class Enemy : CharacterBase
@@ -41,6 +40,7 @@ public abstract class Enemy : CharacterBase
     public Material[] defaultMtl;
     public Material[] detectedMtl;
     public Material[] TargetMtl;
+    public Material[] DeadMtl;
 
     public bool isTarget; //현재 대상이 플레이어의 타겟인지 확인
 
@@ -139,10 +139,40 @@ public abstract class Enemy : CharacterBase
         Debug.Log("적 사망");
         //플레이어에게 경험치 넣기
         // 경험치 이벤트 발생
-        ChangeDefaultMtl();
+        ChangeDeadMtl();
+
         OnEnemyKilled?.Invoke(deathEXP);
 
+        //사라지기 시작
+        StartCoroutine(DissolveCoroutine());
+
         StartCoroutine(DestroyEnemy());
+    }
+
+    private IEnumerator DissolveCoroutine()
+    {
+        float t = 0f;
+        float duration = 5f; // 몇 초 동안 서서히 사라질지
+
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            float dissolve = Mathf.Clamp01(t / duration);
+
+            foreach (var mat in GetComponentInChildren<SkinnedMeshRenderer>().materials)
+            {
+                if (mat.HasProperty("_NoiseAmount"))
+                    mat.SetFloat("_NoiseAmount", dissolve);
+            }
+
+            yield return null;
+        }
+
+        // 완전히 사라짐
+        foreach (var mat in GetComponentInChildren<SkinnedMeshRenderer>().materials)
+        {
+            mat.SetFloat("_NoiseAmount", 1f);
+        }
     }
 
     private IEnumerator DestroyEnemy()
@@ -190,6 +220,12 @@ public abstract class Enemy : CharacterBase
     {
         currentMtl = defaultMtl;
         GetComponentInChildren<SkinnedMeshRenderer>().materials = defaultMtl;
+    }
+
+    public virtual void ChangeDeadMtl()
+    {
+        currentMtl = DeadMtl;
+        GetComponentInChildren<SkinnedMeshRenderer>().materials = DeadMtl;
     }
 
     //추격할때 머터리얼 변경
