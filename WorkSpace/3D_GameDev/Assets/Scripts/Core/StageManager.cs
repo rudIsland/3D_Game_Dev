@@ -46,6 +46,7 @@ public class StageManager : MonoBehaviour
         CurrentStageName = nextStageName;
         SceneManager.LoadScene(nextStageName, LoadSceneMode.Single);
         SaveSystem.SaveGameData();
+        UIManager.Instance.SetStageClearText();
     }
 
 
