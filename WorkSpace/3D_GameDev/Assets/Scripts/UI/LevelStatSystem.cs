@@ -85,7 +85,7 @@ public class LevelStatSystem : MonoBehaviour
     public void CloseLevelPanel()
     {
         levelUpPanel.SetActive(false);
-        GameManager.Instance.ContinueGame();
+        GameManager.Instance.ResumeGame();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }

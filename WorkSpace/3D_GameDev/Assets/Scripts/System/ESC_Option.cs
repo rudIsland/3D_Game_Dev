@@ -50,8 +50,7 @@ public class ESC_Option : MonoBehaviour
     {
         ESCPanel.SetActive(false);
         Time.timeScale = 1.0f;
-        PlayerStats savedStats = Player.Instance.playerStateMachine.playerStat;
-        SaveSystem.SaveData(savedStats);
+        SaveSystem.SaveGameData(); //플레이어의 현재 상태로 게임 저장
 
         if (Player.Instance != null)
             Destroy(Player.Instance.gameObject);

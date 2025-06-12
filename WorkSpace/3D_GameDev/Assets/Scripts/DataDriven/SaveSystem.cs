@@ -3,7 +3,7 @@ using UnityEngine.SceneManagement;
 using System.IO;
 
 
-public static class SaveSystem
+public class SaveSystem
 {
     private const string FileName = "JsonSavedData.json";
     public static readonly string SavePath = Path.Combine(Application.persistentDataPath, FileName);
@@ -12,60 +12,28 @@ public static class SaveSystem
 
     public static void SaveData(PlayerStats stats)
     {
-
-        SavedData data = new SavedData
-        {
-            maxHP = stats.maxHP,
-            currentHP = stats.currentHP,
-            ATK = stats.ATK,
-            DEF = stats.DEF,
-            level = stats.level.currentLevel,
-            currentExp = stats.level.currentExp,
-            maxStamina = stats.maxStamina,
-            currentStamina = stats.currentStamina,
-            statPoint = stats.statPoint,
-            StageName = StageManager.Instance.CurrentStageName
-        };
-
-        string SaveString = JsonUtility.ToJson(data, true);
-        File.WriteAllText(SavePath, SaveString);
+        SavedData data = CreateSaveData(stats);
+        string saveString = JsonUtility.ToJson(data, true);
+        File.WriteAllText(SavePath, saveString);
 
         Debug.Log("현재 상태 저장");
     }
 
+    //현재 플레이어의 상태를 저장
     public static void SaveGameData()
     {
-        PlayerStats stats = Player.Instance.playerStateMachine.playerStat;
-        SavedData data = new SavedData
-        {
-            maxHP = stats.maxHP,
-            currentHP = stats.currentHP,
-            ATK = stats.ATK,
-            DEF = stats.DEF,
-            level = stats.level.currentLevel,
-            currentExp = stats.level.currentExp,
-            maxStamina = stats.maxStamina,
-            currentStamina = stats.currentStamina,
-            statPoint = stats.statPoint,
-            StageName = StageManager.Instance.CurrentStageName
-        };
-
-        string SaveString = JsonUtility.ToJson(data, true);
-        File.WriteAllText(SavePath, SaveString);
-
-        Debug.Log("현재 상태 저장");
+        SaveData(Player.Instance.playerStateMachine.playerStat);
     }
+
 
     public static SavedData getSavedData()
     {
         if (!File.Exists(SavePath))
         {
-            Debug.Log("파일 없음!");
-
-            SaveGameData();
+            Debug.Log("파일 없음! 초기 데이터 생성");
+            SavedData.CreateDefault(); //기본값으로 생성시킴
         }
 
-        // 저장된 세이브 파일 불러오기
         string json = File.ReadAllText(SavePath);
         Debug.Log("저장된 파일 로드됨");
         return JsonUtility.FromJson<SavedData>(json);
@@ -102,23 +70,34 @@ public static class SaveSystem
     public static void ResetData()
     {
         PlayerStats stats = new PlayerStats();
-        SavedData data = new SavedData
-        {
-            maxHP = stats.maxHP,
-            currentHP = stats.currentHP,
-            ATK = stats.ATK,
-            DEF = stats.DEF,
-            level = stats.level.currentLevel,
-            currentExp = stats.level.currentExp,
-            maxStamina = stats.maxStamina,
-            currentStamina = stats.currentStamina,
-            statPoint = stats.statPoint,
-            StageName = "0_Start"
-        };
+        SavedData data = SavedData.CreateDefault(); //초기화된 데이터 생성
 
         string SaveString = JsonUtility.ToJson(data, true);
         File.WriteAllText(SavePath, SaveString);
 
-        Debug.Log("현재 상태 저장");
+        Debug.Log("게임 초기화 후 저장");
+    }
+
+    public bool HasSavedData()
+    {
+        return File.Exists(SavePath);
+    }
+
+
+    //현재 저장된 스테이지정보와 플레이어 정보로 저장
+    private static SavedData CreateSaveData(PlayerStats stats)
+    {
+        return new SavedData(
+           stats.maxHP,
+           stats.currentHP,
+           stats.ATK,
+           stats.DEF,
+           stats.level.currentLevel,
+           stats.level.currentExp,
+           stats.maxStamina,
+           stats.currentStamina,
+           stats.statPoint,
+           StageManager.Instance.CurrentStageName
+       );
     }
 }

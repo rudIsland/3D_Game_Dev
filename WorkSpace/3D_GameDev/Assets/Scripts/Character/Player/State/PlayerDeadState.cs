@@ -60,7 +60,7 @@ public class PlayerDeadState : PlayerBaseState
                 if (mat.HasProperty("_NoiseAmount"))
                 {
                     mat.SetFloat("_NoiseAmount", dissolve);
-                    GameManager.Instance.PlayderDead(dissolve);
+                    UIManager.Instance.OnPlayerDeath(dissolve);
                 }
             }
         }

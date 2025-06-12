@@ -2,7 +2,7 @@
 using TMPro;
 using UnityEngine;
 
-public class UIManager : MonoBehaviour
+public class UIManager : MonoBehaviour, IPlayerDeadHandler
 {
     public TextMeshProUGUI clearCountTXt;
     public PlayerResource playerResource;
@@ -31,9 +31,28 @@ public class UIManager : MonoBehaviour
 
     public void SetStageClearText()
     {
+
+        if (clearCountTXt == null)
+        {
+            //Debug.LogWarning("clearCountTXt가 null입니다. 인스펙터에서 할당했는지 확인하세요.");
+            return;
+        }
+
+        if (Player.Instance == null)
+        {
+            Debug.LogWarning("Player.Instance가 null입니다.");
+            return;
+        }
+
         Stage currentStage = FindObjectOfType<Stage>();
+        if (currentStage == null)
+        {
+            Debug.LogWarning("[UIManager]StageManager에 CurrentStage가 할당되지 않았습니다");
+            return;
+        }
+
         int currentLevel = Player.Instance.playerStateMachine.playerStat.level.currentLevel;
-        clearCountTXt.text = $"{currentLevel} / {currentStage.clearLevel} ";
+        clearCountTXt.text = $"{currentLevel} / {currentStage.clearLevel}";
     }
 
     public void RefreshAll()
@@ -42,5 +61,14 @@ public class UIManager : MonoBehaviour
         playerResource.UpdateStaminaUI();
         levelStatSystem.UpdateExpSlider();
         levelStatSystem.Update_StatUI();
+    }
+
+    public void OnPlayerDeath(float time)
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        deadPanel.ActiveDeadPanel(true);
+        deadPanel.ShowDeadPanel(time);
     }
 }

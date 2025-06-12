@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviour, IGamePauseHandler
 {
     public static GameManager Instance { get; private set; }
 
@@ -38,24 +38,24 @@ public class GameManager : MonoBehaviour
 
     void OnEnable()
     {
-        onLevelUp += LevelUpPauseGame;
+        onLevelUp += LevelUpTrigger;
     }
 
     void OnDisable()
     {
-        onLevelUp -= LevelUpPauseGame;
+        onLevelUp -= LevelUpTrigger;
     }
 
-    public void LevelUpPauseGame()
+    public void LevelUpTrigger()
     {
         isPause = true;
         Time.timeScale = 0f;
         UIManager.Instance.SetStageClearText();
-
+        SaveSystem.SaveGameData();
         Debug.Log("게임 일시정지: 레벨업 발생");
     }
 
-    public void ContinueGame()
+    public void ResumeGame() //정지 해제
     {
         isPause = false;
         Time.timeScale = 1f;
@@ -64,21 +64,11 @@ public class GameManager : MonoBehaviour
 
     void OnApplicationQuit()
     {
-        SaveSystem.SaveGameData();
+       //그냥 게임 종료
     }
 
-
-    public void PlayderDead(float time)
+    public void PauseGame()
     {
-
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-
-        UIManager.Instance.deadPanel.ActiveDeadPanel(true);
-
-        UIManager.Instance.deadPanel.ShowDeadPanel(time);
-
+        //게임 정지
     }
-
-
 }

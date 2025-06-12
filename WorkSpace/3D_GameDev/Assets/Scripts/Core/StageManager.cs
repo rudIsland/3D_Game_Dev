@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -11,6 +9,7 @@ public class StageManager : MonoBehaviour
     [SerializeField] private readonly string SPAWN_POINT_TAGNAME = "SpawnPoint";
 
     public string CurrentStageName;
+
 
     private void Awake()
     {

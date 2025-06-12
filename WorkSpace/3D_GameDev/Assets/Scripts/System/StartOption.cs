@@ -49,7 +49,7 @@ public class StartOption : MonoBehaviour
             // 실행
             SaveSystem.LoadAndContinue(data);
 
-            Debug.Log("Game state loaded and continued.");
+            Debug.Log("저장된 정보로 게임을 이어합니다.");
 
             // 더 이상 호출되지 않게 제거
             SceneManager.sceneLoaded -= OnHUDLoadedThenContinue;
