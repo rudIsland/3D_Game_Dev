@@ -24,7 +24,7 @@ public class Zombie1 : Enemy
 
         //레벨
         level.SetLevel(3);
-        deathEXP = 130;
+        deathEXP = 1300;
 
         GetComponentInChildren<EnemyGUI>()?.UpdateLevel(); //GUI레벨설정
     }

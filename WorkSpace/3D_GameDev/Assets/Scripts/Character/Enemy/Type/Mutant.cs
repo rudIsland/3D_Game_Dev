@@ -63,13 +63,13 @@ public class Mutant : Enemy
         moveSpeed = runningSpeed; //이동속도
         angularSpeed = 180f; //회전속도
 
-        level.SetLevel(3); //레벨설정
+        level.SetLevel(13); //레벨설정
 
         enemyStat.maxHP = 500;
         enemyStat.ATK = 25f;
         enemyStat.DEF = 15f;
         enemyStat.currentHP = enemyStat.maxHP; //현재 체력설정
-        deathEXP = 1500;
+        deathEXP = 15000;
 
         GetComponentInChildren<EnemyGUI>()?.UpdateLevel(); //GUI레벨설정
     }

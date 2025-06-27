@@ -30,8 +30,10 @@ public class SaveSystem
     {
         if (!File.Exists(SavePath))
         {
-            Debug.Log("파일 없음! 초기 데이터 생성");
-            SavedData.CreateDefault(); //기본값으로 생성시킴
+            Debug.Log("파일 없음! 초기 데이터 생성 후 저장");
+            SavedData data = SavedData.CreateDefault(); //기본값으로 생성시킴
+            string saveString = JsonUtility.ToJson(data, true);
+            File.WriteAllText(SavePath, saveString);
         }
 
         string json = File.ReadAllText(SavePath);

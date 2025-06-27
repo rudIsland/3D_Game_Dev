@@ -127,13 +127,13 @@ public class Fighter : Enemy
         moveSpeed = 1.5f; //이동속도
         angularSpeed = 260f; //회전속도
 
-        level.SetLevel(20); //레벨설정
+        level.SetLevel(25); //레벨설정
 
         enemyStat.maxHP = 1000;
         enemyStat.ATK = 40f;
         enemyStat.DEF = 30f;
         enemyStat.currentHP = enemyStat.maxHP; //현재 체력설정
-        deathEXP = 4500;
+        deathEXP = 45000;
 
         GetComponentInChildren<EnemyGUI>()?.UpdateLevel(); //GUI레벨설정
     }
