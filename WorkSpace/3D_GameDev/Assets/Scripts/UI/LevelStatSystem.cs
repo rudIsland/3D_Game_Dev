@@ -40,6 +40,12 @@ public class LevelStatSystem : MonoBehaviour
 
     public void UpdateExpSlider()
     {
+        if (expSlider == null || stats == null)
+        {
+            Debug.LogWarning("[LevelStatSystem] expSlider or stats is null.");
+            return;
+        }
+
         expSlider.maxValue = stats.level.MaxExp;
         expSlider.value = stats.level.currentExp;
     }
@@ -79,7 +85,7 @@ public class LevelStatSystem : MonoBehaviour
     public void CloseLevelPanel()
     {
         levelUpPanel.SetActive(false);
-        GameManager.Instance.ContinueGame();
+        GameManager.Instance.ResumeGame();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }

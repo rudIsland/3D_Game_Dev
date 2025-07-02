@@ -530,7 +530,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1664515883537947617}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.06350985, y: -0.104975834, z: 0.006717908, w: 0.99242204}
+  m_LocalRotation: {x: 0.22975299, y: 0.0000000031852552, z: -0.0000000015337834,
+    w: 0.973249}
   m_LocalPosition: {x: 0, y: 2.3999999, z: -7.87}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1180,6 +1181,12 @@ MonoBehaviour:
   playerCamera: {fileID: 5593655399845308693}
   animator: {fileID: 1214335856033616137}
   stateNum: 0
+  playerSkin:
+  - {fileID: 2850316884544572323}
+  - {fileID: 8406611650458336384}
+  - {fileID: 6434630084099182382}
+  - {fileID: 1568856798451512820}
+  deadMtl: {fileID: 2100000, guid: b1085c266d8ec3a44a4d3fd8bfbdb012, type: 2}
   LandingAudioClip: {fileID: 8300000, guid: ff697d3070687ce4583faa0561a145a2, type: 3}
   FootstepAudioClips:
   - {fileID: 8300000, guid: 72f526a6a9890f643a88e85a61c86c8a, type: 3}
@@ -3287,7 +3294,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SphereCollider: {fileID: 0}
   TargetRadius: 6
-  targets: []
   currentTarget: {fileID: 0}
 --- !u!1 &7018573973388409330
 GameObject:
@@ -4568,7 +4574,7 @@ Transform:
   m_GameObject: {fileID: 9162558218924959475}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.000000014791348, z: 0.0000000012976684, w: 1}
-  m_LocalPosition: {x: 0.12790656, y: -0.2270093, z: 15.6698265}
+  m_LocalPosition: {x: -0.000000018431832, y: 0.00000059604645, z: 3.354102}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

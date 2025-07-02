@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
 public class Fighter : Enemy
 {
@@ -69,6 +70,11 @@ public class Fighter : Enemy
     protected override void Update()
     {
         if (enemyStat.IsDead) return;
+        if (Player.Instance.playerStateMachine.currentState is PlayerDeadState)
+        {
+            ChangeDefaultMtl();
+            return;
+        }
 
         UpdateDistanceToPlayer();
         HandleDetectedState();
@@ -121,13 +127,13 @@ public class Fighter : Enemy
         moveSpeed = 1.5f; //이동속도
         angularSpeed = 260f; //회전속도
 
-        level.SetLevel(20); //레벨설정
+        level.SetLevel(25); //레벨설정
 
         enemyStat.maxHP = 1000;
         enemyStat.ATK = 40f;
         enemyStat.DEF = 30f;
         enemyStat.currentHP = enemyStat.maxHP; //현재 체력설정
-        deathEXP = 150000;
+        deathEXP = 45000;
 
         GetComponentInChildren<EnemyGUI>()?.UpdateLevel(); //GUI레벨설정
     }
@@ -168,9 +174,13 @@ public class Fighter : Enemy
         // 가장 넓은 탐지 거리 내에 들어오면 SUCCESS 반환
         if (distance <= DectectedRange)
         {
+            ChangeDetectedMtl();
             return ESTATE.SUCCESS;
         }
 
+        // 탐지 실패 시 바로 정지
+        SetAgentStop(true);
+        ChangeDefaultMtl();
         return ESTATE.FAILED;
 
     }
@@ -179,12 +189,13 @@ public class Fighter : Enemy
     {
         if (isAttacking) return ESTATE.SUCCESS; // 공격 중이면 회전 금지
 
-    if (!IsFacingTarget(enemyMemory.player.position))
-    {
-        RotateTowardsPlayer();
-        return ESTATE.RUN;
-    }
-    return ESTATE.SUCCESS;
+        if (!IsFacingTarget(enemyMemory.player.position))
+        {
+            RotateTowardsPlayer();
+            return ESTATE.RUN;
+        }
+
+        return ESTATE.SUCCESS;
     }
 
     private ESTATE FightSelector()
@@ -485,7 +496,9 @@ public class Fighter : Enemy
 
     private bool IsFacingTarget(Vector3 target)
     {
+        //Vector의 방향을 구하고 정규화(기하벡터)
         Vector3 directionToTarget = (target - transform.position).normalized;
+        //파이터 방향과 플레이어 방향으로 각도 구하기
         float dot = Vector3.Dot(transform.forward, directionToTarget);
         return dot > 0.98f; // 0.95 이상이면 거의 정면을 보고 있다고 판단
     }

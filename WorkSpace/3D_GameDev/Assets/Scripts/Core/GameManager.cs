@@ -1,8 +1,10 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviour, IGamePauseHandler
 {
     public static GameManager Instance { get; private set; }
 
@@ -27,40 +29,46 @@ public class GameManager : MonoBehaviour
     public void GameReset()
     {
         Debug.Log("게임 재시작");
-        //SceneManager.LoadScene("Sample");
+        SceneManager.LoadScene("0_Start");
+
+        // 기본 스탯 초기화
+        SaveSystem.ResetData();
     }
 
 
     void OnEnable()
     {
-        onLevelUp += PauseGame;
+        onLevelUp += LevelUpTrigger;
     }
 
     void OnDisable()
     {
-        onLevelUp -= PauseGame;
+        onLevelUp -= LevelUpTrigger;
     }
 
-    public void PauseGame()
+    public void LevelUpTrigger()
     {
         isPause = true;
         Time.timeScale = 0f;
         UIManager.Instance.SetStageClearText();
+        SaveSystem.SaveGameData();
         Debug.Log("게임 일시정지: 레벨업 발생");
     }
 
-    public void ContinueGame()
+    public void ResumeGame() //정지 해제
     {
         isPause = false;
         Time.timeScale = 1f;
         Debug.Log("게임 계속하기");
     }
 
-    //void OnApplicationQuit()
-    //{
-    //    SaveSystem.SaveToAsset(this);
-    //}
+    void OnApplicationQuit()
+    {
+       //그냥 게임 종료
+    }
 
-
-
+    public void PauseGame()
+    {
+        //게임 정지
+    }
 }

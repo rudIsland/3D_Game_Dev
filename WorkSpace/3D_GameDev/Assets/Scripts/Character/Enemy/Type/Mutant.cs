@@ -58,18 +58,18 @@ public class Mutant : Enemy
 
     protected override void SetupStats()
     {
-        detectRange = 15f; //탐지범위
+        detectRange = 10f; //탐지범위
         attackRange = 1.0f; //공격범위
         moveSpeed = runningSpeed; //이동속도
         angularSpeed = 180f; //회전속도
 
-        level.SetLevel(3); //레벨설정
+        level.SetLevel(13); //레벨설정
 
         enemyStat.maxHP = 500;
         enemyStat.ATK = 25f;
         enemyStat.DEF = 15f;
         enemyStat.currentHP = enemyStat.maxHP; //현재 체력설정
-        deathEXP = 30000;
+        deathEXP = 15000;
 
         GetComponentInChildren<EnemyGUI>()?.UpdateLevel(); //GUI레벨설정
     }
@@ -85,6 +85,12 @@ public class Mutant : Enemy
     protected override void Update()
     {
         if (enemyStat.IsDead) return;
+        if (Player.Instance.playerStateMachine.currentState is PlayerDeadState)
+        {
+            ChangeDefaultMtl();
+            return;
+        }
+
         JumpAttackCoolTime();
 
         UpdateDistanceToPlayer(); //플레이어와의 거리 계산
@@ -104,7 +110,7 @@ public class Mutant : Enemy
 
     private void JumpAttackCoolTime()
     {
-        jumpAttackTimer -= Time.deltaTime; // ← 이것만 남김
+        jumpAttackTimer -= Time.deltaTime; //시간 흐름대로 줄어들도록 설정
     }
 
 
@@ -117,6 +123,14 @@ public class Mutant : Enemy
         isJumpAttackRange = enemyMemory.distanceToPlayer <= JumpAttackRange;
         isPunchAttackRange = enemyMemory.distanceToPlayer <= PunchAttackRange;
         isSwipAttackRange = enemyMemory.distanceToPlayer <= SwipAttackRange;
+
+        if (isTarget) return; //타겟일땐 바꾸지않게
+
+        // 상태 변경된 경우만 머터리얼 바꿈
+        if (!enemyMemory.isPlayerDetected)
+        {
+            ChangeDefaultMtl();
+        }
     }
 
 
@@ -171,12 +185,15 @@ public class Mutant : Enemy
         if (isAttacking)
         {
             Debug.Log("[이동] 공격 중 → 이동 정지");
+            ChangeDetectedMtl();
             SetAgentStop(true);
             return ESTATE.SUCCESS;
         }
 
         // 공격 실패 후 이동
         Debug.Log("[이동] 플레이어에게 이동 중");
+
+        ChangeDetectedMtl();
         SetAgentStop(false);
         agent.SetDestination(enemyMemory.player.position);
 

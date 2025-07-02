@@ -12,7 +12,7 @@ public class Stage2 : Stage
     public override void StageClearCondition()
     {
         int currentLevel = Player.Instance.playerStateMachine.playerStat.level.currentLevel;
-        if (currentLevel > clearLevel)
+        if (currentLevel >= clearLevel)
             Portal.SetActive(true);
     }
 

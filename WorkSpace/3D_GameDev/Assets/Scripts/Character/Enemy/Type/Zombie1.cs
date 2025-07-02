@@ -24,7 +24,7 @@ public class Zombie1 : Enemy
 
         //레벨
         level.SetLevel(3);
-        deathEXP = 130;
+        deathEXP = 1300;
 
         GetComponentInChildren<EnemyGUI>()?.UpdateLevel(); //GUI레벨설정
     }
@@ -40,6 +40,12 @@ public class Zombie1 : Enemy
     protected override void Update()
     {   
         if (enemyStat.IsDead) return;
+
+        if (Player.Instance.playerStateMachine.currentState is PlayerDeadState)
+        {
+            ChangeDefaultMtl();
+            return;
+        }
 
         UpdateDistanceToPlayer();
         UpdateDetectionStatus();
@@ -71,9 +77,7 @@ public class Zombie1 : Enemy
         // 공격 트리
         ENode attackTree = new SequenceNode(new List<ENode> {
             new ActionNode(CheckAttackRange),
-            new SelectorNode(new List<ENode>{
-                new ActionNode(NormalAttack)
-            })
+            new ActionNode(NormalAttack)
         });
 
         // 전체 트리 구성
@@ -99,13 +103,13 @@ public class Zombie1 : Enemy
     //이동
     private ESTATE MoveToPlayer()
     {
-        if (!enemyMemory.isPlayerDetected)
+        if (!enemyMemory.isPlayerDetected) //탐지실패 -> 이동정지
         {
             SetAgentStop(true);
             return ESTATE.FAILED;
         }
 
-        if (enemyMemory.isInAttackRange)
+        if (enemyMemory.isInAttackRange) //공격중
         {
             SetAgentStop(true);
             return ESTATE.SUCCESS;
@@ -113,7 +117,7 @@ public class Zombie1 : Enemy
 
         animator.SetBool(_animIDAttackRange, false);
 
-        if (!isAttacking)
+        if (!isAttacking) //공격중이 아닐때 
         {
             SetAgentStop(false);
             agent.SetDestination(enemyMemory.player.position);
@@ -265,7 +269,10 @@ public class Zombie1 : Enemy
     private void NormalAttackingStart()
     {
         isAttacking = true;
-        agent.isStopped = true; // agent Stop
+        if (agent != null && agent.enabled)
+        {
+            agent.isStopped = true;
+        }
         animator.SetBool(_animIDAttack, true);
     }
 

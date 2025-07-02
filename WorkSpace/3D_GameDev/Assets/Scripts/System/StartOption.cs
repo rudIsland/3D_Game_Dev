@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.IO;
 
 public class StartOption : MonoBehaviour
 {
     [SerializeField] Button ContinueBtn;
-
     private void Start()
     {
         ContinueBtn_Active();
@@ -19,31 +19,49 @@ public class StartOption : MonoBehaviour
 
         // 기본 스탯 초기화
         PlayerStats stats = new PlayerStats();
-        stats.ResetToDefault();
 
-        SaveSystem.SaveData(); // 저장
+        SaveSystem.SaveData(stats); // 저장
 
-        // UIManager가 포함된 HUD 씬 먼저 로드
-        SceneManager.LoadSceneAsync("01_HUD", LoadSceneMode.Additive);
-        SceneManager.LoadSceneAsync("001_Main");
+        // HUD 씬 로드 (Additive)
+        SceneManager.LoadScene("01_HUD", LoadSceneMode.Additive);
 
+        // 바로 메인 스테이지로 이동
+        StageManager.Instance.MoveToStage("001_Main");
     }
 
     public void StartScene_Continue()
     {
-        ContinueBtn_Active();
-
         Debug.Log("이어하기 시작");
-        SaveSystem.LoadAndContinue();
+
+        SavedData data = SaveSystem.getSavedData();
+
+        // HUD 씬 로드
+        SceneManager.LoadScene("01_HUD", LoadSceneMode.Additive);
+
+        // HUD 씬 로드 완료 후 이어하기 실행
+        SceneManager.sceneLoaded += OnHUDLoadedThenContinue;
+
+        // 내부 클래스용 콜백 저장
+        void OnHUDLoadedThenContinue(Scene scene, LoadSceneMode mode)
+        {
+            if (scene.name != "01_HUD") return;
+
+            // 실행
+            SaveSystem.LoadAndContinue(data);
+
+            Debug.Log("저장된 정보로 게임을 이어합니다.");
+
+            // 더 이상 호출되지 않게 제거
+            SceneManager.sceneLoaded -= OnHUDLoadedThenContinue;
+        }
     }
 
     private void ContinueBtn_Active()
     {
-        if (!SaveSystem.HasSavedData()) return;
 
-        SavedData data = Resources.Load<SavedData>("savedData");
+        SavedData data = SaveSystem.getSavedData();
 
-        if (data.StageName == "0_Start")
+        if (data.StageName == "0_Start" || data.StageName == "001_Main" || !File.Exists(SaveSystem.SavePath))
             ContinueBtn.interactable = false;
         else
             ContinueBtn.interactable = true;
@@ -53,4 +71,5 @@ public class StartOption : MonoBehaviour
     {
         Debug.Log("게임 나가기");
     }
+
 }

@@ -1,3 +1,5 @@
+using System;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
 [System.Serializable]
@@ -6,7 +8,7 @@ public class PlayerStats : CharacterStats
     [Header("½ºÅÈ")]
     [SerializeField] private double serializedMaxHP = 100;
     [SerializeField] private double serializedCurrentHP = 100;
-    [SerializeField] private double serializedATK = 1000;
+    [SerializeField] private double serializedATK = 10;
     [SerializeField] private double serializedDEF = 5;
 
     public override double maxHP { get => serializedMaxHP; set => serializedMaxHP = value; }
@@ -40,17 +42,19 @@ public class PlayerStats : CharacterStats
         statPoint = 0;
     }
 
-    public void ResetToDefault()
+    public void ApplySavedData(SavedData data)
     {
-        maxHP = 100;
-        currentHP = 100;
-        maxStamina = 100;
-        currentStamina = 100;
-        level = new Level();
-        ATK = 10;
-        DEF = 5;
-        statPoint = 0;
+        maxHP = data.maxHP;
+        currentHP = data.currentHP;
+        ATK = data.ATK;
+        DEF = data.DEF;
+        level.currentLevel = data.level;
+        level.currentExp = data.currentExp;
+        maxStamina = data.maxStamina;
+        currentStamina = data.currentStamina;
+        statPoint = data.statPoint;
     }
+
 
     public bool CanUse(float amount)
     {
@@ -89,6 +93,8 @@ public class PlayerStats : CharacterStats
 
         UIManager.Instance.levelStatSystem.UpdateExpSlider();
         level.currentExp = Mathf.Max(0, level.currentExp);
+
+        SaveSystem.SaveGameData();
     }
 
     private void HandleLevelUp()

@@ -1903,6 +1903,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0.43015614
       objectReference: {fileID: 0}
+    - target: {fileID: 6749314087805099976, guid: 4f5a071c6c6ce6c4aa40851481b9a1ca,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.779
+      objectReference: {fileID: 0}
     - target: {fileID: 7078722787440015773, guid: 4f5a071c6c6ce6c4aa40851481b9a1ca,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -2129,10 +2134,29 @@ MonoBehaviour:
     - 35355
     currentLevel: 1
     currentExp: 0
+  EnemyStat:
+    serializedMaxHP: 100
+    serializedCurrentHP: 100
+    serializedATK: 10
+    serializedDEF: 5
   agent: {fileID: 0}
   isAttacking: 0
   hpSlider: {fileID: 7460630977535651217}
   hpText: {fileID: 4996066783013141276}
+  defaultMtl:
+  - {fileID: 2100000, guid: 2d191485b9787c1459addb3e069a421f, type: 2}
+  - {fileID: 2100000, guid: 99615e22f83e7ae4b9e5b4efa9cbd435, type: 2}
+  detectedMtl:
+  - {fileID: 2100000, guid: 40bac2589e61e5645b4ec16b1a16291f, type: 2}
+  - {fileID: 2100000, guid: a6e101739be745247bafa5d4e652e19f, type: 2}
+  TargetMtl:
+  - {fileID: 2100000, guid: 31f35ccdcf9ea3047bd4b9c9cca77522, type: 2}
+  - {fileID: 2100000, guid: 0240ac1638e675149b7e8bf3435d907a, type: 2}
+  DeadMtl:
+  - {fileID: 2100000, guid: fc0a3a989e776f048981de93c4730aec, type: 2}
+  - {fileID: 2100000, guid: dcc34c422b6da9c49ab8a99bce7ffc9d, type: 2}
+  isTarget: 0
+  currentMtl: []
   weapon: {fileID: 6434762333465992132}
 --- !u!114 &512478756119801562
 MonoBehaviour:

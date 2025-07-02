@@ -1546,10 +1546,29 @@ MonoBehaviour:
     - 35355
     currentLevel: 1
     currentExp: 0
+  EnemyStat:
+    serializedMaxHP: 100
+    serializedCurrentHP: 100
+    serializedATK: 10
+    serializedDEF: 5
   agent: {fileID: 0}
   isAttacking: 0
   hpSlider: {fileID: 8638232658166746187}
   hpText: {fileID: 5581338119029002468}
+  defaultMtl:
+  - {fileID: 2100000, guid: ab2577d9b8c2a1d4faccbd9f32586306, type: 2}
+  - {fileID: 2100000, guid: 0adfc943c4c23384eb30a1a3eafa6904, type: 2}
+  detectedMtl:
+  - {fileID: 2100000, guid: df8cd8fc771c6944aa2bd16e4418ef28, type: 2}
+  - {fileID: 2100000, guid: 7dafad952ce06d54a8f6f2374902b17b, type: 2}
+  TargetMtl:
+  - {fileID: 2100000, guid: 268332899963be442b414042329aae10, type: 2}
+  - {fileID: 2100000, guid: 50bea82a059700a4d8df42a4d1a7175b, type: 2}
+  DeadMtl:
+  - {fileID: 2100000, guid: 985718656d7b9994f83bfcf51ea232ce, type: 2}
+  - {fileID: 2100000, guid: 3ec86473f1056c543a1a9dd92102c7f8, type: 2}
+  isTarget: 0
+  currentMtl: []
   isDecteced: 0
   LeftHandWeapon: {fileID: 6995037820952417372}
   RightHandWeapon: {fileID: 7376331169877251308}
@@ -1568,7 +1587,7 @@ NavMeshAgent:
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
-  m_AngularSpeed: 120
+  m_AngularSpeed: 180
   m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1

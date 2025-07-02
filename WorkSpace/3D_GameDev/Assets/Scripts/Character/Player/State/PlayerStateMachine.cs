@@ -39,6 +39,8 @@ public class PlayerStateMachine : CharacterBase
     //공통 변수
     public Animator animator;
     public int stateNum;
+    public SkinnedMeshRenderer[] playerSkin; //플레이어의 4가지 스킨들
+    public Material deadMtl;
 
     [Header("오디오")]
     //오디오
@@ -69,7 +71,7 @@ public class PlayerStateMachine : CharacterBase
     public override CharacterStats Stat => stat;
     public PlayerStats playerStat => stat;
 
-    public Targeter targeter;
+    public PlayerTargeter targeter;
 
     /************************** End **************************/
 
@@ -153,8 +155,8 @@ public class PlayerStateMachine : CharacterBase
         // 게임 오버 처리
         isDead = true;
         SwitchState(new PlayerDeadState(this));
-
     }
+
 
     public void OnJumpPressed()
     {

@@ -1,0 +1,12 @@
+{
+    "maxHP": 100.0,
+    "currentHP": 100.0,
+    "ATK": 1000.0,
+    "DEF": 5.0,
+    "level": 1,
+    "currentExp": 0.0,
+    "maxStamina": 100.0,
+    "currentStamina": 100.0,
+    "statPoint": 0,
+    "StageName": "001_Main"
+}

@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class Targeter : MonoBehaviour
+public class PlayerTargeter : MonoBehaviour
 {
     public SphereCollider SphereCollider;
     [SerializeField] private float TargetRadius = 6f;
-    public List<Target> targets = new List<Target>(); //바라볼 타겟 리스트
+    public LinkedList<Target> targets = new LinkedList<Target>(); //바라볼 타겟 리스트
 
     public Target currentTarget;
 
@@ -32,14 +33,21 @@ public class Targeter : MonoBehaviour
         if(targets.Count == 0)
             return false;
 
-        currentTarget = targets[0]; //가장 첫번째 요소를 현재 타겟으로
+        currentTarget = targets.First.Value; //가장 첫번째 요소를 현재 타겟으로
+        currentTarget.GetComponent<Enemy>().isTarget = true;
+        currentTarget.GetComponent<Enemy>().ChangeTargettMtl();
 
         return true;
     }
 
     public void CanCel()
     {
-        currentTarget = null;
+        if (currentTarget != null)
+        {
+            currentTarget.GetComponent<Enemy>().isTarget = false;
+            currentTarget.GetComponent<Enemy>().ChangeDefaultMtl();
+            currentTarget = null;
+        }
     }
 
     public void RemoveTarget(Target target)
@@ -47,7 +55,6 @@ public class Targeter : MonoBehaviour
         if (targets.Contains(target))
         {
             targets.Remove(target);
-
             if (currentTarget == target)
             {
                 CanCel();
@@ -63,7 +70,7 @@ public class Targeter : MonoBehaviour
         if (target == null)
             return;
 
-        targets.Add(target);
+        targets.AddLast(target);
 
         CharacterBase character = target.GetComponent<CharacterBase>();
         if (character != null)

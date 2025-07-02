@@ -3,16 +3,22 @@ using UnityEngine;
 
 public class Stage1 : Stage
 {
-    private GameObject Wall;
+    public GameObject Wall;
 
     protected override void Start()
     {
         base.Start();
     }
+
+    protected override void Update()
+    {
+        base.Update();
+    }
+
     public override void StageClearCondition()
     {
         int currentLevel = Player.Instance.playerStateMachine.playerStat.level.currentLevel;
-        if (currentLevel > clearLevel)
+        if (currentLevel >= clearLevel)
         {
             Wall.SetActive(false);
             Portal.SetActive(true);

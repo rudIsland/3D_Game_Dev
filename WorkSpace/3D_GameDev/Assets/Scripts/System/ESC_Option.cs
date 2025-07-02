@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ESC_Option : MonoBehaviour
 {
@@ -48,6 +49,19 @@ public class ESC_Option : MonoBehaviour
     public void InGameEXIT()
     {
         ESCPanel.SetActive(false);
+        Time.timeScale = 1.0f;
+        SaveSystem.SaveGameData(); //플레이어의 현재 상태로 게임 저장
+
+        if (Player.Instance != null)
+            Destroy(Player.Instance.gameObject);
+
+        if (UIManager.Instance != null)
+            Destroy(UIManager.Instance.gameObject);
+
+        if (StageManager.Instance != null)
+            Destroy(StageManager.Instance.gameObject);
+
+        SceneManager.LoadScene("0_Start", LoadSceneMode.Single);
     }
 
 }
