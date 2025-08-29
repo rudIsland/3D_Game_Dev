@@ -5,14 +5,25 @@
 
 ### 🗓️ Development Time : 25.04.05 ~ 25.06.18
 
-![슬라이드2](./Document/Images/슬라이드2.jpeg)
-
+[📄 프로젝트 보고서 PDF](./Document/3D_RPG_포트폴리오.pdf)
+<p align="center">
+  <img src="./Document/Images/3D_RPG_6.jpg" alt="슬라이드4" width="600">
+</p>
+<p align="center">
+  <img src="./Document/Images/3D_RPG_1.jpg" alt="3D_RPG_1" width="600">
+</p>
+<p align="center">
+  <img src="./Document/Images/3D_RPG_4.jpg" alt="슬라이드3" width="600">
+</p>
+<p align="center">
+  <img src="./Document/Images/3D_RPG_3.jpg" alt="슬라이드4" width="600">
+</p>
 
 ## 📝 Postmortem of Game Development
 이번 프로젝트는 단순히 게임 제작이라기보다 **학습과 성장**에 초점이 맞춰진 작업이었습니다.  
 기존 온라인 강의 기반으로 시작했지만, 이후에는 스스로 새로운 기능과 기술을 탐구하며 확장했습니다.
 
-- **AI** : 적 행동의 다양성을 위해 **Behavior Tree** 학습 및 구현  
+- **AI** : 적 행동의 다양성을 위해 **Behavior Tree** 학습 및 구현
 - **수학** : 공격 로직 구현을 위해 **벡터, 내적, 회전** 개념 학습  
 - **그래픽스** : 시각적 몰입감을 위해 **RimLight Shader**와 **Dissolve Shader** 제작 및 적용  
 
