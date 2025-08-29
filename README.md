@@ -5,6 +5,9 @@
 
 ### 🗓️ Development Time : 25.04.05 ~ 25.06.18
 
+## 🎥 Gameplay Video
+[▶️ 게임 플레이 영상 보기](https://www.youtube.com/watch?v=bncWZRMoomo)
+
 [📄 프로젝트 보고서 PDF](./Document/3D_RPG_포트폴리오.pdf)
 <p align="center">
   <img src="./Document/Images/3D_RPG_6.jpg" alt="슬라이드4" width="600">
