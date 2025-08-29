@@ -5,8 +5,7 @@
 
 ### 🗓️ Development Time : 25.04.05 ~ 25.06.18
 
-[📄 프로젝트 보고서 PDF]
-(./Document/Images/슬라이드2.JPG)
+![슬라이드2](./Document/Images/슬라이드2.jpeg)
 
 
 ## 📝 Postmortem of Game Development
