@@ -5,7 +5,9 @@
 
 ### 🗓️ Development Time : 25.04.05 ~ 25.06.18
 
-[📄 프로젝트 보고서 PDF](./Document/3D_RPG_포트폴리오.pdf)
+[📄 프로젝트 보고서 PDF]
+(./Document/Image/슬라이드2.jpeg)
+
 
 ## Postmortem of Game Development
 게임 제작에 대해 많은 고민이 생기던 기간이였습니다.
