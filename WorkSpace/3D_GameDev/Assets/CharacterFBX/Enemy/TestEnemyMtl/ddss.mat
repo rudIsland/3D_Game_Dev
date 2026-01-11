@@ -130,7 +130,7 @@ Material:
     - _GlossyReflections: 0
     - _MetalicFloat: 0
     - _Metallic: 0
-    - _NoiseAmount: 0.07
+    - _NoiseAmount: 0
     - _NormalStr: 1
     - _OcclusionStrength: 1
     - _OutLineWidth: 1.2

@@ -1,0 +1,101 @@
+using System;
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+public class PlayerInputReader : MonoBehaviour, PlayerControls.IPlayerActions
+{
+
+    private PlayerControls controls;
+
+    public Vector2 lookInput; //바라보기 방향 벡터
+    public Vector2 moveInput; //움직일 방향 벡터 -1 or 1
+    public bool isMove = false;
+
+    public bool onSprint = false;
+    public bool isAttack = false;
+
+    public event Action jumpPressed;
+
+    public event Action TargetPressed;
+    public bool tabToggleProtect = true;
+
+    void Start()
+    {
+        // Input System 초기화
+        controls = new PlayerControls();
+        controls.Player.SetCallbacks(this);
+
+        controls.Player.Enable();
+    }
+
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        if (!context.started) return;
+
+        jumpPressed?.Invoke();
+ 
+    }
+
+    public void OnLook(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            lookInput = context.ReadValue<Vector2>();
+           // Debug.Log($"바라보기 입력: {lookInput}");
+        }
+    }
+
+    public void OnMove(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            moveInput = context.ReadValue<Vector2>();
+            isMove = true;
+        }
+        else if (context.canceled)
+        {
+            moveInput = Vector2.zero; // 입력 중지 시 초기화
+            isMove = false;
+        }
+    }
+
+    public void OnAttack(InputAction.CallbackContext context)
+    {
+        if(context.started)
+        {
+            isAttack = true;
+        }
+    }
+
+    public void OnSprint(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            // 스프린트 활성화
+            onSprint = true;
+            //Debug.Log("스프린트 시작");
+        }
+        else if (context.canceled)
+        {
+            // 스프린트 비활성화
+            onSprint = false;
+            //Debug.Log("스프린트 종료");
+        }
+    }
+
+
+    public void OnTarget(InputAction.CallbackContext context)
+    {
+        //키입력이 여러번 들어와서 상태가 바로 변환되어버려 started와 bool로 2중으로 막음.
+        if (context.started)
+        {
+            if (!tabToggleProtect) return;
+            tabToggleProtect = false;
+            TargetPressed?.Invoke();
+        }
+        else if (context.canceled)
+        {
+            tabToggleProtect = true; // 키 뗀 다음에만 다시 토글 가능
+        }
+    }
+}
