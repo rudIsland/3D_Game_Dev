@@ -6,6 +6,13 @@ public class EnemyStateMachine : MonoBehaviour
     public EnemyState currentState { get; private set; }
     public Enemy enemy;
 
+    // 모든 적이 공통으로 가질 상태들 (추상화)
+    public EnemyState deadState;
+    public EnemyState idleState;
+    public EnemyState attackState;
+    public EnemyState hitState;
+    public EnemyState moveState;
+
     public void Awake()
     {
         enemy = GetComponent<Enemy>();
@@ -16,17 +23,15 @@ public class EnemyStateMachine : MonoBehaviour
         enemy.SetupStateMachine(this);
     }
 
-    public void Initalize(EnemyState state) //현재 상태 등록
+    public void InitalizeState(EnemyState state) //현재 상태 등록
     {
         currentState = state;
         currentState?.Enter();
     }
 
-    public void SwitchState(EnemyState newState)
+    public void SwitchState(EnemyState newState)    //상태변환
     {
         if (currentState == newState) return;
-
-        //현재 상태를 나가고 새 상태를 받고나서 시작 실행
         currentState?.Exit();
         currentState = newState;
         currentState?.Enter();
@@ -36,6 +41,7 @@ public class EnemyStateMachine : MonoBehaviour
     public void Update()
     {
         currentState?.Tick(Time.deltaTime);
+
     }
 
 }

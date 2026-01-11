@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb27920e20ef99141a901be0897e061d, type: 3}
+  m_Name: MutantStat
+  m_EditorClassIdentifier: 
+  maxHP: 250
+  attack: 15
+  defense: 10
+  _DetectRange: 8
+  _AttackRange: 1
+  _MoveSpeed: 1
+  _AngularSpeed: 5
+  baseDeathEXP: 1300
+  expGrowthPerLevel: 150
+  hpGrowthPerLevel: 40
+  atkGrowthPerLevel: 2.5
+  defGrowthPerLevel: 1.5
+  SwingAttack: {fileID: 11400000, guid: a18b5c2042da48847a6856ffa27d53cf, type: 2}
+  PunchAttack: {fileID: 11400000, guid: 02aa4335a8e44a24f8cd5ca3bec1f33f, type: 2}
+  JumpAttack: {fileID: 11400000, guid: 470a68d71e2f04c45b4436df810f765a, type: 2}
+  _JumpAttackRange: 2
+  _SwingAttackRange: 1.5
+  _PunchAttackRange: 0.75
+  _WalkRange: 5
+  _WalkSpeed: 1.4
+  _RunRange: 8
+  _RunSpeed: 2.4
