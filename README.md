@@ -3,7 +3,7 @@
 각 스테이지(맵)마다 여러 몬스터가 스폰되고, 이를 처치하며 레벨업을 통해 스탯상승을 할 수 있습니다.
 특정 레벨을 달성하면 맵 어딘가에 포탈이 생성되고 다음 스테이지로 넘어갈 수 있습니다.
 
-### 🗓️ Development Time : 25.04.05 ~ 25.06.18
+### 🗓️ Development Time : 25.04.05 ~ 25.06.18 / Refactoring: 25.12.09 ~ 26.01.11
 
 ## 🎥 Gameplay Video
 [▶️ 게임 플레이 영상 보기](https://www.youtube.com/watch?v=bncWZRMoomo)
