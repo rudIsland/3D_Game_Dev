@@ -1,36 +1,31 @@
-# 3D TPS형식 RPG제작
-## 🕹️ Game Description
-각 스테이지(맵)마다 여러 몬스터가 스폰되고, 이를 처치하며 레벨업을 통해 스탯상승을 할 수 있습니다.
-특정 레벨을 달성하면 맵 어딘가에 포탈이 생성되고 다음 스테이지로 넘어갈 수 있습니다.
+📌 GitHub 커밋 및 README용 요약
+[Title]
+refactor: 3D 게임 시스템 아키텍처 개편 및 성능 최적화 (45 FPS → 70 FPS)
 
-### 🗓️ Development Time : 25.04.05 ~ 25.06.18
+[Commit Message / Description]
+1. AI 및 전투 시스템 리팩토링
 
-## 🎥 Gameplay Video
-[▶️ 게임 플레이 영상 보기](https://www.youtube.com/watch?v=bncWZRMoomo)
+AI 구조 변경: Behavior Tree를 FSM(State 패턴)으로 교체하여 유지보수성 및 공격 패턴 확장성 강화.
 
-[📄 프로젝트 보고서 PDF](./Document/3D_RPG_포트폴리오.pdf)
-<p align="center">
-  <img src="./Document/Images/3D_RPG_6.jpg" alt="슬라이드4" width="600">
-</p>
-<p align="center">
-  <img src="./Document/Images/3D_RPG_1.jpg" alt="3D_RPG_1" width="600">
-</p>
-<p align="center">
-  <img src="./Document/Images/3D_RPG_4.jpg" alt="슬라이드3" width="600">
-</p>
-<p align="center">
-  <img src="./Document/Images/3D_RPG_3.jpg" alt="슬라이드4" width="600">
-</p>
+데미지 로직 고도화: 비율 기반 방어력 감쇄 공식 적용 및 부위별 타격 판정 구현.
 
-## 📝 Postmortem of Game Development
-이번 프로젝트는 단순히 게임 제작이라기보다 **학습과 성장**에 초점이 맞춰진 작업이었습니다.  
-기존 온라인 강의 기반으로 시작했지만, 이후에는 스스로 새로운 기능과 기술을 탐구하며 확장했습니다.
+레벨 스케일링: 플레이어 성장에 따른 몬스터 스탯 동적 업데이트 로직 추가.
 
-- **AI** : 적 행동의 다양성을 위해 **Behavior Tree** 학습 및 구현
-- **수학** : 공격 로직 구현을 위해 **벡터, 내적, 회전** 개념 학습  
-- **그래픽스** : 시각적 몰입감을 위해 **RimLight Shader**와 **Dissolve Shader** 제작 및 적용  
+2. 데이터 관리 및 최적화 (Data-Driven)
 
-이를 통해 프로그래밍, 수학, 그래픽스 등 여러 분야의 기초를 경험하며 개발자로서의 성장 가능성과 부족한 점을 동시에 확인할 수 있었습니다.
+SO 기반 데이터 설계: 플레이어/몬스터/스테이지 데이터를 ScriptableObject로 에셋화하여 관리.
 
-## 📎 Reference
-- [Coloso 온라인 강의: Technical Artist 박성국](https://coloso.co.kr/products/technicalartist-parksungkuk) (3D 제작 부분 참고)
+오브젝트 풀링(Object Pooling): 몬스터 및 이펙트 재사용 구조를 통해 메모리 부하 감소 및 프레임 드랍 방지.
+
+JSON 저장 시스템: SO 데이터를 JSON으로 물리 저장하고, 빌드 인덱스를 활용한 스마트 이어하기 기능 구현.
+
+3. 성능 및 UI/UX 개선
+
+성능 향상: 기존 45~49 FPS에서 평균 70 FPS로 최적화 성공 (약 50% 향상).
+
+Billboard UI: 카메라 방향에 고정되는 몬스터 체력바 구현 및 이벤트 기반 UI 갱신 시스템 구축.
+
+데이터 무결성: 새 게임 시작 시 ResetFromPreset을 통한 데이터 초기화 버그 해결.
+
+[README.md 요약 한 줄]
+"AI 기반 아키텍처 리팩토링을 통해 코드 유지보수성을 극대화하고, 오브젝트 풀링 및 데이터 최적화로 평균 프레임을 50% 향상시킨 프로젝트입니다."
