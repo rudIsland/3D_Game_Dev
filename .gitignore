@@ -26,6 +26,9 @@
 # Visual Studio cache directory
 .vs/
 
+# Visual Studio Code generated settings
+/WorkSpace/Refact_3DGame/.vscode/
+
 # Gradle cache directory
 .gradle/
 
@@ -35,6 +38,7 @@ ExportedObj/
 *.csproj
 *.unityproj
 *.sln
+*.slnx
 *.suo
 *.tmp
 *.user
