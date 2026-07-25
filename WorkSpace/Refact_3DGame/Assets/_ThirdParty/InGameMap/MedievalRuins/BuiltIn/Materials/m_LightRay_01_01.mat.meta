@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 62bcf52c21d68ce458d77c845b2dad81
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 258405
+  packageName: Medieval Fantasy Ruins - Dark Forest Environment
+  packageVersion: 1.3
+  assetPath: Assets/ScansFactory/MedievalRuins/BuiltIn/Materials/m_LightRay_01_01.mat
+  uploadId: 790534

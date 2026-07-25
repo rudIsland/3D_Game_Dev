@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 92242a611f1aa5d48a167bd86568b226
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 15600000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 258405
+  packageName: Medieval Fantasy Ruins - Dark Forest Environment
+  packageVersion: 1.3
+  assetPath: Assets/ScansFactory/MedievalRuins/URP/TerrainData/Terrain/MedievalTerrainData/MedievalTerrainData.asset
+  uploadId: 790534

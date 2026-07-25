@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: M_WaterShader_BuiltIn
+  m_Shader: {fileID: 4800000, guid: ee604e0f73aa536489845642199b9226, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _WaveNormal:
+        m_Texture: {fileID: 2800000, guid: 6d25f8fe3d58e1f4e8f09eb0fd96a0bb, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _texcoord:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _ChromaticAberration: 0.026
+    - _Refraction: 1.03
+    - _Smoothness: 5
+    - _WavOffsetMul01: 0.02
+    - _WavOffsetMul02: -0.02
+    - __dirty: 0
+    m_Colors:
+    - _WaterCol: {r: 0.2570731, g: 0.32548776, b: 0.33999994, a: 0.7607843}
+    - _Wave01_Tiling: {r: 2, g: 2, b: 0, a: 0}
+    - _Wave02_Tiling: {r: 2, g: 2, b: 0, a: 0}
+  m_BuildTextureStacks: []

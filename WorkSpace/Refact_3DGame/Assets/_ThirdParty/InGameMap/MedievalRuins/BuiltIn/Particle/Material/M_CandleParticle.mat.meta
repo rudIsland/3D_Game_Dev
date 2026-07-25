@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 775f03e7a37dc6141a3cc7483caf581f
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 258405
+  packageName: Medieval Fantasy Ruins - Dark Forest Environment
+  packageVersion: 1.3
+  assetPath: Assets/ScansFactory/MedievalRuins/BuiltIn/Particle/Material/M_CandleParticle.mat
+  uploadId: 790534

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c594f149f369fb74b8838c29d4573d0e
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4890085278179872738
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 258405
+  packageName: Medieval Fantasy Ruins - Dark Forest Environment
+  packageVersion: 1.3
+  assetPath: Assets/ScansFactory/MedievalRuins/BuiltIn/Demo/Overview_LightSettings.lighting
+  uploadId: 790534
