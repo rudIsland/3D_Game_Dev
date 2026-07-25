@@ -92,3 +92,38 @@ Assets/Viking Village/Textures/Buildings/wood_tiled_01_n.tif
 # Lienece
 GooglePlayTangle.cs
 Assets/Plugins/UnityPurchasing/GooglePlayTangle.cs
+# Unity project under WorkSpace/Refact_3DGame
+/WorkSpace/Refact_3DGame/.utmp/
+/WorkSpace/Refact_3DGame/[Oo]bj/
+/WorkSpace/Refact_3DGame/[Bb]uild/
+/WorkSpace/Refact_3DGame/[Bb]uilds/
+/WorkSpace/Refact_3DGame/[Uu]ser[Ss]ettings/
+/WorkSpace/Refact_3DGame/[Mm]emory[Cc]aptures/
+/WorkSpace/Refact_3DGame/[Rr]ecordings/
+
+# Generated Unity files missing from the existing rules
+*.log
+*.blend1
+*.blend1.meta
+*.DotSettings.user
+mono_crash.*
+*.unitypackage.meta
+/WorkSpace/Refact_3DGame/ServerData/
+/WorkSpace/Refact_3DGame/[Aa]ssets/Plugins/Editor/JetBrains*
+/WorkSpace/Refact_3DGame/[Aa]ssets/[Ss]treamingAssets/aa*
+/WorkSpace/Refact_3DGame/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/link.xml*
+/WorkSpace/Refact_3DGame/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+/WorkSpace/Refact_3DGame/[Aa]ssets/[Aa]ddressables_[Tt]emp*
+/WorkSpace/Refact_3DGame/[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Flow/UnitOptions.db
+/WorkSpace/Refact_3DGame/[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Flow/UnitOptions.db.meta
+/WorkSpace/Refact_3DGame/[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers
+/WorkSpace/Refact_3DGame/[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers.meta
+/WorkSpace/Refact_3DGame/[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+/WorkSpace/Refact_3DGame/[Aa]ssets/[Ss]ceneDependencyCache*
+
+# Local editor and operating system files
+.idea/
+.fleet/
+.DS_Store
+Thumbs.db
+Desktop.ini
