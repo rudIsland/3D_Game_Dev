@@ -193,7 +193,7 @@ MonoBehaviour:
   m_BlendUpdateMethod: 1
   m_DefaultBlend:
     m_Style: 1
-    m_Time: 2
+    m_Time: 0.35
     m_CustomCurve:
       serializedVersion: 2
       m_Curve: []
@@ -243,7 +243,6 @@ MonoBehaviour:
   m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
-  m_Version: 2
   m_TaaSettings:
     m_Quality: 3
     m_FrameInfluence: 0.1
@@ -251,6 +250,7 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+  m_Version: 2
 --- !u!1 &1472815476280435897
 GameObject:
   m_ObjectHideFlags: 0
@@ -306,7 +306,7 @@ MonoBehaviour:
   m_LookAt: {fileID: 3138281932123564919}
   m_Follow: {fileID: 4821794257717421849}
   m_Lens:
-    FieldOfView: 25
+    FieldOfView: 42
     OrthographicSize: 10
     NearClipPlane: 0.1
     FarClipPlane: 1000
@@ -553,18 +553,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd6043bde05a7fc4cba197d06915c1e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Damping: {x: 0.2, y: 0.6, z: 0.3}
-  ShoulderOffset: {x: 0.5, y: -0.4, z: 0}
-  VerticalArmLength: 1.6
-  CameraSide: 0.545
-  CameraDistance: 6
+  Damping: {x: 0.12, y: 0.2, z: 0.12}
+  ShoulderOffset: {x: 0.55, y: 0.1, z: 0}
+  VerticalArmLength: 1.5
+  CameraSide: 0.55
+  CameraDistance: 5
   CameraCollisionFilter:
     serializedVersion: 2
     m_Bits: 0
   IgnoreTag: 
-  CameraRadius: 0.674
+  CameraRadius: 0.3
   DampingIntoCollision: 0
-  DampingFromCollision: 2
+  DampingFromCollision: 0.4
 --- !u!114 &8404458252699661191
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -859,9 +859,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_BindingMode: 4
   m_FollowOffset: {x: 0, y: 1, z: -5}
-  m_XDamping: 1
-  m_YDamping: 1
-  m_ZDamping: 1
+  m_XDamping: 0.15
+  m_YDamping: 0.25
+  m_ZDamping: 0.15
   m_AngularDampingMode: 0
   m_PitchDamping: 0
   m_YawDamping: 0
@@ -919,8 +919,8 @@ MonoBehaviour:
   m_VerticalDamping: 0
   m_ScreenX: 0.5
   m_ScreenY: 0.5
-  m_DeadZoneWidth: 0
-  m_DeadZoneHeight: 0
+  m_DeadZoneWidth: 0.05
+  m_DeadZoneHeight: 0.05
   m_SoftZoneWidth: 0.8
   m_SoftZoneHeight: 0.8
   m_BiasX: 0
@@ -936,6 +936,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7543557603021912725}
   - component: {fileID: 3289036845528397202}
+  - component: {fileID: 4287663059037732000}
   m_Layer: 6
   m_Name: FreeLook Camera
   m_TagString: Untagged
@@ -983,7 +984,7 @@ MonoBehaviour:
   m_Follow: {fileID: 4821794257717421849}
   m_CommonLens: 1
   m_Lens:
-    FieldOfView: 40
+    FieldOfView: 52
     OrthographicSize: 10
     NearClipPlane: 0.1
     FarClipPlane: 150
@@ -1003,8 +1004,8 @@ MonoBehaviour:
   m_YAxis:
     Value: 0.5
     m_SpeedMode: 0
-    m_MaxSpeed: 1
-    m_AccelTime: 0.2
+    m_MaxSpeed: 1.1
+    m_AccelTime: 0.1
     m_DecelTime: 0.1
     m_InputAxisName: Mouse Y
     m_InputAxisValue: 0
@@ -1027,9 +1028,9 @@ MonoBehaviour:
   m_XAxis:
     Value: 0
     m_SpeedMode: 0
-    m_MaxSpeed: 220
-    m_AccelTime: 0.1
-    m_DecelTime: 0.3
+    m_MaxSpeed: 280
+    m_AccelTime: 0.08
+    m_DecelTime: 0.08
     m_InputAxisName: Mouse X
     m_InputAxisValue: 0
     m_InvertInput: 0
@@ -1055,17 +1056,47 @@ MonoBehaviour:
   m_BindingMode: 4
   m_SplineCurvature: 0.2
   m_Orbits:
-  - m_Height: 2.5
+  - m_Height: 2.6
     m_Radius: 4
-  - m_Height: 1
-    m_Radius: 5
-  - m_Height: 0
-    m_Radius: 4
+  - m_Height: 1.4
+    m_Radius: 4.5
+  - m_Height: 0.5
+    m_Radius: 3.8
   m_LegacyHeadingBias: 3.4028235e+38
   m_Rigs:
   - {fileID: 4519540334242155603}
   - {fileID: 2160994774630671004}
   - {fileID: 7907683009909267052}
+--- !u!114 &4287663059037732000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7024859343137567680}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e501d18bb52cf8c40b1853ca4904654f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Cinemachine::Cinemachine.CinemachineCollider
+  m_CollideAgainst:
+    serializedVersion: 2
+    m_Bits: 1
+  m_IgnoreTag: 
+  m_TransparentLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_MinimumDistanceFromTarget: 0.2
+  m_AvoidObstacles: 1
+  m_DistanceLimit: 0
+  m_MinimumOcclusionTime: 0
+  m_CameraRadius: 0.25
+  m_Strategy: 0
+  m_MaximumEffort: 4
+  m_SmoothingTime: 0.05
+  m_Damping: 0.15
+  m_DampingWhenOccluded: 0.05
+  m_OptimalTargetDistance: 0
 --- !u!1 &8062054971680361707
 GameObject:
   m_ObjectHideFlags: 0
@@ -1123,9 +1154,7 @@ MonoBehaviour:
   m_AnimatedTarget: {fileID: 5056240533305867661}
   m_LayerIndex: 0
   m_ShowDebugText: 0
-  m_ChildCameras:
-  - {fileID: 3289036845528397202}
-  - {fileID: 4035464656028431212}
+  m_ChildCameras: []
   m_Instructions:
   - m_FullHash: 585382737
     m_VirtualCamera: {fileID: 3289036845528397202}
@@ -1242,9 +1271,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_BindingMode: 4
   m_FollowOffset: {x: 0, y: 1, z: -5}
-  m_XDamping: 1
-  m_YDamping: 1
-  m_ZDamping: 1
+  m_XDamping: 0.15
+  m_YDamping: 0.25
+  m_ZDamping: 0.15
   m_AngularDampingMode: 0
   m_PitchDamping: 0
   m_YawDamping: 0
@@ -1302,8 +1331,8 @@ MonoBehaviour:
   m_VerticalDamping: 0
   m_ScreenX: 0.5
   m_ScreenY: 0.55
-  m_DeadZoneWidth: 0
-  m_DeadZoneHeight: 0
+  m_DeadZoneWidth: 0.05
+  m_DeadZoneHeight: 0.05
   m_SoftZoneWidth: 0.8
   m_SoftZoneHeight: 0.8
   m_BiasX: 0
@@ -1369,9 +1398,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_BindingMode: 4
   m_FollowOffset: {x: 0, y: 1, z: -5}
-  m_XDamping: 1
-  m_YDamping: 1
-  m_ZDamping: 1
+  m_XDamping: 0.15
+  m_YDamping: 0.25
+  m_ZDamping: 0.15
   m_AngularDampingMode: 0
   m_PitchDamping: 0
   m_YawDamping: 0
@@ -1429,8 +1458,8 @@ MonoBehaviour:
   m_VerticalDamping: 0
   m_ScreenX: 0.5
   m_ScreenY: 0.6
-  m_DeadZoneWidth: 0
-  m_DeadZoneHeight: 0
+  m_DeadZoneWidth: 0.05
+  m_DeadZoneHeight: 0.05
   m_SoftZoneWidth: 0.8
   m_SoftZoneHeight: 0.8
   m_BiasX: 0
@@ -1952,6 +1981,11 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: 3e0b1f3b43b625e43bbda773d09bd130, type: 2}
+    - target: {fileID: 5866666021909216657, guid: 7954cdbd4d66f3648837abb35c3f8e35,
+        type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6240733294840144465, guid: 7954cdbd4d66f3648837abb35c3f8e35,
         type: 3}
       propertyPath: m_Layer
@@ -2086,10 +2120,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1861715782741717464}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -2131,8 +2165,8 @@ MonoBehaviour:
   saveData: {fileID: 11400000, guid: 6f38c95c7fe809446a4e3eba7dcb0101, type: 2}
   moveSpeed: 2.5
   sprintSpeed: 5.333
-  rotateSpeed: 10
-  animationDampTime: 0.1
+  rotateSpeed: 14
+  animationDampTime: 0.08
   isJumping: 0
   Attacking: 0
   isHitting: 0
@@ -2141,12 +2175,12 @@ MonoBehaviour:
   verticallDir: {x: 0, y: 0, z: 0}
   GroundedOffset: 0.15
   GroundedRadius: 0.3
-  jumpHeight: 1.4
-  JumpTimeout: 2
-  FallTimeout: 0.15
+  jumpHeight: 1.6
+  JumpTimeout: 0.15
+  FallTimeout: 0.1
   jumpTimeoutDelta: 0
   fallTimeoutDelta: 0
-  gravity: -17
+  gravity: -22
   verticalVelocity: 0
   terminalVelocity: -53
   Grounded: 1
@@ -2196,7 +2230,6 @@ CharacterController:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -2266,7 +2299,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
     m_ActionId: 6bc1aaf4-b110-4ff7-891e-5b9fe6f32c4d
-    m_ActionName: Player/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d,/Keyboard/upArrow,/Keyboard/downArrow,/Keyboard/leftArrow,/Keyboard/rightArrow]
+    m_ActionName: 'Player/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d,/Keyboard/upArrow,/Keyboard/downArrow,/Keyboard/leftArrow,/Keyboard/rightArrow]'
   - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 668001061297150597}
@@ -2282,7 +2315,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
     m_ActionId: 2690c379-f54d-45be-a724-414123833eb4
-    m_ActionName: Player/Look[/Mouse/delta]
+    m_ActionName: 'Player/Look[/Mouse/delta]'
   - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 668001061297150597}
@@ -2298,7 +2331,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
     m_ActionId: 8c4abdf8-4099-493a-aa1a-129acec7c3df
-    m_ActionName: Player/Jump[/Keyboard/space]
+    m_ActionName: 'Player/Jump[/Keyboard/space]'
   - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 668001061297150597}
@@ -2314,7 +2347,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
     m_ActionId: 980e881e-182c-404c-8cbf-3d09fdb48fef
-    m_ActionName: Player/Sprint[/Keyboard/leftShift]
+    m_ActionName: 'Player/Sprint[/Keyboard/leftShift]'
   - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 668001061297150597}
@@ -2330,7 +2363,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
     m_ActionId: c2a94265-305d-4e61-968a-098b8ee9da15
-    m_ActionName: Player/Attack[/Mouse/leftButton]
+    m_ActionName: 'Player/Attack[/Mouse/leftButton]'
   - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 668001061297150597}
@@ -2346,7 +2379,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
     m_ActionId: 5a8dd4ce-de96-42f7-a7c2-0a53def9f631
-    m_ActionName: Player/Target[/Keyboard/tab]
+    m_ActionName: 'Player/Target[/Keyboard/tab]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
