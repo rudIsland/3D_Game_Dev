@@ -574,6 +574,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Paladin_J_Nordstrom_Sword
       objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: 7954cdbd4d66f3648837abb35c3f8e35,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: e93d1c8e5b73ae149ae568de3571cf1f, type: 2}
+    - target: {fileID: 5866666021909216657, guid: 7954cdbd4d66f3648837abb35c3f8e35,
+        type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -582,6 +592,12 @@ PrefabInstance:
 --- !u!4 &247913599 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 7954cdbd4d66f3648837abb35c3f8e35,
+    type: 3}
+  m_PrefabInstance: {fileID: 247913598}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &247913600 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 7954cdbd4d66f3648837abb35c3f8e35,
     type: 3}
   m_PrefabInstance: {fileID: 247913598}
   m_PrefabAsset: {fileID: 0}
@@ -656,7 +672,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 276505471}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.0895311, y: -0.27530143, z: 0.025760025, w: 0.9568332}
+  m_LocalRotation: {x: 0.093163304, y: -0.000000012028256, z: 0.0000000011254869,
+    w: 0.9956509}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -674,6 +691,7 @@ GameObject:
   m_Component:
   - component: {fileID: 305077230}
   - component: {fileID: 305077229}
+  - component: {fileID: 305077231}
   m_Layer: 0
   m_Name: DirectionalLight
   m_TagString: Untagged
@@ -761,6 +779,35 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &305077231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 305077228}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalLightData
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_CustomShadowLayers: 0
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
 --- !u!1 &307015477
 GameObject:
   m_ObjectHideFlags: 0
@@ -1074,8 +1121,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519073570}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.08953114, y: -0.2753015, z: 0.025760029, w: 0.9568332}
-  m_LocalPosition: {x: 1.8069223, y: 2.35, z: -11.88011}
+  m_LocalRotation: {x: 0.09316332, y: 0.00000009972315, z: -0.000000009331122, w: 0.9956509}
+  m_LocalPosition: {x: 0, y: 2.35, z: -12.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1233,6 +1280,54 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 545657872}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &600374218
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 600374220}
+  - component: {fileID: 600374219}
+  m_Layer: 0
+  m_Name: WorldObjectManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &600374219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 600374218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ff34200066bb0e459eda47c9909cca5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.World.WorldObjectManager
+  spawnSettings:
+  - {fileID: 11400000, guid: ed9ba383143ec9046a9eff29d32441a4, type: 2}
+  activeCount: 0
+  poolUsage: []
+--- !u!4 &600374220
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 600374218}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &626820251
 GameObject:
   m_ObjectHideFlags: 3
@@ -1306,7 +1401,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9384ab8608cdc3d479fe89cd51eed48f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Cinemachine::Cinemachine.CinemachineOrbitalTransposer
-  m_BindingMode: 5
+  m_BindingMode: 4
   m_FollowOffset: {x: 0, y: 0.8, z: -3.4}
   m_XDamping: 1
   m_YDamping: 1
@@ -2150,7 +2245,7 @@ MonoBehaviour:
     m_RecenteringTime: 2
     m_LegacyHeadingDefinition: -1
     m_LegacyVelocityFilterStrength: -1
-  m_BindingMode: 5
+  m_BindingMode: 4
   m_SplineCurvature: 0.2
   m_Orbits:
   - m_Height: 1.6
@@ -2173,7 +2268,7 @@ Transform:
   m_GameObject: {fileID: 1028451433}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.8069223, y: 2.3, z: -2.8801098}
+  m_LocalPosition: {x: 0, y: 2.3, z: -3.3999996}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2294,6 +2389,52 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1062341411}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1081047388
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1081047390}
+  - component: {fileID: 1081047389}
+  m_Layer: 0
+  m_Name: WorldObjectDemoSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1081047389
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1081047388}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d4211ea2668f004ab2ca6ee8bbc5b25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Dev.WorldDemo.WorldObjectDemoSpawner
+  worldObjectManager: {fileID: 600374219}
+  spawnSettings: {fileID: 11400000, guid: ed9ba383143ec9046a9eff29d32441a4, type: 2}
+--- !u!4 &1081047390
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1081047388}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1120283124
 GameObject:
   m_ObjectHideFlags: 0
@@ -2721,11 +2862,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9384ab8608cdc3d479fe89cd51eed48f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Cinemachine::Cinemachine.CinemachineOrbitalTransposer
-  m_BindingMode: 5
+  m_BindingMode: 4
   m_FollowOffset: {x: 0, y: 0.8, z: -3.4}
-  m_XDamping: 1
-  m_YDamping: 1
-  m_ZDamping: 1
+  m_XDamping: 0
+  m_YDamping: 0
+  m_ZDamping: 0
   m_AngularDampingMode: 0
   m_PitchDamping: 0
   m_YawDamping: 0
@@ -2846,7 +2987,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1302424112}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.110793605, y: -0.27466026, z: 0.031877693, w: 0.9546048}
+  m_LocalRotation: {x: 0.11528841, y: 0.0000000074009017, z: -8.589657e-10, w: 0.9933321}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2927,7 +3068,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9384ab8608cdc3d479fe89cd51eed48f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Cinemachine::Cinemachine.CinemachineOrbitalTransposer
-  m_BindingMode: 5
+  m_BindingMode: 4
   m_FollowOffset: {x: 0, y: 0.8, z: -3.4}
   m_XDamping: 1
   m_YDamping: 1
@@ -3371,6 +3512,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1699705000}
   - component: {fileID: 1699705001}
+  - component: {fileID: 1699705002}
   m_Layer: 0
   m_Name: PlayerRoot
   m_TagString: Untagged
@@ -3393,7 +3535,6 @@ Transform:
   m_Children:
   - {fileID: 247913599}
   - {fileID: 1914686415}
-  - {fileID: 1901413413}
   m_Father: {fileID: 223694693}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!143 &1699705001
@@ -3421,6 +3562,117 @@ CharacterController:
   m_SkinWidth: 0.03
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.9, z: 0}
+--- !u!114 &1699705002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1699704999}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76c69612715ed1a42bf78057dd671024, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RudIsland.Rpg3D.Player.PlayerController
+  worldObjectManager: {fileID: 600374219}
+  moveCamera: {fileID: 519073573}
+  playerAnimator: {fileID: 247913600}
+  maxHealth: 100
+  walkSpeed: 2.8
+  sprintSpeed: 5.5
+  turnSpeed: 720
+  moveAcceleration: 28
+  moveDeceleration: 36
+  animationSmoothTime: 0.12
+  rollDistanceByStartSpeed:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1.65
+      inSlope: 0
+      outSlope: 1.6
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 3.25
+      inSlope: 1.6
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  rollMoveProgressByTime:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0.15
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.12
+      value: 0.03
+      inSlope: 0.4
+      outSlope: 0.8
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.36
+      value: 0.45
+      inSlope: 1.9
+      outSlope: 1.9
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.6
+      value: 0.88
+      inSlope: 1.1
+      outSlope: 1.1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.75
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  sprintRollStartSpeedRatio: 0.72
+  rollTotalTime: 1.1
+  rollTurnTime: 0.1
+  gravity: -22
+  groundPull: -2
 --- !u!1 &1712270763
 GameObject:
   m_ObjectHideFlags: 0
@@ -3639,7 +3891,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1835938357}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.06830836, y: -0.27580464, z: 0.019653782, w: 0.95858204}
+  m_LocalRotation: {x: 0.07107959, y: -9.148913e-10, z: 6.519509e-11, w: 0.9974707}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3672,12 +3924,12 @@ Transform:
   m_GameObject: {fileID: 1901413412}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.05, z: -9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1028451437}
-  m_Father: {fileID: 1699705000}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1914686414
 GameObject:
@@ -3943,3 +4195,6 @@ SceneRoots:
   - {fileID: 223694693}
   - {fileID: 305077230}
   - {fileID: 519073573}
+  - {fileID: 1901413413}
+  - {fileID: 600374220}
+  - {fileID: 1081047390}
