@@ -1,0 +1,14 @@
+{
+  "name": "rudIsland.RPG3D.Runtime",
+  "rootNamespace": "rudIsland.RPG3D",
+  "references": [],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
