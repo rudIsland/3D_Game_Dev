@@ -10,9 +10,9 @@ namespace rudIsland.RPG3D.World
         [Serializable]
         private sealed class PoolUsage
         {
-            [SerializeField] private SpawnSettings settings;
-            [SerializeField] private int usedCount;
-            [SerializeField] private int availableCount;
+            [SerializeField] private SpawnSettings settings; //스폰 설정
+            [SerializeField] private int usedCount; //사용중인 갯수
+            [SerializeField] private int availableCount; //사용가능한 갯수
 
             public PoolUsage(SpawnSettings settings)
             {
@@ -61,14 +61,17 @@ namespace rudIsland.RPG3D.World
 
         [Header("실행 상태")]
         [SerializeField] private int activeCount;
-        [SerializeField] private List<PoolUsage> poolUsage =
-            new List<PoolUsage>();
+        [SerializeField] private List<PoolUsage> poolUsage = new List<PoolUsage>();
 
         // List는 순회에 사용하고 HashSet은 중복 등록을 빠르게 막는다.
+
+        //Manager에 등록된 오브젝트
         private readonly List<IWorldObject> registeredObjects =
             new List<IWorldObject>(64);
         private readonly HashSet<IWorldObject> registeredSet =
             new HashSet<IWorldObject>();
+
+        //등록된 객체 중 Tick을 실행할 객체
         private readonly List<IWorldObject> activeObjects =
             new List<IWorldObject>(64);
         private readonly HashSet<IWorldObject> activeSet =

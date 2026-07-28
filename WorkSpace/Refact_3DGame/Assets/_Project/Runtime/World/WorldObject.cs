@@ -13,6 +13,7 @@ namespace rudIsland.RPG3D.World
         // 최초 한 번만 필요한 준비 작업을 실행한다.
         public void Create()
         {
+            //이미 생성되어있거나 제거상태일경우 X
             if (IsCreated || isDisposed)
             {
                 return;
@@ -25,18 +26,18 @@ namespace rudIsland.RPG3D.World
         // Create가 끝난 객체만 사용할 수 있는 상태로 바꾼다.
         public void Enable()
         {
-            if (isDisposed)
+            if (isDisposed) //제거된 객체일경우 예외처리
             {
                 throw new ObjectDisposedException(GetType().Name);
             }
 
-            if (!IsCreated)
+            if (!IsCreated) //생성되지 않고 생명주기를 건너올경우
             {
                 throw new InvalidOperationException(
                     "WorldObject.Create()를 먼저 호출해야 합니다.");
             }
 
-            if (IsEnabled)
+            if (IsEnabled) //이미 활성화되어 있을경우
             {
                 return;
             }
@@ -65,7 +66,7 @@ namespace rudIsland.RPG3D.World
             }
 
             IsEnabled = false;
-            OnDisable();
+            OnDisable(); //비활성화
         }
 
         // 비활성화한 뒤 마지막 정리 작업을 한 번만 실행한다.
@@ -76,9 +77,9 @@ namespace rudIsland.RPG3D.World
                 return;
             }
 
-            Disable();
+            Disable(); //비활성화
             isDisposed = true;
-            OnDispose();
+            OnDispose(); //제거
         }
 
         // 자식 클래스는 공개 생명주기 대신 아래 메서드만 필요한 만큼 구현한다.
