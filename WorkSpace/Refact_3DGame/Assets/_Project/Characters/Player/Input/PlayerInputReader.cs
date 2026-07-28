@@ -16,6 +16,7 @@ namespace rudIsland.RPG3D.Player.Input
 
         // 버튼을 한 번 눌렀을 때 Update에서 한 번만 사용한다.
         private bool hasRollInput;
+        private bool hasAttackInput;
         private bool hasBlockImpactTestInput;
 
         // Input Actions를 생성하고 이 클래스의 콜백을 연결한다.
@@ -55,6 +56,7 @@ namespace rudIsland.RPG3D.Player.Input
             IsSprinting = false;
             IsBlocking = false;
             hasRollInput = false;
+            hasAttackInput = false;
             hasBlockImpactTestInput = false;
         }
 
@@ -105,6 +107,26 @@ namespace rudIsland.RPG3D.Player.Input
             if (context.started)
             {
                 hasRollInput = true;
+            }
+        }
+
+        // 저장된 공격 입력을 한 번 반환한 뒤 지운다.
+        public bool TakeAttackInput()
+        {
+            if (!hasAttackInput)
+            {
+                return false;
+            }
+
+            hasAttackInput = false;
+            return true;
+        }
+
+        public void OnAttack(InputAction.CallbackContext context)
+        {
+            if (context.started)
+            {
+                hasAttackInput = true;
             }
         }
 

@@ -12,14 +12,14 @@ namespace rudIsland.RPG3D.Player.States
 
         public void Enter()
         {
-            stateMachine.Movement.StartBlock();
+            stateMachine.Movement.StopHorizontalMove();
             stateMachine.SetMoveAnimationStopped();
             stateMachine.SetBlockingAnimation(true);
         }
 
         public void Update(float deltaTime)
         {
-            stateMachine.Movement.UpdateBlock(deltaTime);
+            stateMachine.Movement.UpdateStoppedMove(deltaTime);
             stateMachine.SetMoveAnimationStopped();
         }
 

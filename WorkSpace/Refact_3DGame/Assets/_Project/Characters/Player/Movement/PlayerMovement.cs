@@ -80,17 +80,24 @@ namespace rudIsland.RPG3D.Player.Movement
             UpdateVerticalSpeed(deltaTime);
             MovePlayer(deltaTime);
         }
-        // Clear the remaining move speed when blocking starts.
-        public void StartBlock()
+        // 공격이나 방어를 시작할 때 남은 수평 이동 속도를 지운다.
+        public void StopHorizontalMove()
         {
             currentMoveSpeed = 0f;
         }
 
-        // Keep gravity and ground movement while horizontal movement is blocked.
-        public void UpdateBlock(float deltaTime)
+        // 수평 이동을 멈춘 동안에도 중력과 지면 접지를 갱신한다.
+        public void UpdateStoppedMove(float deltaTime)
         {
             UpdateVerticalSpeed(deltaTime);
             MovePlayer(deltaTime);
+        }
+
+        // 달리기 공격 애니메이션의 수평 이동만 캐릭터 루트에 적용한다.
+        public void ApplyRunAttackMove(Vector3 deltaPosition)
+        {
+            deltaPosition.y = 0f;
+            characterController.Move(deltaPosition);
         }
 
         // 구르기 가능 여부를 확인하고 시작 방향과 거리를 저장한다.

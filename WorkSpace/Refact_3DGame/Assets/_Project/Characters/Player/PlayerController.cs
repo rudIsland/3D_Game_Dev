@@ -46,6 +46,16 @@ namespace rudIsland.RPG3D.Player
         [SerializeField, Min(0.01f)] private float rollTotalTime = 1.1f;
         [SerializeField, Min(0.01f)] private float rollTurnTime = 0.1f;
 
+        [Header("공격")]
+        [SerializeField, Min(0.01f)] private float attack01TotalTime = 0.97f;
+        [SerializeField, Min(0.01f)] private float attack02TotalTime = 1.13f;
+        [SerializeField, Min(0.01f)] private float attack03TotalTime = 0.98f;
+        [SerializeField, Min(0f)] private float attack01NextTime = 0.65f;
+        [SerializeField, Min(0f)] private float attack02NextTime = 0.72f;
+        [SerializeField, Min(0.01f)] private float runAttackTotalTime = 0.94f;
+        [SerializeField, Range(0f, 1f)]
+        private float runAttackStartSpeedRatio = 0.9f;
+
         [Header("중력")]
         [SerializeField] private float gravity = -22f;
         [SerializeField] private float groundPull = -2f;
@@ -90,7 +100,7 @@ namespace rudIsland.RPG3D.Player
 
             if (playerAnimator != null)
             {
-                playerAnimator.applyRootMotion = false;
+                playerAnimator.applyRootMotion = true;
             }
 
             playerInput = new PlayerInputReader();
@@ -120,7 +130,14 @@ namespace rudIsland.RPG3D.Player
                 playerAnimator,
                 sprintSpeed,
                 animationSmoothTime,
-                sprintRollStartSpeedRatio);
+                sprintRollStartSpeedRatio,
+                attack01TotalTime,
+                attack02TotalTime,
+                attack03TotalTime,
+                attack01NextTime,
+                attack02NextTime,
+                runAttackTotalTime,
+                runAttackStartSpeedRatio);
 
             playerWorldUnit = new PlayerWorldUnit(
                 maxHealth,
@@ -135,6 +152,12 @@ namespace rudIsland.RPG3D.Player
             {
                 worldObjectManager.Enable(playerWorldUnit);
             }
+        }
+
+        // Animator 자식이 전달한 달리기 공격 이동을 플레이어 루트에 적용한다.
+        public void ApplyRunAttackAnimationMove(Vector3 deltaPosition)
+        {
+            playerStateMachine?.ApplyRunAttackAnimationMove(deltaPosition);
         }
 
         // 방패를 들고 있을 때만 방어 피격 애니메이션을 재생한다.

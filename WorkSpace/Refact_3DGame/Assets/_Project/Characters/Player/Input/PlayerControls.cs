@@ -131,6 +131,15 @@ namespace rudIsland.RPG3D.Player.Input
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""Attack"",
+                    ""type"": ""Button"",
+                    ""id"": ""4d4f9f68-c4b0-4a28-9bb5-6e61a713e44a"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""Shield"",
                     ""type"": ""Button"",
                     ""id"": ""00ae8658-3e27-4203-906a-13d6b029eb2e"",
@@ -240,6 +249,17 @@ namespace rudIsland.RPG3D.Player.Input
                 },
                 {
                     ""name"": """",
+                    ""id"": ""0a9b5403-eafd-4e7e-a571-458ab0a95073"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""e3c7dabb-cae8-493b-b04f-79871406b38f"",
                     ""path"": ""<Mouse>/rightButton"",
                     ""interactions"": """",
@@ -271,6 +291,7 @@ namespace rudIsland.RPG3D.Player.Input
             m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
             m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
             m_Player_Roll = m_Player.FindAction("Roll", throwIfNotFound: true);
+            m_Player_Attack = m_Player.FindAction("Attack", throwIfNotFound: true);
             m_Player_Shield = m_Player.FindAction("Shield", throwIfNotFound: true);
             m_Player_ShieldImpactTest = m_Player.FindAction("ShieldImpactTest", throwIfNotFound: true);
         }
@@ -357,6 +378,7 @@ namespace rudIsland.RPG3D.Player.Input
         private readonly InputAction m_Player_Move;
         private readonly InputAction m_Player_Sprint;
         private readonly InputAction m_Player_Roll;
+        private readonly InputAction m_Player_Attack;
         private readonly InputAction m_Player_Shield;
         private readonly InputAction m_Player_ShieldImpactTest;
         /// <summary>
@@ -386,6 +408,10 @@ namespace rudIsland.RPG3D.Player.Input
             /// Provides access to the underlying input action "Player/Roll".
             /// </summary>
             public InputAction @Roll => m_Wrapper.m_Player_Roll;
+            /// <summary>
+            /// Provides access to the underlying input action "Player/Attack".
+            /// </summary>
+            public InputAction @Attack => m_Wrapper.m_Player_Attack;
             /// <summary>
             /// Provides access to the underlying input action "Player/Shield".
             /// </summary>
@@ -432,6 +458,9 @@ namespace rudIsland.RPG3D.Player.Input
                 @Roll.started += instance.OnRoll;
                 @Roll.performed += instance.OnRoll;
                 @Roll.canceled += instance.OnRoll;
+                @Attack.started += instance.OnAttack;
+                @Attack.performed += instance.OnAttack;
+                @Attack.canceled += instance.OnAttack;
                 @Shield.started += instance.OnShield;
                 @Shield.performed += instance.OnShield;
                 @Shield.canceled += instance.OnShield;
@@ -461,6 +490,9 @@ namespace rudIsland.RPG3D.Player.Input
                 @Roll.started -= instance.OnRoll;
                 @Roll.performed -= instance.OnRoll;
                 @Roll.canceled -= instance.OnRoll;
+                @Attack.started -= instance.OnAttack;
+                @Attack.performed -= instance.OnAttack;
+                @Attack.canceled -= instance.OnAttack;
                 @Shield.started -= instance.OnShield;
                 @Shield.performed -= instance.OnShield;
                 @Shield.canceled -= instance.OnShield;
@@ -535,6 +567,13 @@ namespace rudIsland.RPG3D.Player.Input
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnRoll(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Attack" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnAttack(InputAction.CallbackContext context);
             /// <summary>
             /// Method invoked when associated input action "Shield" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>

@@ -582,12 +582,16 @@ PrefabInstance:
     - target: {fileID: 5866666021909216657, guid: 7954cdbd4d66f3648837abb35c3f8e35,
         type: 3}
       propertyPath: m_ApplyRootMotion
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7954cdbd4d66f3648837abb35c3f8e35,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1659820410}
   m_SourcePrefab: {fileID: 100100000, guid: 7954cdbd4d66f3648837abb35c3f8e35, type: 3}
 --- !u!4 &247913599 stripped
 Transform:
@@ -672,8 +676,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 276505471}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.093163304, y: -0.000000012028256, z: 0.0000000011254869,
-    w: 0.9956509}
+  m_LocalRotation: {x: 0.09316329, y: -9.1322383e-10, z: 8.5450334e-11, w: 0.9956509}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2987,7 +2990,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1302424112}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.11528841, y: 0.0000000074009017, z: -8.589657e-10, w: 0.9933321}
+  m_LocalRotation: {x: 0.11528839, y: 0.000000029603607, z: -0.0000000034358623, w: 0.9933321}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3502,6 +3505,24 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1645214328}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1659820409 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 7954cdbd4d66f3648837abb35c3f8e35,
+    type: 3}
+  m_PrefabInstance: {fileID: 247913598}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1659820410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1659820409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70987d43b83ad76429a31e43b3ef129e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Player.Animations.PlayerAnimationMoveReceiver
 --- !u!1 &1699704999
 GameObject:
   m_ObjectHideFlags: 0
@@ -3671,6 +3692,13 @@ MonoBehaviour:
   sprintRollStartSpeedRatio: 0.72
   rollTotalTime: 1.1
   rollTurnTime: 0.1
+  attack01TotalTime: 0.97
+  attack02TotalTime: 1.13
+  attack03TotalTime: 0.98
+  attack01NextTime: 0.65
+  attack02NextTime: 0.72
+  runAttackTotalTime: 0.94
+  runAttackStartSpeedRatio: 0.9
   gravity: -22
   groundPull: -2
 --- !u!1 &1712270763
@@ -3891,7 +3919,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1835938357}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.07107959, y: -9.148913e-10, z: 6.519509e-11, w: 0.9974707}
+  m_LocalRotation: {x: 0.07107958, y: -4.3901374e-16, z: -3.5890377e-17, w: 0.9974707}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0

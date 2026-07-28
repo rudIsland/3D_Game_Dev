@@ -37,10 +37,14 @@ namespace rudIsland.RPG3D.Player
         protected override void OnUnitTick(float deltaTime)
         {
             bool rollPressed = playerInput.TakeRollInput();
+            bool attackPressed = playerInput.TakeAttackInput();
             bool blockImpactTestPressed =
                 playerInput.TakeBlockImpactTestInput();
 
-            playerStateMachine.Update(deltaTime, rollPressed);
+            playerStateMachine.Update(
+                deltaTime,
+                rollPressed,
+                attackPressed);
 
             if (blockImpactTestPressed)
             {
