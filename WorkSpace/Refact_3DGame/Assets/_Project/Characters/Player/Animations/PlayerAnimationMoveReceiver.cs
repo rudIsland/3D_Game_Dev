@@ -31,7 +31,7 @@ namespace rudIsland.RPG3D.Player.Animations
                 return;
             }
 
-            playerController.ApplyRunAttackAnimationMove(
+            playerController.ApplyAttackAnimationMove(
                 playerAnimator.deltaPosition);
         }
     }

@@ -198,15 +198,27 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   sprintRollStartSpeedRatio: 0.72
-  rollTotalTime: 1.1
+  normalRollTotalTime: 0.97
+  sprintRollTotalTime: 0.73
   rollTurnTime: 0.1
-  attack01TotalTime: 0.97
-  attack02TotalTime: 1.13
-  attack03TotalTime: 0.98
-  attack01NextTime: 0.65
-  attack02NextTime: 0.72
+  attack01TotalTime: 1.21
+  attack02TotalTime: 0.95
+  attack03TotalTime: 1.27
+  attack04TotalTime: 1.18
+  attack05TotalTime: 1.47
+  attack01NextTime: 0.55
+  attack02NextTime: 0.6
+  attack03NextTime: 0.65
+  attack04NextTime: 0.65
+  attack01MoveScale: 0.4
+  attack02MoveScale: 0.4
+  attack03MoveScale: 0.5
+  attack04MoveScale: 0.5
+  attack05MoveScale: 0.5
   runAttackTotalTime: 0.94
-  runAttackStartSpeedRatio: 0.9
+  runAttackMinimumSprintTime: 0.35
+  runAttackStartSpeedRatio: 0.95
+  runAttackMoveScale: 1
   gravity: -22
   groundPull: -2
 --- !u!1001 &6586900582712672055

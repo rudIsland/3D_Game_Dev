@@ -1,4 +1,6 @@
-namespace rudIsland.RPG3D.Player.States
+using rudIsland.RPG3D.Player.States;
+
+namespace rudIsland.RPG3D.Player.States.Block
 {
     // 방어 중 수평 이동을 멈추고 방어 애니메이션을 유지한다.
     internal sealed class PlayerBlockState : IPlayerState
@@ -17,7 +19,9 @@ namespace rudIsland.RPG3D.Player.States
             stateMachine.SetBlockingAnimation(true);
         }
 
-        public void Update(float deltaTime)
+        public void Update(
+            float deltaTime,
+            PlayerStateInput input)
         {
             stateMachine.Movement.UpdateStoppedMove(deltaTime);
             stateMachine.SetMoveAnimationStopped();

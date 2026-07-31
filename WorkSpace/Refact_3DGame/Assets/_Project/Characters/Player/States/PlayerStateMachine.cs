@@ -1,10 +1,13 @@
 using rudIsland.RPG3D.Player.Input;
 using rudIsland.RPG3D.Player.Movement;
+using rudIsland.RPG3D.Player.States.Attack;
+using rudIsland.RPG3D.Player.States.Block;
+using rudIsland.RPG3D.Player.States.Movement;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Player.States
 {
-    // 현재 행동 하나만 실행하고 이동, 방어, 구르기 전환 순서를 관리한다.
+    // 최상위 상태의 생명주기를 관리하고 상태가 사용할 기능을 제공한다.
     public sealed class PlayerStateMachine
     {
         private static readonly int MoveAmountId = Animator.StringToHash("MoveAmount");
@@ -14,6 +17,10 @@ namespace rudIsland.RPG3D.Player.States
         private static readonly int BlockImpactId = Animator.StringToHash("BlockImpact");
         private static readonly int AttackId = Animator.StringToHash("Attack");
         private static readonly int AttackIndexId = Animator.StringToHash("AttackIndex");
+        private static readonly int PlayerRollStateId =
+            Animator.StringToHash("Base Layer.Movement.PlayerRoll");
+        private static readonly int PlayerSprintRollStateId =
+            Animator.StringToHash("Base Layer.Movement.PlayerSprintRoll");
 
         private readonly PlayerInputReader playerInput;
         private readonly PlayerMovement playerMovement;
@@ -21,22 +28,27 @@ namespace rudIsland.RPG3D.Player.States
         private readonly Animator playerAnimator;
         private readonly float sprintSpeed;
         private readonly float animationSmoothTime;
-        private readonly float sprintRollStartSpeedRatio;
+        private readonly float runAttackMinimumSprintTime;
         private readonly float runAttackStartSpeedRatio;
 
-        private readonly PlayerMoveState moveState;
-        private readonly PlayerBlockState blockState;
-        private readonly PlayerRollState rollState;
-        private readonly PlayerAttackState attackState;
+        private readonly PlayerControlState controlState;
 
         private IPlayerState currentState;
+        private Transform lockOnTarget;
+        private float sprintMoveElapsedTime;
         private bool isEnabled;
 
         internal PlayerMovement Movement => playerMovement;
 
-        public bool IsBlocking => ReferenceEquals(currentState, blockState);
-        public bool IsRolling => ReferenceEquals(currentState, rollState);
-        public bool IsAttacking => ReferenceEquals(currentState, attackState);
+        public bool IsBlocking =>
+            ReferenceEquals(currentState, controlState) &&
+            controlState.IsBlocking;
+        public bool IsRolling =>
+            ReferenceEquals(currentState, controlState) &&
+            controlState.IsRolling;
+        public bool IsAttacking =>
+            ReferenceEquals(currentState, controlState) &&
+            controlState.IsAttacking;
 
         public PlayerStateMachine(
             PlayerInputReader playerInput,
@@ -45,14 +57,24 @@ namespace rudIsland.RPG3D.Player.States
             Animator playerAnimator,
             float sprintSpeed,
             float animationSmoothTime,
-            float sprintRollStartSpeedRatio,
             float attack01TotalTime,
             float attack02TotalTime,
             float attack03TotalTime,
+            float attack04TotalTime,
+            float attack05TotalTime,
             float attack01NextTime,
             float attack02NextTime,
+            float attack03NextTime,
+            float attack04NextTime,
+            float attack01MoveScale,
+            float attack02MoveScale,
+            float attack03MoveScale,
+            float attack04MoveScale,
+            float attack05MoveScale,
             float runAttackTotalTime,
-            float runAttackStartSpeedRatio)
+            float runAttackMinimumSprintTime,
+            float runAttackStartSpeedRatio,
+            float runAttackMoveScale)
         {
             this.playerInput = playerInput;
             this.playerMovement = playerMovement;
@@ -60,21 +82,38 @@ namespace rudIsland.RPG3D.Player.States
             this.playerAnimator = playerAnimator;
             this.sprintSpeed = sprintSpeed;
             this.animationSmoothTime = animationSmoothTime;
-            this.sprintRollStartSpeedRatio = sprintRollStartSpeedRatio;
+            this.runAttackMinimumSprintTime =
+                Mathf.Max(0f, runAttackMinimumSprintTime);
             this.runAttackStartSpeedRatio =
                 Mathf.Clamp01(runAttackStartSpeedRatio);
 
-            moveState = new PlayerMoveState(this);
-            blockState = new PlayerBlockState(this);
-            rollState = new PlayerRollState(this);
-            attackState = new PlayerAttackState(
+            PlayerMoveState moveState = new PlayerMoveState(this);
+            PlayerBlockState blockState = new PlayerBlockState(this);
+            PlayerRollState rollState = new PlayerRollState(this);
+            PlayerAttackState attackState = new PlayerAttackState(
                 this,
                 Mathf.Max(0.01f, attack01TotalTime),
                 Mathf.Max(0.01f, attack02TotalTime),
                 Mathf.Max(0.01f, attack03TotalTime),
+                Mathf.Max(0.01f, attack04TotalTime),
+                Mathf.Max(0.01f, attack05TotalTime),
                 Mathf.Max(0f, attack01NextTime),
                 Mathf.Max(0f, attack02NextTime),
-                Mathf.Max(0.01f, runAttackTotalTime));
+                Mathf.Max(0f, attack03NextTime),
+                Mathf.Max(0f, attack04NextTime),
+                Mathf.Max(0f, attack01MoveScale),
+                Mathf.Max(0f, attack02MoveScale),
+                Mathf.Max(0f, attack03MoveScale),
+                Mathf.Max(0f, attack04MoveScale),
+                Mathf.Max(0f, attack05MoveScale),
+                Mathf.Max(0.01f, runAttackTotalTime),
+                Mathf.Max(0f, runAttackMoveScale));
+            controlState = new PlayerControlState(
+                this,
+                moveState,
+                blockState,
+                rollState,
+                attackState);
         }
 
         public void Enable()
@@ -85,7 +124,7 @@ namespace rudIsland.RPG3D.Player.States
             }
 
             isEnabled = true;
-            ChangeState(moveState);
+            ChangeState(controlState);
         }
 
         public void Update(
@@ -98,68 +137,12 @@ namespace rudIsland.RPG3D.Player.States
                 return;
             }
 
-            if (ReferenceEquals(currentState, rollState))
-            {
-                currentState.Update(deltaTime);
-
-                if (!playerMovement.IsRolling)
-                {
-                    if (playerInput.IsBlocking)
-                    {
-                        ChangeState(blockState);
-                    }
-                    else
-                    {
-                        ChangeState(moveState);
-                    }
-                }
-
-                return;
-            }
-
-            if (ReferenceEquals(currentState, attackState))
-            {
-                attackState.UpdateAttack(
-                    deltaTime,
-                    attackPressed);
-
-                if (attackState.IsFinished)
-                {
-                    ChangeState(
-                        playerInput.IsBlocking
-                            ? blockState
-                            : moveState);
-                }
-
-                return;
-            }
-
-            if (playerInput.IsBlocking)
-            {
-                ChangeState(blockState);
-                currentState.Update(deltaTime);
-                return;
-            }
-
-            if (rollPressed && playerMovement.TryStartRoll())
-            {
-                ChangeState(rollState);
-                currentState.Update(deltaTime);
-                return;
-            }
-
-            if (attackPressed &&
-                characterController != null &&
-                characterController.isGrounded)
-            {
-                attackState.Prepare(ShouldPlayRunAttack());
-                ChangeState(attackState);
-                currentState.Update(deltaTime);
-                return;
-            }
-
-            ChangeState(moveState);
-            currentState.Update(deltaTime);
+            PlayerStateInput input = new PlayerStateInput(
+                rollPressed,
+                attackPressed,
+                playerInput.IsBlocking);
+            UpdateSprintMoveTime(deltaTime);
+            currentState.Update(deltaTime, input);
         }
 
         public void Disable()
@@ -171,6 +154,7 @@ namespace rudIsland.RPG3D.Player.States
 
             currentState?.Exit();
             currentState = null;
+            sprintMoveElapsedTime = 0f;
             isEnabled = false;
 
             if (playerAnimator == null)
@@ -196,6 +180,11 @@ namespace rudIsland.RPG3D.Player.States
 
             playerAnimator.ResetTrigger(BlockImpactId);
             playerAnimator.SetTrigger(BlockImpactId);
+        }
+
+        public void SetLockOnTarget(Transform target)
+        {
+            lockOnTarget = target;
         }
 
         private void ChangeState(IPlayerState nextState)
@@ -247,7 +236,24 @@ namespace rudIsland.RPG3D.Player.States
             playerAnimator?.SetFloat(MoveAmountId, 0f);
         }
 
-        internal void PlayRollAnimation()
+        internal void SetAttackDirection()
+        {
+            playerMovement.SetAttackDirection(lockOnTarget);
+        }
+
+        internal void UpdateAttackTurn(float deltaTime)
+        {
+            playerMovement.UpdateAttackTurn(
+                lockOnTarget,
+                deltaTime);
+        }
+
+        internal void ClearAttackDirection()
+        {
+            playerMovement.ClearAttackDirection();
+        }
+
+        internal void PlayRollAnimation(bool startsAfterAttackCancel)
         {
             if (playerAnimator == null)
             {
@@ -259,23 +265,40 @@ namespace rudIsland.RPG3D.Player.States
             playerAnimator.ResetTrigger(RollId);
             playerAnimator.ResetTrigger(SprintRollId);
 
-            bool useSprintRoll =
-                playerMovement.RollStartSpeedRatio >=
-                sprintRollStartSpeedRatio;
+            if (startsAfterAttackCancel)
+            {
+                playerAnimator.ResetTrigger(AttackId);
+                playerAnimator.SetInteger(AttackIndexId, 0);
+                playerAnimator.CrossFadeInFixedTime(
+                    playerMovement.UsesSprintRoll
+                        ? PlayerSprintRollStateId
+                        : PlayerRollStateId,
+                    0.08f);
+                return;
+            }
 
             playerAnimator.SetTrigger(
-                useSprintRoll ? SprintRollId : RollId);
+                playerMovement.UsesSprintRoll
+                    ? SprintRollId
+                    : RollId);
         }
 
-        internal void ApplyRunAttackAnimationMove(
+        internal void ApplyAttackAnimationMove(
             Vector3 deltaPosition)
         {
-            if (!IsAttacking || !attackState.UsesAnimationMove)
+            if (!IsAttacking)
             {
                 return;
             }
 
-            playerMovement.ApplyRunAttackMove(deltaPosition);
+            float moveScale =
+                controlState.CurrentAttackAnimationMoveScale;
+            if (moveScale <= 0f)
+            {
+                return;
+            }
+
+            playerMovement.ApplyAttackAnimationMove(deltaPosition, moveScale);
         }
 
         internal void PlayAttackAnimation(int attackNumber)
@@ -292,9 +315,16 @@ namespace rudIsland.RPG3D.Player.States
             playerAnimator.SetTrigger(AttackId);
         }
 
-        private bool ShouldPlayRunAttack()
+        internal bool CanStartAttack()
+        {
+            return characterController != null &&
+                characterController.isGrounded;
+        }
+
+        internal bool ShouldPlayRunAttack()
         {
             if (!playerInput.IsSprinting ||
+                sprintMoveElapsedTime < runAttackMinimumSprintTime ||
                 characterController == null)
             {
                 return false;
@@ -308,6 +338,21 @@ namespace rudIsland.RPG3D.Player.States
                 : 0f;
 
             return currentSpeedRatio >= runAttackStartSpeedRatio;
+        }
+
+        private void UpdateSprintMoveTime(float deltaTime)
+        {
+            if (!playerInput.IsSprinting ||
+                playerInput.MoveValue.sqrMagnitude < 0.01f ||
+                controlState.IsAttacking ||
+                controlState.IsRolling ||
+                controlState.IsBlocking)
+            {
+                sprintMoveElapsedTime = 0f;
+                return;
+            }
+
+            sprintMoveElapsedTime += deltaTime;
         }
     }
 }

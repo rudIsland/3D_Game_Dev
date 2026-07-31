@@ -4,6 +4,7 @@ using rudIsland.RPG3D.Player.Movement;
 using rudIsland.RPG3D.Player.States;
 using rudIsland.RPG3D.World;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace rudIsland.RPG3D.Player
 {
@@ -26,6 +27,10 @@ namespace rudIsland.RPG3D.Player
         [SerializeField, Min(0.01f)] private float moveAcceleration = 28f;
         [SerializeField, Min(0.01f)] private float moveDeceleration = 36f;
 
+        [Header("Attack Direction")]
+        [SerializeField] private Transform lockOnTarget;
+        [SerializeField, Min(0f)] private float attackTurnSpeed = 360f;
+
         [Header("이동 애니메이션")]
         [SerializeField] private float animationSmoothTime = 0.12f;
 
@@ -42,19 +47,34 @@ namespace rudIsland.RPG3D.Player
 
         [SerializeField, Range(0f, 1f)]
         [Tooltip("이 속도 비율 이상으로 롤을 시작하면 달리기 롤을 재생합니다.")]
-        private float sprintRollStartSpeedRatio = 0.72f;
-        [SerializeField, Min(0.01f)] private float rollTotalTime = 1.1f;
+        private float sprintRollStartSpeedRatio = 0.85f;
+        [FormerlySerializedAs("rollTotalTime")]
+        [SerializeField, Min(0.01f)] private float normalRollTotalTime = 0.97f;
+        [SerializeField, Min(0.01f)] private float sprintRollTotalTime = 0.73f;
         [SerializeField, Min(0.01f)] private float rollTurnTime = 0.1f;
 
         [Header("공격")]
         [SerializeField, Min(0.01f)] private float attack01TotalTime = 0.97f;
         [SerializeField, Min(0.01f)] private float attack02TotalTime = 1.13f;
         [SerializeField, Min(0.01f)] private float attack03TotalTime = 0.98f;
+        [SerializeField, Min(0.01f)] private float attack04TotalTime = 1.18f;
+        [SerializeField, Min(0.01f)] private float attack05TotalTime = 1.47f;
         [SerializeField, Min(0f)] private float attack01NextTime = 0.65f;
         [SerializeField, Min(0f)] private float attack02NextTime = 0.72f;
+        [SerializeField, Min(0f)] private float attack03NextTime = 0.65f;
+        [SerializeField, Min(0f)] private float attack04NextTime = 0.65f;
+        [SerializeField, Min(0f)] private float attack01MoveScale = 0.4f;
+        [SerializeField, Min(0f)] private float attack02MoveScale = 0.4f;
+        [SerializeField, Min(0f)] private float attack03MoveScale = 0.5f;
+        [SerializeField, Min(0f)] private float attack04MoveScale = 0.5f;
+        [SerializeField, Min(0f)] private float attack05MoveScale = 0.5f;
         [SerializeField, Min(0.01f)] private float runAttackTotalTime = 0.94f;
+        [SerializeField, Min(0f)]
+        [Tooltip("이동하면서 달리기를 이 시간 이상 유지해야 달리기 공격을 사용합니다.")]
+        private float runAttackMinimumSprintTime = 0.35f;
         [SerializeField, Range(0f, 1f)]
-        private float runAttackStartSpeedRatio = 0.9f;
+        private float runAttackStartSpeedRatio = 0.95f;
+        [SerializeField, Min(0f)] private float runAttackMoveScale = 1f;
 
         [Header("중력")]
         [SerializeField] private float gravity = -22f;
@@ -114,11 +134,14 @@ namespace rudIsland.RPG3D.Player
                 walkSpeed,
                 sprintSpeed,
                 turnSpeed,
+                attackTurnSpeed,
                 moveAcceleration,
                 moveDeceleration,
                 rollDistanceByStartSpeed,
                 rollMoveProgressByTime,
-                rollTotalTime,
+                sprintRollStartSpeedRatio,
+                normalRollTotalTime,
+                sprintRollTotalTime,
                 rollTurnTime,
                 gravity,
                 groundPull);
@@ -130,14 +153,25 @@ namespace rudIsland.RPG3D.Player
                 playerAnimator,
                 sprintSpeed,
                 animationSmoothTime,
-                sprintRollStartSpeedRatio,
                 attack01TotalTime,
                 attack02TotalTime,
                 attack03TotalTime,
+                attack04TotalTime,
+                attack05TotalTime,
                 attack01NextTime,
                 attack02NextTime,
+                attack03NextTime,
+                attack04NextTime,
+                attack01MoveScale,
+                attack02MoveScale,
+                attack03MoveScale,
+                attack04MoveScale,
+                attack05MoveScale,
                 runAttackTotalTime,
-                runAttackStartSpeedRatio);
+                runAttackMinimumSprintTime,
+                runAttackStartSpeedRatio,
+                runAttackMoveScale);
+            playerStateMachine.SetLockOnTarget(lockOnTarget);
 
             playerWorldUnit = new PlayerWorldUnit(
                 maxHealth,
@@ -148,22 +182,36 @@ namespace rudIsland.RPG3D.Player
 
         private void OnEnable()
         {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+
             if (playerWorldUnit != null)
             {
                 worldObjectManager.Enable(playerWorldUnit);
             }
         }
 
-        // Animator 자식이 전달한 달리기 공격 이동을 플레이어 루트에 적용한다.
-        public void ApplyRunAttackAnimationMove(Vector3 deltaPosition)
+        // Animator 자식이 전달한 공격 이동을 플레이어 루트에 적용한다.
+        public void ApplyAttackAnimationMove(Vector3 deltaPosition)
         {
-            playerStateMachine?.ApplyRunAttackAnimationMove(deltaPosition);
+            playerStateMachine?.ApplyAttackAnimationMove(deltaPosition);
         }
 
         // 방패를 들고 있을 때만 방어 피격 애니메이션을 재생한다.
         public void PlayBlockImpact()
         {
             playerWorldUnit?.PlayBlockImpact();
+        }
+
+        public void SetLockOnTarget(Transform target)
+        {
+            lockOnTarget = target;
+            playerStateMachine?.SetLockOnTarget(target);
+        }
+
+        public void ClearLockOnTarget()
+        {
+            SetLockOnTarget(null);
         }
 
         // 비어 있는 롤 커브만 기본 설정으로 복구한다.
@@ -210,6 +258,9 @@ namespace rudIsland.RPG3D.Player
 
         private void OnDisable()
         {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+
             if (playerWorldUnit != null && worldObjectManager != null)
             {
                 worldObjectManager.Disable(playerWorldUnit);

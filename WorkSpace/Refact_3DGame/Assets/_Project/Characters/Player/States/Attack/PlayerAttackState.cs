@@ -1,15 +1,16 @@
-namespace rudIsland.RPG3D.Player.States
+using rudIsland.RPG3D.Player.States;
+
+namespace rudIsland.RPG3D.Player.States.Attack
 {
-    // 일반 공격 3단 콤보와 달리기 공격의 재생 순서를 관리한다.
+    // 일반 공격 5단 콤보와 달리기 공격의 재생 순서를 관리한다.
     internal sealed class PlayerAttackState : IPlayerState
     {
         private readonly PlayerStateMachine stateMachine;
-        private readonly float attack01TotalTime;
-        private readonly float attack02TotalTime;
-        private readonly float attack03TotalTime;
-        private readonly float attack01NextTime;
-        private readonly float attack02NextTime;
+        private readonly float[] attackTotalTimes;
+        private readonly float[] nextAttackTimes;
+        private readonly float[] attackMoveScales;
         private readonly float runAttackTotalTime;
+        private readonly float runAttackMoveScale;
 
         private float attackElapsedTime;
         private int comboNumber;
@@ -17,24 +18,55 @@ namespace rudIsland.RPG3D.Player.States
         private bool hasNextAttackInput;
 
         public bool IsFinished { get; private set; }
-        public bool UsesAnimationMove => playRunAttack;
+        public float CurrentAnimationMoveScale => playRunAttack
+            ? runAttackMoveScale
+            : attackMoveScales[comboNumber - 1];
 
         public PlayerAttackState(
             PlayerStateMachine stateMachine,
             float attack01TotalTime,
             float attack02TotalTime,
             float attack03TotalTime,
+            float attack04TotalTime,
+            float attack05TotalTime,
             float attack01NextTime,
             float attack02NextTime,
-            float runAttackTotalTime)
+            float attack03NextTime,
+            float attack04NextTime,
+            float attack01MoveScale,
+            float attack02MoveScale,
+            float attack03MoveScale,
+            float attack04MoveScale,
+            float attack05MoveScale,
+            float runAttackTotalTime,
+            float runAttackMoveScale)
         {
             this.stateMachine = stateMachine;
-            this.attack01TotalTime = attack01TotalTime;
-            this.attack02TotalTime = attack02TotalTime;
-            this.attack03TotalTime = attack03TotalTime;
-            this.attack01NextTime = attack01NextTime;
-            this.attack02NextTime = attack02NextTime;
+            attackTotalTimes = new[]
+            {
+                attack01TotalTime,
+                attack02TotalTime,
+                attack03TotalTime,
+                attack04TotalTime,
+                attack05TotalTime
+            };
+            nextAttackTimes = new[]
+            {
+                attack01NextTime,
+                attack02NextTime,
+                attack03NextTime,
+                attack04NextTime
+            };
+            attackMoveScales = new[]
+            {
+                attack01MoveScale,
+                attack02MoveScale,
+                attack03MoveScale,
+                attack04MoveScale,
+                attack05MoveScale
+            };
             this.runAttackTotalTime = runAttackTotalTime;
+            this.runAttackMoveScale = runAttackMoveScale;
         }
 
         // 상태 진입 전에 일반 콤보와 달리기 공격 중 하나를 선택한다.
@@ -53,19 +85,22 @@ namespace rudIsland.RPG3D.Player.States
             stateMachine.SetMoveAnimationStopped();
             stateMachine.SetBlockingAnimation(false);
             stateMachine.Movement.StopHorizontalMove();
+            stateMachine.SetAttackDirection();
 
             if (playRunAttack)
             {
-                stateMachine.PlayAttackAnimation(4);
+                stateMachine.PlayAttackAnimation(6);
                 return;
             }
 
             stateMachine.PlayAttackAnimation(comboNumber);
         }
 
-        public void Update(float deltaTime)
+        public void Update(
+            float deltaTime,
+            PlayerStateInput input)
         {
-            UpdateAttack(deltaTime, false);
+            UpdateAttack(deltaTime, input.AttackPressed);
         }
 
         // 추가 공격 입력을 저장하고 이어질 콤보 시점에 다음 공격을 재생한다.
@@ -73,6 +108,7 @@ namespace rudIsland.RPG3D.Player.States
         {
             attackElapsedTime += deltaTime;
             stateMachine.SetMoveAnimationStopped();
+            stateMachine.UpdateAttackTurn(deltaTime);
 
             if (playRunAttack)
             {
@@ -83,7 +119,7 @@ namespace rudIsland.RPG3D.Player.States
 
             stateMachine.Movement.UpdateStoppedMove(deltaTime);
 
-            if (attackPressed && comboNumber < 3)
+            if (attackPressed && comboNumber < attackTotalTimes.Length)
             {
                 hasNextAttackInput = true;
             }
@@ -94,6 +130,7 @@ namespace rudIsland.RPG3D.Player.States
                 comboNumber++;
                 attackElapsedTime = 0f;
                 hasNextAttackInput = false;
+                stateMachine.SetAttackDirection();
                 stateMachine.PlayAttackAnimation(comboNumber);
                 return;
             }
@@ -104,26 +141,17 @@ namespace rudIsland.RPG3D.Player.States
         public void Exit()
         {
             hasNextAttackInput = false;
+            stateMachine.ClearAttackDirection();
         }
 
         private float GetNextAttackTime()
         {
-            return comboNumber == 1
-                ? attack01NextTime
-                : attack02NextTime;
+            return nextAttackTimes[comboNumber - 1];
         }
 
         private float GetAttackTotalTime()
         {
-            switch (comboNumber)
-            {
-                case 1:
-                    return attack01TotalTime;
-                case 2:
-                    return attack02TotalTime;
-                default:
-                    return attack03TotalTime;
-            }
+            return attackTotalTimes[comboNumber - 1];
         }
     }
 }
