@@ -676,7 +676,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 276505471}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.09316329, y: -9.1322383e-10, z: 8.5450334e-11, w: 0.9956509}
+  m_LocalRotation: {x: 0.0931633, y: -0.000000011333968, z: 0.0000000010605227, w: 0.9956509}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2448,6 +2448,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1120283125}
   - component: {fileID: 1120283126}
+  - component: {fileID: 1120283129}
+  - component: {fileID: 1120283128}
+  - component: {fileID: 1120283127}
   m_Layer: 0
   m_Name: ZombieDisplay
   m_TagString: Untagged
@@ -2488,11 +2491,74 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.2
   m_Height: 1.8881487
   m_Direction: 1
+  m_Center: {x: 0.00025605678, y: 0.94407433, z: 0.054606438}
+--- !u!114 &1120283127
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1120283124}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b5927d60def09743b3bcdf870f359c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Characters.Enemies.Zombie.ZombieController
+  worldObjectManager: {fileID: 600374219}
+  target: {fileID: 1699705000}
+  zombieAnimator: {fileID: 1232782336}
+  maxHealth: 100
+  findRange: 30
+  attackRange: 1.8
+  chaseSpeed: 3.5
+  turnSpeed: 360
+  gravity: -22
+  groundPull: -2
+  alertTime: 1.5
+  attackInterval: 1.5
+  hitTime: 0.7
+--- !u!114 &1120283128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1120283124}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44b30a6e56c305c4da9f00ef97b0079e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Characters.Enemies.Zombie.ZombieAnimationController
+  zombieAnimator: {fileID: 1232782336}
+--- !u!143 &1120283129
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1120283124}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 1.8881487
+  m_Radius: 0.2
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.05
+  m_MinMoveDistance: 0.001
   m_Center: {x: 0.00025605678, y: 0.94407433, z: 0.054606438}
 --- !u!1 &1158284645
 GameObject:
@@ -2781,14 +2847,29 @@ PrefabInstance:
       propertyPath: m_Name
       value: ZombieModel
       objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: 2d05a0c0087041645b75d2cf7482be05,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: ce1e359e0c06a3f4c92b48dffd2f1965, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2d05a0c0087041645b75d2cf7482be05,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2013241470}
   m_SourcePrefab: {fileID: 100100000, guid: 2d05a0c0087041645b75d2cf7482be05, type: 3}
 --- !u!4 &1232782335 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2d05a0c0087041645b75d2cf7482be05,
+    type: 3}
+  m_PrefabInstance: {fileID: 1232782334}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &1232782336 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 2d05a0c0087041645b75d2cf7482be05,
     type: 3}
   m_PrefabInstance: {fileID: 1232782334}
   m_PrefabAsset: {fileID: 0}
@@ -2990,7 +3071,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1302424112}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.11528839, y: 0.000000029603607, z: -0.0000000034358623, w: 0.9933321}
+  m_LocalRotation: {x: 0.11528841, y: 0, z: 0, w: 0.99333215}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3549,7 +3630,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1699704999}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 1, z: -0, w: -0.00000010015876}
   m_LocalPosition: {x: 0, y: 0.05, z: -9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3604,6 +3685,8 @@ MonoBehaviour:
   turnSpeed: 720
   moveAcceleration: 28
   moveDeceleration: 36
+  lockOnTarget: {fileID: 0}
+  attackTurnSpeed: 360
   animationSmoothTime: 0.12
   rollDistanceByStartSpeed:
     serializedVersion: 2
@@ -3690,15 +3773,27 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   sprintRollStartSpeedRatio: 0.72
-  rollTotalTime: 1.1
+  normalRollTotalTime: 0.97
+  sprintRollTotalTime: 0.73
   rollTurnTime: 0.1
   attack01TotalTime: 0.97
   attack02TotalTime: 1.13
   attack03TotalTime: 0.98
+  attack04TotalTime: 1.18
+  attack05TotalTime: 1.47
   attack01NextTime: 0.65
   attack02NextTime: 0.72
+  attack03NextTime: 0.65
+  attack04NextTime: 0.65
+  attack01MoveScale: 0.4
+  attack02MoveScale: 0.4
+  attack03MoveScale: 0.5
+  attack04MoveScale: 0.5
+  attack05MoveScale: 0.5
   runAttackTotalTime: 0.94
-  runAttackStartSpeedRatio: 0.9
+  runAttackMinimumSprintTime: 0.35
+  runAttackStartSpeedRatio: 0.95
+  runAttackMoveScale: 1
   gravity: -22
   groundPull: -2
 --- !u!1 &1712270763
@@ -3919,7 +4014,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1835938357}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.07107958, y: -4.3901374e-16, z: -3.5890377e-17, w: 0.9974707}
+  m_LocalRotation: {x: 0.071079575, y: -0.000000023210092, z: 0.0000000016539469,
+    w: 0.9974707}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3990,6 +4086,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1699705000}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2013241469 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 2d05a0c0087041645b75d2cf7482be05,
+    type: 3}
+  m_PrefabInstance: {fileID: 1232782334}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2013241470
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2013241469}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efb93583e4ecdd54e98852abfc45f73a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Characters.Enemies.Zombie.ZombieAnimationEventReceiver
 --- !u!1 &2113069543
 GameObject:
   m_ObjectHideFlags: 0
