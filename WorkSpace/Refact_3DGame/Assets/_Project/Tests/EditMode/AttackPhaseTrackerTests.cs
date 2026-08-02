@@ -65,6 +65,36 @@ namespace rudIsland.RPG3D.Tests
         }
 
         [Test]
+        public void BeginHit_AfterRecovery_DoesNothing()
+        {
+            var tracker = new AttackPhaseTracker();
+            tracker.BeginAttack();
+            tracker.BeginRecovery();
+
+            bool changed = tracker.BeginHit();
+
+            Assert.That(changed, Is.False);
+            Assert.That(
+                tracker.CurrentPhase,
+                Is.EqualTo(AttackPhase.Recovery));
+        }
+
+        [Test]
+        public void BeginRecovery_AfterRecovery_DoesNothing()
+        {
+            var tracker = new AttackPhaseTracker();
+            tracker.BeginAttack();
+            tracker.BeginRecovery();
+
+            bool changed = tracker.BeginRecovery();
+
+            Assert.That(changed, Is.False);
+            Assert.That(
+                tracker.CurrentPhase,
+                Is.EqualTo(AttackPhase.Recovery));
+        }
+
+        [Test]
         public void PhaseEvent_AfterEnd_DoesNothing()
         {
             var tracker = new AttackPhaseTracker();

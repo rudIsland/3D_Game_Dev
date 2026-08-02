@@ -122,9 +122,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             return playbackReader != null && playbackReader.IsInTransition(0);
         }
 
-        internal void ApplyAttackRootRotation(Quaternion deltaRotation)
+        internal void ApplyAttackRootRotation(
+            Quaternion deltaRotation,
+            bool canTurn)
         {
-            if (requestedAnimationState == AnimationState.Attack)
+            if (requestedAnimationState == AnimationState.Attack && canTurn)
             {
                 transform.rotation *= deltaRotation;
             }

@@ -955,15 +955,28 @@ Profiler 확인:
 - 공격 상태, Controller, AnimationEventReceiver, 루트 회전과 씬·프리팹에는 8단계 변경을 아직 적용하지 않음
 - 새 8단계는 완료 처리하지 않음
 
+### 2026-08-02 8단계 1차 구현
+
+- `PlayerAttackState`와 `ZombieAttackState`가 각각 `AttackPhaseTracker`를 소유하도록 연결
+- 공격 시작, 타격 시작, 타격 종료와 공격 종료를 `Ready → Hit → Recovery → 종료` 흐름에 연결
+- Player 입력 방향 회전과 Root Motion 회전은 `Ready`에서만 허용
+- Zombie 공격 Root Rotation도 `Ready`에서만 허용
+- Animation Event Receiver는 Controller의 구간 전환 메서드를 호출하고, Controller가 Detector 종료를 담당
+- 공격 상태가 피격 또는 사망으로 종료될 때 Tracker도 함께 종료
+- `AttackPhaseTrackerTests` 경계 테스트 2개 추가
+- Runtime 및 EditMode 테스트 어셈블리 컴파일 성공, 오류 0개
+- Unity EditMode 테스트는 동일 프로젝트를 다른 Unity 인스턴스가 사용 중이어서 실행하지 못함
+- Unity PlayMode와 실제 공격 중 회전 고정은 아직 확인하지 않음
+- 새 8단계는 완료 처리하지 않음
+
 ### 재개할 작업
 
 `8단계: 공격 방향과 후딜`을 현재 공격 애니메이션 이벤트와 상태 흐름을 유지하면서 공격 구간 판정부터 작은 범위로 적용한다.
 
-1. Unity 연결을 새로 확인하고 `AttackPhaseTracker.cs`와 테스트 파일을 가져온 뒤 프로젝트 파일을 갱신한다.
-2. `AttackPhaseTrackerTests` 6개와 런타임·EditMode 테스트 어셈블리 컴파일을 먼저 확인한다.
-3. Player와 Zombie 공격의 시작, 타격 시작, 타격 종료와 상태 종료를 `Ready → Hit → Recovery → 종료`에 연결한다.
-4. Player 입력 회전과 Player·Zombie 공격 루트 회전은 `Ready`에서만 허용한다.
+1. Unity 프로젝트 잠금이 해제된 뒤 `AttackPhaseTrackerTests`를 Unity EditMode에서 실행한다.
+2. Unity Play에서 Player와 Zombie의 준비·타격·Recovery 구간을 확인한다.
+3. Unity Play에서 타격 순간 입력 회전과 Root Motion 회전이 멈추는지 확인한다.
+4. 공격 종료, `Damaged`, `Staggered`와 사망 전환에서 Detector와 Tracker가 함께 종료되는지 확인한다.
 5. 공격별 방향 보정 가능 시간, 최대 보정 각도와 취소 가능 시점을 직관적인 설정 값으로 데이터화한다.
-6. `Damaged`는 공격을 유지하고 `Staggered` 이상만 현재 공격을 끊는 6단계 규칙을 보존한다.
-7. 구간 전환, 경계 시간, 방향 제한, 후딜 중 입력과 경직 취소를 자동 테스트한다.
-8. Unity Play에서 큰 목표 각도, 타격 순간 방향 고정, 후딜과 연속 피격 시 공격 중단을 확인한다.
+6. 구간 전환, 경계 시간, 방향 제한, 후딜 중 입력과 경직 취소를 자동 테스트한다.
+7. Unity Play에서 큰 목표 각도, 타격 순간 방향 고정, 후딜과 연속 피격 시 공격 중단을 확인한다.

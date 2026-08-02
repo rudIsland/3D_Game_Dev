@@ -64,6 +64,21 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             stateMachine.NotifyAttackAnimationEnded();
         }
 
+        internal bool CanTurnDuringAttack()
+        {
+            return stateMachine.CanTurnDuringAttack();
+        }
+
+        internal bool BeginAttackHit()
+        {
+            return stateMachine.BeginAttackHit();
+        }
+
+        internal bool BeginAttackRecovery()
+        {
+            return stateMachine.BeginAttackRecovery();
+        }
+
         internal void NotifyAlertAnimationEnded()
         {
             stateMachine.NotifyAlertAnimationEnded();

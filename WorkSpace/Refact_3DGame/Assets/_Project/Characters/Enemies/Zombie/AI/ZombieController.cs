@@ -64,6 +64,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             zombieWorldUnit != null
                 ? zombieWorldUnit.LastHitReaction
                 : default;
+        internal bool CanTurnDuringAttack =>
+            zombieWorldUnit != null &&
+            zombieWorldUnit.CanTurnDuringAttack();
 
         protected override IWorldObject CreateRuntimeObject()
         {
@@ -125,8 +128,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         public void StartAttackHit(int attackNumber)
         {
-            EndAttackHit();
-
             if (!AttackHitSettings.TryFind(
                     attackHitSettings,
                     attackNumber,
@@ -135,6 +136,14 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             {
                 return;
             }
+
+            if (zombieWorldUnit == null ||
+                !zombieWorldUnit.BeginAttackHit())
+            {
+                return;
+            }
+
+            EndAttackHit();
 
             var hit = new AttackHitData(
                 hitSettings.Damage,
@@ -147,6 +156,14 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             activeHitDetector.StartHit(in hit);
         }
 
+        public void EndAttackHitAnimationEvent()
+        {
+            if (zombieWorldUnit?.BeginAttackRecovery() == true)
+            {
+                EndAttackHit();
+            }
+        }
+
         public void EndAttackHit()
         {
             activeHitDetector?.EndHit();
@@ -155,6 +172,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         internal void NotifyAttackAnimationEnded()
         {
+            zombieWorldUnit?.BeginAttackRecovery();
+            EndAttackHit();
             zombieWorldUnit?.NotifyAttackAnimationEnded();
         }
 

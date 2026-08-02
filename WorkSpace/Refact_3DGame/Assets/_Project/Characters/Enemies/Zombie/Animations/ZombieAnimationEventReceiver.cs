@@ -38,12 +38,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         public void EndAttackHitAnimationEvent()
         {
-            zombieController?.EndAttackHit();
+            zombieController?.EndAttackHitAnimationEvent();
         }
 
         public void EndAttackAnimationEvent()
         {
-            zombieController?.EndAttackHit();
             zombieController?.NotifyAttackAnimationEnded();
         }
 
@@ -60,7 +59,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             }
 
             animationController?.ApplyAttackRootRotation(
-                zombieAnimator.deltaRotation);
+                zombieAnimator.deltaRotation,
+                zombieController != null &&
+                zombieController.CanTurnDuringAttack);
         }
 
         private void OnDisable()

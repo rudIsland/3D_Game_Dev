@@ -228,6 +228,26 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             endAttackHit?.Invoke();
         }
 
+        internal bool CanTurnDuringAttack()
+        {
+            return ReferenceEquals(currentState, aliveState) &&
+                aliveState.CanTurnDuringAttack();
+        }
+
+        internal bool BeginAttackHit()
+        {
+            return isEnabled &&
+                ReferenceEquals(currentState, aliveState) &&
+                aliveState.BeginAttackHit();
+        }
+
+        internal bool BeginAttackRecovery()
+        {
+            return isEnabled &&
+                ReferenceEquals(currentState, aliveState) &&
+                aliveState.BeginAttackRecovery();
+        }
+
         internal void PlayIdle()
         {
             animation.PlayIdle();

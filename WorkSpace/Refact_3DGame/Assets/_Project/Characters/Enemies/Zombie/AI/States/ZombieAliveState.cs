@@ -108,6 +108,24 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             }
         }
 
+        internal bool CanTurnDuringAttack()
+        {
+            return ReferenceEquals(currentChildState, attackState) &&
+                attackState.CanTurn;
+        }
+
+        internal bool BeginAttackHit()
+        {
+            return ReferenceEquals(currentChildState, attackState) &&
+                attackState.BeginAttackHit();
+        }
+
+        internal bool BeginAttackRecovery()
+        {
+            return ReferenceEquals(currentChildState, attackState) &&
+                attackState.BeginAttackRecovery();
+        }
+
         internal void ChooseDistanceState()
         {
             if (!stateMachine.IsTargetFound())
