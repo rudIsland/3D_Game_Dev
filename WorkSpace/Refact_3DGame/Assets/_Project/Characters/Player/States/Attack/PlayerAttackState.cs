@@ -1,157 +1,230 @@
+using rudIsland.RPG3D.Player.Animations;
 using rudIsland.RPG3D.Player.States;
 
 namespace rudIsland.RPG3D.Player.States.Attack
 {
-    // 일반 공격 5단 콤보와 달리기 공격의 재생 순서를 관리한다.
+    // 1~5단 일반 콤보와 별도 달리기 공격의 재생 순서를 관리한다.
     internal sealed class PlayerAttackState : IPlayerState
     {
-        private readonly PlayerStateMachine stateMachine;
-        private readonly float[] attackTotalTimes;
-        private readonly float[] nextAttackTimes;
-        private readonly float[] attackMoveScales;
-        private readonly float runAttackTotalTime;
-        private readonly float runAttackMoveScale;
+        private const int LastComboNumber = 5;
+        private const int RunAttackNumber = 6;
+        private const float AttackCompleteNormalizedTime = 1f;
 
-        private float attackElapsedTime;
+        private readonly PlayerStateMachine stateMachine;
+        private readonly PlayerAnimationController animationController;
+        private readonly float attack01NextInputTime;
+        private readonly float attack02NextInputTime;
+        private readonly float attack03NextInputTime;
+        private readonly float attack04NextInputTime;
+        private readonly float comboInputBufferDuration;
+        private readonly float attack01MoveScale;
+        private readonly float attack02MoveScale;
+        private readonly float attack03MoveScale;
+        private readonly float attack04MoveScale;
+        private readonly float attack05MoveScale;
+        private readonly float runAttackMoveScale;
         private int comboNumber;
-        private bool playRunAttack;
-        private bool hasNextAttackInput;
+        private bool isRunAttack;
+        private bool hasAnimationStarted;
+        private bool animationEndedByEvent;
+        private bool hasBufferedAttackInput;
+        private float bufferedAttackInputAge;
 
         public bool IsFinished { get; private set; }
-        public float CurrentAnimationMoveScale => playRunAttack
-            ? runAttackMoveScale
-            : attackMoveScales[comboNumber - 1];
+        public float CurrentMoveScale => GetCurrentMoveScale();
 
         public PlayerAttackState(
             PlayerStateMachine stateMachine,
-            float attack01TotalTime,
-            float attack02TotalTime,
-            float attack03TotalTime,
-            float attack04TotalTime,
-            float attack05TotalTime,
-            float attack01NextTime,
-            float attack02NextTime,
-            float attack03NextTime,
-            float attack04NextTime,
+            PlayerAnimationController animationController,
+            float attack01NextInputTime,
+            float attack02NextInputTime,
+            float attack03NextInputTime,
+            float attack04NextInputTime,
+            float comboInputBufferDuration,
             float attack01MoveScale,
             float attack02MoveScale,
             float attack03MoveScale,
             float attack04MoveScale,
             float attack05MoveScale,
-            float runAttackTotalTime,
             float runAttackMoveScale)
         {
             this.stateMachine = stateMachine;
-            attackTotalTimes = new[]
-            {
-                attack01TotalTime,
-                attack02TotalTime,
-                attack03TotalTime,
-                attack04TotalTime,
-                attack05TotalTime
-            };
-            nextAttackTimes = new[]
-            {
-                attack01NextTime,
-                attack02NextTime,
-                attack03NextTime,
-                attack04NextTime
-            };
-            attackMoveScales = new[]
-            {
-                attack01MoveScale,
-                attack02MoveScale,
-                attack03MoveScale,
-                attack04MoveScale,
-                attack05MoveScale
-            };
-            this.runAttackTotalTime = runAttackTotalTime;
+            this.animationController = animationController;
+            this.attack01NextInputTime = attack01NextInputTime;
+            this.attack02NextInputTime = attack02NextInputTime;
+            this.attack03NextInputTime = attack03NextInputTime;
+            this.attack04NextInputTime = attack04NextInputTime;
+            this.comboInputBufferDuration = comboInputBufferDuration;
+            this.attack01MoveScale = attack01MoveScale;
+            this.attack02MoveScale = attack02MoveScale;
+            this.attack03MoveScale = attack03MoveScale;
+            this.attack04MoveScale = attack04MoveScale;
+            this.attack05MoveScale = attack05MoveScale;
             this.runAttackMoveScale = runAttackMoveScale;
         }
 
-        // 상태 진입 전에 일반 콤보와 달리기 공격 중 하나를 선택한다.
-        public void Prepare(bool useRunAttack)
+        public void Prepare(bool startAsRunAttack)
         {
-            playRunAttack = useRunAttack;
+            isRunAttack = startAsRunAttack;
         }
 
         public void Enter()
         {
-            attackElapsedTime = 0f;
             comboNumber = 1;
-            hasNextAttackInput = false;
+            hasAnimationStarted = false;
             IsFinished = false;
-
-            stateMachine.SetMoveAnimationStopped();
-            stateMachine.SetBlockingAnimation(false);
-            stateMachine.Movement.StopHorizontalMove();
-            stateMachine.SetAttackDirection();
-
-            if (playRunAttack)
-            {
-                stateMachine.PlayAttackAnimation(6);
-                return;
-            }
-
-            stateMachine.PlayAttackAnimation(comboNumber);
+            ClearBufferedAttackInput();
+            PlayCurrentAttack();
         }
 
-        public void Update(
-            float deltaTime,
-            PlayerStateInput input)
+        public void Update(float deltaTime, PlayerStateInput input)
         {
-            UpdateAttack(deltaTime, input.AttackPressed);
-        }
-
-        // 추가 공격 입력을 저장하고 이어질 콤보 시점에 다음 공격을 재생한다.
-        public void UpdateAttack(float deltaTime, bool attackPressed)
-        {
-            attackElapsedTime += deltaTime;
-            stateMachine.SetMoveAnimationStopped();
+            CaptureAttackInput(deltaTime, input.AttackPressed);
+            stateMachine.Movement.UpdateStoppedMove(deltaTime);
+            animationController.StopMove();
             stateMachine.UpdateAttackTurn(deltaTime);
 
-            if (playRunAttack)
+            if (animationEndedByEvent)
             {
-                stateMachine.Movement.UpdateStoppedMove(deltaTime);
-                IsFinished = attackElapsedTime >= runAttackTotalTime;
+                IsFinished = true;
                 return;
             }
 
-            stateMachine.Movement.UpdateStoppedMove(deltaTime);
-
-            if (attackPressed && comboNumber < attackTotalTimes.Length)
+            if (!animationController.TryGetAttackTime(out float normalizedTime))
             {
-                hasNextAttackInput = true;
-            }
+                if (animationController.IsChangingAttackState())
+                {
+                    return;
+                }
 
-            if (hasNextAttackInput &&
-                attackElapsedTime >= GetNextAttackTime())
-            {
-                comboNumber++;
-                attackElapsedTime = 0f;
-                hasNextAttackInput = false;
-                stateMachine.SetAttackDirection();
-                stateMachine.PlayAttackAnimation(comboNumber);
+                IsFinished = hasAnimationStarted;
                 return;
             }
 
-            IsFinished = attackElapsedTime >= GetAttackTotalTime();
+            if (animationController.IsChangingAttackState())
+            {
+                return;
+            }
+
+            hasAnimationStarted = true;
+            if (TryStartNextCombo(normalizedTime))
+            {
+                return;
+            }
+
+            IsFinished = normalizedTime >= AttackCompleteNormalizedTime;
         }
 
         public void Exit()
         {
-            hasNextAttackInput = false;
+            ClearBufferedAttackInput();
+            stateMachine.EndAttackHit();
             stateMachine.ClearAttackDirection();
         }
 
-        private float GetNextAttackTime()
+        private void PlayCurrentAttack()
         {
-            return nextAttackTimes[comboNumber - 1];
+            animationEndedByEvent = false;
+            stateMachine.SetAttackDirection();
+            animationController.PlayAttack(isRunAttack ? RunAttackNumber : comboNumber);
         }
 
-        private float GetAttackTotalTime()
+        internal void NotifyAnimationEnded()
         {
-            return attackTotalTimes[comboNumber - 1];
+            int attackNumber = isRunAttack
+                ? RunAttackNumber
+                : comboNumber;
+            if (!hasAnimationStarted ||
+                !animationController.IsPlayingAttack(attackNumber))
+            {
+                return;
+            }
+
+            animationEndedByEvent = true;
+        }
+
+        private bool TryStartNextCombo(float normalizedTime)
+        {
+            if (isRunAttack || normalizedTime < GetNextInputTime() ||
+                !hasBufferedAttackInput || comboNumber >= LastComboNumber)
+            {
+                return false;
+            }
+
+            ClearBufferedAttackInput();
+            comboNumber++;
+            hasAnimationStarted = false;
+            stateMachine.EndAttackHit();
+            PlayCurrentAttack();
+            return true;
+        }
+
+        private void CaptureAttackInput(float deltaTime, bool attackPressed)
+        {
+            if (attackPressed)
+            {
+                hasBufferedAttackInput = true;
+                bufferedAttackInputAge = 0f;
+                return;
+            }
+
+            if (!hasBufferedAttackInput)
+            {
+                return;
+            }
+
+            bufferedAttackInputAge += deltaTime;
+            if (bufferedAttackInputAge > comboInputBufferDuration)
+            {
+                ClearBufferedAttackInput();
+            }
+        }
+
+        private void ClearBufferedAttackInput()
+        {
+            hasBufferedAttackInput = false;
+            bufferedAttackInputAge = 0f;
+        }
+
+        private float GetNextInputTime()
+        {
+            switch (comboNumber)
+            {
+                case 1:
+                    return attack01NextInputTime;
+                case 2:
+                    return attack02NextInputTime;
+                case 3:
+                    return attack03NextInputTime;
+                case 4:
+                    return attack04NextInputTime;
+                default:
+                    return 1f;
+            }
+        }
+
+        private float GetCurrentMoveScale()
+        {
+            if (isRunAttack)
+            {
+                return runAttackMoveScale;
+            }
+
+            switch (comboNumber)
+            {
+                case 1:
+                    return attack01MoveScale;
+                case 2:
+                    return attack02MoveScale;
+                case 3:
+                    return attack03MoveScale;
+                case 4:
+                    return attack04MoveScale;
+                case 5:
+                    return attack05MoveScale;
+                default:
+                    return 0f;
+            }
         }
     }
 }

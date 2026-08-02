@@ -1,16 +1,16 @@
 using rudIsland.RPG3D.Characters;
+using rudIsland.RPG3D.Combat;
 using rudIsland.RPG3D.Player.Input;
 using rudIsland.RPG3D.Player.Movement;
 using rudIsland.RPG3D.Player.States;
 using rudIsland.RPG3D.World;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace rudIsland.RPG3D.Player
 {
     [RequireComponent(typeof(CharacterController))]
-    // Unity 생명주기에서 입력, 이동, 애니메이션을 연결한다.
-    public sealed class PlayerController : MonoBehaviour
+    // Unity 생명주기에서 플레이어 입력, 이동, Animator를 연결한다.
+    public sealed class PlayerController : MonoBehaviour, IAttackHitReceiver
     {
         [Header("필수 연결")]
         [SerializeField] private WorldObjectManager worldObjectManager;
@@ -19,62 +19,50 @@ namespace rudIsland.RPG3D.Player
 
         [Header("생명")]
         [SerializeField, Min(1f)] private float maxHealth = 100f;
+        [SerializeField] private MeleeHitDetector attackHitDetector;
+        [SerializeField] private PlayerAttackDamage[] attackDamages =
+            CreateDefaultAttackDamages();
 
-        [Header("이동")]
-        [SerializeField] private float walkSpeed = 2.8f;
-        [SerializeField] private float sprintSpeed = 5.5f;
+#if UNITY_EDITOR
+        [Header("체력 확인")]
+        [SerializeField, Min(0f)] private float testDamage = 10f;
+#endif
+
+        [Header("회전")]
         [SerializeField] private float turnSpeed = 720f;
-        [SerializeField, Min(0.01f)] private float moveAcceleration = 28f;
-        [SerializeField, Min(0.01f)] private float moveDeceleration = 36f;
 
-        [Header("Attack Direction")]
-        [SerializeField] private Transform lockOnTarget;
-        [SerializeField, Min(0f)] private float attackTurnSpeed = 360f;
+        [Header("입력 이동")]
+        [SerializeField, Min(0f)] private float walkSpeed = 2.5f;
+        [SerializeField, Min(0f)] private float sprintSpeed = 5f;
 
         [Header("이동 애니메이션")]
         [SerializeField] private float animationSmoothTime = 0.12f;
 
-        [Header("회피 구르기")]
-        [SerializeField]
-        [Tooltip("X축은 롤 시작 속도 비율, Y축은 총 구르기 거리입니다.")]
-        private AnimationCurve rollDistanceByStartSpeed =
-            CreateDefaultRollDistanceByStartSpeed();
+        [Header("구르기 이동 거리")]
+        [Tooltip("1이면 원래 거리, 0.5면 절반, 1.5면 1.5배 이동합니다.")]
+        [SerializeField, Min(0f)] private float rollDistanceScale = 0.75f;
 
-        [SerializeField]
-        [Tooltip("X축은 롤 재생 시간 비율, Y축은 누적 이동 거리 비율입니다.")]
-        private AnimationCurve rollMoveProgressByTime =
-            CreateDefaultRollMoveProgressByTime();
+        [Header("콤보 연결 시점 (0~1)")]
+        [Tooltip("1타 재생이 이 비율을 넘은 뒤부터 2타 입력을 받습니다.")]
+        [SerializeField, Range(0f, 1f)] private float attack01NextInputTime = 0.42f;
+        [Tooltip("2타 재생이 이 비율을 넘은 뒤부터 3타 입력을 받습니다.")]
+        [SerializeField, Range(0f, 1f)] private float attack02NextInputTime = 0.52f;
+        [Tooltip("3타 재생이 이 비율을 넘은 뒤부터 4타 입력을 받습니다.")]
+        [SerializeField, Range(0f, 1f)] private float attack03NextInputTime = 0.52f;
+        [Tooltip("4타 재생이 이 비율을 넘은 뒤부터 5타 입력을 받습니다.")]
+        [SerializeField, Range(0f, 1f)] private float attack04NextInputTime = 0.48f;
 
-        [SerializeField, Range(0f, 1f)]
-        [Tooltip("이 속도 비율 이상으로 롤을 시작하면 달리기 롤을 재생합니다.")]
-        private float sprintRollStartSpeedRatio = 0.85f;
-        [FormerlySerializedAs("rollTotalTime")]
-        [SerializeField, Min(0.01f)] private float normalRollTotalTime = 0.97f;
-        [SerializeField, Min(0.01f)] private float sprintRollTotalTime = 0.73f;
-        [SerializeField, Min(0.01f)] private float rollTurnTime = 0.1f;
+        [Header("콤보 입력 버퍼")]
+        [Tooltip("콤보 연결 시점 전에 누른 공격 입력을 보관하는 시간입니다.")]
+        [SerializeField, Min(0f)] private float comboInputBufferDuration = 0.15f;
 
-        [Header("공격")]
-        [SerializeField, Min(0.01f)] private float attack01TotalTime = 0.97f;
-        [SerializeField, Min(0.01f)] private float attack02TotalTime = 1.13f;
-        [SerializeField, Min(0.01f)] private float attack03TotalTime = 0.98f;
-        [SerializeField, Min(0.01f)] private float attack04TotalTime = 1.18f;
-        [SerializeField, Min(0.01f)] private float attack05TotalTime = 1.47f;
-        [SerializeField, Min(0f)] private float attack01NextTime = 0.65f;
-        [SerializeField, Min(0f)] private float attack02NextTime = 0.72f;
-        [SerializeField, Min(0f)] private float attack03NextTime = 0.65f;
-        [SerializeField, Min(0f)] private float attack04NextTime = 0.65f;
-        [SerializeField, Min(0f)] private float attack01MoveScale = 0.4f;
-        [SerializeField, Min(0f)] private float attack02MoveScale = 0.4f;
-        [SerializeField, Min(0f)] private float attack03MoveScale = 0.5f;
-        [SerializeField, Min(0f)] private float attack04MoveScale = 0.5f;
-        [SerializeField, Min(0f)] private float attack05MoveScale = 0.5f;
-        [SerializeField, Min(0.01f)] private float runAttackTotalTime = 0.94f;
-        [SerializeField, Min(0f)]
-        [Tooltip("이동하면서 달리기를 이 시간 이상 유지해야 달리기 공격을 사용합니다.")]
-        private float runAttackMinimumSprintTime = 0.35f;
-        [SerializeField, Range(0f, 1f)]
-        private float runAttackStartSpeedRatio = 0.95f;
-        [SerializeField, Min(0f)] private float runAttackMoveScale = 1f;
+        [Header("공격 전진 거리 비율 (0~1)")]
+        [SerializeField, Range(0f, 1f)] private float attack01MoveScale = 0.65f;
+        [SerializeField, Range(0f, 1f)] private float attack02MoveScale = 0.65f;
+        [SerializeField, Range(0f, 1f)] private float attack03MoveScale = 0.55f;
+        [SerializeField, Range(0f, 1f)] private float attack04MoveScale = 0.60f;
+        [SerializeField, Range(0f, 1f)] private float attack05MoveScale = 0.50f;
+        [SerializeField, Range(0f, 1f)] private float runAttackMoveScale = 0.80f;
 
         [Header("중력")]
         [SerializeField] private float gravity = -22f;
@@ -86,33 +74,25 @@ namespace rudIsland.RPG3D.Player
         private PlayerMovement playerMovement;
         private PlayerWorldUnit playerWorldUnit;
 
-        public bool IsBlocking => playerWorldUnit?.IsBlocking == true;
-
-        // Inspector에서 커브가 비어 있으면 기본값을 채운다.
-        private void OnValidate()
-        {
-            EnsureRollCurves();
-        }
-
-        // 필수 컴포넌트와 입력·이동 객체를 한 번 생성한다.
         private void Awake()
         {
-            if (worldObjectManager == null)
+            if (worldObjectManager == null || moveCamera == null)
             {
-                Debug.LogError("PlayerController에 WorldObjectManager가 연결되지 않았습니다.", this);
-                enabled = false;
-                return;
-            }
-
-            if (moveCamera == null)
-            {
-                Debug.LogError("PlayerController에 이동 기준 카메라가 연결되지 않았습니다.", this);
+                Debug.LogError(
+                    "PlayerController에 WorldObjectManager와 이동 기준 카메라가 필요합니다.",
+                    this);
                 enabled = false;
                 return;
             }
 
             characterController = GetComponent<CharacterController>();
+            if (attackHitDetector == null)
+            {
+                attackHitDetector =
+                    GetComponentInChildren<MeleeHitDetector>(true);
+            }
 
+            EnsureAttackDamages();
             if (playerAnimator == null)
             {
                 playerAnimator = GetComponentInChildren<Animator>();
@@ -124,55 +104,34 @@ namespace rudIsland.RPG3D.Player
             }
 
             playerInput = new PlayerInputReader();
-            EnsureRollCurves();
-
             playerMovement = new PlayerMovement(
                 transform,
                 moveCamera,
                 characterController,
                 playerInput,
+                turnSpeed,
                 walkSpeed,
                 sprintSpeed,
-                turnSpeed,
-                attackTurnSpeed,
-                moveAcceleration,
-                moveDeceleration,
-                rollDistanceByStartSpeed,
-                rollMoveProgressByTime,
-                sprintRollStartSpeedRatio,
-                normalRollTotalTime,
-                sprintRollTotalTime,
-                rollTurnTime,
                 gravity,
                 groundPull);
-
             playerStateMachine = new PlayerStateMachine(
                 playerInput,
                 playerMovement,
-                characterController,
                 playerAnimator,
-                sprintSpeed,
                 animationSmoothTime,
-                attack01TotalTime,
-                attack02TotalTime,
-                attack03TotalTime,
-                attack04TotalTime,
-                attack05TotalTime,
-                attack01NextTime,
-                attack02NextTime,
-                attack03NextTime,
-                attack04NextTime,
+                rollDistanceScale,
+                attack01NextInputTime,
+                attack02NextInputTime,
+                attack03NextInputTime,
+                attack04NextInputTime,
+                comboInputBufferDuration,
                 attack01MoveScale,
                 attack02MoveScale,
                 attack03MoveScale,
                 attack04MoveScale,
                 attack05MoveScale,
-                runAttackTotalTime,
-                runAttackMinimumSprintTime,
-                runAttackStartSpeedRatio,
-                runAttackMoveScale);
-            playerStateMachine.SetLockOnTarget(lockOnTarget);
-
+                runAttackMoveScale,
+                EndAttackHit);
             playerWorldUnit = new PlayerWorldUnit(
                 maxHealth,
                 playerInput,
@@ -191,73 +150,58 @@ namespace rudIsland.RPG3D.Player
             }
         }
 
-        // Animator 자식이 전달한 공격 이동을 플레이어 루트에 적용한다.
-        public void ApplyAttackAnimationMove(Vector3 deltaPosition)
+        // 구르기·방어·공격·사망 애니메이션의 루트 모션을 플레이어 루트에 적용한다.
+        public void ApplyRootMotion(
+            Vector3 deltaPosition,
+            Quaternion deltaRotation)
         {
-            playerStateMachine?.ApplyAttackAnimationMove(deltaPosition);
+            playerStateMachine?.ApplyRootMotion(deltaPosition, deltaRotation);
         }
 
-        // 방패를 들고 있을 때만 방어 피격 애니메이션을 재생한다.
-        public void PlayBlockImpact()
+        public void TakeDamage(float damage)
         {
-            playerWorldUnit?.PlayBlockImpact();
+            playerWorldUnit?.TakeDamage(damage);
         }
 
-        public void SetLockOnTarget(Transform target)
+        public void ReceiveHit(in AttackHitData hit)
         {
-            lockOnTarget = target;
-            playerStateMachine?.SetLockOnTarget(target);
+            playerWorldUnit?.ApplyHit(in hit);
         }
 
-        public void ClearLockOnTarget()
+        public void StartAttackHit(int attackNumber)
         {
-            SetLockOnTarget(null);
-        }
+            EndAttackHit();
 
-        // 비어 있는 롤 커브만 기본 설정으로 복구한다.
-        private void EnsureRollCurves()
-        {
-            if (rollDistanceByStartSpeed == null || rollDistanceByStartSpeed.length == 0)
+            if (attackHitDetector == null ||
+                !PlayerAttackDamage.TryGetDamage(
+                    attackDamages,
+                    attackNumber,
+                    out AttackDamage damage))
             {
-                rollDistanceByStartSpeed = CreateDefaultRollDistanceByStartSpeed();
+                return;
             }
 
-            if (rollMoveProgressByTime == null || rollMoveProgressByTime.length == 0)
-            {
-                rollMoveProgressByTime = CreateDefaultRollMoveProgressByTime();
-            }
+            var hit = new AttackHitData(
+                damage,
+                UnitTeam.Player,
+                attackNumber);
+            attackHitDetector.StartHit(in hit);
         }
 
-        // 정지 1.65m에서 최고속도 3.25m까지 거리를 늘린다.
-        private static AnimationCurve CreateDefaultRollDistanceByStartSpeed()
+        public void EndAttackHit()
         {
-            AnimationCurve curve = AnimationCurve.Linear(
-                0f,
-                1.65f,
-                1f,
-                3.25f);
-            curve.preWrapMode = WrapMode.Clamp;
-            curve.postWrapMode = WrapMode.Clamp;
-            return curve;
+            attackHitDetector?.EndHit();
         }
 
-        // 전체 시간의 75%까지 이동하고 남은 시간에는 일어난다.
-        private static AnimationCurve CreateDefaultRollMoveProgressByTime()
+        internal void NotifyAttackAnimationEnded()
         {
-            AnimationCurve curve = new AnimationCurve(
-                new Keyframe(0f, 0f, 0f, 0.15f),
-                new Keyframe(0.12f, 0.03f, 0.4f, 0.8f),
-                new Keyframe(0.36f, 0.45f, 1.9f, 1.9f),
-                new Keyframe(0.60f, 0.88f, 1.1f, 1.1f),
-                new Keyframe(0.75f, 1f, 0f, 0f),
-                new Keyframe(1f, 1f, 0f, 0f));
-            curve.preWrapMode = WrapMode.Clamp;
-            curve.postWrapMode = WrapMode.Clamp;
-            return curve;
+            EndAttackHit();
+            playerStateMachine?.NotifyAttackAnimationEnded();
         }
 
         private void OnDisable()
         {
+            EndAttackHit();
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
 
@@ -282,5 +226,59 @@ namespace rudIsland.RPG3D.Player
 
             playerWorldUnit.Dispose();
         }
+
+        private void EnsureAttackDamages()
+        {
+            if (attackDamages != null && attackDamages.Length > 0)
+            {
+                return;
+            }
+
+            attackDamages = CreateDefaultAttackDamages();
+        }
+
+        private static PlayerAttackDamage[] CreateDefaultAttackDamages()
+        {
+            var defaultDamages = new PlayerAttackDamage[6];
+            for (int index = 0; index < defaultDamages.Length; index++)
+            {
+                defaultDamages[index] = new PlayerAttackDamage(
+                    index + 1,
+                    new AttackDamage(10f));
+            }
+
+            return defaultDamages;
+        }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (PlayerAttackDamage.HasDuplicateAttackNumber(attackDamages))
+            {
+                Debug.LogError(
+                    "PlayerController의 공격 번호가 중복되었습니다.",
+                    this);
+            }
+        }
+
+        [ContextMenu("Test Damage")]
+        private void TestDamage()
+        {
+            if (!Application.isPlaying || playerWorldUnit == null)
+            {
+                Debug.LogWarning(
+                    "Test Damage는 Play 중이고 플레이어 준비가 끝난 뒤 사용할 수 있습니다.",
+                    this);
+                return;
+            }
+
+            float healthBeforeDamage = playerWorldUnit.CurrentHealth;
+            playerWorldUnit.TakeDamage(testDamage);
+
+            Debug.Log(
+                $"플레이어 체력: {healthBeforeDamage} → {playerWorldUnit.CurrentHealth}",
+                this);
+        }
+#endif
     }
 }

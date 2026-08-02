@@ -4,7 +4,7 @@ using rudIsland.RPG3D.Player.States.Movement;
 
 namespace rudIsland.RPG3D.Player.States
 {
-    // 플레이어가 조작 가능한 동안 이동, 방어, 구르기, 공격 중 하나를 실행한다.
+    // 플레이어의 이동, 방어, 구르기, 공격 애니메이션 상태를 전환한다.
     internal sealed class PlayerControlState : IPlayerState
     {
         private readonly PlayerStateMachine stateMachine;
@@ -12,14 +12,11 @@ namespace rudIsland.RPG3D.Player.States
         private readonly PlayerBlockState blockState;
         private readonly PlayerRollState rollState;
         private readonly PlayerAttackState attackState;
-
         private IPlayerState currentState;
 
         public bool IsBlocking => ReferenceEquals(currentState, blockState);
         public bool IsRolling => ReferenceEquals(currentState, rollState);
         public bool IsAttacking => ReferenceEquals(currentState, attackState);
-        public float CurrentAttackAnimationMoveScale =>
-            IsAttacking ? attackState.CurrentAnimationMoveScale : 0f;
 
         public PlayerControlState(
             PlayerStateMachine stateMachine,
@@ -40,9 +37,7 @@ namespace rudIsland.RPG3D.Player.States
             ChangeState(moveState);
         }
 
-        public void Update(
-            float deltaTime,
-            PlayerStateInput input)
+        public void Update(float deltaTime, PlayerStateInput input)
         {
             if (currentState == null)
             {
@@ -52,10 +47,9 @@ namespace rudIsland.RPG3D.Player.States
             if (ReferenceEquals(currentState, rollState))
             {
                 currentState.Update(deltaTime, input);
-
-                if (!stateMachine.Movement.IsRolling)
+                if (rollState.IsFinished)
                 {
-                    ChangeToMoveOrBlock(input.IsBlocking);
+                    ChangeState(input.IsBlocking ? blockState : moveState);
                 }
 
                 return;
@@ -73,10 +67,20 @@ namespace rudIsland.RPG3D.Player.States
                 }
 
                 currentState.Update(deltaTime, input);
-
                 if (attackState.IsFinished)
                 {
-                    ChangeToMoveOrBlock(input.IsBlocking);
+                    ChangeState(input.IsBlocking ? blockState : moveState);
+                }
+
+                return;
+            }
+
+            if (ReferenceEquals(currentState, blockState))
+            {
+                currentState.Update(deltaTime, input);
+                if (!input.IsBlocking)
+                {
+                    ChangeState(moveState);
                 }
 
                 return;
@@ -89,26 +93,21 @@ namespace rudIsland.RPG3D.Player.States
                 return;
             }
 
-            if (input.RollPressed &&
-                stateMachine.Movement.TryStartRoll())
+            if (input.RollPressed && stateMachine.Movement.TryStartRoll())
             {
                 ChangeState(rollState);
                 currentState.Update(deltaTime, input);
                 return;
             }
 
-            if (input.AttackPressed &&
-                stateMachine.CanStartAttack())
+            if (input.AttackPressed && stateMachine.CanStartAttack())
             {
-                attackState.Prepare(stateMachine.ShouldPlayRunAttack());
+                attackState.Prepare(stateMachine.ShouldStartRunAttack());
                 ChangeState(attackState);
-
-                // 첫 입력은 공격 시작에만 사용하고 다음 콤보로 예약하지 않는다.
-                PlayerStateInput attackStartInput = new PlayerStateInput(
-                    input.RollPressed,
+                currentState.Update(deltaTime, new PlayerStateInput(
                     false,
-                    input.IsBlocking);
-                currentState.Update(deltaTime, attackStartInput);
+                    false,
+                    input.IsBlocking));
                 return;
             }
 
@@ -120,11 +119,6 @@ namespace rudIsland.RPG3D.Player.States
         {
             currentState?.Exit();
             currentState = null;
-        }
-
-        private void ChangeToMoveOrBlock(bool isBlocking)
-        {
-            ChangeState(isBlocking ? blockState : moveState);
         }
 
         private void ChangeState(IPlayerState nextState)

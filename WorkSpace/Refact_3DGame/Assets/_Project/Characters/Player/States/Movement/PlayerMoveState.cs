@@ -1,3 +1,4 @@
+using rudIsland.RPG3D.Player.Animations;
 using rudIsland.RPG3D.Player.States;
 
 namespace rudIsland.RPG3D.Player.States.Movement
@@ -6,23 +7,27 @@ namespace rudIsland.RPG3D.Player.States.Movement
     internal sealed class PlayerMoveState : IPlayerState
     {
         private readonly PlayerStateMachine stateMachine;
+        private readonly PlayerAnimationController animationController;
 
-        public PlayerMoveState(PlayerStateMachine stateMachine)
+        public PlayerMoveState(
+            PlayerStateMachine stateMachine,
+            PlayerAnimationController animationController)
         {
             this.stateMachine = stateMachine;
+            this.animationController = animationController;
         }
 
         public void Enter()
         {
-            stateMachine.SetBlockingAnimation(false);
         }
 
-        public void Update(
-            float deltaTime,
-            PlayerStateInput input)
+        public void Update(float deltaTime, PlayerStateInput input)
         {
             stateMachine.Movement.UpdateMove(deltaTime);
-            stateMachine.UpdateMoveAnimation(deltaTime);
+            animationController.UpdateMove(
+                stateMachine.Input.MoveValue,
+                stateMachine.Input.IsSprinting,
+                deltaTime);
         }
 
         public void Exit()

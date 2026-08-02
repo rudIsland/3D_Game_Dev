@@ -1,6 +1,6 @@
 namespace rudIsland.RPG3D.Player.States
 {
-    // 이번 프레임에 상태가 판단할 입력만 묶어서 전달한다.
+    // 이번 프레임에 상태가 판단할 입력만 전달한다.
     internal readonly struct PlayerStateInput
     {
         public bool RollPressed { get; }

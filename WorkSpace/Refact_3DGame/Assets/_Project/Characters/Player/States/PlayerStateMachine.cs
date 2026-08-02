@@ -1,3 +1,5 @@
+using System;
+using rudIsland.RPG3D.Player.Animations;
 using rudIsland.RPG3D.Player.Input;
 using rudIsland.RPG3D.Player.Movement;
 using rudIsland.RPG3D.Player.States.Attack;
@@ -7,113 +9,81 @@ using UnityEngine;
 
 namespace rudIsland.RPG3D.Player.States
 {
-    // 최상위 상태의 생명주기를 관리하고 상태가 사용할 기능을 제공한다.
+    // 플레이어 상태 전환, 입력 판단, 루트 모션 전달을 관리한다.
     public sealed class PlayerStateMachine
     {
-        private static readonly int MoveAmountId = Animator.StringToHash("MoveAmount");
-        private static readonly int RollId = Animator.StringToHash("Roll");
-        private static readonly int SprintRollId = Animator.StringToHash("SprintRoll");
-        private static readonly int IsBlockingId = Animator.StringToHash("IsBlocking");
-        private static readonly int BlockImpactId = Animator.StringToHash("BlockImpact");
-        private static readonly int AttackId = Animator.StringToHash("Attack");
-        private static readonly int AttackIndexId = Animator.StringToHash("AttackIndex");
-        private static readonly int PlayerRollStateId =
-            Animator.StringToHash("Base Layer.Movement.PlayerRoll");
-        private static readonly int PlayerSprintRollStateId =
-            Animator.StringToHash("Base Layer.Movement.PlayerSprintRoll");
-
         private readonly PlayerInputReader playerInput;
         private readonly PlayerMovement playerMovement;
-        private readonly CharacterController characterController;
-        private readonly Animator playerAnimator;
-        private readonly float sprintSpeed;
-        private readonly float animationSmoothTime;
-        private readonly float runAttackMinimumSprintTime;
-        private readonly float runAttackStartSpeedRatio;
-
+        private readonly PlayerAnimationController animationController;
+        private readonly PlayerAttackState attackState;
         private readonly PlayerControlState controlState;
+        private readonly PlayerHitState hitState;
+        private readonly PlayerDeadState deadState;
+        private readonly Action endAttackHit;
+        private readonly float rollDistanceScale;
 
         private IPlayerState currentState;
-        private Transform lockOnTarget;
-        private float sprintMoveElapsedTime;
         private bool isEnabled;
 
         internal PlayerMovement Movement => playerMovement;
-
-        public bool IsBlocking =>
-            ReferenceEquals(currentState, controlState) &&
+        internal PlayerInputReader Input => playerInput;
+        public bool IsBlocking => ReferenceEquals(currentState, controlState) &&
             controlState.IsBlocking;
-        public bool IsRolling =>
-            ReferenceEquals(currentState, controlState) &&
+        public bool IsRolling => ReferenceEquals(currentState, controlState) &&
             controlState.IsRolling;
-        public bool IsAttacking =>
-            ReferenceEquals(currentState, controlState) &&
+        public bool IsAttacking => ReferenceEquals(currentState, controlState) &&
             controlState.IsAttacking;
+        public bool IsDead => ReferenceEquals(currentState, deadState);
+        public bool IsHit => ReferenceEquals(currentState, hitState);
 
         public PlayerStateMachine(
             PlayerInputReader playerInput,
             PlayerMovement playerMovement,
-            CharacterController characterController,
             Animator playerAnimator,
-            float sprintSpeed,
             float animationSmoothTime,
-            float attack01TotalTime,
-            float attack02TotalTime,
-            float attack03TotalTime,
-            float attack04TotalTime,
-            float attack05TotalTime,
-            float attack01NextTime,
-            float attack02NextTime,
-            float attack03NextTime,
-            float attack04NextTime,
+            float rollDistanceScale,
+            float attack01NextInputTime,
+            float attack02NextInputTime,
+            float attack03NextInputTime,
+            float attack04NextInputTime,
+            float comboInputBufferDuration,
             float attack01MoveScale,
             float attack02MoveScale,
             float attack03MoveScale,
             float attack04MoveScale,
             float attack05MoveScale,
-            float runAttackTotalTime,
-            float runAttackMinimumSprintTime,
-            float runAttackStartSpeedRatio,
-            float runAttackMoveScale)
+            float runAttackMoveScale,
+            Action endAttackHit)
         {
             this.playerInput = playerInput;
             this.playerMovement = playerMovement;
-            this.characterController = characterController;
-            this.playerAnimator = playerAnimator;
-            this.sprintSpeed = sprintSpeed;
-            this.animationSmoothTime = animationSmoothTime;
-            this.runAttackMinimumSprintTime =
-                Mathf.Max(0f, runAttackMinimumSprintTime);
-            this.runAttackStartSpeedRatio =
-                Mathf.Clamp01(runAttackStartSpeedRatio);
+            animationController = new PlayerAnimationController(
+                playerAnimator,
+                animationSmoothTime);
+            this.rollDistanceScale = Mathf.Max(0f, rollDistanceScale);
+            this.endAttackHit = endAttackHit;
 
-            PlayerMoveState moveState = new PlayerMoveState(this);
-            PlayerBlockState blockState = new PlayerBlockState(this);
-            PlayerRollState rollState = new PlayerRollState(this);
-            PlayerAttackState attackState = new PlayerAttackState(
+            PlayerMoveState moveState = new PlayerMoveState(this, animationController);
+            PlayerBlockState blockState = new PlayerBlockState(this, animationController);
+            PlayerRollState rollState = new PlayerRollState(this, animationController);
+            attackState = new PlayerAttackState(
                 this,
-                Mathf.Max(0.01f, attack01TotalTime),
-                Mathf.Max(0.01f, attack02TotalTime),
-                Mathf.Max(0.01f, attack03TotalTime),
-                Mathf.Max(0.01f, attack04TotalTime),
-                Mathf.Max(0.01f, attack05TotalTime),
-                Mathf.Max(0f, attack01NextTime),
-                Mathf.Max(0f, attack02NextTime),
-                Mathf.Max(0f, attack03NextTime),
-                Mathf.Max(0f, attack04NextTime),
-                Mathf.Max(0f, attack01MoveScale),
-                Mathf.Max(0f, attack02MoveScale),
-                Mathf.Max(0f, attack03MoveScale),
-                Mathf.Max(0f, attack04MoveScale),
-                Mathf.Max(0f, attack05MoveScale),
-                Mathf.Max(0.01f, runAttackTotalTime),
-                Mathf.Max(0f, runAttackMoveScale));
+                animationController,
+                Mathf.Clamp01(attack01NextInputTime),
+                Mathf.Clamp01(attack02NextInputTime),
+                Mathf.Clamp01(attack03NextInputTime),
+                Mathf.Clamp01(attack04NextInputTime),
+                Mathf.Max(0f, comboInputBufferDuration),
+                Mathf.Clamp01(attack01MoveScale),
+                Mathf.Clamp01(attack02MoveScale),
+                Mathf.Clamp01(attack03MoveScale),
+                Mathf.Clamp01(attack04MoveScale),
+                Mathf.Clamp01(attack05MoveScale),
+                Mathf.Clamp01(runAttackMoveScale));
             controlState = new PlayerControlState(
-                this,
-                moveState,
-                blockState,
-                rollState,
-                attackState);
+                this, moveState, blockState, rollState, attackState);
+            hitState = new PlayerHitState(this, animationController);
+            deadState = new PlayerDeadState(this, animationController);
         }
 
         public void Enable()
@@ -127,22 +97,17 @@ namespace rudIsland.RPG3D.Player.States
             ChangeState(controlState);
         }
 
-        public void Update(
-            float deltaTime,
-            bool rollPressed,
-            bool attackPressed)
+        public void Update(float deltaTime, bool rollPressed, bool attackPressed)
         {
             if (!isEnabled || currentState == null)
             {
                 return;
             }
 
-            PlayerStateInput input = new PlayerStateInput(
+            currentState.Update(deltaTime, new PlayerStateInput(
                 rollPressed,
                 attackPressed,
-                playerInput.IsBlocking);
-            UpdateSprintMoveTime(deltaTime);
-            currentState.Update(deltaTime, input);
+                playerInput.IsBlocking));
         }
 
         public void Disable()
@@ -153,38 +118,105 @@ namespace rudIsland.RPG3D.Player.States
             }
 
             currentState?.Exit();
+            EndAttackHit();
             currentState = null;
-            sprintMoveElapsedTime = 0f;
             isEnabled = false;
+            animationController.Reset();
+        }
 
-            if (playerAnimator == null)
+        internal void SetAttackDirection()
+        {
+            playerMovement.SetAttackDirection();
+        }
+
+        internal void UpdateAttackTurn(float deltaTime)
+        {
+            playerMovement.UpdateAttackTurn(deltaTime);
+        }
+
+        internal void ClearAttackDirection()
+        {
+            playerMovement.ClearAttackDirection();
+        }
+
+        internal bool CanStartAttack()
+        {
+            return playerMovement.IsGrounded;
+        }
+
+        internal bool ShouldStartRunAttack()
+        {
+            return playerInput.IsSprinting &&
+                playerInput.MoveValue.sqrMagnitude >= 0.95f;
+        }
+
+        internal void ApplyRootMotion(Vector3 deltaPosition, Quaternion deltaRotation)
+        {
+            if (IsRolling || IsBlocking || IsAttacking || IsDead)
+            {
+                float horizontalMoveScale = IsRolling
+                    ? rollDistanceScale
+                    : IsAttacking
+                        ? attackState.CurrentMoveScale
+                        : 1f;
+                playerMovement.ApplyRootMotion(
+                    deltaPosition,
+                    deltaRotation,
+                    horizontalMoveScale);
+            }
+        }
+
+        internal void ChangeToDeadState()
+        {
+            if (!isEnabled || ReferenceEquals(currentState, deadState))
             {
                 return;
             }
 
-            playerAnimator.SetBool(IsBlockingId, false);
-            playerAnimator.SetFloat(MoveAmountId, 0f);
-            playerAnimator.ResetTrigger(RollId);
-            playerAnimator.ResetTrigger(SprintRollId);
-            playerAnimator.ResetTrigger(BlockImpactId);
-            playerAnimator.ResetTrigger(AttackId);
-            playerAnimator.SetInteger(AttackIndexId, 0);
+            EndAttackHit();
+            ChangeState(deadState);
         }
 
-        public void PlayBlockImpact()
+        internal void ChangeToHitState()
         {
-            if (!IsBlocking || playerAnimator == null)
+            if (!isEnabled || ReferenceEquals(currentState, deadState))
             {
                 return;
             }
 
-            playerAnimator.ResetTrigger(BlockImpactId);
-            playerAnimator.SetTrigger(BlockImpactId);
+            EndAttackHit();
+            if (ReferenceEquals(currentState, hitState))
+            {
+                hitState.Restart();
+                return;
+            }
+
+            ChangeState(hitState);
         }
 
-        public void SetLockOnTarget(Transform target)
+        internal void ChangeToControlState()
         {
-            lockOnTarget = target;
+            if (!isEnabled || ReferenceEquals(currentState, deadState))
+            {
+                return;
+            }
+
+            ChangeState(controlState);
+        }
+
+        internal void EndAttackHit()
+        {
+            endAttackHit?.Invoke();
+        }
+
+        internal void NotifyAttackAnimationEnded()
+        {
+            if (!isEnabled || !IsAttacking)
+            {
+                return;
+            }
+
+            attackState.NotifyAnimationEnded();
         }
 
         private void ChangeState(IPlayerState nextState)
@@ -197,162 +229,6 @@ namespace rudIsland.RPG3D.Player.States
             currentState?.Exit();
             currentState = nextState;
             currentState.Enter();
-        }
-
-        internal void SetBlockingAnimation(bool isBlocking)
-        {
-            playerAnimator?.SetBool(IsBlockingId, isBlocking);
-        }
-
-        internal void UpdateMoveAnimation(float deltaTime)
-        {
-            if (playerAnimator == null || characterController == null)
-            {
-                return;
-            }
-
-            Vector3 currentVelocity = characterController.velocity;
-            currentVelocity.y = 0f;
-
-            if (currentVelocity.sqrMagnitude < 0.0001f)
-            {
-                playerAnimator.SetFloat(MoveAmountId, 0f);
-                return;
-            }
-
-            float moveAmount = sprintSpeed > 0f
-                ? Mathf.Clamp01(currentVelocity.magnitude / sprintSpeed)
-                : 0f;
-
-            playerAnimator.SetFloat(
-                MoveAmountId,
-                moveAmount,
-                animationSmoothTime,
-                deltaTime);
-        }
-
-        internal void SetMoveAnimationStopped()
-        {
-            playerAnimator?.SetFloat(MoveAmountId, 0f);
-        }
-
-        internal void SetAttackDirection()
-        {
-            playerMovement.SetAttackDirection(lockOnTarget);
-        }
-
-        internal void UpdateAttackTurn(float deltaTime)
-        {
-            playerMovement.UpdateAttackTurn(
-                lockOnTarget,
-                deltaTime);
-        }
-
-        internal void ClearAttackDirection()
-        {
-            playerMovement.ClearAttackDirection();
-        }
-
-        internal void PlayRollAnimation(bool startsAfterAttackCancel)
-        {
-            if (playerAnimator == null)
-            {
-                return;
-            }
-
-            playerAnimator.SetBool(IsBlockingId, false);
-            playerAnimator.SetFloat(MoveAmountId, 0f);
-            playerAnimator.ResetTrigger(RollId);
-            playerAnimator.ResetTrigger(SprintRollId);
-
-            if (startsAfterAttackCancel)
-            {
-                playerAnimator.ResetTrigger(AttackId);
-                playerAnimator.SetInteger(AttackIndexId, 0);
-                playerAnimator.CrossFadeInFixedTime(
-                    playerMovement.UsesSprintRoll
-                        ? PlayerSprintRollStateId
-                        : PlayerRollStateId,
-                    0.08f);
-                return;
-            }
-
-            playerAnimator.SetTrigger(
-                playerMovement.UsesSprintRoll
-                    ? SprintRollId
-                    : RollId);
-        }
-
-        internal void ApplyAttackAnimationMove(
-            Vector3 deltaPosition)
-        {
-            if (!IsAttacking)
-            {
-                return;
-            }
-
-            float moveScale =
-                controlState.CurrentAttackAnimationMoveScale;
-            if (moveScale <= 0f)
-            {
-                return;
-            }
-
-            playerMovement.ApplyAttackAnimationMove(deltaPosition, moveScale);
-        }
-
-        internal void PlayAttackAnimation(int attackNumber)
-        {
-            if (playerAnimator == null)
-            {
-                return;
-            }
-
-            playerAnimator.SetBool(IsBlockingId, false);
-            playerAnimator.SetFloat(MoveAmountId, 0f);
-            playerAnimator.ResetTrigger(AttackId);
-            playerAnimator.SetInteger(AttackIndexId, attackNumber);
-            playerAnimator.SetTrigger(AttackId);
-        }
-
-        internal bool CanStartAttack()
-        {
-            return characterController != null &&
-                characterController.isGrounded;
-        }
-
-        internal bool ShouldPlayRunAttack()
-        {
-            if (!playerInput.IsSprinting ||
-                sprintMoveElapsedTime < runAttackMinimumSprintTime ||
-                characterController == null)
-            {
-                return false;
-            }
-
-            Vector3 currentVelocity = characterController.velocity;
-            currentVelocity.y = 0f;
-
-            float currentSpeedRatio = sprintSpeed > 0.01f
-                ? currentVelocity.magnitude / sprintSpeed
-                : 0f;
-
-            return currentSpeedRatio >= runAttackStartSpeedRatio;
-        }
-
-        private void UpdateSprintMoveTime(float deltaTime)
-        {
-            if (!playerInput.IsSprinting ||
-                playerInput.MoveValue.sqrMagnitude < 0.01f ||
-                controlState.IsAttacking ||
-                controlState.IsRolling ||
-                controlState.IsBlocking)
-            {
-                sprintMoveElapsedTime = 0f;
-                return;
-            }
-
-            sprintMoveElapsedTime += deltaTime;
         }
     }
 }
