@@ -3,33 +3,51 @@ using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
 {
+    public enum MummyWarriorHitDirection
+    {
+        Forward,
+        Backward,
+        Left,
+        Right
+    }
+
+    // 네 방향 피격 상태를 빠르게 찾기 위한 Animator 해시
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Animator))]
     // 상태머신의 이동값과 전신 행동 요청을 Animator에 전달한다.
     public sealed class MummyWarriorAnimationController : MonoBehaviour
     {
-        private const int ActionLayerIndex = 1;
+        private static readonly int HitForwardStateId =
+            Animator.StringToHash("Hit_Fw");
+        private static readonly int HitBackwardStateId =
+            Animator.StringToHash("Hit_Bw");
+        private static readonly int HitLeftStateId =
+            Animator.StringToHash("Hit_L");
+        private static readonly int HitRightStateId =
+            Animator.StringToHash("Hit_R");
 
-        private static readonly int MoveSideId = Animator.StringToHash("MoveSide");
-        private static readonly int MoveSpeedId = Animator.StringToHash("MoveSpeed");
-        private static readonly int AlternateIdleId = Animator.StringToHash("AlternateIdle");
-        private static readonly int AttackId = Animator.StringToHash("Attack");
-        private static readonly int AttackNumberId = Animator.StringToHash("AttackNumber");
-        private static readonly int HitId = Animator.StringToHash("Hit");
-        private static readonly int BlockId = Animator.StringToHash("Block");
-        private static readonly int TurnId = Animator.StringToHash("Turn");
-        private static readonly int StepBackId = Animator.StringToHash("StepBack");
-        private static readonly int EnterId = Animator.StringToHash("Enter");
-        private static readonly int ExitId = Animator.StringToHash("Exit");
-        private static readonly int IsDeadId = Animator.StringToHash("IsDead");
-        private static readonly int EnterStateId = Animator.StringToHash("Enter");
-        private static readonly int HitStateId = Animator.StringToHash("Hit");
-        private static readonly int ActionIdleStateId = Animator.StringToHash("Action Idle");
+        private const int ActionLayerIndex = 1; // 현재 행동 상태
 
-        [SerializeField] private Animator mummyAnimator;
+        private static readonly int MoveSideId = Animator.StringToHash("MoveSide"); // 이동 정보
+        private static readonly int MoveSpeedId = Animator.StringToHash("MoveSpeed"); // 이동 속도
+        private static readonly int AlternateIdleId = Animator.StringToHash("AlternateIdle"); // 내부에서 사용하는 값
+        private static readonly int AttackId = Animator.StringToHash("Attack"); // 공격 관련 설정 또는 상태
+        private static readonly int AttackNumberId = Animator.StringToHash("AttackNumber"); // 공격 관련 설정 또는 상태
+        private static readonly int HitId = Animator.StringToHash("Hit"); // 피격 또는 피해 관련 값
+        private static readonly int BlockId = Animator.StringToHash("Block"); // 내부에서 사용하는 값
+        private static readonly int TurnId = Animator.StringToHash("Turn"); // 내부에서 사용하는 값
+        private static readonly int StepBackId = Animator.StringToHash("StepBack"); // 내부에서 사용하는 값
+        private static readonly int EnterId = Animator.StringToHash("Enter"); // 내부에서 사용하는 값
+        private static readonly int ExitId = Animator.StringToHash("Exit"); // 내부에서 사용하는 값
+        private static readonly int IsDeadId = Animator.StringToHash("IsDead"); // 기능 사용 여부
+        private static readonly int EnterStateId = Animator.StringToHash("Enter"); // 현재 행동 상태
+        private static readonly int HitStateId = Animator.StringToHash("Hit"); // 피격 또는 피해 관련 값
+        private static readonly int ActionIdleStateId = Animator.StringToHash("Action Idle"); // 현재 행동 상태
 
-        private int requestedActionStateId;
-        private AnimatorPlaybackReader playbackReader;
+        [SerializeField] private Animator mummyAnimator; // 애니메이터 참조
+
+        private int requestedActionStateId; // 현재 행동 상태
+        private AnimatorPlaybackReader playbackReader; // 씬 또는 시스템 참조
 
         private void Awake()
         {
@@ -76,12 +94,26 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
             }
         }
 
-        public void PlayHit()
+        public void PlayHit(
+            MummyWarriorHitDirection direction =
+                MummyWarriorHitDirection.Forward)
         {
             if (!CanControlAnimator()) return;
+
+            int hitStateId = GetHitStateId(direction);
             mummyAnimator.speed = 1f;
-            StartAction(HitStateId);
+            StartAction(hitStateId);
             mummyAnimator.SetTrigger(HitId);
+
+            if (mummyAnimator.HasState(ActionLayerIndex, hitStateId))
+            {
+                mummyAnimator.CrossFadeInFixedTime(
+                    hitStateId,
+                    0.04f,
+                    ActionLayerIndex,
+                    0f);
+                mummyAnimator.ResetTrigger(HitId);
+            }
         }
 
         public void PlayEnter()
@@ -172,7 +204,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
             mummyAnimator.SetBool(IsDeadId, false);
             ResetActionTriggers();
 
-            if (mummyAnimator.isActiveAndEnabled)
+            if (mummyAnimator.isActiveAndEnabled &&
+                mummyAnimator.gameObject.activeInHierarchy)
             {
                 mummyAnimator.Update(0f);
             }
@@ -192,6 +225,21 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
         private void StartAction(int animatorStateId)
         {
             requestedActionStateId = animatorStateId;
+        }
+
+        private static int GetHitStateId(MummyWarriorHitDirection direction)
+        {
+            switch (direction)
+            {
+                case MummyWarriorHitDirection.Backward:
+                    return HitBackwardStateId;
+                case MummyWarriorHitDirection.Left:
+                    return HitLeftStateId;
+                case MummyWarriorHitDirection.Right:
+                    return HitRightStateId;
+                default:
+                    return HitForwardStateId;
+            }
         }
 
         private bool TryGetCurrentActionTime(
