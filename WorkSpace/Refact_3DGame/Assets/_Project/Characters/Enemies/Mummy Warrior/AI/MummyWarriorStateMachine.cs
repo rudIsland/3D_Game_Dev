@@ -214,7 +214,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
             pattern.StartCooldown(currentTime);
             animation.SetMovement(0f, 0f);
             animation.PlayAttack(
-                attackNumber,
                 pattern.AnimatorStateId,
                 pattern.TransitionTime,
                 pattern.AnimationSpeed);

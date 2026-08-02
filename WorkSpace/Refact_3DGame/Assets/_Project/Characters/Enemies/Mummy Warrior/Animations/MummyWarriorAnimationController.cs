@@ -26,23 +26,15 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
         private static readonly int HitRightStateId =
             Animator.StringToHash("Hit_R");
 
-        private const int ActionLayerIndex = 1; // 현재 행동 상태
+        private const int AnimationLayerIndex = 0; // 이동과 전신 행동 상태
 
         private static readonly int MoveSideId = Animator.StringToHash("MoveSide"); // 이동 정보
         private static readonly int MoveSpeedId = Animator.StringToHash("MoveSpeed"); // 이동 속도
-        private static readonly int AlternateIdleId = Animator.StringToHash("AlternateIdle"); // 내부에서 사용하는 값
-        private static readonly int AttackId = Animator.StringToHash("Attack"); // 공격 관련 설정 또는 상태
-        private static readonly int AttackNumberId = Animator.StringToHash("AttackNumber"); // 공격 관련 설정 또는 상태
-        private static readonly int HitId = Animator.StringToHash("Hit"); // 피격 또는 피해 관련 값
-        private static readonly int BlockId = Animator.StringToHash("Block"); // 내부에서 사용하는 값
-        private static readonly int TurnId = Animator.StringToHash("Turn"); // 내부에서 사용하는 값
-        private static readonly int StepBackId = Animator.StringToHash("StepBack"); // 내부에서 사용하는 값
         private static readonly int EnterId = Animator.StringToHash("Enter"); // 내부에서 사용하는 값
-        private static readonly int ExitId = Animator.StringToHash("Exit"); // 내부에서 사용하는 값
         private static readonly int IsDeadId = Animator.StringToHash("IsDead"); // 기능 사용 여부
         private static readonly int EnterStateId = Animator.StringToHash("Enter"); // 현재 행동 상태
         private static readonly int HitStateId = Animator.StringToHash("Hit"); // 피격 또는 피해 관련 값
-        private static readonly int ActionIdleStateId = Animator.StringToHash("Action Idle"); // 현재 행동 상태
+        private static readonly int MovementStateId = Animator.StringToHash("Movement"); // 이동 상태
 
         [SerializeField] private Animator mummyAnimator; // 애니메이터 참조
 
@@ -62,14 +54,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
             mummyAnimator.SetFloat(MoveSpeedId, moveSpeed);
         }
 
-        public void PlayAlternateIdle() => SetTrigger(AlternateIdleId);
-        public void PlayBlock() => SetTrigger(BlockId);
-        public void PlayTurn() => SetTrigger(TurnId);
-        public void PlayStepBack() => SetTrigger(StepBackId);
-        public void PlayExit() => SetTrigger(ExitId);
-
         public void PlayAttack(
-            int attackNumber,
             int animatorStateId,
             float transitionTime,
             float animationSpeed)
@@ -78,19 +63,15 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
 
             StartAction(animatorStateId);
             mummyAnimator.speed = Mathf.Max(0.01f, animationSpeed);
-            mummyAnimator.SetInteger(AttackNumberId, attackNumber);
-            mummyAnimator.SetTrigger(AttackId);
 
             if (animatorStateId != 0 &&
-                mummyAnimator.HasState(ActionLayerIndex, animatorStateId))
+                mummyAnimator.HasState(AnimationLayerIndex, animatorStateId))
             {
                 mummyAnimator.CrossFadeInFixedTime(
                     animatorStateId,
                     Mathf.Max(0f, transitionTime),
-                    ActionLayerIndex,
+                    AnimationLayerIndex,
                     0f);
-                // 직접 전환한 공격 Trigger가 다음 행동에서 다시 소비되지 않게 한다.
-                mummyAnimator.ResetTrigger(AttackId);
             }
         }
 
@@ -103,16 +84,14 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
             int hitStateId = GetHitStateId(direction);
             mummyAnimator.speed = 1f;
             StartAction(hitStateId);
-            mummyAnimator.SetTrigger(HitId);
 
-            if (mummyAnimator.HasState(ActionLayerIndex, hitStateId))
+            if (mummyAnimator.HasState(AnimationLayerIndex, hitStateId))
             {
                 mummyAnimator.CrossFadeInFixedTime(
                     hitStateId,
                     0.04f,
-                    ActionLayerIndex,
+                    AnimationLayerIndex,
                     0f);
-                mummyAnimator.ResetTrigger(HitId);
             }
         }
 
@@ -131,19 +110,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
             SetMovement(0f, 0f);
             mummyAnimator.SetBool(IsDeadId, true);
             mummyAnimator.Update(0f);
-
-            // 전용 Death 클립이 추가되기 전까지 현재 자세를 그대로 유지한다.
-            FreezeDeathPose();
-        }
-
-        public void FreezeDeathPose()
-        {
-            if (mummyAnimator == null)
-            {
-                return;
-            }
-
-            mummyAnimator.speed = 0f;
             requestedActionStateId = 0;
         }
 
@@ -154,12 +120,12 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
             mummyAnimator.speed = 1f;
             requestedActionStateId = 0;
             if (CanControlAnimator() &&
-                mummyAnimator.HasState(ActionLayerIndex, ActionIdleStateId))
+                mummyAnimator.HasState(AnimationLayerIndex, MovementStateId))
             {
                 mummyAnimator.CrossFadeInFixedTime(
-                    ActionIdleStateId,
+                    MovementStateId,
                     0.08f,
-                    ActionLayerIndex);
+                    AnimationLayerIndex);
             }
         }
 
@@ -182,7 +148,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
         internal bool IsActionTransitioning()
         {
             return playbackReader != null &&
-                playbackReader.IsInTransition(ActionLayerIndex);
+                playbackReader.IsInTransition(AnimationLayerIndex);
         }
 
         public void ResetAnimation()
@@ -200,7 +166,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
             mummyAnimator.Rebind();
             mummyAnimator.SetFloat(MoveSideId, 0f);
             mummyAnimator.SetFloat(MoveSpeedId, 0f);
-            mummyAnimator.SetInteger(AttackNumberId, 0);
             mummyAnimator.SetBool(IsDeadId, false);
             ResetActionTriggers();
 
@@ -256,34 +221,22 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
             }
 
             return playbackReader.TryGetCurrentOrNextStateTime(
-                ActionLayerIndex,
+                AnimationLayerIndex,
                 animatorStateId,
                 out normalizedTime);
-        }
-
-        private void SetTrigger(int triggerId)
-        {
-            if (CanControlAnimator()) mummyAnimator.SetTrigger(triggerId);
         }
 
         private void ResetActionTriggers()
         {
             if (mummyAnimator == null) return;
 
-            mummyAnimator.ResetTrigger(AlternateIdleId);
-            mummyAnimator.ResetTrigger(AttackId);
-            mummyAnimator.ResetTrigger(HitId);
-            mummyAnimator.ResetTrigger(BlockId);
-            mummyAnimator.ResetTrigger(TurnId);
-            mummyAnimator.ResetTrigger(StepBackId);
             mummyAnimator.ResetTrigger(EnterId);
-            mummyAnimator.ResetTrigger(ExitId);
         }
 
         private bool CanControlAnimator()
         {
             return playbackReader != null &&
-                playbackReader.CanRead(ActionLayerIndex);
+                playbackReader.CanRead(AnimationLayerIndex);
         }
 
         private void FindMummyAnimator()

@@ -138,11 +138,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
             return mummyWorldUnit.ApplyHit(in hit);
         }
 
-        public void PlayBlock() => animationController?.PlayBlock();
-        public void PlayTurn() => animationController?.PlayTurn();
-        public void PlayStepBack() => animationController?.PlayStepBack();
-        public void PlayExit() => animationController?.PlayExit();
-
         private void StartAttackHit(
             MummyWarriorAttackPattern pattern,
             int attackNumber)

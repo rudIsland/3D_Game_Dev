@@ -474,7 +474,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1423443276962702508}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.07370825, y: 0.06213661, z: 0.008598651, w: 0.99530506}
+  m_LocalRotation: {x: 0.07370826, y: 0.06213661, z: 0.008598652, w: 0.99530506}
   m_LocalPosition: {x: 0.03459086, y: -0.008637932, z: -0.093374185}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1213,7 +1213,7 @@ Animator:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2759669512657921204}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
+  m_Avatar: {fileID: 9000000, guid: 32d7ee9fac42d134e8d9ec2eddacf521, type: 3}
   m_Controller: {fileID: 9100000, guid: e85a1075d8968db4888f0a46ced92fd3, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
@@ -1254,8 +1254,10 @@ MonoBehaviour:
   target: {fileID: 0}
   mummyAnimator: {fileID: 3104287967616169594}
   lanceHitDetector: {fileID: 5827920989125444038}
+  canTrackTarget: 0
   maxHealth: 120
   deadBodyKeepTime: 2
+  phaseTwoHealthRate: 0.6
   findRange: 25
   runStartRange: 6
   walkSpeed: 1.6
@@ -1803,7 +1805,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3510476074972329256}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.6874742, y: 0.61435795, z: -0.38722542, w: -0.00000030318785}
+  m_LocalRotation: {x: 0.68747425, y: 0.61435795, z: -0.38722545, w: -0.00000030318785}
   m_LocalPosition: {x: -0.8646594, y: -0.77269334, z: 0.4870256}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2473,7 +2475,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4404443227466159594}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7294168, y: 0.20891793, z: 0.63965976, w: 0.123044014}
+  m_LocalRotation: {x: 0.72941685, y: 0.20891795, z: 0.6396598, w: 0.12304402}
   m_LocalPosition: {x: -0.109763496, y: 0.0044623637, z: 0.07316243}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
