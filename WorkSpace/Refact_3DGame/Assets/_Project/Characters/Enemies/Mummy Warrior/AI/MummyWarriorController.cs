@@ -14,36 +14,40 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
     public sealed class MummyWarriorController : WorldObjectView, IAttackHitReceiver
     {
         [Header("필수 연결")]
-        [SerializeField] private Transform target;
-        [SerializeField] private Animator mummyAnimator;
-        [SerializeField] private MeleeHitDetector lanceHitDetector;
+        [SerializeField] private Transform target; // 대상 참조
+        [SerializeField] private Animator mummyAnimator; // 애니메이터 참조
+        [SerializeField] private MeleeHitDetector lanceHitDetector; // 피격 또는 피해 관련 값
+
+        [Header("추적 설정")]
+        [SerializeField] private bool canTrackTarget = false; // 기능 사용 여부
 
         [Header("생명")]
-        [SerializeField, Min(1f)] private float maxHealth = 120f;
-        [SerializeField, Min(0f)] private float deadBodyKeepTime = 2f;
+        [SerializeField, Min(1f)] private float maxHealth = 120f; // 최대 체력
+        [SerializeField, Min(0f)] private float deadBodyKeepTime = 2f; // 시간 설정
+        [SerializeField, Range(0.1f, 0.9f)] private float phaseTwoHealthRate = 0.6f;
 
         [Header("탐지와 이동")]
-        [SerializeField, Min(0.1f)] private float findRange = 25f;
-        [SerializeField, Min(0.1f)] private float runStartRange = 6f;
-        [SerializeField, Min(0.1f)] private float walkSpeed = 1.6f;
-        [SerializeField, Min(0.1f)] private float runSpeed = 3.8f;
-        [SerializeField, Min(1f)] private float turnSpeed = 300f;
-        [SerializeField] private float gravity = -22f;
-        [SerializeField] private float groundPull = -2f;
+        [SerializeField, Min(0.1f)] private float findRange = 25f; // 거리 설정
+        [SerializeField, Min(0.1f)] private float runStartRange = 6f; // 거리 설정
+        [SerializeField, Min(0.1f)] private float walkSpeed = 1.6f; // 이동 속도
+        [SerializeField, Min(0.1f)] private float runSpeed = 3.8f; // 이동 속도
+        [SerializeField, Min(1f)] private float turnSpeed = 300f; // 이동 속도
+        [SerializeField] private float gravity = -22f; // Inspector 설정 값
+        [SerializeField] private float groundPull = -2f; // Inspector 설정 값
 
         [Header("공격 목록")]
-        [SerializeField] private MummyWarriorAttackPattern[] attackPatterns =
+        [SerializeField] private MummyWarriorAttackPattern[] attackPatterns = // 행동 설정 참조
             { new MummyWarriorAttackPattern() };
 
 #if UNITY_EDITOR
         [Header("체력 확인")]
-        [SerializeField, Min(0f)] private float testDamage = 10f;
+        [SerializeField, Min(0f)] private float testDamage = 10f; // 피격 또는 피해 관련 값
 #endif
 
-        private CharacterController characterController;
-        private MummyWarriorAnimationController animationController;
-        private MummyWarriorWorldUnit mummyWorldUnit;
-        private MummyWarriorWorldUnit standaloneWorldUnit;
+        private CharacterController characterController; // 씬 또는 시스템 참조
+        private MummyWarriorAnimationController animationController; // 씬 또는 시스템 참조
+        private MummyWarriorWorldUnit mummyWorldUnit; // 씬 또는 시스템 참조
+        private MummyWarriorWorldUnit standaloneWorldUnit; // 씬 또는 시스템 참조
 
         private void Awake()
         {
@@ -116,15 +120,22 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
                 deadBodyKeepTime,
                 StartAttackHit,
                 EndAttackHit,
-                RequestDeadMummyRelease);
+                RequestDeadMummyRelease,
+                canTrackTarget,
+                phaseTwoHealthRate);
 
             mummyWorldUnit = new MummyWarriorWorldUnit(maxHealth, stateMachine);
             return mummyWorldUnit;
         }
 
-        public void ReceiveHit(in AttackHitData hit)
+        public AttackHitResult ReceiveHit(in AttackHitData hit)
         {
-            mummyWorldUnit?.ApplyHit(in hit);
+            if (mummyWorldUnit == null)
+            {
+                return AttackHitResult.Ignored;
+            }
+
+            return mummyWorldUnit.ApplyHit(in hit);
         }
 
         public void PlayBlock() => animationController?.PlayBlock();
@@ -210,6 +221,10 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
             walkSpeed = Mathf.Max(0.1f, walkSpeed);
             runSpeed = Mathf.Max(walkSpeed, runSpeed);
             deadBodyKeepTime = Mathf.Max(0f, deadBodyKeepTime);
+            phaseTwoHealthRate = Mathf.Clamp(
+                phaseTwoHealthRate,
+                0.1f,
+                0.9f);
 
             if (attackPatterns == null) return;
             for (int index = 0; index < attackPatterns.Length; index++)

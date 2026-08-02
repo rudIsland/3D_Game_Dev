@@ -1264,12 +1264,15 @@ MonoBehaviour:
   gravity: -22
   groundPull: -2
   attackPatterns:
-  - displayName: Lance Attack
-    animatorStateName: Attack 1
+  - attackId: 1
+    attackGroup: 0
+    phaseMask: 3
+    displayName: Attack 01 - Thrust
+    animatorStateName: Attack01
     minimumDistance: 0
     maximumDistance: 2.2
-    allowedAngle: 35
-    selectionWeight: 1
+    allowedAngle: 45
+    selectionWeight: 1.2
     cooldown: 1.2
     damage:
       healthDamage: 15
@@ -1277,6 +1280,224 @@ MonoBehaviour:
     hitEndTime: 0.55
     transitionTime: 0.08
     animationSpeed: 1
+    canChain: 1
+    chainWeight: 0.35
+  - attackId: 2
+    attackGroup: 1
+    phaseMask: 3
+    displayName: Attack 02 - Sweep Right
+    animatorStateName: Attack02
+    minimumDistance: 0
+    maximumDistance: 2.3
+    allowedAngle: 60
+    selectionWeight: 1
+    cooldown: 1.3
+    damage:
+      healthDamage: 16
+    hitStartTime: 0.22
+    hitEndTime: 0.58
+    transitionTime: 0.08
+    animationSpeed: 1
+    canChain: 1
+    chainWeight: 0.3
+  - attackId: 3
+    attackGroup: 1
+    phaseMask: 3
+    displayName: Attack 03 - Sweep Left
+    animatorStateName: Attack03
+    minimumDistance: 0
+    maximumDistance: 2.3
+    allowedAngle: 60
+    selectionWeight: 1
+    cooldown: 1.3
+    damage:
+      healthDamage: 16
+    hitStartTime: 0.22
+    hitEndTime: 0.58
+    transitionTime: 0.08
+    animationSpeed: 1
+    canChain: 1
+    chainWeight: 0.3
+  - attackId: 4
+    attackGroup: 3
+    phaseMask: 3
+    displayName: Attack 04 - Advance
+    animatorStateName: Attack04
+    minimumDistance: 1.4
+    maximumDistance: 3
+    allowedAngle: 55
+    selectionWeight: 1
+    cooldown: 1.5
+    damage:
+      healthDamage: 18
+    hitStartTime: 0.28
+    hitEndTime: 0.62
+    transitionTime: 0.1
+    animationSpeed: 1
+    canChain: 1
+    chainWeight: 0.25
+  - attackId: 5
+    attackGroup: 1
+    phaseMask: 3
+    displayName: Attack 05 - Wide Sweep
+    animatorStateName: Attack05
+    minimumDistance: 0
+    maximumDistance: 2.8
+    allowedAngle: 80
+    selectionWeight: 0.8
+    cooldown: 1.8
+    damage:
+      healthDamage: 22
+    hitStartTime: 0.32
+    hitEndTime: 0.68
+    transitionTime: 0.12
+    animationSpeed: 0.95
+    canChain: 0
+    chainWeight: 0.2
+  - attackId: 6
+    attackGroup: 0
+    phaseMask: 3
+    displayName: Attack 06 - Follow Up
+    animatorStateName: Attack06
+    minimumDistance: 0
+    maximumDistance: 2.4
+    allowedAngle: 55
+    selectionWeight: 0.9
+    cooldown: 1.4
+    damage:
+      healthDamage: 17
+    hitStartTime: 0.24
+    hitEndTime: 0.56
+    transitionTime: 0.08
+    animationSpeed: 1.05
+    canChain: 1
+    chainWeight: 0.4
+  - attackId: 7
+    attackGroup: 3
+    phaseMask: 3
+    displayName: Attack 07 - Charge
+    animatorStateName: Attack07
+    minimumDistance: 1.8
+    maximumDistance: 5
+    allowedAngle: 70
+    selectionWeight: 0.8
+    cooldown: 2
+    damage:
+      healthDamage: 24
+    hitStartTime: 0.3
+    hitEndTime: 0.64
+    transitionTime: 0.12
+    animationSpeed: 1
+    canChain: 0
+    chainWeight: 0.2
+  - attackId: 8
+    attackGroup: 1
+    phaseMask: 3
+    displayName: Attack 08 - Area Sweep
+    animatorStateName: Attack08
+    minimumDistance: 0
+    maximumDistance: 3.2
+    allowedAngle: 100
+    selectionWeight: 0.7
+    cooldown: 2.2
+    damage:
+      healthDamage: 25
+    hitStartTime: 0.3
+    hitEndTime: 0.68
+    transitionTime: 0.12
+    animationSpeed: 0.95
+    canChain: 0
+    chainWeight: 0.2
+  - attackId: 9
+    attackGroup: 1
+    phaseMask: 3
+    displayName: Attack 09 - Low Guard Break
+    animatorStateName: Attack09
+    minimumDistance: 0
+    maximumDistance: 2.6
+    allowedAngle: 70
+    selectionWeight: 0.8
+    cooldown: 1.7
+    damage:
+      healthDamage: 20
+    hitStartTime: 0.28
+    hitEndTime: 0.62
+    transitionTime: 0.1
+    animationSpeed: 1
+    canChain: 0
+    chainWeight: 0.2
+  - attackId: 10
+    attackGroup: 2
+    phaseMask: 2
+    displayName: Attack 10 - Heavy Down
+    animatorStateName: Attack10
+    minimumDistance: 0
+    maximumDistance: 2.8
+    allowedAngle: 55
+    selectionWeight: 0.55
+    cooldown: 2.6
+    damage:
+      healthDamage: 32
+    hitStartTime: 0.38
+    hitEndTime: 0.76
+    transitionTime: 0.14
+    animationSpeed: 0.9
+    canChain: 0
+    chainWeight: 0.15
+  - attackId: 11
+    attackGroup: 4
+    phaseMask: 2
+    displayName: Attack 11 - Retreat Counter
+    animatorStateName: Attack11
+    minimumDistance: 1
+    maximumDistance: 4
+    allowedAngle: 90
+    selectionWeight: 0.65
+    cooldown: 2.4
+    damage:
+      healthDamage: 27
+    hitStartTime: 0.3
+    hitEndTime: 0.68
+    transitionTime: 0.12
+    animationSpeed: 1
+    canChain: 0
+    chainWeight: 0.2
+  - attackId: 12
+    attackGroup: 0
+    phaseMask: 3
+    displayName: Attack 12 - Long Thrust
+    animatorStateName: Attack12
+    minimumDistance: 1.8
+    maximumDistance: 5
+    allowedAngle: 60
+    selectionWeight: 0.65
+    cooldown: 2.1
+    damage:
+      healthDamage: 29
+    hitStartTime: 0.3
+    hitEndTime: 0.67
+    transitionTime: 0.12
+    animationSpeed: 1
+    canChain: 1
+    chainWeight: 0.25
+  - attackId: 13
+    attackGroup: 5
+    phaseMask: 2
+    displayName: Attack 13 - Finisher
+    animatorStateName: Attack13
+    minimumDistance: 0
+    maximumDistance: 3.5
+    allowedAngle: 80
+    selectionWeight: 0.35
+    cooldown: 3
+    damage:
+      healthDamage: 40
+    hitStartTime: 0.4
+    hitEndTime: 0.8
+    transitionTime: 0.16
+    animationSpeed: 0.88
+    canChain: 0
+    chainWeight: 0.1
   testDamage: 10
 --- !u!143 &8824000000000000001
 CharacterController:

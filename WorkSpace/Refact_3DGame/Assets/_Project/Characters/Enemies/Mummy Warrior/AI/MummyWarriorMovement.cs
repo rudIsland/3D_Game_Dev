@@ -5,15 +5,15 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
     // Mummy Warrior의 수평 이동, 회전, 중력만 계산한다.
     public sealed class MummyWarriorMovement
     {
-        private readonly Transform mummyTransform;
-        private readonly CharacterController characterController;
-        private readonly float gravity;
-        private readonly float groundPull;
-        private float verticalSpeed;
+        private readonly Transform mummyTransform; // 씬 또는 시스템 참조
+        private readonly CharacterController characterController; // 씬 또는 시스템 참조
+        private readonly float gravity; // 내부에서 사용하는 값
+        private readonly float groundPull; // 내부에서 사용하는 값
+        private float verticalSpeed; // 이동 속도
 
-        public Vector3 Position => mummyTransform.position;
-        public Vector3 Forward => mummyTransform.forward;
-        public Vector3 Right => mummyTransform.right;
+        public Vector3 Position => mummyTransform.position; // 이동 정보
+        public Vector3 Forward => mummyTransform.forward; // 외부에 제공하는 읽기 값
+        public Vector3 Right => mummyTransform.right; // 외부에 제공하는 읽기 값
 
         public MummyWarriorMovement(
             Transform mummyTransform,

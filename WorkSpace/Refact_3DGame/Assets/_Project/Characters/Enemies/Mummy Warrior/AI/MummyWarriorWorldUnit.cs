@@ -5,9 +5,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
     // EnemyUnit 생명주기에서 Mummy Warrior 상태머신과 체력을 연결한다.
     public sealed class MummyWarriorWorldUnit : EnemyUnit
     {
-        private readonly MummyWarriorStateMachine stateMachine;
+        private readonly MummyWarriorStateMachine stateMachine; // 현재 행동 상태
 
-        public float CurrentHealth => Health.CurrentHealth;
+        public float CurrentHealth => Health.CurrentHealth; // 현재 체력
 
         public MummyWarriorWorldUnit(float maxHealth, MummyWarriorStateMachine stateMachine)
             : base(maxHealth)
@@ -21,12 +21,22 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
             Health.TakeDamage(damage);
 
             if (Health.CurrentHealth >= healthBeforeDamage || IsDead) return;
+            stateMachine.SetHealthRatio(
+                Health.CurrentHealth / Health.MaxHealth);
             stateMachine.ChangeToHitState();
         }
 
-        public void ApplyHit(in AttackHitData hit)
+        public AttackHitResult ApplyHit(in AttackHitData hit)
         {
-            if (hit.AttackerTeam != Team) TakeDamage(hit.Damage.HealthDamage);
+            AttackHitResult hitResult = ApplyHealthHit(in hit);
+            if (hitResult == AttackHitResult.Damaged)
+            {
+                stateMachine.SetHealthRatio(
+                    Health.CurrentHealth / Health.MaxHealth);
+                stateMachine.ChangeToHitState(in hit);
+            }
+
+            return hitResult;
         }
 
         protected override void OnUnitCreate()

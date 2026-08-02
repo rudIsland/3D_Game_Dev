@@ -1,4 +1,5 @@
 using System;
+using rudIsland.RPG3D.Combat;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
@@ -6,28 +7,33 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
     // Alive, Hit, Dead 우선순위와 살아 있을 때의 행동 순서를 관리한다.
     public sealed class MummyWarriorStateMachine
     {
-        private readonly Transform target;
-        private readonly MummyWarriorMovement movement;
-        private readonly MummyWarriorAnimationController animation;
-        private readonly MummyWarriorAttackPattern[] attackPatterns;
-        private readonly AliveState aliveState;
-        private readonly HitState hitState;
-        private readonly DeadState deadState;
-        private readonly Action<MummyWarriorAttackPattern, int> startAttackHit;
-        private readonly Action endAttackHit;
-        private readonly Action requestRelease;
+        private readonly Transform target; // 대상 참조
+        private readonly MummyWarriorMovement movement; // 이동 정보
+        private readonly MummyWarriorAnimationController animation; // 씬 또는 시스템 참조
+        private readonly MummyWarriorAttackPattern[] attackPatterns; // 행동 설정 참조
+        private readonly MummyWarriorAttackChooser attackChooser;
+        private readonly AliveState aliveState; // 현재 행동 상태
+        private readonly HitState hitState; // 피격 또는 피해 관련 값
+        private readonly DeadState deadState; // 현재 행동 상태
+        private readonly Action<MummyWarriorAttackPattern, int> startAttackHit; // 공격 관련 설정 또는 상태
+        private readonly Action endAttackHit; // 공격 관련 설정 또는 상태
+        private readonly Action requestRelease; // 내부에서 사용하는 값
+        private readonly bool canTrackTarget; // 기능 사용 여부
+        private readonly float phaseTwoHealthRate;
 
-        private IMummyWarriorState currentState;
-        private float currentTime;
-        private bool isEnabled;
+        private IMummyWarriorState currentState; // 현재 행동 상태
+        private float currentTime; // 시간 설정
+        private bool isEnabled; // 기능 사용 여부
+        private int currentPhase = 1;
 
-        internal float FindRangeSquared { get; }
-        internal float RunStartRangeSquared { get; }
-        internal float MaximumAttackRangeSquared { get; }
-        internal float WalkSpeed { get; }
-        internal float RunSpeed { get; }
-        internal float TurnSpeed { get; }
-        internal float DeadBodyKeepTime { get; }
+        internal float FindRangeSquared { get; } // 거리 설정
+        internal float RunStartRangeSquared { get; } // 거리 설정
+        internal float MaximumAttackRangeSquared { get; } // 공격 관련 설정 또는 상태
+        internal float WalkSpeed { get; } // 이동 속도
+        internal float RunSpeed { get; } // 이동 속도
+        internal float TurnSpeed { get; } // 이동 속도
+        internal float DeadBodyKeepTime { get; } // 시간 설정
+        internal int CurrentPhase => currentPhase;
 
         public MummyWarriorStateMachine(
             Transform target,
@@ -42,12 +48,15 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
             float deadBodyKeepTime,
             Action<MummyWarriorAttackPattern, int> startAttackHit,
             Action endAttackHit,
-            Action requestRelease)
+            Action requestRelease,
+            bool canTrackTarget = true,
+            float phaseTwoHealthRate = 0.6f)
         {
             this.target = target;
             this.movement = movement;
             this.animation = animation;
             this.attackPatterns = attackPatterns ?? Array.Empty<MummyWarriorAttackPattern>();
+            attackChooser = new MummyWarriorAttackChooser(this.attackPatterns);
             FindRangeSquared = findRange * findRange;
             RunStartRangeSquared = runStartRange * runStartRange;
             float maximumAttackRangeSquared = 0f;
@@ -69,6 +78,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
             this.startAttackHit = startAttackHit;
             this.endAttackHit = endAttackHit;
             this.requestRelease = requestRelease;
+            this.canTrackTarget = canTrackTarget;
+            this.phaseTwoHealthRate = Mathf.Clamp01(phaseTwoHealthRate);
 
             aliveState = new AliveState(this);
             hitState = new HitState(this);
@@ -81,6 +92,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
 
             isEnabled = true;
             currentTime = 0f;
+            currentPhase = 1;
+            attackChooser.Reset();
             for (int index = 0; index < attackPatterns.Length; index++)
             {
                 attackPatterns[index]?.Prepare();
@@ -112,6 +125,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
         public void ChangeToHitState()
         {
             if (!isEnabled || ReferenceEquals(currentState, deadState)) return;
+            hitState.SetDirection(MummyWarriorHitDirection.Forward);
             EndAttackHit();
             if (ReferenceEquals(currentState, hitState))
             {
@@ -122,6 +136,31 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
             ChangeState(hitState);
         }
 
+        public void ChangeToHitState(in AttackHitData hit)
+        {
+            if (!isEnabled || ReferenceEquals(currentState, deadState)) return;
+            hitState.SetDirection(GetHitDirection(hit.HitDirection));
+            EndAttackHit();
+            if (ReferenceEquals(currentState, hitState))
+            {
+                hitState.Restart();
+                return;
+            }
+
+            ChangeState(hitState);
+        }
+
+        public void SetHealthRatio(float healthRatio)
+        {
+            if (currentPhase >= 2 ||
+                healthRatio > phaseTwoHealthRate)
+            {
+                return;
+            }
+
+            currentPhase = 2;
+        }
+
         public void ChangeToDeadState()
         {
             if (!isEnabled || ReferenceEquals(currentState, deadState)) return;
@@ -129,7 +168,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
             ChangeState(deadState);
         }
 
-        internal bool IsTargetFound() => GetTargetDistanceSquared() <= FindRangeSquared;
+        internal bool IsTargetFound()
+        {
+            return canTrackTarget &&
+                GetTargetDistanceSquared() <= FindRangeSquared;
+        }
 
         internal void MoveToTarget(float deltaTime)
         {
@@ -158,56 +201,12 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
 
         internal MummyWarriorAttackPattern ChooseAttack(out int attackNumber)
         {
-            attackNumber = 0;
-            float distanceSquared = GetTargetDistanceSquared();
-            float facingDot = GetTargetFacingDot();
-            int previousIndex = aliveState.PreviousAttackIndex;
-            bool hasOtherAttack = false;
-
-            for (int index = 0; index < attackPatterns.Length; index++)
-            {
-                MummyWarriorAttackPattern pattern = attackPatterns[index];
-                if (index != previousIndex && pattern != null &&
-                    pattern.CanUse(distanceSquared, facingDot, currentTime))
-                {
-                    hasOtherAttack = true;
-                    break;
-                }
-            }
-
-            float totalWeight = 0f;
-            for (int index = 0; index < attackPatterns.Length; index++)
-            {
-                MummyWarriorAttackPattern pattern = attackPatterns[index];
-                if (pattern == null || (hasOtherAttack && index == previousIndex) ||
-                    !pattern.CanUse(distanceSquared, facingDot, currentTime))
-                {
-                    continue;
-                }
-
-                totalWeight += pattern.SelectionWeight;
-            }
-
-            if (totalWeight <= 0f) return null;
-
-            float selectedWeight = UnityEngine.Random.Range(0f, totalWeight);
-            for (int index = 0; index < attackPatterns.Length; index++)
-            {
-                MummyWarriorAttackPattern pattern = attackPatterns[index];
-                if (pattern == null || (hasOtherAttack && index == previousIndex) ||
-                    !pattern.CanUse(distanceSquared, facingDot, currentTime))
-                {
-                    continue;
-                }
-
-                selectedWeight -= pattern.SelectionWeight;
-                if (selectedWeight > 0f) continue;
-
-                attackNumber = index + 1;
-                return pattern;
-            }
-
-            return null;
+            return attackChooser.Choose(
+                GetTargetDistanceSquared(),
+                GetTargetFacingDot(),
+                currentTime,
+                currentPhase,
+                out attackNumber);
         }
 
         internal void PlayAttack(MummyWarriorAttackPattern pattern, int attackNumber)
@@ -282,6 +281,34 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
             return Vector3.Dot(movement.Forward, direction);
         }
 
+        private MummyWarriorHitDirection GetHitDirection(Vector3 hitDirection)
+        {
+            hitDirection.y = 0f;
+            if (hitDirection.sqrMagnitude <= 0.0001f)
+            {
+                return MummyWarriorHitDirection.Forward;
+            }
+
+            Vector3 attackerDirection = -hitDirection.normalized;
+            float forwardDot = Vector3.Dot(
+                movement.Forward,
+                attackerDirection);
+            float rightDot = Vector3.Dot(
+                movement.Right,
+                attackerDirection);
+
+            if (Mathf.Abs(forwardDot) >= Mathf.Abs(rightDot))
+            {
+                return forwardDot >= 0f
+                    ? MummyWarriorHitDirection.Forward
+                    : MummyWarriorHitDirection.Backward;
+            }
+
+            return rightDot >= 0f
+                ? MummyWarriorHitDirection.Right
+                : MummyWarriorHitDirection.Left;
+        }
+
         private void ChangeState(IMummyWarriorState nextState)
         {
             if (ReferenceEquals(currentState, nextState)) return;
@@ -300,17 +327,17 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
                 Attack
             }
 
-            private readonly MummyWarriorStateMachine stateMachine;
-            private MummyWarriorAttackPattern currentAttack;
-            private AliveAction currentAction;
-            private int currentAttackNumber;
-            private bool isHitOpen;
-            private bool hasHitWindowFinished;
-            private bool hasPlayedEnter;
-            private bool hasEnteredEnter;
-            private bool hasEnteredAttack;
+            private readonly MummyWarriorStateMachine stateMachine; // 현재 행동 상태
+            private MummyWarriorAttackPattern currentAttack; // 공격 관련 설정 또는 상태
+            private AliveAction currentAction; // 현재 행동 상태
+            private int currentAttackNumber; // 공격 관련 설정 또는 상태
+            private bool isHitOpen; // 기능 사용 여부
+            private bool hasHitWindowFinished; // 기능 사용 여부
+            private bool hasPlayedEnter; // 기능 사용 여부
+            private bool hasEnteredEnter; // 기능 사용 여부
+            private bool hasEnteredAttack; // 기능 사용 여부
 
-            internal int PreviousAttackIndex { get; private set; } = -1;
+            internal int PreviousAttackIndex { get; private set; } = -1; // 공격 관련 설정 또는 상태
 
             public AliveState(MummyWarriorStateMachine stateMachine)
             {
@@ -514,8 +541,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
 
         private sealed class HitState : IMummyWarriorState
         {
-            private readonly MummyWarriorStateMachine stateMachine;
-            private bool hasEnteredHit;
+            private readonly MummyWarriorStateMachine stateMachine; // 현재 행동 상태
+            private bool hasEnteredHit; // 기능 사용 여부
+            private MummyWarriorHitDirection direction;
 
             public HitState(MummyWarriorStateMachine stateMachine)
             {
@@ -548,19 +576,24 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
                 stateMachine.animation.ResetActionSpeed();
             }
 
+            public void SetDirection(MummyWarriorHitDirection nextDirection)
+            {
+                direction = nextDirection;
+            }
+
             public void Restart()
             {
                 stateMachine.animation.SetMovement(0f, 0f);
                 hasEnteredHit = false;
-                stateMachine.animation.PlayHit();
+                stateMachine.animation.PlayHit(direction);
             }
         }
 
         private sealed class DeadState : IMummyWarriorState
         {
-            private readonly MummyWarriorStateMachine stateMachine;
-            private float remainingKeepTime;
-            private bool hasRequestedRelease;
+            private readonly MummyWarriorStateMachine stateMachine; // 현재 행동 상태
+            private float remainingKeepTime; // 시간 설정
+            private bool hasRequestedRelease; // 기능 사용 여부
 
             public DeadState(MummyWarriorStateMachine stateMachine)
             {

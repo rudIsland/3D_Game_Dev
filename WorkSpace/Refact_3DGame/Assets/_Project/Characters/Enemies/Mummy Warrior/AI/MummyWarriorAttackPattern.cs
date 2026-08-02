@@ -4,36 +4,74 @@ using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
 {
+    public enum MummyWarriorAttackId
+    {
+        Attack01 = 1,
+        Attack02,
+        Attack03,
+        Attack04,
+        Attack05,
+        Attack06,
+        Attack07,
+        Attack08,
+        Attack09,
+        Attack10,
+        Attack11,
+        Attack12,
+        Attack13
+    }
+    public enum MummyWarriorAttackGroup
+    {
+        Thrust,
+        Sweep,
+        Heavy,
+        Approach,
+        Retreat,
+        Finisher
+    }
+
     [Serializable]
     public sealed class MummyWarriorAttackPattern
     {
-        [SerializeField] private string displayName = "Lance Attack";
-        [SerializeField] private string animatorStateName = "Attack 1";
-        [SerializeField, Min(0f)] private float minimumDistance;
-        [SerializeField, Min(0.1f)] private float maximumDistance = 2.2f;
-        [SerializeField, Range(0f, 180f)] private float allowedAngle = 35f;
-        [SerializeField, Min(0f)] private float selectionWeight = 1f;
-        [SerializeField, Min(0f)] private float cooldown = 1.2f;
-        [SerializeField] private AttackDamage damage = new AttackDamage(15f);
-        [SerializeField, Range(0f, 1f)] private float hitStartTime = 0.25f;
-        [SerializeField, Range(0f, 1f)] private float hitEndTime = 0.55f;
-        [SerializeField, Min(0f)] private float transitionTime = 0.08f;
-        [SerializeField, Min(0.01f)] private float animationSpeed = 1f;
+        [SerializeField] private MummyWarriorAttackId attackId =
+            MummyWarriorAttackId.Attack01;
+        [SerializeField] private MummyWarriorAttackGroup attackGroup =
+            MummyWarriorAttackGroup.Thrust;
+        [SerializeField, Min(1)] private int phaseMask = 1;
+        [SerializeField] private string displayName = "Lance Attack"; // 표시 이름
+        [SerializeField] private string animatorStateName = "Attack 1"; // 애니메이터 상태 이름
+        [SerializeField, Min(0f)] private float minimumDistance; // 거리 설정
+        [SerializeField, Min(0.1f)] private float maximumDistance = 2.2f; // 거리 설정
+        [SerializeField, Range(0f, 180f)] private float allowedAngle = 35f; // 각도 설정
+        [SerializeField, Min(0f)] private float selectionWeight = 1f; // 내부에서 사용하는 값
+        [SerializeField, Min(0f)] private float cooldown = 1.2f; // 시간 설정
+        [SerializeField] private AttackDamage damage = new AttackDamage(15f); // 피격 또는 피해 관련 값
+        [SerializeField, Range(0f, 1f)] private float hitStartTime = 0.25f; // 피격 또는 피해 관련 값
+        [SerializeField, Range(0f, 1f)] private float hitEndTime = 0.55f; // 피격 또는 피해 관련 값
+        [SerializeField, Min(0f)] private float transitionTime = 0.08f; // 시간 설정
+        [SerializeField, Min(0.01f)] private float animationSpeed = 1f; // 이동 속도
+        [SerializeField] private bool canChain = false;
+        [SerializeField, Range(0f, 1f)] private float chainWeight = 0.35f;
 
-        [NonSerialized] private int animatorStateId;
-        [NonSerialized] private float nextReadyTime;
+        [NonSerialized] private int animatorStateId; // 애니메이터 참조
+        [NonSerialized] private float nextReadyTime; // 시간 설정
 
-        public string DisplayName => displayName;
-        public int AnimatorStateId => animatorStateId;
-        public float MinimumDistanceSquared => minimumDistance * minimumDistance;
-        public float MaximumDistanceSquared => maximumDistance * maximumDistance;
-        public float MinimumFacingDot => Mathf.Cos(allowedAngle * Mathf.Deg2Rad);
-        public float SelectionWeight => selectionWeight;
-        public float HitStartTime => hitStartTime;
-        public float HitEndTime => hitEndTime;
-        public float TransitionTime => transitionTime;
-        public float AnimationSpeed => animationSpeed;
-        public AttackDamage Damage => damage;
+        public MummyWarriorAttackId AttackId => attackId;
+        public MummyWarriorAttackGroup AttackGroup => attackGroup;
+        public int PhaseMask => phaseMask;
+        public string DisplayName => displayName; // 표시 이름
+        public int AnimatorStateId => animatorStateId; // 애니메이터 참조
+        public float MinimumDistanceSquared => minimumDistance * minimumDistance; // 거리 설정
+        public float MaximumDistanceSquared => maximumDistance * maximumDistance; // 거리 설정
+        public float MinimumFacingDot => Mathf.Cos(allowedAngle * Mathf.Deg2Rad); // 외부에 제공하는 읽기 값
+        public float SelectionWeight => selectionWeight; // 외부에 제공하는 읽기 값
+        public float HitStartTime => hitStartTime; // 피격 또는 피해 관련 값
+        public float HitEndTime => hitEndTime; // 피격 또는 피해 관련 값
+        public float TransitionTime => transitionTime; // 시간 설정
+        public float AnimationSpeed => animationSpeed; // 이동 속도
+        public AttackDamage Damage => damage; // 피격 또는 피해 관련 값
+        public bool CanChain => canChain;
+        public float ChainWeight => chainWeight;
 
         public void Prepare()
         {
@@ -45,8 +83,19 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
 
         public bool CanUse(float distanceSquared, float facingDot, float currentTime)
         {
+            return CanUse(distanceSquared, facingDot, currentTime, 1);
+        }
+
+        public bool CanUse(
+            float distanceSquared,
+            float facingDot,
+            float currentTime,
+            int phase)
+        {
+            int phaseBit = 1 << Mathf.Clamp(phase - 1, 0, 30);
             return animatorStateId != 0 && damage.IsValid &&
                 selectionWeight > 0f &&
+                (phaseMask & phaseBit) != 0 &&
                 distanceSquared >= MinimumDistanceSquared &&
                 distanceSquared <= MaximumDistanceSquared &&
                 facingDot >= MinimumFacingDot && currentTime >= nextReadyTime;
@@ -59,6 +108,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
 
         public void ClampValues()
         {
+            phaseMask = Mathf.Max(1, phaseMask);
             minimumDistance = Mathf.Max(0f, minimumDistance);
             maximumDistance = Mathf.Max(0.1f, maximumDistance);
             minimumDistance = Mathf.Min(minimumDistance, maximumDistance);
@@ -69,6 +119,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
             hitEndTime = Mathf.Clamp(hitEndTime, hitStartTime, 1f);
             transitionTime = Mathf.Max(0f, transitionTime);
             animationSpeed = Mathf.Max(0.01f, animationSpeed);
+            chainWeight = Mathf.Clamp01(chainWeight);
         }
     }
 }
