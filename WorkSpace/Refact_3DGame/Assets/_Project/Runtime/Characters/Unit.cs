@@ -40,7 +40,7 @@ namespace rudIsland.RPG3D.Characters
         protected sealed override void OnDispose()
         {
             OnUnitDispose();
-            Health.ClearDiedListeners();
+            Health.ClearListeners();
         }
 
         // 플레이어와 적은 필요한 단계만 아래 메서드에서 구현한다.

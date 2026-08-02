@@ -85,6 +85,10 @@ namespace rudIsland.RPG3D.World
         private bool isTicking;
         private bool isShuttingDown;
 
+        public event Action<IWorldObject> WorldObjectEnabled;
+        public event Action<IWorldObject> WorldObjectDisabled;
+
+        public IReadOnlyList<IWorldObject> ActiveObjects => activeObjects;
         public int ActiveCount => activeObjects.Count;
         public int RegisteredCount => registeredObjects.Count;
         public int PoolCount => pools.Count;
@@ -312,6 +316,7 @@ namespace rudIsland.RPG3D.World
 
             activeObjects.Add(worldObject);
             worldObject.Enable();
+            WorldObjectEnabled?.Invoke(worldObject);
             RefreshInspectorCounts();
         }
 
@@ -325,6 +330,7 @@ namespace rudIsland.RPG3D.World
 
             RemoveFromActiveList(worldObject);
             worldObject.Disable();
+            WorldObjectDisabled?.Invoke(worldObject);
             RefreshInspectorCounts();
         }
 

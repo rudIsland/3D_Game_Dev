@@ -210,15 +210,15 @@ MonoBehaviour:
   attack02NextTime: 0.6
   attack03NextTime: 0.65
   attack04NextTime: 0.65
-  attack01MoveScale: 0.4
-  attack02MoveScale: 0.4
-  attack03MoveScale: 0.5
-  attack04MoveScale: 0.5
+  attack01MoveScale: 0.65
+  attack02MoveScale: 0.65
+  attack03MoveScale: 0.55
+  attack04MoveScale: 0.6
   attack05MoveScale: 0.5
   runAttackTotalTime: 0.94
   runAttackMinimumSprintTime: 0.35
   runAttackStartSpeedRatio: 0.95
-  runAttackMoveScale: 1
+  runAttackMoveScale: 0.8
   gravity: -22
   groundPull: -2
 --- !u!1001 &6586900582712672055

@@ -140,6 +140,62 @@ namespace rudIsland.RPG3D.Tests
             Assert.That(afterBytes - beforeBytes, Is.Zero);
         }
 
+        [Test]
+        public void EnableAndDisableTwice_RaiseLifecycleEventsOnce()
+        {
+            var worldObject = new FakeWorldObject();
+            int enabledCount = 0;
+            int disabledCount = 0;
+            manager.WorldObjectEnabled += enabled =>
+            {
+                if (ReferenceEquals(enabled, worldObject))
+                {
+                    enabledCount++;
+                }
+            };
+            manager.WorldObjectDisabled += disabled =>
+            {
+                if (ReferenceEquals(disabled, worldObject))
+                {
+                    disabledCount++;
+                }
+            };
+
+            manager.Register(worldObject);
+            manager.Enable(worldObject);
+            manager.Enable(worldObject);
+            manager.Disable(worldObject);
+            manager.Disable(worldObject);
+
+            Assert.That(enabledCount, Is.EqualTo(1));
+            Assert.That(disabledCount, Is.EqualTo(1));
+            Assert.That(manager.ActiveObjects, Is.Empty);
+        }
+
+        [Test]
+        public void SpawnAfterDespawn_RaisesEnabledAgainForReusedObject()
+        {
+            CreatePool(initialSize: 1, maxSize: 1);
+            int enabledCount = 0;
+            manager.WorldObjectEnabled += _ => enabledCount++;
+
+            manager.TrySpawn(
+                settings,
+                Vector3.zero,
+                Quaternion.identity,
+                out WorldObjectView firstView);
+            manager.Despawn(firstView);
+            manager.TrySpawn(
+                settings,
+                Vector3.one,
+                Quaternion.identity,
+                out WorldObjectView secondView);
+
+            Assert.That(secondView, Is.SameAs(firstView));
+            Assert.That(enabledCount, Is.EqualTo(2));
+            Assert.That(manager.ActiveObjects, Has.Count.EqualTo(1));
+        }
+
         private void CreatePool(int initialSize, int maxSize)
         {
             prefabObject = new GameObject("Fake World Object Prefab");

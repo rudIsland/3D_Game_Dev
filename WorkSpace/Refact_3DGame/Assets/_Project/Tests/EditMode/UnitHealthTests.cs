@@ -32,5 +32,47 @@ namespace rudIsland.RPG3D.Tests
             Assert.That(health.CurrentHealth, Is.EqualTo(10f));
             Assert.That(health.IsDead, Is.False);
         }
+
+        [Test]
+        public void HealthChanges_RaiseOneEventOnlyWhenValueChanges()
+        {
+            var health = new UnitHealth(10f);
+            int changedCount = 0;
+            UnitHealth lastChangedHealth = null;
+            health.HealthChanged += changedHealth =>
+            {
+                changedCount++;
+                lastChangedHealth = changedHealth;
+            };
+
+            health.TakeDamage(0f);
+            health.TakeDamage(float.NaN);
+            health.TakeDamage(float.PositiveInfinity);
+            health.TakeDamage(4f);
+            health.Heal(0f);
+            health.Heal(float.NaN);
+            health.Heal(float.PositiveInfinity);
+            health.Heal(2f);
+            health.Heal(100f);
+            health.Heal(1f);
+            health.Reset();
+
+            Assert.That(changedCount, Is.EqualTo(3));
+            Assert.That(lastChangedHealth, Is.SameAs(health));
+            Assert.That(health.CurrentHealth, Is.EqualTo(10f));
+        }
+
+        [Test]
+        public void TakeDamage_WhenHealthReachesZero_RaisesChangeBeforeDeath()
+        {
+            var health = new UnitHealth(10f);
+            string callOrder = string.Empty;
+            health.HealthChanged += _ => callOrder += "changed ";
+            health.Died += () => callOrder += "died";
+
+            health.TakeDamage(10f);
+
+            Assert.That(callOrder, Is.EqualTo("changed died"));
+        }
     }
 }
