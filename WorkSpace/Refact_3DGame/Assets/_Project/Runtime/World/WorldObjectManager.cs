@@ -19,7 +19,7 @@ namespace rudIsland.RPG3D.World
                 this.settings = settings;
             }
 
-            public SpawnSettings Settings => settings;
+            public SpawnSettings Settings => settings; // 행동 설정 참조
 
             public void UpdateCount(WorldObjectPool pool)
             {
@@ -40,9 +40,9 @@ namespace rudIsland.RPG3D.World
 
         private readonly struct PendingAction
         {
-            public PendingActionType Type { get; }
-            public IWorldObject WorldObject { get; }
-            public WorldObjectView View { get; }
+            public PendingActionType Type { get; } // 외부에 제공하는 읽기 값
+            public IWorldObject WorldObject { get; } // 씬 또는 시스템 참조
+            public WorldObjectView View { get; } // 씬 또는 시스템 참조
 
             public PendingAction(
                 PendingActionType type,
@@ -56,42 +56,42 @@ namespace rudIsland.RPG3D.World
         }
 
         [Header("풀 설정")]
-        [SerializeField] private SpawnSettings[] spawnSettings =
+        [SerializeField] private SpawnSettings[] spawnSettings = // 행동 설정 참조
             Array.Empty<SpawnSettings>();
 
         [Header("실행 상태")]
-        [SerializeField] private int activeCount;
-        [SerializeField] private List<PoolUsage> poolUsage = new List<PoolUsage>();
+        [SerializeField] private int activeCount; // 개수 또는 크기
+        [SerializeField] private List<PoolUsage> poolUsage = new List<PoolUsage>(); // 씬 또는 시스템 참조
 
         // List는 순회에 사용하고 HashSet은 중복 등록을 빠르게 막는다.
 
         //Manager에 등록된 오브젝트
-        private readonly List<IWorldObject> registeredObjects =
+        private readonly List<IWorldObject> registeredObjects = // 씬 또는 시스템 참조
             new List<IWorldObject>(64);
-        private readonly HashSet<IWorldObject> registeredSet =
+        private readonly HashSet<IWorldObject> registeredSet = // 씬 또는 시스템 참조
             new HashSet<IWorldObject>();
 
         //등록된 객체 중 Tick을 실행할 객체
-        private readonly List<IWorldObject> activeObjects =
+        private readonly List<IWorldObject> activeObjects = // 씬 또는 시스템 참조
             new List<IWorldObject>(64);
-        private readonly HashSet<IWorldObject> activeSet =
+        private readonly HashSet<IWorldObject> activeSet = // 씬 또는 시스템 참조
             new HashSet<IWorldObject>();
-        private readonly Dictionary<SpawnSettings, WorldObjectPool> pools =
+        private readonly Dictionary<SpawnSettings, WorldObjectPool> pools = // 씬 또는 시스템 참조
             new Dictionary<SpawnSettings, WorldObjectPool>();
         // Tick 도중 들어온 변경 요청을 순회가 끝날 때까지 잠시 보관한다.
-        private readonly List<PendingAction> pendingActions =
+        private readonly List<PendingAction> pendingActions = // 현재 행동 상태
             new List<PendingAction>(16);
 
-        private bool isTicking;
-        private bool isShuttingDown;
+        private bool isTicking; // 기능 사용 여부
+        private bool isShuttingDown; // 기능 사용 여부
 
-        public event Action<IWorldObject> WorldObjectEnabled;
-        public event Action<IWorldObject> WorldObjectDisabled;
+        public event Action<IWorldObject> WorldObjectEnabled; // 씬 또는 시스템 참조
+        public event Action<IWorldObject> WorldObjectDisabled; // 씬 또는 시스템 참조
 
-        public IReadOnlyList<IWorldObject> ActiveObjects => activeObjects;
-        public int ActiveCount => activeObjects.Count;
-        public int RegisteredCount => registeredObjects.Count;
-        public int PoolCount => pools.Count;
+        public IReadOnlyList<IWorldObject> ActiveObjects => activeObjects; // 씬 또는 시스템 참조
+        public int ActiveCount => activeObjects.Count; // 개수 또는 크기
+        public int RegisteredCount => registeredObjects.Count; // 개수 또는 크기
+        public int PoolCount => pools.Count; // 개수 또는 크기
 
         // Inspector에 연결한 설정마다 풀을 만들고 예열한다.
         private void Awake()

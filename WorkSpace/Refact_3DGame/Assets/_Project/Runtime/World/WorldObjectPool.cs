@@ -9,15 +9,15 @@ namespace rudIsland.RPG3D.World
     // SpawnSettings 하나에 해당하는 뷰 인스턴스를 재사용한다.
     internal sealed class WorldObjectPool : IDisposable
     {
-        private readonly WorldObjectManager manager;
-        private readonly SpawnSettings settings;
-        private readonly Transform container;
-        private readonly ObjectPool<WorldObjectView> pool;
-        private readonly List<WorldObjectView> takenViews;
-        private bool isDisposed;
+        private readonly WorldObjectManager manager; // 씬 또는 시스템 참조
+        private readonly SpawnSettings settings; // 행동 설정 참조
+        private readonly Transform container; // 씬 또는 시스템 참조
+        private readonly ObjectPool<WorldObjectView> pool; // 씬 또는 시스템 참조
+        private readonly List<WorldObjectView> takenViews; // 씬 또는 시스템 참조
+        private bool isDisposed; // 기능 사용 여부
 
-        public int UsedCount => pool.CountActive;
-        public int AvailableCount => pool.CountInactive;
+        public int UsedCount => pool.CountActive; // 개수 또는 크기
+        public int AvailableCount => pool.CountInactive; // 개수 또는 크기
 
         // 설정값으로 풀을 만들고 initialSize만큼 미리 준비한다.
         public WorldObjectPool(

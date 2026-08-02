@@ -7,14 +7,14 @@ namespace rudIsland.RPG3D.Player.Input
     // Input System 값을 게임에서 읽기 쉬운 상태로 저장한다.
     public sealed class PlayerInputReader : PlayerControls.IPlayerActions
     {
-        private PlayerControls playerControls;
-        private bool hasRollInput;
-        private bool hasAttackInput;
+        private PlayerControls playerControls; // 내부에서 사용하는 값
+        private bool hasRollInput; // 기능 사용 여부
+        private bool hasAttackInput; // 기능 사용 여부
 
         // 누르고 있는 동안 계속 유지되는 입력 상태다.
-        public Vector2 MoveValue { get; private set; }
-        public bool IsSprinting { get; private set; }
-        public bool IsBlocking { get; private set; }
+        public Vector2 MoveValue { get; private set; } // 이동 정보
+        public bool IsSprinting { get; private set; } // 기능 사용 여부
+        public bool IsBlocking { get; private set; } // 기능 사용 여부
 
         public void Create()
         {

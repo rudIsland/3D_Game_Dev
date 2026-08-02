@@ -14,14 +14,14 @@ namespace rudIsland.RPG3D.Editor
     [InitializeOnLoad]
     public static class CombatHudPrefabBuilder
     {
-        private const string RequestPath = "Temp/BuildCombatHud.request";
-        private const string GuiFolder = "Assets/_Project/GUI";
-        private const string HudFolder = GuiFolder + "/CombatHud";
-        private const string SpriteFolder = HudFolder + "/Sprites";
-        private const string PrefabPath = HudFolder + "/CombatHud.prefab";
-        private const string CharacterTestScenePath =
+        private const string RequestPath = "Temp/BuildCombatHud.request"; // 내부에서 사용하는 값
+        private const string GuiFolder = "Assets/_Project/GUI"; // 내부에서 사용하는 값
+        private const string HudFolder = GuiFolder + "/CombatHud"; // 내부에서 사용하는 값
+        private const string SpriteFolder = HudFolder + "/Sprites"; // 내부에서 사용하는 값
+        private const string PrefabPath = HudFolder + "/CombatHud.prefab"; // 내부에서 사용하는 값
+        private const string CharacterTestScenePath = // 내부에서 사용하는 값
             "Assets/_Project/Scenes/Dev/CharacterTestScene.unity";
-        private const string GameScenePath =
+        private const string GameScenePath = // 내부에서 사용하는 값
             "Assets/_Project/Scenes/GameScene.unity";
 
         static CombatHudPrefabBuilder()

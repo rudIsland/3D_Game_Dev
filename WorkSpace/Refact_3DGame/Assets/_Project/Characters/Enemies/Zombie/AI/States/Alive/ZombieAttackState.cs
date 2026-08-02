@@ -12,19 +12,19 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
     // 공격 중에는 추격 회전을 멈추고 애니메이션이 끝나기를 기다린다.
     internal sealed class ZombieAttackState : IZombieState
     {
-        private const float CloseAttackRangeRatioSquared = 0.36f;
-        private const float CloseSwingWeight = 3f;
-        private const float CloseKickWeight = 6f;
-        private const float CloseUpDownWeight = 1f;
-        private const float FarSwingWeight = 4f;
-        private const float FarKickWeight = 1f;
-        private const float FarUpDownWeight = 5f;
+        private const float CloseAttackRangeRatioSquared = 0.36f; // 공격 관련 설정 또는 상태
+        private const float CloseSwingWeight = 3f; // 내부에서 사용하는 값
+        private const float CloseKickWeight = 6f; // 내부에서 사용하는 값
+        private const float CloseUpDownWeight = 1f; // 내부에서 사용하는 값
+        private const float FarSwingWeight = 4f; // 내부에서 사용하는 값
+        private const float FarKickWeight = 1f; // 내부에서 사용하는 값
+        private const float FarUpDownWeight = 5f; // 내부에서 사용하는 값
 
-        private readonly ZombieAliveState aliveState;
-        private readonly ZombieStateMachine stateMachine;
-        private ZombieAttackType previousAttackType;
-        private bool hasPreviousAttack;
-        private bool animationEndedByEvent;
+        private readonly ZombieAliveState aliveState; // 현재 행동 상태
+        private readonly ZombieStateMachine stateMachine; // 현재 행동 상태
+        private ZombieAttackType previousAttackType; // 공격 관련 설정 또는 상태
+        private bool hasPreviousAttack; // 기능 사용 여부
+        private bool animationEndedByEvent; // 기능 사용 여부
 
         public ZombieAttackState(
             ZombieAliveState aliveState,

@@ -5,10 +5,10 @@ namespace rudIsland.RPG3D.World
     // 월드 객체의 공통 호출 순서를 한곳에서 지킨다.
     public abstract class WorldObject : IWorldObject
     {
-        private bool isDisposed;
+        private bool isDisposed; // 기능 사용 여부
 
-        public bool IsCreated { get; private set; }
-        public bool IsEnabled { get; private set; }
+        public bool IsCreated { get; private set; } // 기능 사용 여부
+        public bool IsEnabled { get; private set; } // 기능 사용 여부
 
         // 최초 한 번만 필요한 준비 작업을 실행한다.
         public void Create()

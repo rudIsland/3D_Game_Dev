@@ -8,10 +8,10 @@ namespace rudIsland.RPG3D.Tests
 {
     public sealed class WorldObjectManagerTests
     {
-        private GameObject managerObject;
-        private WorldObjectManager manager;
-        private GameObject prefabObject;
-        private SpawnSettings settings;
+        private GameObject managerObject; // 씬 또는 시스템 참조
+        private WorldObjectManager manager; // 씬 또는 시스템 참조
+        private GameObject prefabObject; // 씬 또는 시스템 참조
+        private SpawnSettings settings; // 행동 설정 참조
 
         [SetUp]
         public void SetUp()
@@ -210,8 +210,8 @@ namespace rudIsland.RPG3D.Tests
 
         private sealed class FakeWorldObject : WorldObject
         {
-            public Action TickAction { get; set; }
-            public int TickCount { get; private set; }
+            public Action TickAction { get; set; } // 현재 행동 상태
+            public int TickCount { get; private set; } // 개수 또는 크기
 
             protected override void OnTick(float deltaTime)
             {
@@ -222,7 +222,7 @@ namespace rudIsland.RPG3D.Tests
 
         private sealed class FakeWorldObjectView : WorldObjectView
         {
-            public FakeWorldObject FakeRuntime { get; private set; }
+            public FakeWorldObject FakeRuntime { get; private set; } // 시간 설정
 
             protected override IWorldObject CreateRuntimeObject()
             {

@@ -6,36 +6,36 @@ namespace rudIsland.RPG3D.Player.Animations
     // 플레이어 Animator의 파라미터와 재생 시간을 한곳에서 관리한다.
     public sealed class PlayerAnimationController
     {
-        private static readonly int MoveAmountId = Animator.StringToHash("MoveAmount");
-        private static readonly int BlockMoveXId = Animator.StringToHash("BlockMoveX");
-        private static readonly int BlockMoveYId = Animator.StringToHash("BlockMoveY");
-        private static readonly int RollDirectionXId = Animator.StringToHash("RollDirectionX");
-        private static readonly int RollDirectionYId = Animator.StringToHash("RollDirectionY");
-        private static readonly int RollId = Animator.StringToHash("Roll");
-        private static readonly int SprintRollId = Animator.StringToHash("SprintRoll");
-        private static readonly int IsBlockingId = Animator.StringToHash("IsBlocking");
-        private static readonly int AttackId = Animator.StringToHash("Attack");
-        private static readonly int AttackIndexId = Animator.StringToHash("AttackIndex");
-        private static readonly int HitId = Animator.StringToHash("Hit");
-        private static readonly int DeathId = Animator.StringToHash("Death");
-        private static readonly int PlayerHitStateId =
+        private static readonly int MoveAmountId = Animator.StringToHash("MoveAmount"); // 이동 정보
+        private static readonly int BlockMoveXId = Animator.StringToHash("BlockMoveX"); // 이동 정보
+        private static readonly int BlockMoveYId = Animator.StringToHash("BlockMoveY"); // 이동 정보
+        private static readonly int RollDirectionXId = Animator.StringToHash("RollDirectionX"); // 이동 정보
+        private static readonly int RollDirectionYId = Animator.StringToHash("RollDirectionY"); // 이동 정보
+        private static readonly int RollId = Animator.StringToHash("Roll"); // 내부에서 사용하는 값
+        private static readonly int SprintRollId = Animator.StringToHash("SprintRoll"); // 내부에서 사용하는 값
+        private static readonly int IsBlockingId = Animator.StringToHash("IsBlocking"); // 기능 사용 여부
+        private static readonly int AttackId = Animator.StringToHash("Attack"); // 공격 관련 설정 또는 상태
+        private static readonly int AttackIndexId = Animator.StringToHash("AttackIndex"); // 공격 관련 설정 또는 상태
+        private static readonly int HitId = Animator.StringToHash("Hit"); // 피격 또는 피해 관련 값
+        private static readonly int DeathId = Animator.StringToHash("Death"); // 내부에서 사용하는 값
+        private static readonly int PlayerHitStateId = // 피격 또는 피해 관련 값
             Animator.StringToHash("PlayerHit");
-        private static readonly int PlayerHitFullPathId =
+        private static readonly int PlayerHitFullPathId = // 피격 또는 피해 관련 값
             Animator.StringToHash("Base Layer.PlayerHit");
-        private static readonly int PlayerRollStateId =
+        private static readonly int PlayerRollStateId = // 현재 행동 상태
             Animator.StringToHash("Base Layer.Movement.PlayerRoll");
-        private static readonly int PlayerSprintRollStateId =
+        private static readonly int PlayerSprintRollStateId = // 현재 행동 상태
             Animator.StringToHash("Base Layer.Movement.PlayerSprintRoll");
-        private static readonly int PlayerAttack01StateId = Animator.StringToHash("PlayerAttack01");
-        private static readonly int PlayerAttack02StateId = Animator.StringToHash("PlayerAttack02");
-        private static readonly int PlayerAttack03StateId = Animator.StringToHash("PlayerAttack03");
-        private static readonly int PlayerAttack04StateId = Animator.StringToHash("PlayerAttack04");
-        private static readonly int PlayerAttack05StateId = Animator.StringToHash("PlayerAttack05");
-        private static readonly int PlayerRunAttackStateId = Animator.StringToHash("PlayerRunAttack");
+        private static readonly int PlayerAttack01StateId = Animator.StringToHash("PlayerAttack01"); // 공격 관련 설정 또는 상태
+        private static readonly int PlayerAttack02StateId = Animator.StringToHash("PlayerAttack02"); // 공격 관련 설정 또는 상태
+        private static readonly int PlayerAttack03StateId = Animator.StringToHash("PlayerAttack03"); // 공격 관련 설정 또는 상태
+        private static readonly int PlayerAttack04StateId = Animator.StringToHash("PlayerAttack04"); // 공격 관련 설정 또는 상태
+        private static readonly int PlayerAttack05StateId = Animator.StringToHash("PlayerAttack05"); // 공격 관련 설정 또는 상태
+        private static readonly int PlayerRunAttackStateId = Animator.StringToHash("PlayerRunAttack"); // 공격 관련 설정 또는 상태
 
-        private readonly Animator playerAnimator;
-        private readonly AnimatorPlaybackReader playbackReader;
-        private readonly float smoothTime;
+        private readonly Animator playerAnimator; // 애니메이터 참조
+        private readonly AnimatorPlaybackReader playbackReader; // 씬 또는 시스템 참조
+        private readonly float smoothTime; // 시간 설정
 
         public PlayerAnimationController(Animator playerAnimator, float smoothTime)
         {

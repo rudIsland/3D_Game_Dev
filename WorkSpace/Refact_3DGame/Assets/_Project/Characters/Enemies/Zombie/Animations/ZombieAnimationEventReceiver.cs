@@ -7,9 +7,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
     // 좀비 클립의 AnimationEvent와 루트 회전을 게임 코드에 전달한다.
     public sealed class ZombieAnimationEventReceiver : MonoBehaviour
     {
-        private Animator zombieAnimator;
-        private ZombieAnimationController animationController;
-        private ZombieController zombieController;
+        private Animator zombieAnimator; // 애니메이터 참조
+        private ZombieAnimationController animationController; // 씬 또는 시스템 참조
+        private ZombieController zombieController; // 씬 또는 시스템 참조
 
         private void Awake()
         {

@@ -1,4 +1,5 @@
 using System;
+using rudIsland.RPG3D.Combat;
 using rudIsland.RPG3D.Player.Animations;
 using rudIsland.RPG3D.Player.Input;
 using rudIsland.RPG3D.Player.Movement;
@@ -12,29 +13,30 @@ namespace rudIsland.RPG3D.Player.States
     // 플레이어 상태 전환, 입력 판단, 루트 모션 전달을 관리한다.
     public sealed class PlayerStateMachine
     {
-        private readonly PlayerInputReader playerInput;
-        private readonly PlayerMovement playerMovement;
-        private readonly PlayerAnimationController animationController;
-        private readonly PlayerAttackState attackState;
-        private readonly PlayerControlState controlState;
-        private readonly PlayerHitState hitState;
-        private readonly PlayerDeadState deadState;
-        private readonly Action endAttackHit;
-        private readonly float rollDistanceScale;
+        private readonly PlayerInputReader playerInput; // 입력 또는 행동 여부
+        private readonly PlayerMovement playerMovement; // 이동 정보
+        private readonly PlayerAnimationController animationController; // 씬 또는 시스템 참조
+        private readonly PlayerAttackState attackState; // 공격 관련 설정 또는 상태
+        private readonly PlayerControlState controlState; // 현재 행동 상태
+        private readonly PlayerHitState hitState; // 피격 또는 피해 관련 값
+        private readonly PlayerDeadState deadState; // 현재 행동 상태
+        private readonly Action endAttackHit; // 공격 관련 설정 또는 상태
+        private readonly float rollDistanceScale; // 거리 설정
 
-        private IPlayerState currentState;
-        private bool isEnabled;
+        private IPlayerState currentState; // 현재 행동 상태
+        private bool isEnabled; // 기능 사용 여부
 
-        internal PlayerMovement Movement => playerMovement;
-        internal PlayerInputReader Input => playerInput;
-        public bool IsBlocking => ReferenceEquals(currentState, controlState) &&
+        internal PlayerMovement Movement => playerMovement; // 이동 정보
+        internal PlayerInputReader Input => playerInput; // 입력 또는 행동 여부
+        public bool IsBlocking => ReferenceEquals(currentState, controlState) && // 기능 사용 여부
             controlState.IsBlocking;
-        public bool IsRolling => ReferenceEquals(currentState, controlState) &&
+        public bool IsRolling => ReferenceEquals(currentState, controlState) && // 기능 사용 여부
             controlState.IsRolling;
-        public bool IsAttacking => ReferenceEquals(currentState, controlState) &&
+        public bool IsAttacking => ReferenceEquals(currentState, controlState) && // 기능 사용 여부
             controlState.IsAttacking;
-        public bool IsDead => ReferenceEquals(currentState, deadState);
-        public bool IsHit => ReferenceEquals(currentState, hitState);
+        public bool IsDead => ReferenceEquals(currentState, deadState); // 기능 사용 여부
+        public bool IsHit => ReferenceEquals(currentState, hitState); // 기능 사용 여부
+        public HitReaction LastHitReaction { get; private set; }
 
         public PlayerStateMachine(
             PlayerInputReader playerInput,
@@ -179,11 +181,28 @@ namespace rudIsland.RPG3D.Player.States
 
         internal void ChangeToHitState()
         {
+            HitReaction reaction = default;
+            ChangeToHitState(in reaction);
+        }
+
+        internal void ChangeToHitState(in AttackHitData hit)
+        {
+            HitReaction reaction = HitReaction.Create(
+                in hit,
+                playerMovement.Forward,
+                playerMovement.Right);
+            ChangeToHitState(in reaction);
+        }
+
+        private void ChangeToHitState(in HitReaction reaction)
+        {
             if (!isEnabled || ReferenceEquals(currentState, deadState))
             {
                 return;
             }
 
+            LastHitReaction = reaction;
+            hitState.SetHitReaction(in reaction);
             EndAttackHit();
             if (ReferenceEquals(currentState, hitState))
             {

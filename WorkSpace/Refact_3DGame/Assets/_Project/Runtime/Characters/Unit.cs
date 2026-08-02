@@ -1,4 +1,5 @@
 using rudIsland.RPG3D.World;
+using rudIsland.RPG3D.Combat;
 
 namespace rudIsland.RPG3D.Characters
 {
@@ -6,14 +7,54 @@ namespace rudIsland.RPG3D.Characters
     public abstract class Unit : WorldObject
     {
         // 이동, 공격, AI는 넣지 않고 팀과 체력만 공통으로 보관한다.
-        public UnitTeam Team { get; }
-        public UnitHealth Health { get; }
-        public bool IsDead => Health.IsDead;
+        public UnitTeam Team { get; } // 씬 또는 시스템 참조
+        public UnitHealth Health { get; } // 씬 또는 시스템 참조
+        public bool IsDead => Health.IsDead; // 기능 사용 여부
 
         protected Unit(UnitTeam team, float maxHealth)
         {
             Team = team;
             Health = new UnitHealth(maxHealth);
+        }
+
+        // 모든 Unit이 같은 순서로 팀, 사망과 체력 피해 결과를 판단한다.
+        protected AttackHitResult ApplyHealthHit(in AttackHitData hit)
+        {
+            if (IsDead ||
+                hit.AttackerTeam == Team ||
+                !hit.Damage.IsValid)
+            {
+                return AttackHitResult.Ignored;
+            }
+
+            float healthBeforeDamage = Health.CurrentHealth;
+            Health.TakeDamage(hit.Damage.HealthDamage);
+
+            if (Health.CurrentHealth >= healthBeforeDamage)
+            {
+                return AttackHitResult.Ignored;
+            }
+
+            return IsDead
+                ? AttackHitResult.Killed
+                : AttackHitResult.Damaged;
+        }
+
+        // 체력 피해를 먼저 적용하고, 살아 있으면 경직 한계 도달 여부를 판단한다.
+        protected AttackHitResult ApplyHealthAndStaggerHit(
+            in AttackHitData hit,
+            UnitStagger unitStagger)
+        {
+            AttackHitResult healthResult = ApplyHealthHit(in hit);
+            if (healthResult != AttackHitResult.Damaged ||
+                unitStagger == null)
+            {
+                return healthResult;
+            }
+
+            return unitStagger.AddStaggerDamage(hit.StaggerDamage)
+                ? AttackHitResult.Staggered
+                : AttackHitResult.Damaged;
         }
 
         // WorldObject의 호출 순서를 유지하면서 Unit 전용 확장 지점으로 전달한다.

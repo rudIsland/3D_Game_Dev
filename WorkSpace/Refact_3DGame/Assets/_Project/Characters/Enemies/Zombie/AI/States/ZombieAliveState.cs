@@ -3,16 +3,16 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
     // 살아 있는 동안 Idle, Alert, Chase, Attack 상태를 관리한다.
     internal sealed class ZombieAliveState : IZombieState
     {
-        private readonly ZombieStateMachine stateMachine;
-        private readonly ZombieIdleState idleState;
-        private readonly ZombieAlertState alertState;
-        private readonly ZombieChaseState chaseState;
-        private readonly ZombieAttackState attackState;
+        private readonly ZombieStateMachine stateMachine; // 현재 행동 상태
+        private readonly ZombieIdleState idleState; // 현재 행동 상태
+        private readonly ZombieAlertState alertState; // 현재 행동 상태
+        private readonly ZombieChaseState chaseState; // 현재 행동 상태
+        private readonly ZombieAttackState attackState; // 공격 관련 설정 또는 상태
 
-        private IZombieState currentChildState;
-        private bool hasFoundTargetBefore;
+        private IZombieState currentChildState; // 현재 행동 상태
+        private bool hasFoundTargetBefore; // 기능 사용 여부
 
-        internal bool NeedsTargetUpdateEveryFrame =>
+        internal bool NeedsTargetUpdateEveryFrame => // 기능 사용 여부
             !ReferenceEquals(currentChildState, idleState);
 
         public ZombieAliveState(ZombieStateMachine stateMachine)

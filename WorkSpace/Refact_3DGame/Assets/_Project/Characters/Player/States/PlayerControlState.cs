@@ -7,16 +7,16 @@ namespace rudIsland.RPG3D.Player.States
     // 플레이어의 이동, 방어, 구르기, 공격 애니메이션 상태를 전환한다.
     internal sealed class PlayerControlState : IPlayerState
     {
-        private readonly PlayerStateMachine stateMachine;
-        private readonly PlayerMoveState moveState;
-        private readonly PlayerBlockState blockState;
-        private readonly PlayerRollState rollState;
-        private readonly PlayerAttackState attackState;
-        private IPlayerState currentState;
+        private readonly PlayerStateMachine stateMachine; // 현재 행동 상태
+        private readonly PlayerMoveState moveState; // 이동 정보
+        private readonly PlayerBlockState blockState; // 현재 행동 상태
+        private readonly PlayerRollState rollState; // 현재 행동 상태
+        private readonly PlayerAttackState attackState; // 공격 관련 설정 또는 상태
+        private IPlayerState currentState; // 현재 행동 상태
 
-        public bool IsBlocking => ReferenceEquals(currentState, blockState);
-        public bool IsRolling => ReferenceEquals(currentState, rollState);
-        public bool IsAttacking => ReferenceEquals(currentState, attackState);
+        public bool IsBlocking => ReferenceEquals(currentState, blockState); // 기능 사용 여부
+        public bool IsRolling => ReferenceEquals(currentState, rollState); // 기능 사용 여부
+        public bool IsAttacking => ReferenceEquals(currentState, attackState); // 기능 사용 여부
 
         public PlayerControlState(
             PlayerStateMachine stateMachine,

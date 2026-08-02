@@ -7,12 +7,12 @@ namespace rudIsland.RPG3D.UI
     // Receives prepared health data and only draws one health bar.
     public sealed class HealthBarView : MonoBehaviour
     {
-        [SerializeField] private GameObject barRoot;
-        [SerializeField] private Image healthFill;
-        [SerializeField] private Text healthText;
-        [SerializeField] private Text targetNameText;
+        [SerializeField] private GameObject barRoot; // 씬 또는 시스템 참조
+        [SerializeField] private Image healthFill; // Inspector 설정 값
+        [SerializeField] private Text healthText; // Inspector 설정 값
+        [SerializeField] private Text targetNameText; // 대상 참조
 
-        public bool IsVisible =>
+        public bool IsVisible => // 기능 사용 여부
             barRoot != null && barRoot.activeSelf;
 
         public void Show(string targetName, UnitHealth health)

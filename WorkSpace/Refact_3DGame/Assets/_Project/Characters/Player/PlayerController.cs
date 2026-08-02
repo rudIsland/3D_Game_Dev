@@ -13,66 +13,81 @@ namespace rudIsland.RPG3D.Player
     public sealed class PlayerController : MonoBehaviour, IAttackHitReceiver
     {
         [Header("필수 연결")]
-        [SerializeField] private WorldObjectManager worldObjectManager;
-        [SerializeField] private Transform moveCamera;
-        [SerializeField] private Animator playerAnimator;
+        [SerializeField] private WorldObjectManager worldObjectManager; // 씬 또는 시스템 참조
+        [SerializeField] private Transform moveCamera; // 이동 정보
+        [SerializeField] private Animator playerAnimator; // 애니메이터 참조
 
         [Header("생명")]
-        [SerializeField, Min(1f)] private float maxHealth = 100f;
-        [SerializeField] private MeleeHitDetector attackHitDetector;
-        [SerializeField] private PlayerAttackDamage[] attackDamages =
-            CreateDefaultAttackDamages();
+        [SerializeField, Min(1f)] private float maxHealth = 100f; // 최대 체력
+        [Header("공격별 타격")]
+        [SerializeField] private AttackHitSettings[] attackHitSettings; // 행동 설정 참조
+
+        [Header("경직")]
+        [SerializeField, Min(0.01f)] private float staggerLimit = 10f; // 피격 동작이 나올 경직 한계
+        [SerializeField, Min(0f)] private float staggerRecoverDelay = 1f; // 경직 회복을 기다리는 시간
+        [SerializeField, Min(0f)] private float staggerRecoverSpeed = 20f; // 1초에 회복할 경직 수치
+
+        [Header("피격 밀림")]
+        [SerializeField, Min(0.01f)] private float hitPushTime = 0.18f; // 피격 또는 피해 관련 값
 
 #if UNITY_EDITOR
         [Header("체력 확인")]
-        [SerializeField, Min(0f)] private float testDamage = 10f;
+        [SerializeField, Min(0f)] private float testDamage = 10f; // 피격 또는 피해 관련 값
 #endif
 
         [Header("회전")]
-        [SerializeField] private float turnSpeed = 720f;
+        [SerializeField] private float turnSpeed = 720f; // 회전 속도
 
         [Header("입력 이동")]
-        [SerializeField, Min(0f)] private float walkSpeed = 2.5f;
-        [SerializeField, Min(0f)] private float sprintSpeed = 5f;
+        [SerializeField, Min(0f)] private float walkSpeed = 2.5f; // 걷기 속도
+        [SerializeField, Min(0f)] private float sprintSpeed = 5f; // 달리기 속도
 
         [Header("이동 애니메이션")]
-        [SerializeField] private float animationSmoothTime = 0.12f;
+        [SerializeField] private float animationSmoothTime = 0.12f; // 시간 설정
 
         [Header("구르기 이동 거리")]
         [Tooltip("1이면 원래 거리, 0.5면 절반, 1.5면 1.5배 이동합니다.")]
-        [SerializeField, Min(0f)] private float rollDistanceScale = 0.75f;
+        [SerializeField, Min(0f)] private float rollDistanceScale = 0.1f; // 거리 설정
 
         [Header("콤보 연결 시점 (0~1)")]
         [Tooltip("1타 재생이 이 비율을 넘은 뒤부터 2타 입력을 받습니다.")]
-        [SerializeField, Range(0f, 1f)] private float attack01NextInputTime = 0.42f;
+        [SerializeField, Range(0f, 1f)] private float attack01NextInputTime = 0.42f; // 공격 관련 설정 또는 상태
         [Tooltip("2타 재생이 이 비율을 넘은 뒤부터 3타 입력을 받습니다.")]
-        [SerializeField, Range(0f, 1f)] private float attack02NextInputTime = 0.52f;
+        [SerializeField, Range(0f, 1f)] private float attack02NextInputTime = 0.52f; // 공격 관련 설정 또는 상태
         [Tooltip("3타 재생이 이 비율을 넘은 뒤부터 4타 입력을 받습니다.")]
-        [SerializeField, Range(0f, 1f)] private float attack03NextInputTime = 0.52f;
+        [SerializeField, Range(0f, 1f)] private float attack03NextInputTime = 0.52f; // 공격 관련 설정 또는 상태
         [Tooltip("4타 재생이 이 비율을 넘은 뒤부터 5타 입력을 받습니다.")]
-        [SerializeField, Range(0f, 1f)] private float attack04NextInputTime = 0.48f;
+        [SerializeField, Range(0f, 1f)] private float attack04NextInputTime = 0.48f; // 공격 관련 설정 또는 상태
 
         [Header("콤보 입력 버퍼")]
         [Tooltip("콤보 연결 시점 전에 누른 공격 입력을 보관하는 시간입니다.")]
-        [SerializeField, Min(0f)] private float comboInputBufferDuration = 0.15f;
+        [SerializeField, Min(0f)] private float comboInputBufferDuration = 0.15f; // 시간 설정
 
         [Header("공격 전진 거리 비율 (0~1)")]
-        [SerializeField, Range(0f, 1f)] private float attack01MoveScale = 0.65f;
-        [SerializeField, Range(0f, 1f)] private float attack02MoveScale = 0.65f;
-        [SerializeField, Range(0f, 1f)] private float attack03MoveScale = 0.55f;
-        [SerializeField, Range(0f, 1f)] private float attack04MoveScale = 0.60f;
-        [SerializeField, Range(0f, 1f)] private float attack05MoveScale = 0.50f;
-        [SerializeField, Range(0f, 1f)] private float runAttackMoveScale = 0.80f;
+        [SerializeField, Range(0f, 1f)] private float attack01MoveScale = 0.40f; // 공격 관련 설정 또는 상태
+        [SerializeField, Range(0f, 1f)] private float attack02MoveScale = 0.55f; // 공격 관련 설정 또는 상태
+        [SerializeField, Range(0f, 1f)] private float attack03MoveScale = 0.50f; // 공격 관련 설정 또는 상태
+        [SerializeField, Range(0f, 1f)] private float attack04MoveScale = 0.45f; // 공격 관련 설정 또는 상태
+        [SerializeField, Range(0f, 1f)] private float attack05MoveScale = 0.35f; // 공격 관련 설정 또는 상태
+        [SerializeField, Range(0f, 1f)] private float runAttackMoveScale = 0.50f; // 공격 관련 설정 또는 상태
 
         [Header("중력")]
-        [SerializeField] private float gravity = -22f;
-        [SerializeField] private float groundPull = -2f;
+        [SerializeField] private float gravity = -22f; // Inspector 설정 값
+        [SerializeField] private float groundPull = -2f; // Inspector 설정 값
 
-        private CharacterController characterController;
-        private PlayerInputReader playerInput;
-        private PlayerStateMachine playerStateMachine;
-        private PlayerMovement playerMovement;
-        private PlayerWorldUnit playerWorldUnit;
+        private CharacterController characterController; // 씬 또는 시스템 참조
+        private PlayerInputReader playerInput; // 입력 또는 행동 여부
+        private PlayerStateMachine playerStateMachine; // 현재 행동 상태
+        private PlayerMovement playerMovement; // 이동 정보
+        private PlayerWorldUnit playerWorldUnit; // 씬 또는 시스템 참조
+        private MeleeHitDetector activeHitDetector; // 피격 또는 피해 관련 값
+
+        public bool IsAttackHitActive =>
+            activeHitDetector != null;
+        public HitReaction LastHitReaction =>
+            playerStateMachine != null
+                ? playerStateMachine.LastHitReaction
+                : default;
 
         private void Awake()
         {
@@ -86,13 +101,8 @@ namespace rudIsland.RPG3D.Player
             }
 
             characterController = GetComponent<CharacterController>();
-            if (attackHitDetector == null)
-            {
-                attackHitDetector =
-                    GetComponentInChildren<MeleeHitDetector>(true);
-            }
-
-            EnsureAttackDamages();
+            EnsureAttackHitSettings(
+                GetComponentInChildren<MeleeHitDetector>(true));
             if (playerAnimator == null)
             {
                 playerAnimator = GetComponentInChildren<Animator>();
@@ -113,7 +123,8 @@ namespace rudIsland.RPG3D.Player
                 walkSpeed,
                 sprintSpeed,
                 gravity,
-                groundPull);
+                groundPull,
+                hitPushTime);
             playerStateMachine = new PlayerStateMachine(
                 playerInput,
                 playerMovement,
@@ -134,6 +145,9 @@ namespace rudIsland.RPG3D.Player
                 EndAttackHit);
             playerWorldUnit = new PlayerWorldUnit(
                 maxHealth,
+                staggerLimit,
+                staggerRecoverDelay,
+                staggerRecoverSpeed,
                 playerInput,
                 playerStateMachine);
             worldObjectManager.Register(playerWorldUnit);
@@ -163,34 +177,44 @@ namespace rudIsland.RPG3D.Player
             playerWorldUnit?.TakeDamage(damage);
         }
 
-        public void ReceiveHit(in AttackHitData hit)
+        public AttackHitResult ReceiveHit(in AttackHitData hit)
         {
-            playerWorldUnit?.ApplyHit(in hit);
+            if (playerWorldUnit == null)
+            {
+                return AttackHitResult.Ignored;
+            }
+
+            return playerWorldUnit.ApplyHit(in hit);
         }
 
         public void StartAttackHit(int attackNumber)
         {
             EndAttackHit();
 
-            if (attackHitDetector == null ||
-                !PlayerAttackDamage.TryGetDamage(
-                    attackDamages,
+            if (!AttackHitSettings.TryFind(
+                    attackHitSettings,
                     attackNumber,
-                    out AttackDamage damage))
+                    out AttackHitSettings hitSettings) ||
+                hitSettings.HitDetector == null)
             {
                 return;
             }
 
             var hit = new AttackHitData(
-                damage,
+                hitSettings.Damage,
                 UnitTeam.Player,
-                attackNumber);
-            attackHitDetector.StartHit(in hit);
+                attackNumber,
+                hitSettings.Strength,
+                hitSettings.StaggerDamage,
+                hitSettings.PushDistance);
+            activeHitDetector = hitSettings.HitDetector;
+            activeHitDetector.StartHit(in hit);
         }
 
         public void EndAttackHit()
         {
-            attackHitDetector?.EndHit();
+            activeHitDetector?.EndHit();
+            activeHitDetector = null;
         }
 
         internal void NotifyAttackAnimationEnded()
@@ -227,33 +251,55 @@ namespace rudIsland.RPG3D.Player
             playerWorldUnit.Dispose();
         }
 
-        private void EnsureAttackDamages()
+        private void EnsureAttackHitSettings(
+            MeleeHitDetector defaultHitDetector)
         {
-            if (attackDamages != null && attackDamages.Length > 0)
+            if (attackHitSettings != null &&
+                attackHitSettings.Length > 0)
             {
                 return;
             }
 
-            attackDamages = CreateDefaultAttackDamages();
+            attackHitSettings =
+                CreateDefaultAttackHitSettings(defaultHitDetector);
         }
 
-        private static PlayerAttackDamage[] CreateDefaultAttackDamages()
+        private static AttackHitSettings[]
+            CreateDefaultAttackHitSettings(
+                MeleeHitDetector defaultHitDetector)
         {
-            var defaultDamages = new PlayerAttackDamage[6];
-            for (int index = 0; index < defaultDamages.Length; index++)
+            return new[]
             {
-                defaultDamages[index] = new PlayerAttackDamage(
-                    index + 1,
-                    new AttackDamage(10f));
-            }
-
-            return defaultDamages;
+                new AttackHitSettings(
+                    1, defaultHitDetector, new AttackDamage(10f), 10f, 0.40f),
+                new AttackHitSettings(
+                    2, defaultHitDetector, new AttackDamage(10f), 10f, 0.40f),
+                new AttackHitSettings(
+                    3, defaultHitDetector, new AttackDamage(10f), 10f, 0.40f),
+                new AttackHitSettings(
+                    4, defaultHitDetector, new AttackDamage(10f), 10f, 0.45f),
+                new AttackHitSettings(
+                    5,
+                    defaultHitDetector,
+                    new AttackDamage(10f),
+                    HitStrength.Heavy,
+                    10f,
+                    0.55f),
+                new AttackHitSettings(
+                    6,
+                    defaultHitDetector,
+                    new AttackDamage(10f),
+                    HitStrength.Heavy,
+                    10f,
+                    0.50f)
+            };
         }
 
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            if (PlayerAttackDamage.HasDuplicateAttackNumber(attackDamages))
+            if (AttackHitSettings.HasDuplicateAttackNumber(
+                    attackHitSettings))
             {
                 Debug.LogError(
                     "PlayerController의 공격 번호가 중복되었습니다.",

@@ -5,7 +5,7 @@ namespace rudIsland.RPG3D.Animation
     // Animator의 현재 재생 상태와 전환 상태만 읽는다.
     public sealed class AnimatorPlaybackReader
     {
-        private readonly Animator animator;
+        private readonly Animator animator; // 애니메이터 참조
 
         public AnimatorPlaybackReader(Animator animator)
         {

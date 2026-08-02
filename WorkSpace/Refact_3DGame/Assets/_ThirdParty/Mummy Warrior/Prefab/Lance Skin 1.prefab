@@ -137,9 +137,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 323e24f05bb546dda1720c04dc24b7f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Combat.MeleeHitDetector
-  hitStart: {fileID: 8823000000000000011}
-  hitEnd: {fileID: 8823000000000000021}
-  hitRadius: 0.18
+  attackShape:
+    shapeType: 0
+    startPoint: {fileID: 8823000000000000011}
+    endPoint: {fileID: 8823000000000000021}
+    radius: 0.18
+    boxSize: {x: 0, y: 0, z: 0}
   targetLayers:
     serializedVersion: 2
     m_Bits: 64

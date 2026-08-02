@@ -3,8 +3,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
     // 목표가 탐지 범위에 있는 동안 목표를 따라간다.
     internal sealed class ZombieChaseState : IZombieState
     {
-        private readonly ZombieAliveState aliveState;
-        private readonly ZombieStateMachine stateMachine;
+        private readonly ZombieAliveState aliveState; // 현재 행동 상태
+        private readonly ZombieStateMachine stateMachine; // 현재 행동 상태
 
         public ZombieChaseState(
             ZombieAliveState aliveState,

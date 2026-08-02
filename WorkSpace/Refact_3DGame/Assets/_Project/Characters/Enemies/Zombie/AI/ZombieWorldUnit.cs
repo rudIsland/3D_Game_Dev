@@ -5,13 +5,26 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
     // EnemyUnit 생명주기에서 좀비의 탐지·추적 상태머신을 실행한다.
     public sealed class ZombieWorldUnit : EnemyUnit
     {
-        private readonly ZombieStateMachine stateMachine;
+        private readonly ZombieStateMachine stateMachine; // 현재 행동 상태
+        private readonly UnitStagger unitStagger; // 현재 경직 누적값과 회복 규칙
 
-        public float CurrentHealth => Health.CurrentHealth;
+        public float CurrentHealth => Health.CurrentHealth; // 현재 체력
+        public float CurrentStagger => unitStagger.CurrentStagger; // 현재 경직 누적값
+        public HitReaction LastHitReaction =>
+            stateMachine.LastHitReaction;
 
-        public ZombieWorldUnit(float maxHealth, ZombieStateMachine stateMachine)
+        public ZombieWorldUnit(
+            float maxHealth,
+            float staggerLimit,
+            float staggerRecoverDelay,
+            float staggerRecoverSpeed,
+            ZombieStateMachine stateMachine)
             : base(maxHealth)
         {
+            unitStagger = new UnitStagger(
+                staggerLimit,
+                staggerRecoverDelay,
+                staggerRecoverSpeed);
             this.stateMachine = stateMachine;
         }
 
@@ -34,14 +47,16 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             stateMachine.ChangeToHitState();
         }
 
-        internal void ApplyHit(in AttackHitData hit)
+        internal AttackHitResult ApplyHit(in AttackHitData hit)
         {
-            if (hit.AttackerTeam != UnitTeam.Player)
+            AttackHitResult hitResult =
+                ApplyHealthAndStaggerHit(in hit, unitStagger);
+            if (hitResult == AttackHitResult.Staggered)
             {
-                return;
+                stateMachine.ChangeToHitState(in hit);
             }
 
-            TakeDamage(hit.Damage.HealthDamage);
+            return hitResult;
         }
 
         internal void NotifyAttackAnimationEnded()
@@ -61,11 +76,17 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         protected override void OnEnemyEnable()
         {
+            unitStagger.Reset();
             stateMachine.Enable();
         }
 
         protected override void OnUnitTick(float deltaTime)
         {
+            if (!IsDead)
+            {
+                unitStagger.Update(deltaTime);
+            }
+
             stateMachine.Update(deltaTime);
         }
 

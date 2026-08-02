@@ -9,13 +9,13 @@ namespace rudIsland.RPG3D.UI
     public sealed class CombatHudController : MonoBehaviour
     {
         [Header("World")]
-        [SerializeField] private WorldObjectManager worldObjectManager;
+        [SerializeField] private WorldObjectManager worldObjectManager; // 씬 또는 시스템 참조
 
         [Header("Health Bars")]
-        [SerializeField] private HealthBarView playerHealthBar;
-        [SerializeField] private HealthBarView bossHealthBar;
+        [SerializeField] private HealthBarView playerHealthBar; // 씬 또는 시스템 참조
+        [SerializeField] private HealthBarView bossHealthBar; // 씬 또는 시스템 참조
 
-        private readonly Dictionary<UnitHealth, Unit> trackedUnits =
+        private readonly Dictionary<UnitHealth, Unit> trackedUnits = // 씬 또는 시스템 참조
             new Dictionary<UnitHealth, Unit>(2);
 
         private void Awake()

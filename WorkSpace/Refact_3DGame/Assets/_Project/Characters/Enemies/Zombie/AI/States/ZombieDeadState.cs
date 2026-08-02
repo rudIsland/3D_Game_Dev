@@ -3,10 +3,10 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
     // 사망 후에는 행동을 다시 시작하지 않고 중력과 지면만 유지한다.
     internal sealed class ZombieDeadState : IZombieState
     {
-        private readonly ZombieStateMachine stateMachine;
-        private float remainingKeepTime;
-        private bool isAnimationComplete;
-        private bool hasRequestedRelease;
+        private readonly ZombieStateMachine stateMachine; // 현재 행동 상태
+        private float remainingKeepTime; // 시간 설정
+        private bool isAnimationComplete; // 기능 사용 여부
+        private bool hasRequestedRelease; // 기능 사용 여부
 
         public ZombieDeadState(ZombieStateMachine stateMachine)
         {

@@ -61,11 +61,11 @@ namespace rudIsland.RPG3D.Tests
 
         private sealed class FakeWorldObject : WorldObject
         {
-            public int CreateCount { get; private set; }
-            public int EnableCount { get; private set; }
-            public int TickCount { get; private set; }
-            public int DisableCount { get; private set; }
-            public int DisposeCount { get; private set; }
+            public int CreateCount { get; private set; } // 개수 또는 크기
+            public int EnableCount { get; private set; } // 개수 또는 크기
+            public int TickCount { get; private set; } // 개수 또는 크기
+            public int DisableCount { get; private set; } // 개수 또는 크기
+            public int DisposeCount { get; private set; } // 개수 또는 크기
 
             protected override void OnCreate()
             {

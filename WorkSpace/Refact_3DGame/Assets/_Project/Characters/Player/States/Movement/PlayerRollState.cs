@@ -6,12 +6,12 @@ namespace rudIsland.RPG3D.Player.States.Movement
     // 구르기 애니메이션이 끝날 때까지 중력과 이동 Blend Tree 값을 갱신한다.
     internal sealed class PlayerRollState : IPlayerState
     {
-        private readonly PlayerStateMachine stateMachine;
-        private readonly PlayerAnimationController animationController;
-        private bool startsAfterAttackCancel;
-        private bool hasAnimationStarted;
+        private readonly PlayerStateMachine stateMachine; // 현재 행동 상태
+        private readonly PlayerAnimationController animationController; // 씬 또는 시스템 참조
+        private bool startsAfterAttackCancel; // 기능 사용 여부
+        private bool hasAnimationStarted; // 기능 사용 여부
 
-        public bool IsFinished { get; private set; }
+        public bool IsFinished { get; private set; } // 기능 사용 여부
 
         public PlayerRollState(
             PlayerStateMachine stateMachine,

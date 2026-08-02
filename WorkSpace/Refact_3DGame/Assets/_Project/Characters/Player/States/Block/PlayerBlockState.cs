@@ -6,8 +6,8 @@ namespace rudIsland.RPG3D.Player.States.Block
     // 방어 입력이 유지되는 동안 방패 걷기 Blend Tree와 방어 상태를 유지한다.
     internal sealed class PlayerBlockState : IPlayerState
     {
-        private readonly PlayerStateMachine stateMachine;
-        private readonly PlayerAnimationController animationController;
+        private readonly PlayerStateMachine stateMachine; // 현재 행동 상태
+        private readonly PlayerAnimationController animationController; // 씬 또는 시스템 참조
 
         public PlayerBlockState(
             PlayerStateMachine stateMachine,

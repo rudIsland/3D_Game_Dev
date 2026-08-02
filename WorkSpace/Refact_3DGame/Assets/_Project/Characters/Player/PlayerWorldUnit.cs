@@ -8,17 +8,26 @@ namespace rudIsland.RPG3D.Player
     // 플레이어 체력과 입력 상태를 Unit 생명주기로 실행한다.
     public sealed class PlayerWorldUnit : Unit
     {
-        private readonly PlayerInputReader playerInput;
-        private readonly PlayerStateMachine playerStateMachine;
+        private readonly PlayerInputReader playerInput; // 입력 또는 행동 여부
+        private readonly PlayerStateMachine playerStateMachine; // 현재 행동 상태
+        private readonly UnitStagger unitStagger; // 현재 경직 누적값과 회복 규칙
 
-        public float CurrentHealth => Health.CurrentHealth;
+        public float CurrentHealth => Health.CurrentHealth; // 현재 체력
+        public float CurrentStagger => unitStagger.CurrentStagger; // 현재 경직 누적값
 
         public PlayerWorldUnit(
             float maxHealth,
+            float staggerLimit,
+            float staggerRecoverDelay,
+            float staggerRecoverSpeed,
             PlayerInputReader playerInput,
             PlayerStateMachine playerStateMachine)
             : base(UnitTeam.Player, maxHealth)
         {
+            unitStagger = new UnitStagger(
+                staggerLimit,
+                staggerRecoverDelay,
+                staggerRecoverSpeed);
             this.playerInput = playerInput;
             this.playerStateMachine = playerStateMachine;
         }
@@ -36,14 +45,16 @@ namespace rudIsland.RPG3D.Player
             playerStateMachine.ChangeToHitState();
         }
 
-        internal void ApplyHit(in AttackHitData hit)
+        internal AttackHitResult ApplyHit(in AttackHitData hit)
         {
-            if (hit.AttackerTeam != UnitTeam.Enemy)
+            AttackHitResult hitResult =
+                ApplyHealthAndStaggerHit(in hit, unitStagger);
+            if (hitResult == AttackHitResult.Staggered)
             {
-                return;
+                playerStateMachine.ChangeToHitState(in hit);
             }
 
-            TakeDamage(hit.Damage.HealthDamage);
+            return hitResult;
         }
 
         protected override void OnUnitCreate()
@@ -54,6 +65,8 @@ namespace rudIsland.RPG3D.Player
 
         protected override void OnUnitEnable()
         {
+            unitStagger.Reset();
+
             if (IsDead)
             {
                 playerStateMachine.Enable();
@@ -73,6 +86,7 @@ namespace rudIsland.RPG3D.Player
                 return;
             }
 
+            unitStagger.Update(deltaTime);
             playerStateMachine.Update(
                 deltaTime,
                 playerInput.TakeRollInput(),

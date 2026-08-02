@@ -1,4 +1,5 @@
 using System;
+using rudIsland.RPG3D.Combat;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.Zombie
@@ -6,27 +7,29 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
     // 좀비의 탐지·경계·추적·공격 상태를 관리한다.
     public sealed class ZombieStateMachine
     {
-        private readonly Transform target;
-        private readonly ZombieMovement movement;
-        private readonly ZombieAnimationController animation;
-        private readonly ZombieAliveState aliveState;
-        private readonly ZombieHitState hitState;
-        private readonly ZombieDeadState deadState;
-        private readonly Action requestRelease;
-        private readonly Action endAttackHit;
-        private readonly float minimumAttackFacingDot;
+        private readonly Transform target; // 대상 참조
+        private readonly ZombieMovement movement; // 이동 정보
+        private readonly ZombieAnimationController animation; // 씬 또는 시스템 참조
+        private readonly ZombieAliveState aliveState; // 현재 행동 상태
+        private readonly ZombieHitState hitState; // 피격 또는 피해 관련 값
+        private readonly ZombieDeadState deadState; // 현재 행동 상태
+        private readonly Action requestRelease; // 내부에서 사용하는 값
+        private readonly Action endAttackHit; // 공격 관련 설정 또는 상태
+        private readonly float minimumAttackFacingDot; // 공격 관련 설정 또는 상태
 
-        private IZombieState currentState;
-        private bool isEnabled;
-        private Vector3 targetPosition;
-        private float targetDistanceSquared;
+        private IZombieState currentState; // 현재 행동 상태
+        private bool isEnabled; // 기능 사용 여부
+        private Vector3 targetPosition; // 대상 참조
+        private float targetDistanceSquared; // 대상 참조
 
-        internal float FindRangeSquared { get; }
-        internal float IdleTargetCheckInterval { get; }
-        internal float AttackRangeSquared { get; }
-        internal float ChaseSpeed { get; }
-        internal float TurnSpeed { get; }
-        internal float DeadBodyKeepTime { get; }
+        internal float FindRangeSquared { get; } // 거리 설정
+        internal float IdleTargetCheckInterval { get; } // 대상 참조
+        internal float AttackRangeSquared { get; } // 공격 관련 설정 또는 상태
+        internal float ChaseSpeed { get; } // 이동 속도
+        internal float TurnSpeed { get; } // 이동 속도
+        internal float DeadBodyKeepTime { get; } // 시간 설정
+        public HitReaction LastHitReaction { get; private set; }
+
         public ZombieStateMachine(
             Transform target,
             ZombieMovement movement,
@@ -146,7 +149,39 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             movement.StayOnGround(deltaTime);
         }
 
+        internal void StartHitPush(
+            Vector3 hitDirection,
+            float pushDistance)
+        {
+            movement.StartHitPush(hitDirection, pushDistance);
+        }
+
+        internal void UpdateHitPush(float deltaTime)
+        {
+            movement.UpdateHitPush(deltaTime);
+        }
+
+        internal void StopHitPush()
+        {
+            movement.StopHitPush();
+        }
+
         internal void ChangeToHitState()
+        {
+            HitReaction reaction = default;
+            ChangeToHitState(in reaction);
+        }
+
+        internal void ChangeToHitState(in AttackHitData hit)
+        {
+            HitReaction reaction = HitReaction.Create(
+                in hit,
+                movement.Forward,
+                movement.Right);
+            ChangeToHitState(in reaction);
+        }
+
+        private void ChangeToHitState(in HitReaction reaction)
         {
             if (!isEnabled ||
                 ReferenceEquals(currentState, deadState))
@@ -154,6 +189,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 return;
             }
 
+            LastHitReaction = reaction;
+            hitState.SetHitReaction(in reaction);
             EndAttackHit();
             if (ReferenceEquals(currentState, hitState))
             {

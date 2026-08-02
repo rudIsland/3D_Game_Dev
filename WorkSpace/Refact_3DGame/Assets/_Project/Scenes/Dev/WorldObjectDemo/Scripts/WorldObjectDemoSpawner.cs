@@ -6,10 +6,10 @@ namespace rudIsland.RPG3D.Dev.WorldDemo
     // 씬이 시작되면 테스트 객체 하나를 풀에서 꺼낸다.
     public sealed class WorldObjectDemoSpawner : MonoBehaviour
     {
-        [SerializeField] private WorldObjectManager worldObjectManager;
-        [SerializeField] private SpawnSettings spawnSettings;
+        [SerializeField] private WorldObjectManager worldObjectManager; // 씬 또는 시스템 참조
+        [SerializeField] private SpawnSettings spawnSettings; // 행동 설정 참조
 
-        private WorldObjectView spawnedView;
+        private WorldObjectView spawnedView; // 씬 또는 시스템 참조
 
         private void Start()
         {

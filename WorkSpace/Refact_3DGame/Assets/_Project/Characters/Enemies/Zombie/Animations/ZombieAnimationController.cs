@@ -7,18 +7,18 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
     // 좀비 상태를 Animator 값으로 바꾸고 공격 클립의 루트 회전을 적용한다.
     public sealed class ZombieAnimationController : MonoBehaviour
     {
-        private const float HitRestartBlendTime = 0.15f;
+        private const float HitRestartBlendTime = 0.15f; // 피격 또는 피해 관련 값
 
-        private static readonly int StateId = Animator.StringToHash("State");
-        private static readonly int AttackTypeId = Animator.StringToHash("AttackType");
-        private static readonly int IdleStateId = Animator.StringToHash("Idle");
-        private static readonly int AlertStateId = Animator.StringToHash("Alert");
-        private static readonly int SwingAttackStateId = Animator.StringToHash("Swing Attack");
-        private static readonly int KickAttackStateId = Animator.StringToHash("Kick Attack");
-        private static readonly int UpDownAttackStateId =Animator.StringToHash("Up Down Attack");
-        private static readonly int HitStateId = Animator.StringToHash("Hit");
-        private static readonly int HitFullPathId = Animator.StringToHash("Base Layer.Hit");
-        private static readonly int DeadStateId = Animator.StringToHash("Dead");
+        private static readonly int StateId = Animator.StringToHash("State"); // 현재 행동 상태
+        private static readonly int AttackTypeId = Animator.StringToHash("AttackType"); // 공격 관련 설정 또는 상태
+        private static readonly int IdleStateId = Animator.StringToHash("Idle"); // 현재 행동 상태
+        private static readonly int AlertStateId = Animator.StringToHash("Alert"); // 현재 행동 상태
+        private static readonly int SwingAttackStateId = Animator.StringToHash("Swing Attack"); // 공격 관련 설정 또는 상태
+        private static readonly int KickAttackStateId = Animator.StringToHash("Kick Attack"); // 공격 관련 설정 또는 상태
+        private static readonly int UpDownAttackStateId =Animator.StringToHash("Up Down Attack"); // 공격 관련 설정 또는 상태
+        private static readonly int HitStateId = Animator.StringToHash("Hit"); // 피격 또는 피해 관련 값
+        private static readonly int HitFullPathId = Animator.StringToHash("Base Layer.Hit"); // 피격 또는 피해 관련 값
+        private static readonly int DeadStateId = Animator.StringToHash("Dead"); // 현재 행동 상태
         private enum AnimationState
         {
             Idle = 0,
@@ -29,10 +29,10 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             Dead = 5
         }
 
-        [SerializeField] private Animator zombieAnimator;
+        [SerializeField] private Animator zombieAnimator; // 애니메이터 참조
 
-        private AnimationState requestedAnimationState;
-        private AnimatorPlaybackReader playbackReader;
+        private AnimationState requestedAnimationState; // 현재 행동 상태
+        private AnimatorPlaybackReader playbackReader; // 씬 또는 시스템 참조
 
         private void Awake()
         {

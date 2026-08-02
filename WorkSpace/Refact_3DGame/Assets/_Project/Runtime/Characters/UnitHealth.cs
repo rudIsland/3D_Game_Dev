@@ -5,12 +5,12 @@ namespace rudIsland.RPG3D.Characters
     // 캐릭터의 현재 체력과 사망 알림만 관리한다.
     public sealed class UnitHealth
     {
-        public event Action<UnitHealth> HealthChanged;
-        public event Action Died;
+        public event Action<UnitHealth> HealthChanged; // 씬 또는 시스템 참조
+        public event Action Died; // 내부에서 사용하는 값
 
-        public float MaxHealth { get; }
-        public float CurrentHealth { get; private set; }
-        public bool IsDead => CurrentHealth <= 0f;
+        public float MaxHealth { get; } // 최대 체력
+        public float CurrentHealth { get; private set; } // 현재 체력
+        public bool IsDead => CurrentHealth <= 0f; // 기능 사용 여부
 
         public UnitHealth(float maxHealth)
         {

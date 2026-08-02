@@ -489,12 +489,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 323e24f05bb546dda1720c04dc24b7f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Combat.MeleeHitDetector
-  hitStart: {fileID: 3600597762167226313}
-  hitEnd: {fileID: 7341035276671574659}
-  hitRadius: 0.18
+  attackShape:
+    shapeType: 1
+    startPoint: {fileID: 7341035276671574659}
+    endPoint: {fileID: 0}
+    radius: 0.18
+    boxSize: {x: 0, y: 0, z: 0}
   targetLayers:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 131073
 --- !u!1 &1696024440212956797
 GameObject:
   m_ObjectHideFlags: 0
@@ -691,6 +694,75 @@ Transform:
   - {fileID: 2529845618520871616}
   m_Father: {fileID: 1611975494622334113}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2690285843070371678
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2589484274241232311}
+  - component: {fileID: 5098097509099665693}
+  - component: {fileID: 3067069832466099523}
+  m_Layer: 18
+  m_Name: EnemyBodyHitBox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2589484274241232311
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2690285843070371678}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3099887175951325285}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &5098097509099665693
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2690285843070371678}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.26
+  m_Height: 1.888
+  m_Direction: 1
+  m_Center: {x: 0.00026, y: 0.944, z: 0.0546}
+--- !u!114 &3067069832466099523
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2690285843070371678}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70a80ec996a74679a8f90a204abc1234, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Combat.UnitHitBox
+  bodyPart: 2
 --- !u!1 &2755850010944684170
 GameObject:
   m_ObjectHideFlags: 0
@@ -767,12 +839,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 323e24f05bb546dda1720c04dc24b7f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Combat.MeleeHitDetector
-  hitStart: {fileID: 6960831650949134440}
-  hitEnd: {fileID: 4995447017950012193}
-  hitRadius: 0.18
+  attackShape:
+    shapeType: 0
+    startPoint: {fileID: 6960831650949134440}
+    endPoint: {fileID: 4995447017950012193}
+    radius: 0.18
+    boxSize: {x: 0, y: 0, z: 0}
   targetLayers:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 131073
 --- !u!1 &2864643373496435409
 GameObject:
   m_ObjectHideFlags: 0
@@ -939,6 +1014,7 @@ Transform:
   m_Children:
   - {fileID: 4832853044412176866}
   - {fileID: 4218926007317599928}
+  - {fileID: 2589484274241232311}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!136 &925567523092408675
@@ -1017,21 +1093,38 @@ MonoBehaviour:
   target: {fileID: 0}
   zombieAnimator: {fileID: 2536206786879619756}
   maxHealth: 100
-  swingHitDetector: {fileID: 6330658553343561630}
-  kickHitDetector: {fileID: 8191701687353553632}
-  upDownHitDetector: {fileID: 4652307759974324094}
-  swingDamage:
-    healthDamage: 10
-  kickDamage:
-    healthDamage: 10
-  upDownDamage:
-    healthDamage: 10
+  attackHitSettings:
+  - attackNumber: 1
+    hitDetector: {fileID: 6330658553343561630}
+    damage:
+      healthDamage: 10
+    strength: 0
+    staggerDamage: 10
+    pushDistance: 0.3
+  - attackNumber: 2
+    hitDetector: {fileID: 8191701687353553632}
+    damage:
+      healthDamage: 10
+    strength: 1
+    staggerDamage: 10
+    pushDistance: 0.3
+  - attackNumber: 3
+    hitDetector: {fileID: 4652307759974324094}
+    damage:
+      healthDamage: 10
+    strength: 1
+    staggerDamage: 10
+    pushDistance: 0.3
+  staggerLimit: 20
+  staggerRecoverDelay: 1
+  staggerRecoverSpeed: 10
+  hitPushTime: 0.18
   deadBodyKeepTime: 2
   testDamage: 100
   findRange: 30
   idleTargetCheckInterval: 0.1
   attackRange: 1.8
-  attackFacingAngle: 30
+  attackFacingAngle: 10
   chaseSpeed: 3.5
   turnSpeed: 360
   gravity: -22
@@ -1500,12 +1593,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 323e24f05bb546dda1720c04dc24b7f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Combat.MeleeHitDetector
-  hitStart: {fileID: 5000065061354086210}
-  hitEnd: {fileID: 3600597762167226313}
-  hitRadius: 0.18
+  attackShape:
+    shapeType: 0
+    startPoint: {fileID: 5000065061354086210}
+    endPoint: {fileID: 3600597762167226313}
+    radius: 0.18
+    boxSize: {x: 0, y: 0, z: 0}
   targetLayers:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 131073
 --- !u!1 &5151366861225205955
 GameObject:
   m_ObjectHideFlags: 0

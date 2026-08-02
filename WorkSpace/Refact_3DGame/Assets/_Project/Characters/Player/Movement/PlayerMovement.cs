@@ -1,3 +1,4 @@
+using rudIsland.RPG3D.Characters;
 using rudIsland.RPG3D.Player.Input;
 using UnityEngine;
 
@@ -6,25 +7,28 @@ namespace rudIsland.RPG3D.Player.Movement
     // 입력을 카메라 기준 이동으로 바꾸고, 구르기·방어 루트 이동을 적용한다.
     public sealed class PlayerMovement
     {
-        private readonly Transform playerTransform;
-        private readonly Transform moveCamera;
-        private readonly CharacterController characterController;
-        private readonly PlayerInputReader playerInput;
-        private readonly float turnSpeed;
-        private readonly float walkSpeed;
-        private readonly float sprintSpeed;
-        private readonly float gravity;
-        private readonly float groundPull;
+        private readonly Transform playerTransform; // 씬 또는 시스템 참조
+        private readonly Transform moveCamera; // 이동 정보
+        private readonly CharacterController characterController; // 씬 또는 시스템 참조
+        private readonly PlayerInputReader playerInput; // 입력 또는 행동 여부
+        private readonly float turnSpeed; // 이동 속도
+        private readonly float walkSpeed; // 이동 속도
+        private readonly float sprintSpeed; // 이동 속도
+        private readonly float gravity; // 내부에서 사용하는 값
+        private readonly float groundPull; // 내부에서 사용하는 값
+        private readonly HitPushMovement hitPushMovement; // 피격 또는 피해 관련 값
 
-        private float verticalSpeed;
-        private Vector3 attackDirection;
-        private bool hasAttackDirection;
+        private float verticalSpeed; // 이동 속도
+        private Vector3 attackDirection; // 공격 관련 설정 또는 상태
+        private bool hasAttackDirection; // 기능 사용 여부
 
-        public bool IsGrounded => characterController != null &&
+        public bool IsGrounded => characterController != null && // 기능 사용 여부
             characterController.isGrounded;
+        public Vector3 Forward => playerTransform.forward; // 플레이어가 바라보는 방향
+        public Vector3 Right => playerTransform.right; // 플레이어의 오른쪽 방향
 
-        public bool UsesSprintRoll { get; private set; }
-        public Vector2 RollDirectionInput { get; private set; }
+        public bool UsesSprintRoll { get; private set; } // 기능 사용 여부
+        public Vector2 RollDirectionInput { get; private set; } // 입력 또는 행동 여부
 
         public PlayerMovement(
             Transform playerTransform,
@@ -35,7 +39,8 @@ namespace rudIsland.RPG3D.Player.Movement
             float walkSpeed,
             float sprintSpeed,
             float gravity,
-            float groundPull)
+            float groundPull,
+            float hitPushTime)
         {
             this.playerTransform = playerTransform;
             this.moveCamera = moveCamera;
@@ -46,6 +51,7 @@ namespace rudIsland.RPG3D.Player.Movement
             this.sprintSpeed = Mathf.Max(this.walkSpeed, sprintSpeed);
             this.gravity = gravity;
             this.groundPull = groundPull;
+            hitPushMovement = new HitPushMovement(hitPushTime);
         }
 
         public void UpdateMove(float deltaTime)
@@ -63,6 +69,26 @@ namespace rudIsland.RPG3D.Player.Movement
         public void UpdateStoppedMove(float deltaTime)
         {
             UpdateVerticalSpeed(deltaTime);
+        }
+
+        public void StartHitPush(
+            Vector3 hitDirection,
+            float pushDistance)
+        {
+            hitPushMovement.StartPush(hitDirection, pushDistance);
+        }
+
+        public void UpdateHitPush(float deltaTime)
+        {
+            UpdateVerticalSpeed(deltaTime);
+            Vector3 hitMove = hitPushMovement.GetNextMove(deltaTime);
+            hitMove.y = verticalSpeed * deltaTime;
+            characterController.Move(hitMove);
+        }
+
+        public void StopHitPush()
+        {
+            hitPushMovement.StopPush();
         }
 
         public bool TryStartRoll()

@@ -8,19 +8,19 @@ namespace rudIsland.RPG3D.Dev.CharacterTest
     public sealed class TestSceneEnemySpawner : MonoBehaviour
     {
         [Header("필수 연결")]
-        [SerializeField] private WorldObjectManager worldObjectManager;
+        [SerializeField] private WorldObjectManager worldObjectManager; // 씬 또는 시스템 참조
 
         [Header("적 설정과 배치 위치")]
-        [SerializeField] private SpawnSettings[] enemySettings =
+        [SerializeField] private SpawnSettings[] enemySettings = // 행동 설정 참조
             Array.Empty<SpawnSettings>();
-        [SerializeField] private Transform[] spawnPoints =
+        [SerializeField] private Transform[] spawnPoints = // 씬 또는 시스템 참조
             Array.Empty<Transform>();
 
         [Header("다시 생성")]
-        [SerializeField, Min(0f)] private float respawnDelay = 3f;
+        [SerializeField, Min(0f)] private float respawnDelay = 3f; // 시간 설정
 
-        private WorldObjectView[] spawnedEnemies;
-        private float[] remainingRespawnTimes;
+        private WorldObjectView[] spawnedEnemies; // 씬 또는 시스템 참조
+        private float[] remainingRespawnTimes; // 시간 설정
 
         private void Start()
         {

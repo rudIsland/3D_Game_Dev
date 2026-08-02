@@ -7,8 +7,8 @@ namespace rudIsland.RPG3D.Player.Animations
     // Animator의 루트 이동을 전달하며, 상태 머신이 행동 루트 모션만 적용한다.
     public sealed class PlayerAnimationEventReceiver : MonoBehaviour
     {
-        private Animator playerAnimator;
-        private PlayerController playerController;
+        private Animator playerAnimator; // 애니메이터 참조
+        private PlayerController playerController; // 씬 또는 시스템 참조
 
         private void Awake()
         {

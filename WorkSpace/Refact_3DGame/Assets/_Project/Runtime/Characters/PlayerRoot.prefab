@@ -64,6 +64,7 @@ Transform:
   m_Children:
   - {fileID: 6693446715994511580}
   - {fileID: 684135341859363741}
+  - {fileID: 3945709285472504484}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!143 &6648479244505933005
@@ -107,120 +108,141 @@ MonoBehaviour:
   moveCamera: {fileID: 0}
   playerAnimator: {fileID: 721643049174057638}
   maxHealth: 100
+  attackHitSettings:
+  - attackNumber: 1
+    hitDetector: {fileID: 0}
+    damage:
+      healthDamage: 10
+    strength: 0
+    staggerDamage: 10
+    pushDistance: 0.4
+  - attackNumber: 2
+    hitDetector: {fileID: 0}
+    damage:
+      healthDamage: 10
+    strength: 0
+    staggerDamage: 10
+    pushDistance: 0.4
+  - attackNumber: 3
+    hitDetector: {fileID: 0}
+    damage:
+      healthDamage: 10
+    strength: 0
+    staggerDamage: 10
+    pushDistance: 0.4
+  - attackNumber: 4
+    hitDetector: {fileID: 0}
+    damage:
+      healthDamage: 10
+    strength: 0
+    staggerDamage: 10
+    pushDistance: 0.45
+  - attackNumber: 5
+    hitDetector: {fileID: 0}
+    damage:
+      healthDamage: 10
+    strength: 1
+    staggerDamage: 10
+    pushDistance: 0.55
+  - attackNumber: 6
+    hitDetector: {fileID: 0}
+    damage:
+      healthDamage: 10
+    strength: 1
+    staggerDamage: 10
+    pushDistance: 0.5
+  staggerLimit: 10
+  staggerRecoverDelay: 1
+  staggerRecoverSpeed: 20
+  hitPushTime: 0.18
+  testDamage: 10
+  turnSpeed: 720
   walkSpeed: 2.8
   sprintSpeed: 5.5
-  turnSpeed: 720
-  moveAcceleration: 28
-  moveDeceleration: 36
   animationSmoothTime: 0.12
-  rollDistanceByStartSpeed:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1.65
-      inSlope: 0
-      outSlope: 1.6
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 3.25
-      inSlope: 1.6
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  rollMoveProgressByTime:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0.15
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 0.12
-      value: 0.03
-      inSlope: 0.4
-      outSlope: 0.8
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 0.36
-      value: 0.45
-      inSlope: 1.9
-      outSlope: 1.9
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 0.6
-      value: 0.88
-      inSlope: 1.1
-      outSlope: 1.1
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 0.75
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  sprintRollStartSpeedRatio: 0.72
-  normalRollTotalTime: 0.97
-  sprintRollTotalTime: 0.73
-  rollTurnTime: 0.1
-  attack01TotalTime: 1.21
-  attack02TotalTime: 0.95
-  attack03TotalTime: 1.27
-  attack04TotalTime: 1.18
-  attack05TotalTime: 1.47
-  attack01NextTime: 0.55
-  attack02NextTime: 0.6
-  attack03NextTime: 0.65
-  attack04NextTime: 0.65
-  attack01MoveScale: 0.65
-  attack02MoveScale: 0.65
-  attack03MoveScale: 0.55
-  attack04MoveScale: 0.6
-  attack05MoveScale: 0.5
-  runAttackTotalTime: 0.94
-  runAttackMinimumSprintTime: 0.35
-  runAttackStartSpeedRatio: 0.95
-  runAttackMoveScale: 0.8
+  rollDistanceScale: 0.1
+  attack01NextInputTime: 0.42
+  attack02NextInputTime: 0.52
+  attack03NextInputTime: 0.52
+  attack04NextInputTime: 0.48
+  comboInputBufferDuration: 0.15
+  attack01MoveScale: 0.4
+  attack02MoveScale: 0.55
+  attack03MoveScale: 0.5
+  attack04MoveScale: 0.45
+  attack05MoveScale: 0.35
+  runAttackMoveScale: 0.5
   gravity: -22
   groundPull: -2
+--- !u!1 &7112299585502653175
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3945709285472504484}
+  - component: {fileID: 7418619056282658818}
+  - component: {fileID: 6673914076574837219}
+  m_Layer: 17
+  m_Name: PlayerBodyHitBox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3945709285472504484
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7112299585502653175}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1607652367621752783}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &7418619056282658818
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7112299585502653175}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.34
+  m_Height: 1.8
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.9, z: 0}
+--- !u!114 &6673914076574837219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7112299585502653175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70a80ec996a74679a8f90a204abc1234, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Combat.UnitHitBox
+  bodyPart: 2
 --- !u!1001 &6586900582712672055
 PrefabInstance:
   m_ObjectHideFlags: 0

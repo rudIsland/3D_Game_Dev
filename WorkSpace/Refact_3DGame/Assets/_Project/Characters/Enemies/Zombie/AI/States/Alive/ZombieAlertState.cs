@@ -3,9 +3,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
     // 목표를 처음 찾았을 때 바라보고 발견 애니메이션을 재생한다.
     internal sealed class ZombieAlertState : IZombieState
     {
-        private readonly ZombieAliveState aliveState;
-        private readonly ZombieStateMachine stateMachine;
-        private bool animationEndedByEvent;
+        private readonly ZombieAliveState aliveState; // 현재 행동 상태
+        private readonly ZombieStateMachine stateMachine; // 현재 행동 상태
+        private bool animationEndedByEvent; // 기능 사용 여부
         public ZombieAlertState(
             ZombieAliveState aliveState,
             ZombieStateMachine stateMachine)

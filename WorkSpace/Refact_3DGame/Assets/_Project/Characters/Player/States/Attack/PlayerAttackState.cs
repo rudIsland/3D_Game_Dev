@@ -6,32 +6,32 @@ namespace rudIsland.RPG3D.Player.States.Attack
     // 1~5단 일반 콤보와 별도 달리기 공격의 재생 순서를 관리한다.
     internal sealed class PlayerAttackState : IPlayerState
     {
-        private const int LastComboNumber = 5;
-        private const int RunAttackNumber = 6;
-        private const float AttackCompleteNormalizedTime = 1f;
+        private const int LastComboNumber = 5; // 내부에서 사용하는 값
+        private const int RunAttackNumber = 6; // 공격 관련 설정 또는 상태
+        private const float AttackCompleteNormalizedTime = 1f; // 공격 관련 설정 또는 상태
 
-        private readonly PlayerStateMachine stateMachine;
-        private readonly PlayerAnimationController animationController;
-        private readonly float attack01NextInputTime;
-        private readonly float attack02NextInputTime;
-        private readonly float attack03NextInputTime;
-        private readonly float attack04NextInputTime;
-        private readonly float comboInputBufferDuration;
-        private readonly float attack01MoveScale;
-        private readonly float attack02MoveScale;
-        private readonly float attack03MoveScale;
-        private readonly float attack04MoveScale;
-        private readonly float attack05MoveScale;
-        private readonly float runAttackMoveScale;
-        private int comboNumber;
-        private bool isRunAttack;
-        private bool hasAnimationStarted;
-        private bool animationEndedByEvent;
-        private bool hasBufferedAttackInput;
-        private float bufferedAttackInputAge;
+        private readonly PlayerStateMachine stateMachine; // 현재 행동 상태
+        private readonly PlayerAnimationController animationController; // 씬 또는 시스템 참조
+        private readonly float attack01NextInputTime; // 공격 관련 설정 또는 상태
+        private readonly float attack02NextInputTime; // 공격 관련 설정 또는 상태
+        private readonly float attack03NextInputTime; // 공격 관련 설정 또는 상태
+        private readonly float attack04NextInputTime; // 공격 관련 설정 또는 상태
+        private readonly float comboInputBufferDuration; // 시간 설정
+        private readonly float attack01MoveScale; // 공격 관련 설정 또는 상태
+        private readonly float attack02MoveScale; // 공격 관련 설정 또는 상태
+        private readonly float attack03MoveScale; // 공격 관련 설정 또는 상태
+        private readonly float attack04MoveScale; // 공격 관련 설정 또는 상태
+        private readonly float attack05MoveScale; // 공격 관련 설정 또는 상태
+        private readonly float runAttackMoveScale; // 공격 관련 설정 또는 상태
+        private int comboNumber; // 내부에서 사용하는 값
+        private bool isRunAttack; // 기능 사용 여부
+        private bool hasAnimationStarted; // 기능 사용 여부
+        private bool animationEndedByEvent; // 기능 사용 여부
+        private bool hasBufferedAttackInput; // 기능 사용 여부
+        private float bufferedAttackInputAge; // 공격 관련 설정 또는 상태
 
-        public bool IsFinished { get; private set; }
-        public float CurrentMoveScale => GetCurrentMoveScale();
+        public bool IsFinished { get; private set; } // 기능 사용 여부
+        public float CurrentMoveScale => GetCurrentMoveScale(); // 이동 정보
 
         public PlayerAttackState(
             PlayerStateMachine stateMachine,

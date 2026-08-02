@@ -6,7 +6,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Undead
     // Unity 생명주기를 Undead Warrior 상태머신에 전달한다.
     public sealed class UndeadWarriorController : MonoBehaviour
     {
-        private UndeadWarriorStateMachine stateMachine;
+        private UndeadWarriorStateMachine stateMachine; // 현재 행동 상태
 
         private void Awake()
         {

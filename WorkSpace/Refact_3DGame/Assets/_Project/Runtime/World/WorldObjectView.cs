@@ -6,14 +6,14 @@ namespace rudIsland.RPG3D.World
     // Unity 컴포넌트와 일반 C# 월드 객체를 연결하는 경계다.
     public abstract class WorldObjectView : MonoBehaviour
     {
-        private WorldObjectManager manager;
+        private WorldObjectManager manager; // 씬 또는 시스템 참조
 
         // 실제 게임 규칙은 MonoBehaviour가 아닌 일반 C# 객체가 담당한다.
-        public IWorldObject RuntimeObject { get; private set; }
+        public IWorldObject RuntimeObject { get; private set; } // 시간 설정
 
-        internal WorldObjectPool OwnerPool { get; private set; }
-        internal bool IsTakenFromPool { get; set; }
-        internal bool IsWaitingForDespawn { get; set; }
+        internal WorldObjectPool OwnerPool { get; private set; } // 씬 또는 시스템 참조
+        internal bool IsTakenFromPool { get; set; } // 기능 사용 여부
+        internal bool IsWaitingForDespawn { get; set; } // 기능 사용 여부
 
         // 아이템 획득이나 적 사망처럼 뷰에서 회수가 필요할 때 호출한다.
         public void RequestDespawn()

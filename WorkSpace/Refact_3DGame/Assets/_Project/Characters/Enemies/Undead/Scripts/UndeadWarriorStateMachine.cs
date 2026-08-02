@@ -3,11 +3,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.Undead
     // Undead Warrior의 현재 상태와 상태 변경 순서를 관리한다.
     public sealed class UndeadWarriorStateMachine
     {
-        private readonly IUndeadWarriorState idleState =
+        private readonly IUndeadWarriorState idleState = // 현재 행동 상태
             new UndeadWarriorIdleState();
 
-        private IUndeadWarriorState currentState;
-        private bool isEnabled;
+        private IUndeadWarriorState currentState; // 현재 행동 상태
+        private bool isEnabled; // 기능 사용 여부
 
         public void Enable()
         {

@@ -7,12 +7,12 @@ namespace rudIsland.RPG3D.Player.Camera
     // 플레이어의 큰 이동을 짧게 늦춰서 카메라에 전달한다.
     public sealed class PlayerCameraTargetFollower : MonoBehaviour
     {
-        [SerializeField] private Transform playerCameraPoint;
-        [SerializeField, Min(0.01f)] private float followSmoothTime = 0.14f;
-        [SerializeField, Min(0.01f)] private float maximumFollowDistance = 0.55f;
-        [SerializeField, Min(0.01f)] private float maximumFollowSpeed = 25f;
+        [SerializeField] private Transform playerCameraPoint; // 씬 또는 시스템 참조
+        [SerializeField, Min(0.01f)] private float followSmoothTime = 0.14f; // 시간 설정
+        [SerializeField, Min(0.01f)] private float maximumFollowDistance = 0.55f; // 거리 설정
+        [SerializeField, Min(0.01f)] private float maximumFollowSpeed = 25f; // 이동 속도
 
-        private Vector3 followVelocity;
+        private Vector3 followVelocity; // 내부에서 사용하는 값
 
         private void Awake()
         {
