@@ -1,3 +1,5 @@
+using System;
+using rudIsland.RPG3D.Combat;
 using rudIsland.RPG3D.Player;
 using rudIsland.RPG3D.World;
 using UnityEngine;
@@ -9,19 +11,41 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         typeof(CharacterController),
         typeof(ZombieAnimationController))]
     // Unity 씬과 일반 C# Zombie AI를 연결한다.
-    public sealed class ZombieController : MonoBehaviour
+    public sealed class ZombieController : WorldObjectView, IAttackHitReceiver
     {
         [Header("필수 연결")]
-        [SerializeField] private WorldObjectManager worldObjectManager;
         [SerializeField] private Transform target;
         [SerializeField] private Animator zombieAnimator;
 
         [Header("생명")]
         [SerializeField, Min(1f)] private float maxHealth = 100f;
 
+        [Header("공격 판정")]
+        [SerializeField] private MeleeHitDetector swingHitDetector;
+        [SerializeField] private MeleeHitDetector kickHitDetector;
+        [SerializeField] private MeleeHitDetector upDownHitDetector;
+        [SerializeField] private AttackDamage swingDamage =
+            new AttackDamage(10f);
+        [SerializeField] private AttackDamage kickDamage =
+            new AttackDamage(10f);
+        [SerializeField] private AttackDamage upDownDamage =
+            new AttackDamage(10f);
+
+        [Header("사망 후 정리")]
+        [SerializeField, Min(0f)] private float deadBodyKeepTime = 2f;
+
+#if UNITY_EDITOR
+        [Header("체력 확인")]
+        [SerializeField, Min(0f)] private float testDamage = 10f;
+#endif
+
         [Header("찾기와 공격 거리")]
         [SerializeField, Min(0.1f)] private float findRange = 30f;
+        [SerializeField, Min(0.01f)]
+        private float idleTargetCheckInterval = 0.1f;
         [SerializeField, Min(0.1f)] private float attackRange = 1.8f;
+        [SerializeField, Range(0f, 180f)]
+        private float attackFacingAngle = 30f;
 
         [Header("이동")]
         [SerializeField, Min(0.1f)] private float chaseSpeed = 3.5f;
@@ -29,49 +53,24 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         [SerializeField] private float gravity = -22f;
         [SerializeField] private float groundPull = -2f;
 
-        [Header("상태 시간")]
-        [SerializeField, Min(0.01f)] private float alertTime = 1.5f;
-        [SerializeField, Min(0.01f)] private float attackInterval = 1.5f;
-        [SerializeField, Min(0.01f)] private float hitTime = 0.7f;
-
         private CharacterController characterController;
         private ZombieAnimationController zombieAnimation;
         private ZombieWorldUnit zombieWorldUnit;
+        private MeleeHitDetector activeHitDetector;
 
-        public string CurrentStateName =>
-            zombieWorldUnit?.CurrentStateName ?? "Not Ready";
-
-        private void Awake()
+        protected override IWorldObject CreateRuntimeObject()
         {
             FindSceneReferences();
+            FindUnityComponents();
 
-            if (worldObjectManager == null || target == null)
+            if (target == null || zombieAnimator == null)
             {
-                Debug.LogError(
-                    "ZombieController에 WorldObjectManager와 Target이 필요합니다.",
-                    this);
-                enabled = false;
-                return;
+                throw new InvalidOperationException(
+                    "ZombieController에 Target과 자식 Animator가 필요합니다.");
             }
 
-            characterController = GetComponent<CharacterController>();
-            zombieAnimation = GetComponent<ZombieAnimationController>();
-
-            if (zombieAnimator == null)
-            {
-                zombieAnimator = GetComponentInChildren<Animator>(true);
-            }
-
-            if (zombieAnimator == null)
-            {
-                Debug.LogError(
-                    "ZombieController가 자식 Animator를 찾지 못했습니다.",
-                    this);
-                enabled = false;
-                return;
-            }
-
-            zombieAnimator.applyRootMotion = false;
+            zombieAnimator.applyRootMotion = true;
+            zombieAnimation.ConnectAnimator(zombieAnimator);
 
             var movement = new ZombieMovement(
                 transform,
@@ -83,65 +82,92 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 movement,
                 zombieAnimation,
                 findRange,
+                idleTargetCheckInterval,
                 attackRange,
+                attackFacingAngle,
                 chaseSpeed,
                 turnSpeed,
-                alertTime,
-                attackInterval,
-                hitTime);
+                deadBodyKeepTime,
+                RequestDeadZombieRelease,
+                EndAttackHit);
 
             zombieWorldUnit = new ZombieWorldUnit(
                 maxHealth,
                 stateMachine);
-            worldObjectManager.Register(zombieWorldUnit);
+            return zombieWorldUnit;
         }
 
-        private void OnEnable()
+        private void RequestDeadZombieRelease()
         {
-            if (zombieWorldUnit != null)
-            {
-                worldObjectManager.Enable(zombieWorldUnit);
-            }
+            RequestDespawn();
         }
 
-        private void OnDisable()
+        public void ReceiveHit(in AttackHitData hit)
         {
-            if (zombieWorldUnit != null && worldObjectManager != null)
-            {
-                worldObjectManager.Disable(zombieWorldUnit);
-            }
+            zombieWorldUnit?.ApplyHit(in hit);
         }
 
-        private void OnDestroy()
+        public void StartAttackHit(int attackNumber)
         {
-            if (zombieWorldUnit == null)
+            EndAttackHit();
+
+            GetAttackHitSettings(
+                attackNumber,
+                out MeleeHitDetector detector,
+                out AttackDamage damage);
+            if (detector == null || !damage.IsValid)
             {
                 return;
             }
 
-            if (worldObjectManager != null)
+            var hit = new AttackHitData(
+                damage,
+                UnitTeam.Enemy,
+                attackNumber);
+            activeHitDetector = detector;
+            activeHitDetector.StartHit(in hit);
+        }
+
+        public void EndAttackHit()
+        {
+            activeHitDetector?.EndHit();
+            activeHitDetector = null;
+        }
+
+        internal void NotifyAttackAnimationEnded()
+        {
+            zombieWorldUnit?.NotifyAttackAnimationEnded();
+        }
+
+        internal void NotifyAlertAnimationEnded()
+        {
+            zombieWorldUnit?.NotifyAlertAnimationEnded();
+        }
+
+#if UNITY_EDITOR
+        [ContextMenu("Test Damage")]
+        private void TestDamage()
+        {
+            if (!Application.isPlaying || zombieWorldUnit == null)
             {
-                worldObjectManager.Unregister(zombieWorldUnit);
+                Debug.LogWarning(
+                    "Test Damage는 Play 중이고 좀비 준비가 끝난 뒤 사용할 수 있습니다.",
+                    this);
                 return;
             }
 
-            zombieWorldUnit.Dispose();
-        }
+            float healthBeforeDamage = zombieWorldUnit.CurrentHealth;
 
-        // 전투 시스템이 완성되면 이 진입점으로 피해를 전달한다.
-        public void TakeDamage(float damage)
-        {
-            zombieWorldUnit?.TakeDamage(damage);
+            zombieWorldUnit.TakeDamage(testDamage);
+
+            Debug.Log(
+                $"좀비 체력: {healthBeforeDamage} → {zombieWorldUnit.CurrentHealth}",
+                this);
         }
+#endif
 
         private void FindSceneReferences()
         {
-            if (worldObjectManager == null)
-            {
-                worldObjectManager =
-                    FindFirstObjectByType<WorldObjectManager>();
-            }
-
             if (target != null)
             {
                 return;
@@ -152,16 +178,60 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             target = player != null ? player.transform : null;
         }
 
-#if UNITY_EDITOR
-        private void OnValidate()
+        private void FindUnityComponents()
         {
+            characterController = GetComponent<CharacterController>();
+            zombieAnimation = GetComponent<ZombieAnimationController>();
+
             if (zombieAnimator == null)
             {
                 zombieAnimator = GetComponentInChildren<Animator>(true);
             }
+        }
+
+        private void GetAttackHitSettings(
+            int attackNumber,
+            out MeleeHitDetector detector,
+            out AttackDamage damage)
+        {
+            switch (attackNumber)
+            {
+                case 1:
+                    detector = swingHitDetector;
+                    damage = swingDamage;
+                    return;
+                case 2:
+                    detector = kickHitDetector;
+                    damage = kickDamage;
+                    return;
+                case 3:
+                    detector = upDownHitDetector;
+                    damage = upDownDamage;
+                    return;
+                default:
+                    detector = null;
+                    damage = default;
+                    return;
+            }
+        }
+
+        protected override void OnResetForPool()
+        {
+            EndAttackHit();
+            zombieAnimation?.ResetAnimation();
+        }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            FindUnityComponents();
 
             findRange = Mathf.Max(0.1f, findRange);
+            idleTargetCheckInterval =
+                Mathf.Max(0.01f, idleTargetCheckInterval);
             attackRange = Mathf.Clamp(attackRange, 0.1f, findRange);
+            attackFacingAngle = Mathf.Clamp(attackFacingAngle, 0f, 180f);
+            deadBodyKeepTime = Mathf.Max(0f, deadBodyKeepTime);
         }
 
         private void OnDrawGizmosSelected()

@@ -1,30 +1,27 @@
 namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 {
-    // 살아 있는 동안 Idle, Alert, Chase, Attack, Hit 자식 상태를 관리한다.
+    // 살아 있는 동안 Idle, Alert, Chase, Attack 상태를 관리한다.
     internal sealed class ZombieAliveState : IZombieState
     {
         private readonly ZombieStateMachine stateMachine;
-        private readonly IdleState idleState;
-        private readonly AlertState alertState;
-        private readonly ChaseState chaseState;
-        private readonly AttackState attackState;
-        private readonly HitState hitState;
+        private readonly ZombieIdleState idleState;
+        private readonly ZombieAlertState alertState;
+        private readonly ZombieChaseState chaseState;
+        private readonly ZombieAttackState attackState;
 
         private IZombieState currentChildState;
+        private bool hasFoundTargetBefore;
 
-        public string Name =>
-            currentChildState == null
-                ? "Alive"
-                : "Alive / " + currentChildState.Name;
+        internal bool NeedsTargetUpdateEveryFrame =>
+            !ReferenceEquals(currentChildState, idleState);
 
         public ZombieAliveState(ZombieStateMachine stateMachine)
         {
             this.stateMachine = stateMachine;
-            idleState = new IdleState(this, stateMachine);
-            alertState = new AlertState(this, stateMachine);
-            chaseState = new ChaseState(this, stateMachine);
-            attackState = new AttackState(this, stateMachine);
-            hitState = new HitState(this, stateMachine);
+            idleState = new ZombieIdleState(this, stateMachine);
+            alertState = new ZombieAlertState(this, stateMachine);
+            chaseState = new ZombieChaseState(this, stateMachine);
+            attackState = new ZombieAttackState(this, stateMachine);
         }
 
         public void Enter()
@@ -43,23 +40,92 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             currentChildState = null;
         }
 
-        public void PlayHit()
+        internal void ChangeToAlert()
         {
-            ChangeChildState(hitState);
+            ChangeChildState(alertState);
         }
 
-        private void ChooseDistanceState()
+        internal void ChangeToIdleAfterLostTarget()
+        {
+            hasFoundTargetBefore = false;
+            ChangeChildState(idleState);
+        }
+
+        internal void FinishAttack()
         {
             if (!stateMachine.IsTargetFound())
             {
-                ChangeChildState(idleState);
+                ChangeToIdleAfterLostTarget();
+                return;
+            }
+
+            if (stateMachine.IsReadyToAttack())
+            {
+                attackState.Restart();
+                return;
+            }
+
+            ChangeChildState(chaseState);
+        }
+
+        internal void ChangeToAttack()
+        {
+            ChangeChildState(attackState);
+        }
+
+        internal void ChooseIdleNextState()
+        {
+            if (!stateMachine.IsTargetFound())
+            {
+                return;
+            }
+
+            if (!hasFoundTargetBefore)
+            {
+                ChangeToAlert();
+                return;
+            }
+
+            ChooseDistanceState();
+        }
+
+        internal void FinishAlert()
+        {
+            hasFoundTargetBefore = true;
+            ChooseDistanceState();
+        }
+
+        internal void NotifyAlertAnimationEnded()
+        {
+            alertState.NotifyAnimationEnded();
+        }
+
+        internal void NotifyAttackAnimationEnded()
+        {
+            if (ReferenceEquals(currentChildState, attackState))
+            {
+                attackState.NotifyAnimationEnded();
+            }
+        }
+
+        internal void ChooseDistanceState()
+        {
+            if (!stateMachine.IsTargetFound())
+            {
+                ChangeToIdleAfterLostTarget();
                 return;
             }
 
             ChangeChildState(
-                stateMachine.IsTargetInAttackRange()
+                stateMachine.IsReadyToAttack()
                     ? attackState
                     : chaseState);
+        }
+
+        internal void ResetTargetAwareness()
+        {
+            hasFoundTargetBefore = false;
+            attackState.ResetAttackHistory();
         }
 
         private void ChangeChildState(IZombieState nextState)
@@ -72,210 +138,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             currentChildState?.Exit();
             currentChildState = nextState;
             currentChildState.Enter();
-        }
-
-        private sealed class IdleState : IZombieState
-        {
-            private readonly ZombieAliveState parent;
-            private readonly ZombieStateMachine stateMachine;
-
-            public string Name => "Idle";
-
-            public IdleState(
-                ZombieAliveState parent,
-                ZombieStateMachine stateMachine)
-            {
-                this.parent = parent;
-                this.stateMachine = stateMachine;
-            }
-
-            public void Enter()
-            {
-                stateMachine.SetMoveSpeed(0f);
-            }
-
-            public void Update(float deltaTime)
-            {
-                stateMachine.StayOnGround(deltaTime);
-
-                if (stateMachine.IsTargetFound())
-                {
-                    parent.ChangeChildState(parent.alertState);
-                }
-            }
-
-            public void Exit()
-            {
-            }
-        }
-
-        private sealed class AlertState : IZombieState
-        {
-            private readonly ZombieAliveState parent;
-            private readonly ZombieStateMachine stateMachine;
-            private float elapsedTime;
-
-            public string Name => "Alert";
-
-            public AlertState(
-                ZombieAliveState parent,
-                ZombieStateMachine stateMachine)
-            {
-                this.parent = parent;
-                this.stateMachine = stateMachine;
-            }
-
-            public void Enter()
-            {
-                elapsedTime = 0f;
-                stateMachine.SetMoveSpeed(0f);
-                stateMachine.PlayScream();
-            }
-
-            public void Update(float deltaTime)
-            {
-                stateMachine.TurnToTarget(deltaTime);
-                elapsedTime += deltaTime;
-
-                if (elapsedTime >= stateMachine.AlertTime)
-                {
-                    parent.ChooseDistanceState();
-                }
-            }
-
-            public void Exit()
-            {
-            }
-        }
-
-        private sealed class ChaseState : IZombieState
-        {
-            private readonly ZombieAliveState parent;
-            private readonly ZombieStateMachine stateMachine;
-
-            public string Name => "Chase";
-
-            public ChaseState(
-                ZombieAliveState parent,
-                ZombieStateMachine stateMachine)
-            {
-                this.parent = parent;
-                this.stateMachine = stateMachine;
-            }
-
-            public void Enter()
-            {
-                stateMachine.SetMoveSpeed(1f);
-            }
-
-            public void Update(float deltaTime)
-            {
-                if (!stateMachine.IsTargetFound())
-                {
-                    parent.ChangeChildState(parent.idleState);
-                    return;
-                }
-
-                if (stateMachine.IsTargetInAttackRange())
-                {
-                    parent.ChangeChildState(parent.attackState);
-                    return;
-                }
-
-                stateMachine.MoveToTarget(deltaTime);
-            }
-
-            public void Exit()
-            {
-                stateMachine.SetMoveSpeed(0f);
-            }
-        }
-
-        private sealed class AttackState : IZombieState
-        {
-            private readonly ZombieAliveState parent;
-            private readonly ZombieStateMachine stateMachine;
-            private float elapsedTime;
-
-            public string Name => "Attack";
-
-            public AttackState(
-                ZombieAliveState parent,
-                ZombieStateMachine stateMachine)
-            {
-                this.parent = parent;
-                this.stateMachine = stateMachine;
-            }
-
-            public void Enter()
-            {
-                elapsedTime = 0f;
-                stateMachine.SetMoveSpeed(0f);
-                stateMachine.PlayAttack();
-            }
-
-            public void Update(float deltaTime)
-            {
-                stateMachine.TurnToTarget(deltaTime);
-                elapsedTime += deltaTime;
-
-                if (elapsedTime < stateMachine.AttackInterval)
-                {
-                    return;
-                }
-
-                if (!stateMachine.IsTargetInAttackRange())
-                {
-                    parent.ChooseDistanceState();
-                    return;
-                }
-
-                elapsedTime = 0f;
-                stateMachine.PlayAttack();
-            }
-
-            public void Exit()
-            {
-            }
-        }
-
-        private sealed class HitState : IZombieState
-        {
-            private readonly ZombieAliveState parent;
-            private readonly ZombieStateMachine stateMachine;
-            private float elapsedTime;
-
-            public string Name => "Hit";
-
-            public HitState(
-                ZombieAliveState parent,
-                ZombieStateMachine stateMachine)
-            {
-                this.parent = parent;
-                this.stateMachine = stateMachine;
-            }
-
-            public void Enter()
-            {
-                elapsedTime = 0f;
-                stateMachine.SetMoveSpeed(0f);
-                stateMachine.PlayHit();
-            }
-
-            public void Update(float deltaTime)
-            {
-                stateMachine.StayOnGround(deltaTime);
-                elapsedTime += deltaTime;
-
-                if (elapsedTime >= stateMachine.HitTime)
-                {
-                    parent.ChooseDistanceState();
-                }
-            }
-
-            public void Exit()
-            {
-            }
         }
     }
 }

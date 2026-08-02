@@ -1,64 +1,66 @@
+using System;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 {
-    // Alive와 Dead 최상위 상태를 관리하고 공통 기능을 제공한다.
+    // 좀비의 탐지·경계·추적·공격 상태를 관리한다.
     public sealed class ZombieStateMachine
     {
         private readonly Transform target;
         private readonly ZombieMovement movement;
         private readonly ZombieAnimationController animation;
-
         private readonly ZombieAliveState aliveState;
+        private readonly ZombieHitState hitState;
         private readonly ZombieDeadState deadState;
+        private readonly Action requestRelease;
+        private readonly Action endAttackHit;
+        private readonly float minimumAttackFacingDot;
 
         private IZombieState currentState;
-        private UnitHealth health;
         private bool isEnabled;
-        private int nextAttackNumber;
+        private Vector3 targetPosition;
+        private float targetDistanceSquared;
 
         internal float FindRangeSquared { get; }
+        internal float IdleTargetCheckInterval { get; }
         internal float AttackRangeSquared { get; }
         internal float ChaseSpeed { get; }
         internal float TurnSpeed { get; }
-        internal float AlertTime { get; }
-        internal float AttackInterval { get; }
-        internal float HitTime { get; }
-
-        public string CurrentStateName =>
-            currentState?.Name ?? "Disabled";
-
+        internal float DeadBodyKeepTime { get; }
         public ZombieStateMachine(
             Transform target,
             ZombieMovement movement,
             ZombieAnimationController animation,
             float findRange,
+            float idleTargetCheckInterval,
             float attackRange,
+            float attackFacingAngle,
             float chaseSpeed,
             float turnSpeed,
-            float alertTime,
-            float attackInterval,
-            float hitTime)
+            float deadBodyKeepTime,
+            Action requestRelease,
+            Action endAttackHit)
         {
             this.target = target;
             this.movement = movement;
             this.animation = animation;
-
             FindRangeSquared = findRange * findRange;
+            IdleTargetCheckInterval = Mathf.Max(
+                0.01f,
+                idleTargetCheckInterval);
             AttackRangeSquared = attackRange * attackRange;
+            minimumAttackFacingDot = Mathf.Cos(
+                Mathf.Clamp(attackFacingAngle, 0f, 180f) *
+                Mathf.Deg2Rad);
             ChaseSpeed = chaseSpeed;
             TurnSpeed = turnSpeed;
-            AlertTime = alertTime;
-            AttackInterval = attackInterval;
-            HitTime = hitTime;
+            DeadBodyKeepTime = Mathf.Max(0f, deadBodyKeepTime);
+            this.requestRelease = requestRelease;
+            this.endAttackHit = endAttackHit;
 
             aliveState = new ZombieAliveState(this);
+            hitState = new ZombieHitState(this);
             deadState = new ZombieDeadState(this);
-        }
-
-        internal void SetHealth(UnitHealth unitHealth)
-        {
-            health = unitHealth;
         }
 
         public void Enable()
@@ -69,7 +71,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             }
 
             isEnabled = true;
-            nextAttackNumber = 0;
+            aliveState.ResetTargetAwareness();
             movement.Reset();
             animation.ResetAnimation();
             ChangeState(aliveState);
@@ -77,18 +79,16 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         public void Update(float deltaTime)
         {
-            if (!isEnabled || currentState == null)
+            if (isEnabled && currentState != null)
             {
-                return;
-            }
+                if (ReferenceEquals(currentState, aliveState) &&
+                    aliveState.NeedsTargetUpdateEveryFrame)
+                {
+                    UpdateTargetSnapshot();
+                }
 
-            if (health.IsDead &&
-                !ReferenceEquals(currentState, deadState))
-            {
-                ChangeState(deadState);
+                currentState.Update(deltaTime);
             }
-
-            currentState.Update(deltaTime);
         }
 
         public void Disable()
@@ -99,51 +99,38 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             }
 
             currentState?.Exit();
+            EndAttackHit();
             currentState = null;
             isEnabled = false;
             animation.ResetAnimation();
         }
 
-        public void TakeDamage(float damage)
-        {
-            if (!isEnabled || health == null || health.IsDead)
-            {
-                return;
-            }
-
-            float healthBeforeDamage = health.CurrentHealth;
-            health.TakeDamage(damage);
-
-            if (Mathf.Approximately(
-                    healthBeforeDamage,
-                    health.CurrentHealth))
-            {
-                return;
-            }
-
-            if (health.IsDead)
-            {
-                ChangeState(deadState);
-                return;
-            }
-
-            aliveState.PlayHit();
-        }
-
         internal bool IsTargetFound()
         {
-            return GetTargetDistanceSquared() <= FindRangeSquared;
+            return targetDistanceSquared <= FindRangeSquared;
         }
 
         internal bool IsTargetInAttackRange()
         {
-            return GetTargetDistanceSquared() <= AttackRangeSquared;
+            return targetDistanceSquared <= AttackRangeSquared;
+        }
+
+        internal bool IsReadyToAttack()
+        {
+            return IsTargetInAttackRange() && IsFacingTarget();
+        }
+
+        internal bool IsFacingTarget()
+        {
+            return movement.IsFacing(
+                targetPosition,
+                minimumAttackFacingDot);
         }
 
         internal void MoveToTarget(float deltaTime)
         {
             movement.MoveTo(
-                target.position,
+                targetPosition,
                 ChaseSpeed,
                 TurnSpeed,
                 deltaTime);
@@ -151,10 +138,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         internal void TurnToTarget(float deltaTime)
         {
-            movement.TurnTo(
-                target.position,
-                TurnSpeed,
-                deltaTime);
+            movement.TurnTo(targetPosition, TurnSpeed, deltaTime);
         }
 
         internal void StayOnGround(float deltaTime)
@@ -162,49 +146,117 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             movement.StayOnGround(deltaTime);
         }
 
-        internal void PlayAttack()
+        internal void ChangeToHitState()
         {
-            switch (nextAttackNumber)
+            if (!isEnabled ||
+                ReferenceEquals(currentState, deadState))
             {
-                case 1:
-                    animation.PlayKickAttack();
-                    break;
-                case 2:
-                    animation.PlayUpDownAttack();
-                    break;
-                default:
-                    animation.PlaySwingAttack();
-                    break;
+                return;
             }
 
-            nextAttackNumber = (nextAttackNumber + 1) % 3;
+            EndAttackHit();
+            if (ReferenceEquals(currentState, hitState))
+            {
+                hitState.Restart();
+                return;
+            }
+
+            ChangeState(hitState);
         }
 
-        internal void PlayScream()
+        internal void ChangeToAliveState()
         {
-            animation.PlayScream();
+            if (ReferenceEquals(currentState, deadState))
+            {
+                return;
+            }
+
+            ChangeState(aliveState);
         }
 
-        internal void PlayHit()
+        internal void ChangeToDeadState()
         {
-            animation.PlayHit();
+            if (!isEnabled ||
+                ReferenceEquals(currentState, deadState))
+            {
+                return;
+            }
+
+            EndAttackHit();
+            ChangeState(deadState);
         }
 
-        internal void PlayDeath()
+        internal void EndAttackHit()
         {
-            animation.PlayDeath();
+            endAttackHit?.Invoke();
         }
 
-        internal void SetMoveSpeed(float moveSpeed)
+        internal void PlayIdle()
         {
-            animation.SetMoveSpeed(moveSpeed);
+            animation.PlayIdle();
         }
 
-        private float GetTargetDistanceSquared()
+        internal void PlayAlert()
         {
-            Vector3 distance = target.position - movement.Position;
+            animation.PlayAlert();
+        }
+
+        internal void PlayChase()
+        {
+            animation.PlayChase();
+        }
+
+        internal void PlayAttack(ZombieAttackType attackType)
+        {
+            animation.PlayAttack(attackType);
+        }
+
+        internal void PlayHitFromStart()
+        {
+            animation.PlayHitFromStart();
+        }
+
+        internal void PlayDead()
+        {
+            animation.PlayDead();
+        }
+
+        internal void RequestRelease()
+        {
+            requestRelease?.Invoke();
+        }
+
+        internal bool TryGetCurrentAnimationTime(out float normalizedTime)
+        {
+            return animation.TryGetCurrentAnimationTime(out normalizedTime);
+        }
+
+        internal bool IsAnimationTransitioning()
+        {
+            return animation.IsAnimationTransitioning();
+        }
+
+        internal void NotifyAttackAnimationEnded()
+        {
+            aliveState.NotifyAttackAnimationEnded();
+        }
+
+        internal void NotifyAlertAnimationEnded()
+        {
+            aliveState.NotifyAlertAnimationEnded();
+        }
+
+        internal float GetTargetDistanceSquared()
+        {
+            return targetDistanceSquared;
+        }
+
+        internal void UpdateTargetSnapshot()
+        {
+            targetPosition = target.position;
+            Vector3 distance = targetPosition - movement.Position;
             distance.y = 0f;
-            return distance.sqrMagnitude;
+            targetDistanceSquared = distance.sqrMagnitude;
         }
 
         private void ChangeState(IZombieState nextState)

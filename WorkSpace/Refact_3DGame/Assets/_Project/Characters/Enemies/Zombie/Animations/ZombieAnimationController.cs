@@ -1,93 +1,163 @@
+using rudIsland.RPG3D.Animation;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 {
     [DisallowMultipleComponent]
-    // Zombie의 게임 상태를 Animator 값으로 바꾸는 Unity 경계다.
+    // 좀비 상태를 Animator 값으로 바꾸고 공격 클립의 루트 회전을 적용한다.
     public sealed class ZombieAnimationController : MonoBehaviour
     {
-        private const int SwingAttackNumber = 0;
-        private const int KickAttackNumber = 1;
-        private const int UpDownAttackNumber = 2;
+        private const float HitRestartBlendTime = 0.15f;
 
-        private static readonly int MoveSpeedId =
-            Animator.StringToHash("MoveSpeed");
-        private static readonly int AttackId =
-            Animator.StringToHash("Attack");
-        private static readonly int AttackNumberId =
-            Animator.StringToHash("AttackNumber");
-        private static readonly int ScreamId =
-            Animator.StringToHash("Scream");
-        private static readonly int HitId =
-            Animator.StringToHash("Hit");
-        private static readonly int DieId =
-            Animator.StringToHash("Die");
+        private static readonly int StateId = Animator.StringToHash("State");
+        private static readonly int AttackTypeId = Animator.StringToHash("AttackType");
+        private static readonly int IdleStateId = Animator.StringToHash("Idle");
+        private static readonly int AlertStateId = Animator.StringToHash("Alert");
+        private static readonly int SwingAttackStateId = Animator.StringToHash("Swing Attack");
+        private static readonly int KickAttackStateId = Animator.StringToHash("Kick Attack");
+        private static readonly int UpDownAttackStateId =Animator.StringToHash("Up Down Attack");
+        private static readonly int HitStateId = Animator.StringToHash("Hit");
+        private static readonly int HitFullPathId = Animator.StringToHash("Base Layer.Hit");
+        private static readonly int DeadStateId = Animator.StringToHash("Dead");
+        private enum AnimationState
+        {
+            Idle = 0,
+            Alert = 1,
+            Chase = 2,
+            Attack = 3,
+            Hit = 4,
+            Dead = 5
+        }
 
         [SerializeField] private Animator zombieAnimator;
 
-        private bool isDead;
+        private AnimationState requestedAnimationState;
+        private AnimatorPlaybackReader playbackReader;
 
         private void Awake()
         {
             FindZombieAnimator();
+            ConnectAnimator(zombieAnimator);
         }
 
-        // 0은 대기, 0보다 크면 걷기와 달리기 애니메이션으로 이어진다.
-        public void SetMoveSpeed(float moveSpeed)
+        public void PlayIdle()
         {
-            if (isDead || zombieAnimator == null)
+            RequestAnimation(AnimationState.Idle);
+        }
+
+        public void PlayChase()
+        {
+            RequestAnimation(AnimationState.Chase);
+        }
+
+        public void PlayAlert()
+        {
+            RequestAnimation(AnimationState.Alert);
+        }
+
+        internal void PlayAttack(ZombieAttackType attackType)
+        {
+            if (!CanControlAnimator())
             {
                 return;
             }
 
-            zombieAnimator.SetFloat(MoveSpeedId, Mathf.Clamp01(moveSpeed));
+            requestedAnimationState = AnimationState.Attack;
+            zombieAnimator.SetInteger(AttackTypeId, (int)attackType);
+            zombieAnimator.SetInteger(StateId, (int)AnimationState.Attack);
         }
 
-        public void PlaySwingAttack()
+        public void PlayHitFromStart()
         {
-            PlayAttack(SwingAttackNumber);
-        }
+            RequestAnimation(AnimationState.Hit);
 
-        public void PlayKickAttack()
-        {
-            PlayAttack(KickAttackNumber);
-        }
-
-        public void PlayUpDownAttack()
-        {
-            PlayAttack(UpDownAttackNumber);
-        }
-
-        public void PlayScream()
-        {
-            PlayTrigger(ScreamId);
-        }
-
-        public void PlayHit()
-        {
-            PlayTrigger(HitId);
-        }
-
-        public void PlayDeath()
-        {
-            if (isDead || zombieAnimator == null)
+            if (!CanControlAnimator())
             {
                 return;
             }
 
-            isDead = true;
-            zombieAnimator.SetFloat(MoveSpeedId, 0f);
-            zombieAnimator.ResetTrigger(AttackId);
-            zombieAnimator.ResetTrigger(ScreamId);
-            zombieAnimator.ResetTrigger(HitId);
-            zombieAnimator.SetTrigger(DieId);
+            bool isPlayingHit = playbackReader.IsCurrentState(0, HitStateId);
+            bool isChangingToHit = playbackReader.IsChangingTo(0, HitStateId);
+
+            if (isPlayingHit || isChangingToHit)
+            {
+                zombieAnimator.CrossFadeInFixedTime(
+                    HitFullPathId,
+                    HitRestartBlendTime,
+                    0,
+                    0f);
+            }
         }
 
-        // 풀에서 다시 꺼낸 Zombie를 처음 대기 상태로 되돌린다.
+        public void PlayDead()
+        {
+            RequestAnimation(AnimationState.Dead);
+        }
+
+        internal bool TryGetCurrentAnimationTime(out float normalizedTime)
+        {
+            normalizedTime = 0f;
+            if (!CanControlAnimator() ||
+                !playbackReader.TryGetCurrentState(
+                    0,
+                    out AnimatorStateInfo stateInfo))
+            {
+                return false;
+            }
+
+            bool isExpectedState = requestedAnimationState == AnimationState.Attack
+                ? IsAttackState(stateInfo.shortNameHash)
+                : stateInfo.shortNameHash == GetRequestedStateId();
+            if (!isExpectedState)
+            {
+                return false;
+            }
+
+            normalizedTime = stateInfo.normalizedTime;
+            return true;
+        }
+
+        internal bool IsAnimationTransitioning()
+        {
+            return playbackReader != null && playbackReader.IsInTransition(0);
+        }
+
+        internal void ApplyAttackRootRotation(Quaternion deltaRotation)
+        {
+            if (requestedAnimationState == AnimationState.Attack)
+            {
+                transform.rotation *= deltaRotation;
+            }
+        }
+
+        internal void ConnectAnimator(Animator animator)
+        {
+            if (animator == null)
+            {
+                return;
+            }
+
+            zombieAnimator = animator;
+            playbackReader = new AnimatorPlaybackReader(animator);
+            ZombieAnimationEventReceiver receiver =
+                animator.GetComponent<ZombieAnimationEventReceiver>();
+            if (receiver == null)
+            {
+                receiver =
+                    animator.gameObject.AddComponent<ZombieAnimationEventReceiver>();
+            }
+
+            receiver.Initialize(this);
+        }
+
         public void ResetAnimation()
         {
-            isDead = false;
             FindZombieAnimator();
+            if (playbackReader == null && zombieAnimator != null)
+            {
+                playbackReader = new AnimatorPlaybackReader(zombieAnimator);
+            }
+            requestedAnimationState = AnimationState.Idle;
 
             if (zombieAnimator == null)
             {
@@ -95,43 +165,49 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             }
 
             zombieAnimator.Rebind();
-
+            zombieAnimator.SetInteger(StateId, (int)AnimationState.Idle);
+            zombieAnimator.SetInteger(AttackTypeId, 0);
             if (zombieAnimator.isActiveAndEnabled)
             {
                 zombieAnimator.Update(0f);
             }
-
-            zombieAnimator.SetFloat(MoveSpeedId, 0f);
-            zombieAnimator.SetInteger(AttackNumberId, SwingAttackNumber);
         }
 
-        private void PlayAttack(int attackNumber)
+        private void RequestAnimation(AnimationState state)
         {
-            if (isDead || zombieAnimator == null)
+            requestedAnimationState = state;
+
+            if (CanControlAnimator())
             {
-                return;
+                zombieAnimator.SetInteger(StateId, (int)state);
             }
-
-            zombieAnimator.SetFloat(MoveSpeedId, 0f);
-            zombieAnimator.SetInteger(AttackNumberId, attackNumber);
-            RestartTrigger(AttackId);
         }
 
-        private void PlayTrigger(int triggerId)
+        private bool CanControlAnimator()
         {
-            if (isDead || zombieAnimator == null)
+            return playbackReader != null && playbackReader.CanRead(0);
+        }
+
+        private int GetRequestedStateId()
+        {
+            switch (requestedAnimationState)
             {
-                return;
+                case AnimationState.Alert:
+                    return AlertStateId;
+                case AnimationState.Hit:
+                    return HitStateId;
+                case AnimationState.Dead:
+                    return DeadStateId;
+                default:
+                    return 0;
             }
-
-            zombieAnimator.SetFloat(MoveSpeedId, 0f);
-            RestartTrigger(triggerId);
         }
 
-        private void RestartTrigger(int triggerId)
+        private static bool IsAttackState(int stateHash)
         {
-            zombieAnimator.ResetTrigger(triggerId);
-            zombieAnimator.SetTrigger(triggerId);
+            return stateHash == SwingAttackStateId ||
+                stateHash == KickAttackStateId ||
+                stateHash == UpDownAttackStateId;
         }
 
         private void FindZombieAnimator()

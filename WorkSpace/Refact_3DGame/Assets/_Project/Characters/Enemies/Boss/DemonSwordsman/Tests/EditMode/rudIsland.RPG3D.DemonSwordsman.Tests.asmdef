@@ -1,0 +1,22 @@
+{
+  "name": "rudIsland.RPG3D.DemonSwordsman.Tests",
+  "rootNamespace": "rudIsland.RPG3D.Tests.DemonSwordsman",
+  "references": [
+    "rudIsland.RPG3D.DemonSwordsman",
+    "rudIsland.RPG3D.Runtime"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}
