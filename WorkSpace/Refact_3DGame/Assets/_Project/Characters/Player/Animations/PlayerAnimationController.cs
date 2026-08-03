@@ -7,10 +7,11 @@ namespace rudIsland.RPG3D.Player.Animations
     public sealed class PlayerAnimationController
     {
         private static readonly int MoveAmountId = Animator.StringToHash("MoveAmount"); // 이동 정보
+        private static readonly int InputDirXId = Animator.StringToHash("InputDirX"); // 이동 정보
+        private static readonly int InputDirYId = Animator.StringToHash("InputDirY"); // 이동 정보
+        private static readonly int IsSprintingId = Animator.StringToHash("IsSprinting"); // 기능 사용 여부
         private static readonly int BlockMoveXId = Animator.StringToHash("BlockMoveX"); // 이동 정보
         private static readonly int BlockMoveYId = Animator.StringToHash("BlockMoveY"); // 이동 정보
-        private static readonly int RollDirectionXId = Animator.StringToHash("RollDirectionX"); // 이동 정보
-        private static readonly int RollDirectionYId = Animator.StringToHash("RollDirectionY"); // 이동 정보
         private static readonly int RollId = Animator.StringToHash("Roll"); // 내부에서 사용하는 값
         private static readonly int SprintRollId = Animator.StringToHash("SprintRoll"); // 내부에서 사용하는 값
         private static readonly int IsBlockingId = Animator.StringToHash("IsBlocking"); // 기능 사용 여부
@@ -53,6 +54,9 @@ namespace rudIsland.RPG3D.Player.Animations
 
             playerAnimator.SetBool(IsBlockingId, false);
             playerAnimator.SetFloat(MoveAmountId, 0f);
+            playerAnimator.SetFloat(InputDirXId, 0f);
+            playerAnimator.SetFloat(InputDirYId, 0f);
+            playerAnimator.SetBool(IsSprintingId, false);
             playerAnimator.SetFloat(BlockMoveXId, 0f);
             playerAnimator.SetFloat(BlockMoveYId, 0f);
             playerAnimator.ResetTrigger(RollId);
@@ -75,6 +79,30 @@ namespace rudIsland.RPG3D.Player.Animations
                 ? 0f
                 : isSprinting ? inputAmount : inputAmount * 0.5090909f;
             playerAnimator.SetFloat(MoveAmountId, moveAmount, smoothTime, deltaTime);
+            playerAnimator.SetFloat(InputDirXId, moveInput.x, smoothTime, deltaTime);
+            playerAnimator.SetFloat(InputDirYId, moveInput.y, smoothTime, deltaTime);
+            playerAnimator.SetBool(IsSprintingId, isSprinting);
+        }
+
+        public void UpdateLocomotion(
+            Vector2 localMoveInput,
+            bool isSprinting,
+            float deltaTime)
+        {
+            if (playerAnimator == null)
+            {
+                return;
+            }
+
+            Vector2 moveInput = Vector2.ClampMagnitude(localMoveInput, 1f);
+            float inputAmount = Mathf.Clamp01(moveInput.magnitude);
+            float moveAmount = inputAmount < 0.01f
+                ? 0f
+                : isSprinting ? inputAmount : inputAmount * 0.5090909f;
+            playerAnimator.SetFloat(MoveAmountId, moveAmount, smoothTime, deltaTime);
+            playerAnimator.SetFloat(InputDirXId, moveInput.x, smoothTime, deltaTime);
+            playerAnimator.SetFloat(InputDirYId, moveInput.y, smoothTime, deltaTime);
+            playerAnimator.SetBool(IsSprintingId, isSprinting);
         }
 
         public void UpdateBlockMove(Vector2 moveInput, float deltaTime)
@@ -108,8 +136,8 @@ namespace rudIsland.RPG3D.Player.Animations
                 return;
             }
 
-            playerAnimator.SetFloat(RollDirectionXId, rollInput.x);
-            playerAnimator.SetFloat(RollDirectionYId, rollInput.y);
+            playerAnimator.SetFloat(InputDirXId, rollInput.x);
+            playerAnimator.SetFloat(InputDirYId, rollInput.y);
             playerAnimator.SetBool(IsBlockingId, false);
             playerAnimator.SetFloat(MoveAmountId, 0f);
             playerAnimator.ResetTrigger(RollId);

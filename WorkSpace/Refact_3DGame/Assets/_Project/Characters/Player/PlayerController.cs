@@ -15,6 +15,9 @@ namespace rudIsland.RPG3D.Player
     // Unity 생명주기에서 플레이어 입력, 이동, Animator를 연결한다.
     public sealed class PlayerController : MonoBehaviour, IAttackHitReceiver
     {
+        private const int ActiveCameraPriority = 20;
+        private const int InactiveCameraPriority = 10;
+
         [Header("필수 연결")]
         [SerializeField] private WorldObjectManager worldObjectManager; // 씬 또는 시스템 참조
         [SerializeField] private Transform moveCamera; // 이동 정보
@@ -22,6 +25,7 @@ namespace rudIsland.RPG3D.Player
 
         [Header("타깃 전환")]
         [SerializeField] private CinemachineFreeLook playerFreeLookCamera;
+        [SerializeField] private CinemachineFreeLook playerTargetLookCamera;
         [SerializeField] private LayerMask targetLayers;
         [SerializeField, Min(0f)] private float targetRange = 12f;
         [SerializeField, Min(0f)] private float targetBreakDistance = 15f;
@@ -103,7 +107,10 @@ namespace rudIsland.RPG3D.Player
 
         private void Awake()
         {
-            if (worldObjectManager == null || moveCamera == null)
+            if (worldObjectManager == null ||
+                moveCamera == null ||
+                playerFreeLookCamera == null ||
+                playerTargetLookCamera == null)
             {
                 Debug.LogError(
                     "PlayerController에 WorldObjectManager와 이동 기준 카메라가 필요합니다.",
@@ -146,6 +153,9 @@ namespace rudIsland.RPG3D.Player
             var targetCamera = new PlayerTargetCamera(
                 transform,
                 playerFreeLookCamera,
+                playerTargetLookCamera,
+                ActiveCameraPriority,
+                InactiveCameraPriority,
                 targetCameraTurnSpeed,
                 targetCameraVerticalValue);
             playerStateMachine = new PlayerStateMachine(

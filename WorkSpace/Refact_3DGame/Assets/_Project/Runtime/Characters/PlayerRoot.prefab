@@ -108,6 +108,7 @@ MonoBehaviour:
   moveCamera: {fileID: 0}
   playerAnimator: {fileID: 721643049174057638}
   playerFreeLookCamera: {fileID: 0}
+  playerTargetLookCamera: {fileID: 0}
   targetLayers:
     serializedVersion: 2
     m_Bits: 262272

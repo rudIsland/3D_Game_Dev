@@ -2,20 +2,23 @@ using UnityEngine;
 
 namespace rudIsland.RPG3D.Player.Movement
 {
-    // 타깃 시점에서는 타깃 기준으로 이동하고 입력과 관계없이 타깃을 바라본다.
+    // 타깃 시점에서는 카메라 기준으로 이동하고 몸만 타깃을 바라본다.
     internal sealed class PlayerTargetMovement : IPlayerMovementMode
     {
         private const float MinimumDirectionSqrMagnitude = 0.01f;
 
         private readonly Transform playerTransform;
+        private readonly Transform moveCamera;
         private readonly float turnSpeed;
         private Transform target;
 
         public PlayerTargetMovement(
             Transform playerTransform,
+            Transform moveCamera,
             float turnSpeed)
         {
             this.playerTransform = playerTransform;
+            this.moveCamera = moveCamera;
             this.turnSpeed = turnSpeed;
         }
 
@@ -32,13 +35,14 @@ namespace rudIsland.RPG3D.Player.Movement
         public Vector3 GetMoveDirection(Vector2 moveInput)
         {
             if (moveInput.sqrMagnitude < MinimumDirectionSqrMagnitude ||
-                !TryGetTargetDirection(out Vector3 targetForward))
+                !TryGetCameraDirection(
+                    out Vector3 cameraForward,
+                    out Vector3 cameraRight))
             {
                 return Vector3.zero;
             }
 
-            Vector3 targetRight = Vector3.Cross(Vector3.up, targetForward);
-            return (targetForward * moveInput.y + targetRight * moveInput.x)
+            return (cameraForward * moveInput.y + cameraRight * moveInput.x)
                 .normalized * moveInput.magnitude;
         }
 
@@ -73,6 +77,29 @@ namespace rudIsland.RPG3D.Player.Movement
             }
 
             direction.Normalize();
+            return true;
+        }
+
+        private bool TryGetCameraDirection(
+            out Vector3 forward,
+            out Vector3 right)
+        {
+            forward = Vector3.zero;
+            right = Vector3.zero;
+            if (moveCamera == null)
+            {
+                return false;
+            }
+
+            forward = moveCamera.forward;
+            forward.y = 0f;
+            if (forward.sqrMagnitude < MinimumDirectionSqrMagnitude)
+            {
+                return false;
+            }
+
+            forward.Normalize();
+            right = Vector3.Cross(Vector3.up, forward);
             return true;
         }
     }

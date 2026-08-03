@@ -3,8 +3,14 @@ using rudIsland.RPG3D.Combat;
 
 namespace rudIsland.RPG3D.Characters
 {
+    // 타겟을 사용하는 코드가 구체적인 유닛 종류를 몰라도 사망 여부를 확인하게 한다.
+    public interface IUnitDeathState
+    {
+        bool IsDead { get; }
+    }
+
     // 살아 있는 캐릭터가 공통으로 가지는 팀과 체력만 제공한다.
-    public abstract class Unit : WorldObject
+    public abstract class Unit : WorldObject, IUnitDeathState
     {
         // 이동, 공격, AI는 넣지 않고 팀과 체력만 공통으로 보관한다.
         public UnitTeam Team { get; } // 씬 또는 시스템 참조

@@ -61,6 +61,7 @@ namespace rudIsland.RPG3D.Player.Movement
                 this.turnSpeed);
             targetMovement = new PlayerTargetMovement(
                 playerTransform,
+                moveCamera,
                 this.turnSpeed);
             currentMovementMode = freeLookMovement;
         }
@@ -139,12 +140,15 @@ namespace rudIsland.RPG3D.Player.Movement
                 ? Vector2.down
                 : rollInput.normalized;
 
-            Vector3 cameraForward = moveCamera.forward;
-            cameraForward.y = 0f;
-            if (cameraForward.sqrMagnitude > 0.01f)
+            if (!ReferenceEquals(currentMovementMode, targetMovement))
             {
-                playerTransform.rotation =
-                    Quaternion.LookRotation(cameraForward);
+                Vector3 cameraForward = moveCamera.forward;
+                cameraForward.y = 0f;
+                if (cameraForward.sqrMagnitude > 0.01f)
+                {
+                    playerTransform.rotation =
+                        Quaternion.LookRotation(cameraForward);
+                }
             }
 
             UsesSprintRoll = playerInput.IsSprinting &&

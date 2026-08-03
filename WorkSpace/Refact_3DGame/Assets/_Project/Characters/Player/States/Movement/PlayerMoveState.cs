@@ -24,8 +24,8 @@ namespace rudIsland.RPG3D.Player.States.Movement
         public void Update(float deltaTime, PlayerStateInput input)
         {
             stateMachine.Movement.UpdateMove(deltaTime);
-            animationController.UpdateMove(
-                stateMachine.Input.MoveValue,
+            animationController.UpdateLocomotion(
+                stateMachine.Movement.GetLocalMoveInput(),
                 stateMachine.Input.IsSprinting,
                 deltaTime);
         }

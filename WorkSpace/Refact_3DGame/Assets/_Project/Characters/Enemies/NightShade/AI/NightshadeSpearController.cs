@@ -1,4 +1,5 @@
 using System;
+using rudIsland.RPG3D.Characters;
 using rudIsland.RPG3D.Combat;
 using rudIsland.RPG3D.Player;
 using rudIsland.RPG3D.World;
@@ -11,7 +12,10 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         typeof(CharacterController),
         typeof(NightshadeSpearAnimationController))]
     // Unity 입력과 일반 C# Nightshade 전투 로직을 연결한다.
-    public sealed class NightshadeSpearController : WorldObjectView, IAttackHitReceiver
+    public sealed class NightshadeSpearController :
+        WorldObjectView,
+        IAttackHitReceiver,
+        IUnitDeathState
     {
         [Header("필수 연결")]
         [SerializeField] private Transform target; // 대상 참조
@@ -54,6 +58,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         private NightshadeSpearAnimationController animationController; // 씬 또는 시스템 참조
         private NightshadeSpearWorldUnit nightshadeWorldUnit; // 씬 또는 시스템 참조
         private NightshadeSpearWorldUnit standaloneWorldUnit; // 씬 또는 시스템 참조
+
+        public bool IsDead =>
+            nightshadeWorldUnit != null && nightshadeWorldUnit.IsDead;
 
         private void Awake()
         {

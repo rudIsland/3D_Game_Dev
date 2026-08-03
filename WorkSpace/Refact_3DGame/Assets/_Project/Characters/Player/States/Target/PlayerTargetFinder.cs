@@ -1,3 +1,4 @@
+using rudIsland.RPG3D.Characters;
 using rudIsland.RPG3D.Combat;
 using UnityEngine;
 
@@ -16,6 +17,8 @@ namespace rudIsland.RPG3D.Player.States.Target
         private readonly LayerMask targetLayers;
         private readonly float targetRange;
         private readonly float minimumFacingDot;
+        private Transform selectedTarget;
+        private IUnitDeathState selectedTargetDeathState;
 
         public PlayerTargetFinder(
             Transform playerTransform,
@@ -36,6 +39,8 @@ namespace rudIsland.RPG3D.Player.States.Target
         public bool TryFindTarget(out Transform target)
         {
             target = null;
+            selectedTarget = null;
+            selectedTargetDeathState = null;
             if (targetRange <= 0f || targetLayers.value == 0)
             {
                 return false;
@@ -64,7 +69,9 @@ namespace rudIsland.RPG3D.Player.States.Target
             {
                 if (!TryGetTargetTransform(
                         detectedTargets[index],
-                        out Transform candidate))
+                        out Transform candidate,
+                        out IUnitDeathState candidateDeathState) ||
+                    candidateDeathState?.IsDead == true)
                 {
                     continue;
                 }
@@ -89,6 +96,8 @@ namespace rudIsland.RPG3D.Player.States.Target
 
                 nearestDistanceSquared = distanceSquared;
                 target = candidate;
+                selectedTarget = candidate;
+                selectedTargetDeathState = candidateDeathState;
             }
 
             return target != null;
@@ -103,6 +112,12 @@ namespace rudIsland.RPG3D.Player.States.Target
                 return false;
             }
 
+            if (target == selectedTarget &&
+                selectedTargetDeathState?.IsDead == true)
+            {
+                return false;
+            }
+
             Vector3 difference = target.position - playerTransform.position;
             difference.y = 0f;
             float clampedMaximumDistance = Mathf.Max(0f, maximumDistance);
@@ -112,9 +127,11 @@ namespace rudIsland.RPG3D.Player.States.Target
 
         private bool TryGetTargetTransform(
             Collider targetCollider,
-            out Transform target)
+            out Transform target,
+            out IUnitDeathState targetDeathState)
         {
             target = null;
+            targetDeathState = null;
             if (targetCollider == null)
             {
                 return false;
@@ -131,6 +148,7 @@ namespace rudIsland.RPG3D.Player.States.Target
             }
 
             target = receiverComponent.transform;
+            targetDeathState = receiver as IUnitDeathState;
             return true;
         }
     }

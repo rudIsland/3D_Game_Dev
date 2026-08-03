@@ -1,4 +1,5 @@
 using System;
+using rudIsland.RPG3D.Characters;
 using rudIsland.RPG3D.Combat;
 using rudIsland.RPG3D.Player;
 using rudIsland.RPG3D.World;
@@ -11,7 +12,10 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         typeof(CharacterController),
         typeof(ZombieAnimationController))]
     // Unity 씬과 일반 C# Zombie AI를 연결한다.
-    public sealed class ZombieController : WorldObjectView, IAttackHitReceiver
+    public sealed class ZombieController :
+        WorldObjectView,
+        IAttackHitReceiver,
+        IUnitDeathState
     {
         [Header("필수 연결")]
         [SerializeField] private Transform target; // 대상 참조
@@ -60,6 +64,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         public bool IsAttackHitActive =>
             activeHitDetector != null;
+        public bool IsDead =>
+            zombieWorldUnit != null && zombieWorldUnit.IsDead;
         public HitReaction LastHitReaction =>
             zombieWorldUnit != null
                 ? zombieWorldUnit.LastHitReaction
