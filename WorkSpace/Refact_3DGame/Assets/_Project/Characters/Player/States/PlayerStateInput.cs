@@ -5,15 +5,18 @@ namespace rudIsland.RPG3D.Player.States
     {
         public bool RollPressed { get; } // 기능 사용 여부
         public bool AttackPressed { get; } // 기능 사용 여부
+        public bool TargetTogglePressed { get; }
         public bool IsBlocking { get; } // 기능 사용 여부
 
         public PlayerStateInput(
             bool rollPressed,
             bool attackPressed,
+            bool targetTogglePressed,
             bool isBlocking)
         {
             RollPressed = rollPressed;
             AttackPressed = attackPressed;
+            TargetTogglePressed = targetTogglePressed;
             IsBlocking = isBlocking;
         }
     }

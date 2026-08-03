@@ -1,41 +1,48 @@
 using System;
 using rudIsland.RPG3D.Combat;
 using rudIsland.RPG3D.Player.Animations;
+using rudIsland.RPG3D.Player.Camera;
 using rudIsland.RPG3D.Player.Input;
 using rudIsland.RPG3D.Player.Movement;
+using rudIsland.RPG3D.Player.States.Actions;
 using rudIsland.RPG3D.Player.States.Attack;
 using rudIsland.RPG3D.Player.States.Block;
+using rudIsland.RPG3D.Player.States.Death;
+using rudIsland.RPG3D.Player.States.FreeLook;
+using rudIsland.RPG3D.Player.States.Hit;
 using rudIsland.RPG3D.Player.States.Movement;
+using rudIsland.RPG3D.Player.States.Target;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Player.States
 {
-    // 플레이어 상태 전환, 입력 판단, 루트 모션 전달을 관리한다.
+    // 시점, 행동, 피격과 사망 상태의 전환 및 생명주기를 관리한다.
     public sealed class PlayerStateMachine
     {
-        private readonly PlayerInputReader playerInput; // 입력 또는 행동 여부
-        private readonly PlayerMovement playerMovement; // 이동 정보
-        private readonly PlayerAnimationController animationController; // 씬 또는 시스템 참조
-        private readonly PlayerAttackState attackState; // 공격 관련 설정 또는 상태
-        private readonly PlayerControlState controlState; // 현재 행동 상태
-        private readonly PlayerHitState hitState; // 피격 또는 피해 관련 값
-        private readonly PlayerDeadState deadState; // 현재 행동 상태
-        private readonly Action endAttackHit; // 공격 관련 설정 또는 상태
-        private readonly float rollDistanceScale; // 거리 설정
+        private readonly PlayerInputReader playerInput;
+        private readonly PlayerMovement playerMovement;
+        private readonly PlayerAnimationController animationController;
+        private readonly PlayerAttackState attackState;
+        private readonly PlayerActionStateMachine actionStateMachine;
+        private readonly PlayerFreeLookState freeLookState;
+        private readonly PlayerTargetLookState targetLookState;
+        private readonly PlayerHitState hitState;
+        private readonly PlayerDeadState deadState;
+        private readonly Action endAttackHit;
+        private readonly float rollDistanceScale;
 
-        private IPlayerState currentState; // 현재 행동 상태
-        private bool isEnabled; // 기능 사용 여부
+        private IPlayerState currentState;
+        private IPlayerState returnLookState;
+        private bool isEnabled;
 
-        internal PlayerMovement Movement => playerMovement; // 이동 정보
-        internal PlayerInputReader Input => playerInput; // 입력 또는 행동 여부
-        public bool IsBlocking => ReferenceEquals(currentState, controlState) && // 기능 사용 여부
-            controlState.IsBlocking;
-        public bool IsRolling => ReferenceEquals(currentState, controlState) && // 기능 사용 여부
-            controlState.IsRolling;
-        public bool IsAttacking => ReferenceEquals(currentState, controlState) && // 기능 사용 여부
-            controlState.IsAttacking;
-        public bool IsDead => ReferenceEquals(currentState, deadState); // 기능 사용 여부
-        public bool IsHit => ReferenceEquals(currentState, hitState); // 기능 사용 여부
+        internal PlayerMovement Movement => playerMovement;
+        internal PlayerInputReader Input => playerInput;
+        public bool IsBlocking => actionStateMachine.IsBlocking;
+        public bool IsRolling => actionStateMachine.IsRolling;
+        public bool IsAttacking => actionStateMachine.IsAttacking;
+        public bool IsTargeting => ReferenceEquals(currentState, targetLookState);
+        public bool IsDead => ReferenceEquals(currentState, deadState);
+        public bool IsHit => ReferenceEquals(currentState, hitState);
         public HitReaction LastHitReaction { get; private set; }
 
         public PlayerStateMachine(
@@ -55,6 +62,9 @@ namespace rudIsland.RPG3D.Player.States
             float attack04MoveScale,
             float attack05MoveScale,
             float runAttackMoveScale,
+            PlayerTargetFinder targetFinder,
+            PlayerTargetCamera targetCamera,
+            float targetBreakDistance,
             Action endAttackHit)
         {
             this.playerInput = playerInput;
@@ -65,9 +75,9 @@ namespace rudIsland.RPG3D.Player.States
             this.rollDistanceScale = Mathf.Max(0f, rollDistanceScale);
             this.endAttackHit = endAttackHit;
 
-            PlayerMoveState moveState = new PlayerMoveState(this, animationController);
-            PlayerBlockState blockState = new PlayerBlockState(this, animationController);
-            PlayerRollState rollState = new PlayerRollState(this, animationController);
+            var moveState = new PlayerMoveState(this, animationController);
+            var blockState = new PlayerBlockState(this, animationController);
+            var rollState = new PlayerRollState(this, animationController);
             attackState = new PlayerAttackState(
                 this,
                 animationController,
@@ -82,8 +92,24 @@ namespace rudIsland.RPG3D.Player.States
                 Mathf.Clamp01(attack04MoveScale),
                 Mathf.Clamp01(attack05MoveScale),
                 Mathf.Clamp01(runAttackMoveScale));
-            controlState = new PlayerControlState(
-                this, moveState, blockState, rollState, attackState);
+            actionStateMachine = new PlayerActionStateMachine(
+                this,
+                moveState,
+                blockState,
+                rollState,
+                attackState);
+            freeLookState = new PlayerFreeLookState(
+                this,
+                actionStateMachine,
+                playerMovement,
+                targetCamera);
+            targetLookState = new PlayerTargetLookState(
+                this,
+                actionStateMachine,
+                playerMovement,
+                targetFinder,
+                targetCamera,
+                targetBreakDistance);
             hitState = new PlayerHitState(this, animationController);
             deadState = new PlayerDeadState(this, animationController);
         }
@@ -96,10 +122,15 @@ namespace rudIsland.RPG3D.Player.States
             }
 
             isEnabled = true;
-            ChangeState(controlState);
+            returnLookState = freeLookState;
+            ChangeState(freeLookState);
         }
 
-        public void Update(float deltaTime, bool rollPressed, bool attackPressed)
+        public void Update(
+            float deltaTime,
+            bool rollPressed,
+            bool attackPressed,
+            bool targetTogglePressed)
         {
             if (!isEnabled || currentState == null)
             {
@@ -109,6 +140,7 @@ namespace rudIsland.RPG3D.Player.States
             currentState.Update(deltaTime, new PlayerStateInput(
                 rollPressed,
                 attackPressed,
+                targetTogglePressed,
                 playerInput.IsBlocking));
         }
 
@@ -119,16 +151,66 @@ namespace rudIsland.RPG3D.Player.States
                 return;
             }
 
+            actionStateMachine.Disable();
+            targetLookState.ReleaseTarget();
             currentState?.Exit();
             EndAttackHit();
             currentState = null;
+            returnLookState = null;
             isEnabled = false;
             animationController.Reset();
         }
 
-        internal void SetAttackDirection()
+        internal void TryChangeToTargetLookState()
         {
-            playerMovement.SetAttackDirection();
+            if (!isEnabled || !targetLookState.TrySelectTarget())
+            {
+                return;
+            }
+
+            returnLookState = targetLookState;
+            ChangeState(targetLookState);
+        }
+
+        internal void ChangeToFreeLookState()
+        {
+            if (!isEnabled || ReferenceEquals(currentState, deadState))
+            {
+                return;
+            }
+
+            targetLookState.ReleaseTarget();
+            returnLookState = freeLookState;
+            ChangeState(freeLookState);
+        }
+
+        internal void ChangeToLookState()
+        {
+            if (!isEnabled || ReferenceEquals(currentState, deadState))
+            {
+                return;
+            }
+
+            if (ReferenceEquals(returnLookState, targetLookState) &&
+                targetLookState.IsTargetAvailable())
+            {
+                ChangeState(targetLookState);
+                return;
+            }
+
+            targetLookState.ReleaseTarget();
+            returnLookState = freeLookState;
+            ChangeState(freeLookState);
+        }
+
+        internal void SetAttackDirection(bool rotateImmediately)
+        {
+            playerMovement.SetAttackDirection(rotateImmediately);
+        }
+
+        internal void UpdateAttackDirection()
+        {
+            playerMovement.UpdateAttackDirection();
         }
 
         internal void UpdateAttackTurn(float deltaTime)
@@ -152,7 +234,9 @@ namespace rudIsland.RPG3D.Player.States
                 playerInput.MoveValue.sqrMagnitude >= 0.95f;
         }
 
-        internal void ApplyRootMotion(Vector3 deltaPosition, Quaternion deltaRotation)
+        internal void ApplyRootMotion(
+            Vector3 deltaPosition,
+            Quaternion deltaRotation)
         {
             if (IsRolling || IsBlocking || IsAttacking || IsDead)
             {
@@ -175,6 +259,9 @@ namespace rudIsland.RPG3D.Player.States
                 return;
             }
 
+            actionStateMachine.Disable();
+            targetLookState.ReleaseTarget();
+            returnLookState = freeLookState;
             EndAttackHit();
             ChangeState(deadState);
         }
@@ -210,17 +297,8 @@ namespace rudIsland.RPG3D.Player.States
                 return;
             }
 
+            actionStateMachine.Disable();
             ChangeState(hitState);
-        }
-
-        internal void ChangeToControlState()
-        {
-            if (!isEnabled || ReferenceEquals(currentState, deadState))
-            {
-                return;
-            }
-
-            ChangeState(controlState);
         }
 
         internal void EndAttackHit()
@@ -236,6 +314,16 @@ namespace rudIsland.RPG3D.Player.States
             }
 
             attackState.NotifyAnimationEnded();
+        }
+
+        internal void NotifyAttackHitEnded()
+        {
+            if (!isEnabled || !IsAttacking)
+            {
+                return;
+            }
+
+            attackState.OpenComboTurnWindow();
         }
 
         private void ChangeState(IPlayerState nextState)

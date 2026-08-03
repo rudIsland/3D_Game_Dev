@@ -43,7 +43,7 @@ namespace rudIsland.RPG3D.Player.Animations
 
         public void EndAttackHitAnimationEvent()
         {
-            playerController?.EndAttackHit();
+            playerController?.NotifyAttackHitEnded();
         }
 
         public void EndAttackAnimationEvent()

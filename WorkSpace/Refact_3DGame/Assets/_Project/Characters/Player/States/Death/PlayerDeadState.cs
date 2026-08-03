@@ -1,12 +1,12 @@
 using rudIsland.RPG3D.Player.Animations;
 
-namespace rudIsland.RPG3D.Player.States
+namespace rudIsland.RPG3D.Player.States.Death
 {
-    // 사망 후에는 조작 상태로 돌아가지 않고 중력과 지면만 유지한다.
+    // 사망 후에는 다른 상태로 돌아가지 않고 중력과 지면만 유지한다.
     internal sealed class PlayerDeadState : IPlayerState
     {
-        private readonly PlayerStateMachine stateMachine; // 현재 행동 상태
-        private readonly PlayerAnimationController animationController; // 씬 또는 시스템 참조
+        private readonly PlayerStateMachine stateMachine;
+        private readonly PlayerAnimationController animationController;
 
         public PlayerDeadState(
             PlayerStateMachine stateMachine,

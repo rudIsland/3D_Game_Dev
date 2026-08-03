@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace rudIsland.RPG3D.Player.Movement
 {
-    // 입력을 카메라 기준 이동으로 바꾸고, 구르기·방어 루트 이동을 적용한다.
+    // 현재 이동 모드의 방향 계산과 구르기·방어 루트 이동을 적용한다.
     public sealed class PlayerMovement
     {
         private readonly Transform playerTransform; // 씬 또는 시스템 참조
@@ -17,10 +17,13 @@ namespace rudIsland.RPG3D.Player.Movement
         private readonly float gravity; // 내부에서 사용하는 값
         private readonly float groundPull; // 내부에서 사용하는 값
         private readonly HitPushMovement hitPushMovement; // 피격 또는 피해 관련 값
+        private readonly PlayerFreeLookMovement freeLookMovement;
+        private readonly PlayerTargetMovement targetMovement;
 
         private float verticalSpeed; // 이동 속도
         private Vector3 attackDirection; // 공격 관련 설정 또는 상태
         private bool hasAttackDirection; // 기능 사용 여부
+        private IPlayerMovementMode currentMovementMode;
 
         public bool IsGrounded => characterController != null && // 기능 사용 여부
             characterController.isGrounded;
@@ -52,18 +55,38 @@ namespace rudIsland.RPG3D.Player.Movement
             this.gravity = gravity;
             this.groundPull = groundPull;
             hitPushMovement = new HitPushMovement(hitPushTime);
+            freeLookMovement = new PlayerFreeLookMovement(
+                playerTransform,
+                moveCamera,
+                this.turnSpeed);
+            targetMovement = new PlayerTargetMovement(
+                playerTransform,
+                this.turnSpeed);
+            currentMovementMode = freeLookMovement;
         }
 
         public void UpdateMove(float deltaTime)
         {
             Vector3 moveDirection = GetMoveDirection();
-            RotateToDirection(moveDirection, deltaTime);
+            currentMovementMode.UpdateFacing(moveDirection, deltaTime);
             UpdateVerticalSpeed(deltaTime);
 
             float moveSpeed = playerInput.IsSprinting ? sprintSpeed : walkSpeed;
             Vector3 moveVelocity = moveDirection * moveSpeed;
             moveVelocity.y = verticalSpeed;
             characterController.Move(moveVelocity * deltaTime);
+        }
+
+        public void SetFreeLookMovement()
+        {
+            targetMovement.ClearTarget();
+            currentMovementMode = freeLookMovement;
+        }
+
+        public void SetTargetMovement(Transform target)
+        {
+            targetMovement.SetTarget(target);
+            currentMovementMode = targetMovement;
         }
 
         public void UpdateStoppedMove(float deltaTime)
@@ -110,16 +133,18 @@ namespace rudIsland.RPG3D.Player.Movement
 
         private void SetRollDirection()
         {
-            Vector3 rollDirection = GetMoveDirection();
-            if (rollDirection.sqrMagnitude < 0.01f)
+            Vector2 rollInput =
+                Vector2.ClampMagnitude(playerInput.MoveValue, 1f);
+            RollDirectionInput = rollInput.sqrMagnitude < 0.01f
+                ? Vector2.down
+                : rollInput.normalized;
+
+            Vector3 cameraForward = moveCamera.forward;
+            cameraForward.y = 0f;
+            if (cameraForward.sqrMagnitude > 0.01f)
             {
-                RollDirectionInput = Vector2.down;
-            }
-            else
-            {
-                Vector3 localDirection = playerTransform.InverseTransformDirection(
-                    rollDirection.normalized);
-                RollDirectionInput = new Vector2(localDirection.x, localDirection.z);
+                playerTransform.rotation =
+                    Quaternion.LookRotation(cameraForward);
             }
 
             UsesSprintRoll = playerInput.IsSprinting &&
@@ -127,17 +152,22 @@ namespace rudIsland.RPG3D.Player.Movement
             verticalSpeed = groundPull;
         }
 
-        // Each combo stage captures the latest camera-relative move direction.
-        public void SetAttackDirection()
+        // 각 콤보 단계는 카메라가 바라보는 수평 방향을 공격 방향으로 사용한다.
+        public void SetAttackDirection(bool rotateImmediately)
         {
-            attackDirection = GetMoveDirection();
-            if (attackDirection.sqrMagnitude < 0.01f)
+            attackDirection = GetAttackDirection();
+            hasAttackDirection = true;
+            if (rotateImmediately)
             {
-                attackDirection = playerTransform.forward;
+                playerTransform.rotation =
+                    Quaternion.LookRotation(attackDirection);
             }
+        }
 
-            attackDirection.y = 0f;
-            hasAttackDirection = attackDirection.sqrMagnitude > 0.01f;
+        public void UpdateAttackDirection()
+        {
+            attackDirection = GetAttackDirection();
+            hasAttackDirection = true;
         }
 
         public void UpdateAttackTurn(float deltaTime)
@@ -169,6 +199,7 @@ namespace rudIsland.RPG3D.Player.Movement
             deltaPosition.y = verticalSpeed * Time.deltaTime;
             characterController.Move(deltaPosition);
             playerTransform.rotation *= deltaRotation;
+            currentMovementMode.UpdateFacing(Vector3.zero, Time.deltaTime);
         }
 
         public Vector2 GetLocalMoveInput()
@@ -188,34 +219,21 @@ namespace rudIsland.RPG3D.Player.Movement
 
         private Vector3 GetMoveDirection()
         {
-            Vector2 moveInput = Vector2.ClampMagnitude(playerInput.MoveValue, 1f);
-            if (moveInput.sqrMagnitude < 0.01f)
-            {
-                return Vector3.zero;
-            }
-
-            Vector3 cameraForward = moveCamera.forward;
-            Vector3 cameraRight = moveCamera.right;
-            cameraForward.y = 0f;
-            cameraRight.y = 0f;
-            cameraForward.Normalize();
-            cameraRight.Normalize();
-            return (cameraForward * moveInput.y + cameraRight * moveInput.x)
-                .normalized * moveInput.magnitude;
+            Vector2 moveInput =
+                Vector2.ClampMagnitude(playerInput.MoveValue, 1f);
+            return currentMovementMode.GetMoveDirection(moveInput);
         }
 
-        private void RotateToDirection(Vector3 direction, float deltaTime)
+        private Vector3 GetAttackDirection()
         {
-            if (direction.sqrMagnitude < 0.01f || turnSpeed <= 0f)
+            Vector3 cameraForward = moveCamera.forward;
+            cameraForward.y = 0f;
+            if (cameraForward.sqrMagnitude < 0.01f)
             {
-                return;
+                return playerTransform.forward;
             }
 
-            Quaternion wantedRotation = Quaternion.LookRotation(direction);
-            playerTransform.rotation = Quaternion.RotateTowards(
-                playerTransform.rotation,
-                wantedRotation,
-                turnSpeed * deltaTime);
+            return cameraForward.normalized;
         }
 
         private void UpdateVerticalSpeed(float deltaTime)

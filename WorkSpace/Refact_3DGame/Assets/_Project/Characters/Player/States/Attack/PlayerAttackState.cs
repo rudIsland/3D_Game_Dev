@@ -28,6 +28,7 @@ namespace rudIsland.RPG3D.Player.States.Attack
         private bool hasAnimationStarted; // 기능 사용 여부
         private bool animationEndedByEvent; // 기능 사용 여부
         private bool hasBufferedAttackInput; // 기능 사용 여부
+        private bool isComboTurnWindowOpen; // 기능 사용 여부
         private float bufferedAttackInputAge; // 공격 관련 설정 또는 상태
 
         public bool IsFinished { get; private set; } // 기능 사용 여부
@@ -73,6 +74,7 @@ namespace rudIsland.RPG3D.Player.States.Attack
             comboNumber = 1;
             hasAnimationStarted = false;
             IsFinished = false;
+            isComboTurnWindowOpen = false;
             ClearBufferedAttackInput();
             PlayCurrentAttack();
         }
@@ -82,7 +84,12 @@ namespace rudIsland.RPG3D.Player.States.Attack
             CaptureAttackInput(deltaTime, input.AttackPressed);
             stateMachine.Movement.UpdateStoppedMove(deltaTime);
             animationController.StopMove();
-            stateMachine.UpdateAttackTurn(deltaTime);
+
+            if (isComboTurnWindowOpen)
+            {
+                stateMachine.UpdateAttackDirection();
+                stateMachine.UpdateAttackTurn(deltaTime);
+            }
 
             if (animationEndedByEvent)
             {
@@ -117,6 +124,7 @@ namespace rudIsland.RPG3D.Player.States.Attack
 
         public void Exit()
         {
+            isComboTurnWindowOpen = false;
             ClearBufferedAttackInput();
             stateMachine.EndAttackHit();
             stateMachine.ClearAttackDirection();
@@ -125,8 +133,19 @@ namespace rudIsland.RPG3D.Player.States.Attack
         private void PlayCurrentAttack()
         {
             animationEndedByEvent = false;
-            stateMachine.SetAttackDirection();
+            isComboTurnWindowOpen = false;
+            stateMachine.SetAttackDirection(comboNumber == 1);
             animationController.PlayAttack(isRunAttack ? RunAttackNumber : comboNumber);
+        }
+
+        internal void OpenComboTurnWindow()
+        {
+            if (isRunAttack || comboNumber >= LastComboNumber)
+            {
+                return;
+            }
+
+            isComboTurnWindowOpen = true;
         }
 
         internal void NotifyAnimationEnded()

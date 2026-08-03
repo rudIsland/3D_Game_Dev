@@ -82,7 +82,7 @@ namespace rudIsland.RPG3D.Player
         {
             if (IsDead)
             {
-                playerStateMachine.Update(deltaTime, false, false);
+                playerStateMachine.Update(deltaTime, false, false, false);
                 return;
             }
 
@@ -90,7 +90,8 @@ namespace rudIsland.RPG3D.Player
             playerStateMachine.Update(
                 deltaTime,
                 playerInput.TakeRollInput(),
-                playerInput.TakeAttackInput());
+                playerInput.TakeAttackInput(),
+                playerInput.TakeTargetToggleInput());
         }
 
         protected override void OnUnitDisable()

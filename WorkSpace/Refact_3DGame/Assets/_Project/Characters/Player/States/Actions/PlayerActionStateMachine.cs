@@ -2,23 +2,25 @@ using rudIsland.RPG3D.Player.States.Attack;
 using rudIsland.RPG3D.Player.States.Block;
 using rudIsland.RPG3D.Player.States.Movement;
 
-namespace rudIsland.RPG3D.Player.States
+namespace rudIsland.RPG3D.Player.States.Actions
 {
-    // 플레이어의 이동, 방어, 구르기, 공격 애니메이션 상태를 전환한다.
-    internal sealed class PlayerControlState : IPlayerState
+    // 이동, 방어, 구르기와 공격 사이의 행동 전환을 한곳에서 관리한다.
+    internal sealed class PlayerActionStateMachine
     {
-        private readonly PlayerStateMachine stateMachine; // 현재 행동 상태
-        private readonly PlayerMoveState moveState; // 이동 정보
-        private readonly PlayerBlockState blockState; // 현재 행동 상태
-        private readonly PlayerRollState rollState; // 현재 행동 상태
-        private readonly PlayerAttackState attackState; // 공격 관련 설정 또는 상태
-        private IPlayerState currentState; // 현재 행동 상태
+        private readonly PlayerStateMachine stateMachine;
+        private readonly PlayerMoveState moveState;
+        private readonly PlayerBlockState blockState;
+        private readonly PlayerRollState rollState;
+        private readonly PlayerAttackState attackState;
 
-        public bool IsBlocking => ReferenceEquals(currentState, blockState); // 기능 사용 여부
-        public bool IsRolling => ReferenceEquals(currentState, rollState); // 기능 사용 여부
-        public bool IsAttacking => ReferenceEquals(currentState, attackState); // 기능 사용 여부
+        private IPlayerState currentState;
+        private bool isEnabled;
 
-        public PlayerControlState(
+        public bool IsBlocking => ReferenceEquals(currentState, blockState);
+        public bool IsRolling => ReferenceEquals(currentState, rollState);
+        public bool IsAttacking => ReferenceEquals(currentState, attackState);
+
+        public PlayerActionStateMachine(
             PlayerStateMachine stateMachine,
             PlayerMoveState moveState,
             PlayerBlockState blockState,
@@ -32,16 +34,22 @@ namespace rudIsland.RPG3D.Player.States
             this.attackState = attackState;
         }
 
-        public void Enter()
+        public void Enable()
         {
+            if (isEnabled)
+            {
+                return;
+            }
+
+            isEnabled = true;
             ChangeState(moveState);
         }
 
         public void Update(float deltaTime, PlayerStateInput input)
         {
-            if (currentState == null)
+            if (!isEnabled || currentState == null)
             {
-                ChangeState(moveState);
+                return;
             }
 
             if (ReferenceEquals(currentState, rollState))
@@ -107,6 +115,7 @@ namespace rudIsland.RPG3D.Player.States
                 currentState.Update(deltaTime, new PlayerStateInput(
                     false,
                     false,
+                    false,
                     input.IsBlocking));
                 return;
             }
@@ -115,10 +124,16 @@ namespace rudIsland.RPG3D.Player.States
             currentState.Update(deltaTime, input);
         }
 
-        public void Exit()
+        public void Disable()
         {
+            if (!isEnabled)
+            {
+                return;
+            }
+
             currentState?.Exit();
             currentState = null;
+            isEnabled = false;
         }
 
         private void ChangeState(IPlayerState nextState)
