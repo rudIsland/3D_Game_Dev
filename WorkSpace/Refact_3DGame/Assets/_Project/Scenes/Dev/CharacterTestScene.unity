@@ -4376,6 +4376,15 @@ MonoBehaviour:
   worldObjectManager: {fileID: 600374219}
   moveCamera: {fileID: 519073573}
   playerAnimator: {fileID: 5866666021796340207}
+  playerFreeLookCamera: {fileID: 1028451436}
+  targetLayers:
+    serializedVersion: 2
+    m_Bits: 262272
+  targetRange: 12
+  targetBreakDistance: 15
+  targetMaximumAngle: 70
+  targetCameraTurnSpeed: 540
+  targetCameraVerticalValue: 0.5
   maxHealth: 100
   attackHitSettings:
   - attackNumber: 1
@@ -4430,17 +4439,17 @@ MonoBehaviour:
   sprintSpeed: 5
   animationSmoothTime: 0.12
   rollDistanceScale: 0.6
-  attack01NextInputTime: 0.42
-  attack02NextInputTime: 0.52
+  attack01NextInputTime: 0.46
+  attack02NextInputTime: 0.58
   attack03NextInputTime: 0.52
-  attack04NextInputTime: 0.48
-  comboInputBufferDuration: 0.15
-  attack01MoveScale: 0.4
-  attack02MoveScale: 0.55
-  attack03MoveScale: 0.5
-  attack04MoveScale: 0.45
-  attack05MoveScale: 0.35
-  runAttackMoveScale: 0.5
+  attack04NextInputTime: 0.5
+  comboInputBufferDuration: 0.25
+  attack01MoveScale: 0.35
+  attack02MoveScale: 0.5
+  attack03MoveScale: 0.45
+  attack04MoveScale: 0.4
+  attack05MoveScale: 0.3
+  runAttackMoveScale: 0.45
   gravity: -22
   groundPull: -2
 --- !u!114 &1699705003
