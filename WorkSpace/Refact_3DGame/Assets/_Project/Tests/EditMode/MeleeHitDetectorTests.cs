@@ -12,11 +12,14 @@ namespace rudIsland.RPG3D.Tests
             IAttackHitReceiver
         {
             public int HitCount { get; private set; } // 피격 또는 피해 관련 값
-            public AttackHitData LastHit { get; private set; } // 피격 또는 피해 관련 값
+            public AttackHitInput LastHit { get; private set; } // 피격 또는 피해 관련 값
             public AttackHitResult ResultToReturn { get; set; } = // 외부에 제공하는 읽기 값
                 AttackHitResult.Damaged;
 
-            public AttackHitResult ReceiveHit(in AttackHitData hit)
+            public bool CanTakeHit => true;
+            public int ActivationSequence => 1;
+
+            public AttackHitResult ReceiveAttackHit(in AttackHitInput hit)
             {
                 HitCount++;
                 LastHit = hit;
@@ -53,7 +56,7 @@ namespace rudIsland.RPG3D.Tests
         {
             MeleeHitDetector detector = CreateDetector();
             RecordingHitReceiver receiver = CreateTarget();
-            var hit = new AttackHitData(
+            var hit = new AttackHitInput(
                 new AttackDamage(12.5f), UnitTeam.Player, 2);
 
             Physics.SyncTransforms();
@@ -84,7 +87,7 @@ namespace rudIsland.RPG3D.Tests
             MeleeHitDetector detector = CreateDetector();
             RecordingHitReceiver receiver = CreateTarget();
             targetObject.transform.position = new Vector3(0.55f, 0f, 1f);
-            var hit = new AttackHitData(
+            var hit = new AttackHitInput(
                 new AttackDamage(10f), UnitTeam.Player, 1);
 
             Physics.SyncTransforms();
@@ -114,14 +117,14 @@ namespace rudIsland.RPG3D.Tests
             receiver.ResultToReturn = AttackHitResult.Blocked;
             int resultCount = 0;
             AttackHitResult receivedResult = AttackHitResult.Ignored;
-            AttackHitData receivedHit = default;
+            AttackHitInput receivedHit = default;
             detector.HitResultReady += (hitResult, hit) =>
             {
                 resultCount++;
                 receivedResult = hitResult;
                 receivedHit = hit;
             };
-            var hitData = new AttackHitData(
+            var hitData = new AttackHitInput(
                 new AttackDamage(10f), UnitTeam.Player, 1);
 
             Physics.SyncTransforms();
@@ -148,7 +151,7 @@ namespace rudIsland.RPG3D.Tests
                 CreateTargetWithHitBox(
                     HitBodyPart.Head,
                     Vector3.zero);
-            var hit = new AttackHitData(
+            var hit = new AttackHitInput(
                 new AttackDamage(10f), UnitTeam.Player, 1);
 
             Physics.SyncTransforms();
@@ -169,7 +172,7 @@ namespace rudIsland.RPG3D.Tests
                 CreateTargetWithHitBox(
                     HitBodyPart.Body,
                     Vector3.forward * 5f);
-            var hit = new AttackHitData(
+            var hit = new AttackHitInput(
                 new AttackDamage(10f), UnitTeam.Player, 1);
 
             Physics.SyncTransforms();
@@ -189,7 +192,7 @@ namespace rudIsland.RPG3D.Tests
                 new Vector3(0.1f, 0f, 0f);
             targetObject.GetComponent<BoxCollider>().size =
                 Vector3.one * 0.1f;
-            var hit = new AttackHitData(
+            var hit = new AttackHitInput(
                 new AttackDamage(10f), UnitTeam.Enemy, 1);
 
             Physics.SyncTransforms();
@@ -209,7 +212,7 @@ namespace rudIsland.RPG3D.Tests
                 new Vector3(0.4f, 0f, 0f);
             targetObject.GetComponent<BoxCollider>().size =
                 Vector3.one * 0.1f;
-            var hit = new AttackHitData(
+            var hit = new AttackHitInput(
                 new AttackDamage(10f), UnitTeam.Enemy, 1);
 
             Physics.SyncTransforms();
@@ -232,7 +235,7 @@ namespace rudIsland.RPG3D.Tests
             targetObject.transform.position = Vector3.zero;
             targetObject.GetComponent<BoxCollider>().size =
                 Vector3.one * 0.1f;
-            var hit = new AttackHitData(
+            var hit = new AttackHitInput(
                 new AttackDamage(10f), UnitTeam.Enemy, 1);
 
             Physics.SyncTransforms();
@@ -263,7 +266,7 @@ namespace rudIsland.RPG3D.Tests
             targetObject.transform.position = Vector3.zero;
             targetObject.GetComponent<BoxCollider>().size =
                 Vector3.one * 0.1f;
-            var hit = new AttackHitData(
+            var hit = new AttackHitInput(
                 new AttackDamage(10f), UnitTeam.Enemy, 1);
 
             Physics.SyncTransforms();
@@ -295,7 +298,7 @@ namespace rudIsland.RPG3D.Tests
 
             RecordingHitReceiver receiver = CreateTarget();
             targetObject.transform.position = Vector3.zero;
-            var hit = new AttackHitData(
+            var hit = new AttackHitInput(
                 new AttackDamage(10f), UnitTeam.Player, 1);
 
             Physics.SyncTransforms();
@@ -342,7 +345,7 @@ namespace rudIsland.RPG3D.Tests
                 new Vector3(-0.5f, 0f, 0.5f);
             targetObject.GetComponent<BoxCollider>().size =
                 Vector3.one * 0.1f;
-            var hit = new AttackHitData(
+            var hit = new AttackHitInput(
                 new AttackDamage(10f), UnitTeam.Player, 1);
 
             Physics.SyncTransforms();
@@ -364,7 +367,7 @@ namespace rudIsland.RPG3D.Tests
         public void EndHit_StopsCurrentHit()
         {
             MeleeHitDetector detector = CreateDetector();
-            var hit = new AttackHitData(
+            var hit = new AttackHitInput(
                 new AttackDamage(10f), UnitTeam.Player, 1);
 
             detector.StartHit(in hit);

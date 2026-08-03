@@ -14,10 +14,12 @@ namespace rudIsland.RPG3D.Tests
             public CombatHitResolver ResolverToQueue { get; set; } // 외부에 제공하는 읽기 값
             public MeleeHitDetector DetectorToQueue { get; set; } // 씬 또는 시스템 참조
             public RecordingHitReceiver ReceiverToQueue { get; set; } // 외부에 제공하는 읽기 값
-            public AttackHitData HitToQueue { get; set; } // 피격 또는 피해 관련 값
+            public AttackHitInput HitToQueue { get; set; } // 피격 또는 피해 관련 값
             public int AttackSequenceToQueue { get; set; } // 공격 관련 설정 또는 상태
+            public bool CanTakeHit => true;
+            public int ActivationSequence => 1;
 
-            public AttackHitResult ReceiveHit(in AttackHitData hit)
+            public AttackHitResult ReceiveAttackHit(in AttackHitInput hit)
             {
                 DetectorToStop?.EndHit();
                 QueueNextHit();
@@ -34,7 +36,7 @@ namespace rudIsland.RPG3D.Tests
                     return;
                 }
 
-                AttackHitData hit = HitToQueue;
+                AttackHitInput hit = HitToQueue;
                 ResolverToQueue.QueueHit(
                     DetectorToQueue,
                     AttackSequenceToQueue,
@@ -80,9 +82,9 @@ namespace rudIsland.RPG3D.Tests
                 DetectorToStop = secondDetector
             };
             var secondReceiver = new RecordingHitReceiver();
-            var firstHit = new AttackHitData(
+            var firstHit = new AttackHitInput(
                 new AttackDamage(10f), UnitTeam.Player, 1);
-            var secondHit = new AttackHitData(
+            var secondHit = new AttackHitInput(
                 new AttackDamage(10f), UnitTeam.Enemy, 1);
 
             bool firstQueued = resolver.QueueHit(
@@ -114,7 +116,7 @@ namespace rudIsland.RPG3D.Tests
             MeleeHitDetector detector =
                 CreateDetector("Detector", out firstDetectorObject);
             var receiver = new RecordingHitReceiver();
-            var hit = new AttackHitData(
+            var hit = new AttackHitInput(
                 new AttackDamage(10f), UnitTeam.Player, 1);
 
             bool firstQueued = resolver.QueueHit(
@@ -144,7 +146,7 @@ namespace rudIsland.RPG3D.Tests
             MeleeHitDetector secondDetector =
                 CreateDetector("SecondDetector", out secondDetectorObject);
             var secondReceiver = new RecordingHitReceiver();
-            var secondHit = new AttackHitData(
+            var secondHit = new AttackHitInput(
                 new AttackDamage(10f), UnitTeam.Enemy, 2);
             var firstReceiver = new RecordingHitReceiver
             {
@@ -154,7 +156,7 @@ namespace rudIsland.RPG3D.Tests
                 HitToQueue = secondHit,
                 AttackSequenceToQueue = 2
             };
-            var firstHit = new AttackHitData(
+            var firstHit = new AttackHitInput(
                 new AttackDamage(10f), UnitTeam.Player, 1);
 
             resolver.QueueHit(

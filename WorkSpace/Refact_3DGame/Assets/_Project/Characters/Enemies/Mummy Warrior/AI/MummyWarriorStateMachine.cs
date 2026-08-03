@@ -136,10 +136,29 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
             ChangeState(hitState);
         }
 
-        public void ChangeToHitState(in AttackHitData hit)
+        public void ChangeToHitState(in AttackHitInput hit)
         {
             if (!isEnabled || ReferenceEquals(currentState, deadState)) return;
             hitState.SetDirection(GetHitDirection(hit.HitDirection));
+            EndAttackHit();
+            if (ReferenceEquals(currentState, hitState))
+            {
+                hitState.Restart();
+                return;
+            }
+
+            ChangeState(hitState);
+        }
+
+        internal void ChangeToHitState(in HitReaction reaction)
+        {
+            if (!isEnabled || ReferenceEquals(currentState, deadState))
+            {
+                return;
+            }
+
+            hitState.SetDirection(
+                (MummyWarriorHitDirection)reaction.Direction);
             EndAttackHit();
             if (ReferenceEquals(currentState, hitState))
             {

@@ -147,14 +147,25 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             return nightshadeWorldUnit;
         }
 
-        public AttackHitResult ReceiveHit(in AttackHitData hit)
+        public bool CanTakeHit =>
+            nightshadeWorldUnit != null &&
+            nightshadeWorldUnit.CanTakeHit;
+
+        public int ActivationSequence =>
+            nightshadeWorldUnit != null
+                ? nightshadeWorldUnit.ActivationSequence
+                : 0;
+
+        public AttackHitResult ReceiveAttackHit(in AttackHitInput hit)
         {
-            if (nightshadeWorldUnit == null)
+            if (!CanTakeHit)
             {
                 return AttackHitResult.Ignored;
             }
 
-            return nightshadeWorldUnit.ApplyHit(in hit);
+            return nightshadeWorldUnit.ReceiveAttackHit(
+                in hit,
+                transform.forward);
         }
 
         private void StartAttackHit(
@@ -163,13 +174,18 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         {
             if (pattern == null || !pattern.Damage.IsValid || attackHitDetector == null) return;
 
-            var hit = new AttackHitData(
+            var hit = new AttackHitInput(
                 pattern.Damage,
                 UnitTeam.Enemy,
                 attackNumber,
                 pattern.Strength,
                 pattern.StaggerDamage,
-                pattern.PushDistance);
+                0f,
+                true,
+                true,
+                pattern.PushDistance,
+                0f,
+                default);
             attackHitDetector.StartHit(in hit);
         }
 

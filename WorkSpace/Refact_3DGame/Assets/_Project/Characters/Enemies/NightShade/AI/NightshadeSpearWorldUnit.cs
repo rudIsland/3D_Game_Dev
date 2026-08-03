@@ -7,10 +7,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
     public sealed class NightshadeSpearWorldUnit : EnemyUnit
     {
         private readonly NightshadeSpearStateMachine stateMachine; // 현재 행동 상태
-        private readonly UnitStagger stagger;
 
         public float CurrentHealth => Health.CurrentHealth; // 현재 체력
-        public float CurrentStagger => stagger.CurrentStagger;
+        public float CurrentStagger => Stagger.CurrentStagger;
         public int CurrentPhase => stateMachine.CurrentPhase;
         public string CurrentStateName => stateMachine.CurrentStateName;
         public string CurrentAttackName => stateMachine.CurrentAttackName;
@@ -21,13 +20,17 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             float staggerLimit,
             float staggerRecoverDelay,
             float staggerRecoverSpeed)
-            : base(maxHealth)
-        {
-            this.stateMachine = stateMachine;
-            stagger = new UnitStagger(
+            : base(
+                maxHealth,
                 staggerLimit,
                 staggerRecoverDelay,
-                staggerRecoverSpeed);
+                staggerRecoverSpeed,
+                0f,
+                0f,
+                0f,
+                0f)
+        {
+            this.stateMachine = stateMachine;
         }
 
         public void TakeDamage(float damage)
@@ -41,20 +44,18 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             stateMachine.ChangeToHitState();
         }
 
-        public AttackHitResult ApplyHit(in AttackHitData hit)
+        protected override void HandleAttackHitResult(
+            in AttackHitResult result)
         {
-            AttackHitResult hitResult = ApplyHealthAndStaggerHit(
-                in hit,
-                stagger);
-            if (hitResult == AttackHitResult.Damaged ||
-                hitResult == AttackHitResult.Staggered)
+            if (result.Type == AttackHitResultType.Staggered ||
+                result.Type == AttackHitResultType.KnockedDown)
             {
                 stateMachine.SetHealthRatio(
                     Health.CurrentHealth / Health.MaxHealth);
-                stateMachine.ChangeToHitState(in hit);
+                HitReaction reaction = result.Reaction;
+                stateMachine.ChangeToHitState(
+                    in reaction);
             }
-
-            return hitResult;
         }
 
         protected override void OnUnitCreate()
@@ -64,13 +65,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
         protected override void OnEnemyEnable()
         {
-            stagger.Reset();
             stateMachine.Enable();
         }
 
         protected override void OnUnitTick(float deltaTime)
         {
-            stagger.Update(deltaTime);
             stateMachine.Update(deltaTime);
         }
         protected override void OnUnitDisable() => stateMachine.Disable();

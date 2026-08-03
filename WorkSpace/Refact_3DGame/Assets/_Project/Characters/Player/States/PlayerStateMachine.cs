@@ -272,7 +272,7 @@ namespace rudIsland.RPG3D.Player.States
             ChangeToHitState(in reaction);
         }
 
-        internal void ChangeToHitState(in AttackHitData hit)
+        internal void ChangeToHitState(in AttackHitInput hit)
         {
             HitReaction reaction = HitReaction.Create(
                 in hit,
@@ -281,7 +281,7 @@ namespace rudIsland.RPG3D.Player.States
             ChangeToHitState(in reaction);
         }
 
-        private void ChangeToHitState(in HitReaction reaction)
+        internal void ChangeToHitState(in HitReaction reaction)
         {
             if (!isEnabled || ReferenceEquals(currentState, deadState))
             {

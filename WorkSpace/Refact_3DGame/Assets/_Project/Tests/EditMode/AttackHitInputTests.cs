@@ -5,13 +5,15 @@ using UnityEngine;
 
 namespace rudIsland.RPG3D.Tests
 {
-    public sealed class AttackHitDataTests
+    public sealed class AttackHitInputTests
     {
         private sealed class RecordingHitReceiver : IAttackHitReceiver
         {
-            public AttackHitData LastHit { get; private set; } // 피격 또는 피해 관련 값
+            public AttackHitInput LastHit { get; private set; } // 피격 또는 피해 관련 값
+            public bool CanTakeHit => true;
+            public int ActivationSequence => 1;
 
-            public AttackHitResult ReceiveHit(in AttackHitData hit)
+            public AttackHitResult ReceiveAttackHit(in AttackHitInput hit)
             {
                 LastHit = hit;
                 return AttackHitResult.Damaged;
@@ -21,7 +23,7 @@ namespace rudIsland.RPG3D.Tests
         [Test]
         public void Constructor_StoresDamageTeamAndAttackNumber()
         {
-            var hitData = new AttackHitData(
+            var hitData = new AttackHitInput(
                 new AttackDamage(12.5f),
                 UnitTeam.Player,
                 3);
@@ -37,7 +39,7 @@ namespace rudIsland.RPG3D.Tests
         [Test]
         public void Constructor_StoresSeparateStaggerDamage()
         {
-            var hitData = new AttackHitData(
+            var hitData = new AttackHitInput(
                 new AttackDamage(12.5f),
                 UnitTeam.Player,
                 3,
@@ -53,7 +55,7 @@ namespace rudIsland.RPG3D.Tests
         [Test]
         public void Constructor_StoresHitStrength()
         {
-            var hitData = new AttackHitData(
+            var hitData = new AttackHitInput(
                 new AttackDamage(12.5f),
                 UnitTeam.Player,
                 3,
@@ -67,7 +69,7 @@ namespace rudIsland.RPG3D.Tests
         [Test]
         public void CreateWithHitContact_StoresContactResult()
         {
-            var hitData = new AttackHitData(
+            var hitData = new AttackHitInput(
                 new AttackDamage(10f),
                 UnitTeam.Player,
                 1,
@@ -82,7 +84,7 @@ namespace rudIsland.RPG3D.Tests
                 HitBodyPart.Head,
                 4.5f);
 
-            AttackHitData hitWithContact =
+            AttackHitInput hitWithContact =
                 hitData.CreateWithHitContact(in contact);
 
             Assert.That(hitWithContact.HitPoint, Is.EqualTo(hitPoint));
@@ -104,10 +106,10 @@ namespace rudIsland.RPG3D.Tests
         }
 
         [Test]
-        public void ReceiveHit_PassesOneAttackHitDataValue()
+        public void ReceiveAttackHit_PassesOneAttackHitInputValue()
         {
             var receiver = new RecordingHitReceiver();
-            AttackHitData hitData = new AttackHitData(
+            AttackHitInput hitData = new AttackHitInput(
                 new AttackDamage(7.5f),
                 UnitTeam.Enemy,
                 2);
@@ -118,7 +120,7 @@ namespace rudIsland.RPG3D.Tests
                 HitBodyPart.Body);
             hitData = hitData.CreateWithHitContact(in contact);
 
-            AttackHitResult hitResult = receiver.ReceiveHit(in hitData);
+            AttackHitResult hitResult = receiver.ReceiveAttackHit(in hitData);
 
             Assert.That(receiver.LastHit.Damage.HealthDamage, Is.EqualTo(7.5f));
             Assert.That(receiver.LastHit.AttackerTeam, Is.EqualTo(UnitTeam.Enemy));
@@ -134,7 +136,7 @@ namespace rudIsland.RPG3D.Tests
             Assert.That(
                 receiver.LastHit.HitBodyPart,
                 Is.EqualTo(HitBodyPart.Body));
-            Assert.That(hitResult, Is.EqualTo(AttackHitResult.Damaged));
+            Assert.That(hitResult.Type, Is.EqualTo(AttackHitResultType.Damaged));
         }
 
         [Test]

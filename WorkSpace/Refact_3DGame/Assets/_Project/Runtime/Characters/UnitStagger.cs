@@ -35,22 +35,39 @@ namespace rudIsland.RPG3D.Characters
         // 유효한 경직 피해를 누적하고 한계에 도달했는지를 반환한다.
         public bool AddStaggerDamage(float staggerDamage)
         {
+            bool reachedLimit = WillReachLimit(staggerDamage);
+            ApplyConfirmedDamage(staggerDamage, reachedLimit);
+            return reachedLimit;
+        }
+
+        // 계산기가 현재 값만 읽고 경직 한계 도달 여부를 판단하게 한다.
+        public bool WillReachLimit(float staggerDamage)
+        {
+            return IsPositiveFinite(staggerDamage) &&
+                CurrentStagger + staggerDamage >= StaggerLimit;
+        }
+
+        // 계산이 끝난 경직 결과를 한 번만 반영한다.
+        public void ApplyConfirmedDamage(
+            float staggerDamage,
+            bool reachedLimit)
+        {
             if (!IsPositiveFinite(staggerDamage))
             {
-                return false;
+                return;
             }
 
-            float nextStagger = CurrentStagger + staggerDamage;
-            if (nextStagger >= StaggerLimit)
+            if (reachedLimit)
             {
                 CurrentStagger = 0f;
                 remainingRecoverDelay = 0f;
-                return true;
+                return;
             }
 
-            CurrentStagger = nextStagger;
+            CurrentStagger = Math.Min(
+                StaggerLimit,
+                CurrentStagger + staggerDamage);
             remainingRecoverDelay = staggerRecoverDelay;
-            return false;
         }
 
         // 마지막 경직 피해 이후 대기 시간이 끝나면 현재 경직을 줄인다.

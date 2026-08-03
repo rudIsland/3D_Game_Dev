@@ -26,17 +26,18 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
             stateMachine.ChangeToHitState();
         }
 
-        public AttackHitResult ApplyHit(in AttackHitData hit)
+        protected override void HandleAttackHitResult(
+            in AttackHitResult result)
         {
-            AttackHitResult hitResult = ApplyHealthHit(in hit);
-            if (hitResult == AttackHitResult.Damaged)
+            if (result.Type == AttackHitResultType.Staggered ||
+                result.Type == AttackHitResultType.KnockedDown)
             {
                 stateMachine.SetHealthRatio(
                     Health.CurrentHealth / Health.MaxHealth);
-                stateMachine.ChangeToHitState(in hit);
+                HitReaction reaction = result.Reaction;
+                stateMachine.ChangeToHitState(
+                    in reaction);
             }
-
-            return hitResult;
         }
 
         protected override void OnUnitCreate()

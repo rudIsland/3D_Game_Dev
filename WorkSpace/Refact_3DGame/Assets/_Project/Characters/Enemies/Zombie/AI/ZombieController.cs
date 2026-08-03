@@ -122,14 +122,25 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             RequestDespawn();
         }
 
-        public AttackHitResult ReceiveHit(in AttackHitData hit)
+        public bool CanTakeHit =>
+            zombieWorldUnit != null &&
+            zombieWorldUnit.CanTakeHit;
+
+        public int ActivationSequence =>
+            zombieWorldUnit != null
+                ? zombieWorldUnit.ActivationSequence
+                : 0;
+
+        public AttackHitResult ReceiveAttackHit(in AttackHitInput hit)
         {
-            if (zombieWorldUnit == null)
+            if (!CanTakeHit)
             {
                 return AttackHitResult.Ignored;
             }
 
-            return zombieWorldUnit.ApplyHit(in hit);
+            return zombieWorldUnit.ReceiveAttackHit(
+                in hit,
+                transform.forward);
         }
 
         public void StartAttackHit(int attackNumber)
@@ -151,13 +162,18 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
             EndAttackHit();
 
-            var hit = new AttackHitData(
+            var hit = new AttackHitInput(
                 hitSettings.Damage,
                 UnitTeam.Enemy,
                 attackNumber,
                 hitSettings.Strength,
                 hitSettings.StaggerDamage,
-                hitSettings.PushDistance);
+                hitSettings.BlockStaminaDamage,
+                hitSettings.CanBeBlocked,
+                hitSettings.CanBeParried,
+                hitSettings.PushDistance,
+                hitSettings.HitStopTime,
+                default);
             activeHitDetector = hitSettings.HitDetector;
             activeHitDetector.StartHit(in hit);
         }

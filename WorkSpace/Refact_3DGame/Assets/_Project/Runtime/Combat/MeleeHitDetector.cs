@@ -29,7 +29,7 @@ namespace rudIsland.RPG3D.Combat
 
         private PhysicsScene physicsScene; // 내부에서 사용하는 값
         private CombatHitResolver hitResolver; // 피격 또는 피해 관련 값
-        private AttackHitData currentHit; // 피격 또는 피해 관련 값
+        private AttackHitInput currentHit; // 피격 또는 피해 관련 값
         private Vector3 previousShapeStartPosition; // 이동 정보
         private Vector3 previousShapeMiddlePosition; // 이동 정보
         private Vector3 previousShapeEndPosition; // 이동 정보
@@ -39,7 +39,7 @@ namespace rudIsland.RPG3D.Combat
         private int currentAttackSequence; // 공격 관련 설정 또는 상태
 
         internal bool IsHitActive => isHitActive; // 기능 사용 여부
-        public event Action<AttackHitResult, AttackHitData> HitResultReady; // 피격 또는 피해 관련 값
+        public event Action<AttackHitResult, AttackHitInput> HitResultReady; // 피격 또는 피해 관련 값
 
         private void Awake()
         {
@@ -56,7 +56,7 @@ namespace rudIsland.RPG3D.Combat
         }
 
         // 새로운 공격의 실제 타격 구간을 연다.
-        public void StartHit(in AttackHitData hit)
+        public void StartHit(in AttackHitInput hit)
         {
             if (!hit.Damage.IsValid)
             {
@@ -103,6 +103,7 @@ namespace rudIsland.RPG3D.Combat
         private void OnDisable()
         {
             EndHit();
+            IncreaseAttackSequence();
         }
 
         // Unity 생명주기와 실제 검색을 분리하여 같은 흐름을 테스트할 수 있게 한다.
@@ -438,7 +439,7 @@ namespace rudIsland.RPG3D.Combat
                 hitNormal,
                 hitDirection,
                 hitTarget.BodyPart);
-            AttackHitData hitWithContact =
+            AttackHitInput hitWithContact =
                 currentHit.CreateWithHitContact(in contact);
 
             if (hitResolver == null)
@@ -459,9 +460,15 @@ namespace rudIsland.RPG3D.Combat
 
         internal void NotifyHitResolved(
             AttackHitResult hitResult,
-            in AttackHitData hit)
+            in AttackHitInput hit)
         {
             HitResultReady?.Invoke(hitResult, hit);
+        }
+
+        internal bool MatchesAttackSequence(int attackSequence)
+        {
+            return currentAttackSequence == 0 ||
+                currentAttackSequence == attackSequence;
         }
 
         private void IncreaseAttackSequence()

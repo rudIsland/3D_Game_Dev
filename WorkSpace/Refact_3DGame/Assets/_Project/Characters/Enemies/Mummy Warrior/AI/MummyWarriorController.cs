@@ -135,14 +135,25 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
             return mummyWorldUnit;
         }
 
-        public AttackHitResult ReceiveHit(in AttackHitData hit)
+        public bool CanTakeHit =>
+            mummyWorldUnit != null &&
+            mummyWorldUnit.CanTakeHit;
+
+        public int ActivationSequence =>
+            mummyWorldUnit != null
+                ? mummyWorldUnit.ActivationSequence
+                : 0;
+
+        public AttackHitResult ReceiveAttackHit(in AttackHitInput hit)
         {
-            if (mummyWorldUnit == null)
+            if (!CanTakeHit)
             {
                 return AttackHitResult.Ignored;
             }
 
-            return mummyWorldUnit.ApplyHit(in hit);
+            return mummyWorldUnit.ReceiveAttackHit(
+                in hit,
+                transform.forward);
         }
 
         private void StartAttackHit(
@@ -151,10 +162,18 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
         {
             if (pattern == null || !pattern.Damage.IsValid) return;
 
-            var hit = new AttackHitData(
+            var hit = new AttackHitInput(
                 pattern.Damage,
                 UnitTeam.Enemy,
-                attackNumber);
+                attackNumber,
+                HitStrength.Light,
+                pattern.Damage.HealthDamage,
+                0f,
+                true,
+                true,
+                0f,
+                0f,
+                default);
             lanceHitDetector.StartHit(in hit);
         }
 

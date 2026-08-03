@@ -213,14 +213,25 @@ namespace rudIsland.RPG3D.Player
             playerWorldUnit?.TakeDamage(damage);
         }
 
-        public AttackHitResult ReceiveHit(in AttackHitData hit)
+        public bool CanTakeHit =>
+            playerWorldUnit != null &&
+            playerWorldUnit.CanTakeHit;
+
+        public int ActivationSequence =>
+            playerWorldUnit != null
+                ? playerWorldUnit.ActivationSequence
+                : 0;
+
+        public AttackHitResult ReceiveAttackHit(in AttackHitInput hit)
         {
-            if (playerWorldUnit == null)
+            if (!CanTakeHit)
             {
                 return AttackHitResult.Ignored;
             }
 
-            return playerWorldUnit.ApplyHit(in hit);
+            return playerWorldUnit.ReceiveAttackHit(
+                in hit,
+                transform.forward);
         }
 
         public void StartAttackHit(int attackNumber)
@@ -236,13 +247,18 @@ namespace rudIsland.RPG3D.Player
                 return;
             }
 
-            var hit = new AttackHitData(
+            var hit = new AttackHitInput(
                 hitSettings.Damage,
                 UnitTeam.Player,
                 attackNumber,
                 hitSettings.Strength,
                 hitSettings.StaggerDamage,
-                hitSettings.PushDistance);
+                hitSettings.BlockStaminaDamage,
+                hitSettings.CanBeBlocked,
+                hitSettings.CanBeParried,
+                hitSettings.PushDistance,
+                hitSettings.HitStopTime,
+                default);
             activeHitDetector = hitSettings.HitDetector;
             activeHitDetector.StartHit(in hit);
         }

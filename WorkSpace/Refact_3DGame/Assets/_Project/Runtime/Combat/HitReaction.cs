@@ -46,7 +46,7 @@ namespace rudIsland.RPG3D.Combat
 
         // 공격이 밀어내는 방향의 반대쪽을 공격이 들어온 위치로 판단한다.
         public static HitReaction Create(
-            in AttackHitData hit,
+            in AttackHitInput hit,
             Vector3 victimForward,
             Vector3 victimRight)
         {

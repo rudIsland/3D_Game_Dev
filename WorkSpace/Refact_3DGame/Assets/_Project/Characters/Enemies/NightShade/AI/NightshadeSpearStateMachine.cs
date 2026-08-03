@@ -169,7 +169,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             ChangeToHitStateInternal();
         }
 
-        public void ChangeToHitState(in AttackHitData hit)
+        public void ChangeToHitState(in AttackHitInput hit)
         {
             if (!isEnabled || ReferenceEquals(currentState, deadState))
             {
@@ -382,6 +382,17 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         internal bool IsActionTransitioning()
         {
             return animation.IsActionTransitioning();
+        }
+
+        internal void ChangeToHitState(in HitReaction reaction)
+        {
+            if (!isEnabled || ReferenceEquals(currentState, deadState))
+            {
+                return;
+            }
+
+            hitState.SetHitReaction(in reaction);
+            ChangeToHitStateInternal();
         }
 
         private void ChangeToHitStateInternal()

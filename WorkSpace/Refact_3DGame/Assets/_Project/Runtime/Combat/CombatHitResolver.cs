@@ -25,11 +25,12 @@ namespace rudIsland.RPG3D.Combat
             MeleeHitDetector sourceDetector,
             int attackSequence,
             IAttackHitReceiver receiver,
-            in AttackHitData hit)
+            in AttackHitInput hit)
         {
             if (!isActiveAndEnabled ||
                 sourceDetector == null ||
-                !IsReceiverAvailable(receiver))
+                !IsReceiverAvailable(receiver) ||
+                !receiver.CanTakeHit)
             {
                 return false;
             }
@@ -46,7 +47,9 @@ namespace rudIsland.RPG3D.Combat
             pendingHits.Add(
                 new PendingHit(
                     sourceDetector,
+                    attackSequence,
                     receiver,
+                    receiver.ActivationSequence,
                     hit));
             return true;
         }
@@ -86,7 +89,12 @@ namespace rudIsland.RPG3D.Combat
 
         private static void ResolveHit(PendingHit pendingHit)
         {
-            if (!IsReceiverAvailable(pendingHit.Receiver))
+            if (!IsReceiverAvailable(pendingHit.Receiver) ||
+                !pendingHit.Receiver.CanTakeHit ||
+                pendingHit.Receiver.ActivationSequence !=
+                    pendingHit.TargetActivationSequence ||
+                !pendingHit.SourceDetector.MatchesAttackSequence(
+                    pendingHit.AttackSequence))
             {
                 return;
             }
@@ -94,9 +102,9 @@ namespace rudIsland.RPG3D.Combat
             AttackHitResult hitResult;
             try
             {
-                AttackHitData hit = pendingHit.Hit;
+                AttackHitInput hit = pendingHit.Hit;
                 hitResult =
-                    pendingHit.Receiver.ReceiveHit(in hit);
+                    pendingHit.Receiver.ReceiveAttackHit(in hit);
             }
             catch (Exception exception)
             {
@@ -108,7 +116,7 @@ namespace rudIsland.RPG3D.Combat
 
             if (pendingHit.SourceDetector != null)
             {
-                AttackHitData hit = pendingHit.Hit;
+                AttackHitInput hit = pendingHit.Hit;
                 pendingHit.SourceDetector.NotifyHitResolved(
                     hitResult,
                     in hit);
@@ -139,15 +147,21 @@ namespace rudIsland.RPG3D.Combat
         {
             internal MeleeHitDetector SourceDetector { get; } // 씬 또는 시스템 참조
             internal IAttackHitReceiver Receiver { get; } // 외부에 제공하는 읽기 값
-            internal AttackHitData Hit { get; } // 피격 또는 피해 관련 값
+            internal int AttackSequence { get; } // 공격 관련 설정 또는 상태
+            internal int TargetActivationSequence { get; } // 풀 활성화 순번
+            internal AttackHitInput Hit { get; } // 피격 또는 피해 관련 값
 
             internal PendingHit(
                 MeleeHitDetector sourceDetector,
+                int attackSequence,
                 IAttackHitReceiver receiver,
-                AttackHitData hit)
+                int targetActivationSequence,
+                AttackHitInput hit)
             {
                 SourceDetector = sourceDetector;
                 Receiver = receiver;
+                AttackSequence = attackSequence;
+                TargetActivationSequence = targetActivationSequence;
                 Hit = hit;
             }
         }

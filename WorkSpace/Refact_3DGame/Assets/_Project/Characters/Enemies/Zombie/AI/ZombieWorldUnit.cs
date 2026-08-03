@@ -6,10 +6,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
     public sealed class ZombieWorldUnit : EnemyUnit
     {
         private readonly ZombieStateMachine stateMachine; // 현재 행동 상태
-        private readonly UnitStagger unitStagger; // 현재 경직 누적값과 회복 규칙
 
         public float CurrentHealth => Health.CurrentHealth; // 현재 체력
-        public float CurrentStagger => unitStagger.CurrentStagger; // 현재 경직 누적값
+        public float CurrentStagger => Stagger.CurrentStagger; // 현재 경직 누적값
         public HitReaction LastHitReaction =>
             stateMachine.LastHitReaction;
 
@@ -19,12 +18,16 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             float staggerRecoverDelay,
             float staggerRecoverSpeed,
             ZombieStateMachine stateMachine)
-            : base(maxHealth)
-        {
-            unitStagger = new UnitStagger(
+            : base(
+                maxHealth,
                 staggerLimit,
                 staggerRecoverDelay,
-                staggerRecoverSpeed);
+                staggerRecoverSpeed,
+                0f,
+                0f,
+                0f,
+                0f)
+        {
             this.stateMachine = stateMachine;
         }
 
@@ -47,16 +50,16 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             stateMachine.ChangeToHitState();
         }
 
-        internal AttackHitResult ApplyHit(in AttackHitData hit)
+        protected override void HandleAttackHitResult(
+            in AttackHitResult result)
         {
-            AttackHitResult hitResult =
-                ApplyHealthAndStaggerHit(in hit, unitStagger);
-            if (hitResult == AttackHitResult.Staggered)
+            if (result.Type == AttackHitResultType.Staggered ||
+                result.Type == AttackHitResultType.KnockedDown)
             {
-                stateMachine.ChangeToHitState(in hit);
+                HitReaction reaction = result.Reaction;
+                stateMachine.ChangeToHitState(
+                    in reaction);
             }
-
-            return hitResult;
         }
 
         internal void NotifyAttackAnimationEnded()
@@ -91,17 +94,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         protected override void OnEnemyEnable()
         {
-            unitStagger.Reset();
             stateMachine.Enable();
         }
 
         protected override void OnUnitTick(float deltaTime)
         {
-            if (!IsDead)
-            {
-                unitStagger.Update(deltaTime);
-            }
-
             stateMachine.Update(deltaTime);
         }
 

@@ -7,5 +7,32 @@ namespace rudIsland.RPG3D.Characters
             : base(UnitTeam.Player, maxHealth)
         {
         }
+
+        protected PlayerUnit(
+            float maxHealth,
+            float staggerLimit,
+            float staggerRecoverDelay,
+            float staggerRecoverSpeed,
+            float maxStamina,
+            float staminaRecoverDelay,
+            float staminaRecoverSpeed,
+            float guardAngle)
+            : base(
+                UnitTeam.Player,
+                maxHealth,
+                staggerLimit,
+                staggerRecoverDelay,
+                staggerRecoverSpeed,
+                maxStamina,
+                staminaRecoverDelay,
+                staminaRecoverSpeed,
+                guardAngle)
+        {
+        }
+
+        protected override void OnUnitResourceEnable()
+        {
+            Stamina.Reset();
+        }
     }
 }

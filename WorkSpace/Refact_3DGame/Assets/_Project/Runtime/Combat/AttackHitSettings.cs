@@ -12,7 +12,11 @@ namespace rudIsland.RPG3D.Combat
         [SerializeField] private AttackDamage damage; // 피격 또는 피해 관련 값
         [SerializeField] private HitStrength strength; // 피격 반응의 세기
         [SerializeField, Min(0f)] private float staggerDamage; // 경직 수치에 더할 값
+        [SerializeField, Min(0f)] private float blockStaminaDamage; // 가드 시 감소시킬 Stamina
+        [SerializeField] private bool canBeBlocked; // 가드 가능 여부
+        [SerializeField] private bool canBeParried; // 패리 가능 여부
         [SerializeField, Min(0f)] private float pushDistance; // 거리 설정
+        [SerializeField, Min(0f)] private float hitStopTime; // 피격 정지 시간
 
         public int AttackNumber => attackNumber; // 공격 관련 설정 또는 상태
         public MeleeHitDetector HitDetector => hitDetector; // 피격 또는 피해 관련 값
@@ -26,13 +30,27 @@ namespace rudIsland.RPG3D.Combat
             staggerDamage > 0f &&
             !float.IsNaN(staggerDamage) &&
             !float.IsInfinity(staggerDamage)
-                ? staggerDamage
+                    ? staggerDamage
+                    : 0f;
+        public float BlockStaminaDamage =>
+            blockStaminaDamage > 0f &&
+            !float.IsNaN(blockStaminaDamage) &&
+            !float.IsInfinity(blockStaminaDamage)
+                ? blockStaminaDamage
                 : 0f;
+        public bool CanBeBlocked => canBeBlocked;
+        public bool CanBeParried => canBeParried;
         public float PushDistance => // 거리 설정
             pushDistance > 0f &&
             !float.IsNaN(pushDistance) &&
             !float.IsInfinity(pushDistance)
                 ? pushDistance
+                : 0f;
+        public float HitStopTime =>
+            hitStopTime > 0f &&
+            !float.IsNaN(hitStopTime) &&
+            !float.IsInfinity(hitStopTime)
+                ? hitStopTime
                 : 0f;
 
         public AttackHitSettings(
@@ -47,7 +65,11 @@ namespace rudIsland.RPG3D.Combat
                 damage,
                 HitStrength.Light,
                 staggerDamage,
-                pushDistance)
+                pushDistance,
+                0f,
+                true,
+                true,
+                0f)
         {
         }
 
@@ -58,6 +80,31 @@ namespace rudIsland.RPG3D.Combat
             HitStrength strength,
             float staggerDamage,
             float pushDistance)
+            : this(
+                attackNumber,
+                hitDetector,
+                damage,
+                strength,
+                staggerDamage,
+                pushDistance,
+                0f,
+                true,
+                true,
+                0f)
+        {
+        }
+
+        public AttackHitSettings(
+            int attackNumber,
+            MeleeHitDetector hitDetector,
+            AttackDamage damage,
+            HitStrength strength,
+            float staggerDamage,
+            float pushDistance,
+            float blockStaminaDamage,
+            bool canBeBlocked,
+            bool canBeParried,
+            float hitStopTime)
         {
             this.attackNumber = attackNumber;
             this.hitDetector = hitDetector;
@@ -65,6 +112,10 @@ namespace rudIsland.RPG3D.Combat
             this.strength = strength;
             this.staggerDamage = staggerDamage;
             this.pushDistance = pushDistance;
+            this.blockStaminaDamage = blockStaminaDamage;
+            this.canBeBlocked = canBeBlocked;
+            this.canBeParried = canBeParried;
+            this.hitStopTime = hitStopTime;
         }
 
         public static bool TryFind(

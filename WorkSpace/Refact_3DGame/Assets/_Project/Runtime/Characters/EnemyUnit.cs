@@ -10,11 +10,35 @@ namespace rudIsland.RPG3D.Characters
         {
         }
 
-        protected sealed override void OnUnitEnable()
+        protected EnemyUnit(
+            float maxHealth,
+            float staggerLimit,
+            float staggerRecoverDelay,
+            float staggerRecoverSpeed,
+            float maxStamina,
+            float staminaRecoverDelay,
+            float staminaRecoverSpeed,
+            float guardAngle)
+            : base(
+                UnitTeam.Enemy,
+                maxHealth,
+                staggerLimit,
+                staggerRecoverDelay,
+                staggerRecoverSpeed,
+                maxStamina,
+                staminaRecoverDelay,
+                staminaRecoverSpeed,
+                guardAngle)
+        {
+        }
+
+        protected override void OnUnitResourceEnable()
         {
             Health.Reset();
-            OnEnemyEnable();
+            Stamina.Reset();
         }
+
+        protected sealed override void OnUnitEnable() => OnEnemyEnable();
 
         protected virtual void OnEnemyEnable()
         {

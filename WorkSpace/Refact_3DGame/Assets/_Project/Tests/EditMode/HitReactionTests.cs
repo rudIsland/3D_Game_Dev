@@ -113,7 +113,7 @@ namespace rudIsland.RPG3D.Tests
                 Vector3.forward,
                 pushDirection,
                 bodyPart);
-            var hit = new AttackHitData(
+            var hit = new AttackHitInput(
                 new AttackDamage(10f),
                 UnitTeam.Player,
                 1,
