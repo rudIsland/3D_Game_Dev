@@ -20,6 +20,7 @@ namespace rudIsland.RPG3D.Player.States.Block
         public void Enter()
         {
             animationController.StopMove();
+            stateMachine.SetAttackDirection(true);
             animationController.SetBlocking(true);
         }
 
@@ -35,6 +36,7 @@ namespace rudIsland.RPG3D.Player.States.Block
         {
             animationController.StopMove();
             animationController.SetBlocking(false);
+            stateMachine.ClearAttackDirection();
         }
     }
 }

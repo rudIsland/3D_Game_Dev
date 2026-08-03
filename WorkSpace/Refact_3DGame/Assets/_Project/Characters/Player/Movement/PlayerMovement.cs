@@ -30,7 +30,6 @@ namespace rudIsland.RPG3D.Player.Movement
         public Vector3 Forward => playerTransform.forward; // 플레이어가 바라보는 방향
         public Vector3 Right => playerTransform.right; // 플레이어의 오른쪽 방향
 
-        public bool UsesSprintRoll { get; private set; } // 기능 사용 여부
         public Vector2 RollDirectionInput { get; private set; } // 입력 또는 행동 여부
 
         public PlayerMovement(
@@ -151,8 +150,6 @@ namespace rudIsland.RPG3D.Player.Movement
                 }
             }
 
-            UsesSprintRoll = playerInput.IsSprinting &&
-                playerInput.MoveValue.sqrMagnitude > 0.01f;
             verticalSpeed = groundPull;
         }
 

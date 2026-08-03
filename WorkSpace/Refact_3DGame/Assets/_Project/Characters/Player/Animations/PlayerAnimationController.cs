@@ -13,7 +13,6 @@ namespace rudIsland.RPG3D.Player.Animations
         private static readonly int BlockMoveXId = Animator.StringToHash("BlockMoveX"); // 이동 정보
         private static readonly int BlockMoveYId = Animator.StringToHash("BlockMoveY"); // 이동 정보
         private static readonly int RollId = Animator.StringToHash("Roll"); // 내부에서 사용하는 값
-        private static readonly int SprintRollId = Animator.StringToHash("SprintRoll"); // 내부에서 사용하는 값
         private static readonly int IsBlockingId = Animator.StringToHash("IsBlocking"); // 기능 사용 여부
         private static readonly int AttackId = Animator.StringToHash("Attack"); // 공격 관련 설정 또는 상태
         private static readonly int AttackIndexId = Animator.StringToHash("AttackIndex"); // 공격 관련 설정 또는 상태
@@ -22,11 +21,9 @@ namespace rudIsland.RPG3D.Player.Animations
         private static readonly int PlayerHitStateId = // 피격 또는 피해 관련 값
             Animator.StringToHash("PlayerHit");
         private static readonly int PlayerHitFullPathId = // 피격 또는 피해 관련 값
-            Animator.StringToHash("Base Layer.PlayerHit");
+            Animator.StringToHash("PlayerHit");
         private static readonly int PlayerRollStateId = // 현재 행동 상태
-            Animator.StringToHash("Base Layer.Movement.PlayerRoll");
-        private static readonly int PlayerSprintRollStateId = // 현재 행동 상태
-            Animator.StringToHash("Base Layer.Movement.PlayerSprintRoll");
+            Animator.StringToHash("PlayerRoll");
         private static readonly int PlayerAttack01StateId = Animator.StringToHash("PlayerAttack01"); // 공격 관련 설정 또는 상태
         private static readonly int PlayerAttack02StateId = Animator.StringToHash("PlayerAttack02"); // 공격 관련 설정 또는 상태
         private static readonly int PlayerAttack03StateId = Animator.StringToHash("PlayerAttack03"); // 공격 관련 설정 또는 상태
@@ -60,7 +57,6 @@ namespace rudIsland.RPG3D.Player.Animations
             playerAnimator.SetFloat(BlockMoveXId, 0f);
             playerAnimator.SetFloat(BlockMoveYId, 0f);
             playerAnimator.ResetTrigger(RollId);
-            playerAnimator.ResetTrigger(SprintRollId);
             playerAnimator.ResetTrigger(AttackId);
             playerAnimator.ResetTrigger(HitId);
             playerAnimator.ResetTrigger(DeathId);
@@ -78,7 +74,18 @@ namespace rudIsland.RPG3D.Player.Animations
             float moveAmount = inputAmount < 0.01f
                 ? 0f
                 : isSprinting ? inputAmount : inputAmount * 0.5090909f;
-            playerAnimator.SetFloat(MoveAmountId, moveAmount, smoothTime, deltaTime);
+            if (inputAmount < 0.01f)
+            {
+                playerAnimator.SetFloat(MoveAmountId, 0f);
+            }
+            else
+            {
+                playerAnimator.SetFloat(
+                    MoveAmountId,
+                    moveAmount,
+                    smoothTime,
+                    deltaTime);
+            }
             playerAnimator.SetFloat(InputDirXId, moveInput.x, smoothTime, deltaTime);
             playerAnimator.SetFloat(InputDirYId, moveInput.y, smoothTime, deltaTime);
             playerAnimator.SetBool(IsSprintingId, isSprinting);
@@ -99,7 +106,18 @@ namespace rudIsland.RPG3D.Player.Animations
             float moveAmount = inputAmount < 0.01f
                 ? 0f
                 : isSprinting ? inputAmount : inputAmount * 0.5090909f;
-            playerAnimator.SetFloat(MoveAmountId, moveAmount, smoothTime, deltaTime);
+            if (inputAmount < 0.01f)
+            {
+                playerAnimator.SetFloat(MoveAmountId, 0f);
+            }
+            else
+            {
+                playerAnimator.SetFloat(
+                    MoveAmountId,
+                    moveAmount,
+                    smoothTime,
+                    deltaTime);
+            }
             playerAnimator.SetFloat(InputDirXId, moveInput.x, smoothTime, deltaTime);
             playerAnimator.SetFloat(InputDirYId, moveInput.y, smoothTime, deltaTime);
             playerAnimator.SetBool(IsSprintingId, isSprinting);
@@ -128,7 +146,6 @@ namespace rudIsland.RPG3D.Player.Animations
 
         public void PlayRoll(
             Vector2 rollInput,
-            bool usesSprintRoll,
             bool startsAfterAttackCancel)
         {
             if (playerAnimator == null)
@@ -141,17 +158,14 @@ namespace rudIsland.RPG3D.Player.Animations
             playerAnimator.SetBool(IsBlockingId, false);
             playerAnimator.SetFloat(MoveAmountId, 0f);
             playerAnimator.ResetTrigger(RollId);
-            playerAnimator.ResetTrigger(SprintRollId);
 
             if (startsAfterAttackCancel)
             {
                 playerAnimator.ResetTrigger(AttackId);
                 playerAnimator.SetInteger(AttackIndexId, 0);
-                playerAnimator.SetTrigger(RollId);
-                return;
             }
 
-            playerAnimator.SetTrigger(usesSprintRoll ? SprintRollId : RollId);
+            playerAnimator.SetTrigger(RollId);
         }
 
         public void PlayAttack(int attackNumber)
@@ -180,7 +194,6 @@ namespace rudIsland.RPG3D.Player.Animations
             playerAnimator.SetFloat(BlockMoveXId, 0f);
             playerAnimator.SetFloat(BlockMoveYId, 0f);
             playerAnimator.ResetTrigger(RollId);
-            playerAnimator.ResetTrigger(SprintRollId);
             playerAnimator.ResetTrigger(AttackId);
             playerAnimator.ResetTrigger(HitId);
             playerAnimator.SetInteger(AttackIndexId, 0);
@@ -190,20 +203,10 @@ namespace rudIsland.RPG3D.Player.Animations
 
         public bool TryGetRollTime(out float normalizedTime)
         {
-            if (playbackReader.TryGetCurrentFullPathStateTime(
-                    0,
-                    PlayerRollStateId,
-                    out normalizedTime) ||
-                playbackReader.TryGetCurrentFullPathStateTime(
-                    0,
-                    PlayerSprintRollStateId,
-                    out normalizedTime))
-            {
-                return true;
-            }
-
-            normalizedTime = 0f;
-            return false;
+            return playbackReader.TryGetCurrentStateTime(
+                0,
+                PlayerRollStateId,
+                out normalizedTime);
         }
 
         public void PlayHitFromStart()
@@ -216,7 +219,6 @@ namespace rudIsland.RPG3D.Player.Animations
             playerAnimator.SetBool(IsBlockingId, false);
             playerAnimator.SetFloat(MoveAmountId, 0f);
             playerAnimator.ResetTrigger(RollId);
-            playerAnimator.ResetTrigger(SprintRollId);
             playerAnimator.ResetTrigger(AttackId);
             playerAnimator.SetInteger(AttackIndexId, 0);
 
