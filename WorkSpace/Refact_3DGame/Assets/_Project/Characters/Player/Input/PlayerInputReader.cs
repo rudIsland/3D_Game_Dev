@@ -10,6 +10,7 @@ namespace rudIsland.RPG3D.Player.Input
         private PlayerControls playerControls; // 내부에서 사용하는 값
         private bool hasRollInput; // 기능 사용 여부
         private bool hasAttackInput; // 기능 사용 여부
+        private bool hasTargetToggleInput; // 기능 사용 여부
 
         // 누르고 있는 동안 계속 유지되는 입력 상태다.
         public Vector2 MoveValue { get; private set; } // 이동 정보
@@ -51,6 +52,7 @@ namespace rudIsland.RPG3D.Player.Input
             IsBlocking = false;
             hasRollInput = false;
             hasAttackInput = false;
+            hasTargetToggleInput = false;
         }
 
         public void Destroy()
@@ -116,6 +118,25 @@ namespace rudIsland.RPG3D.Player.Input
             if (context.started)
             {
                 hasAttackInput = true;
+            }
+        }
+
+        public bool TakeTargetToggleInput()
+        {
+            if (!hasTargetToggleInput)
+            {
+                return false;
+            }
+
+            hasTargetToggleInput = false;
+            return true;
+        }
+
+        public void OnTargetToggle(InputAction.CallbackContext context)
+        {
+            if (context.started)
+            {
+                hasTargetToggleInput = true;
             }
         }
 

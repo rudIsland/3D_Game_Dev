@@ -52,6 +52,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "TargetToggle",
+                    "type": "Button",
+                    "id": "b7b54323-4d3d-4d5e-aeb9-cf70ef2a0145",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Shield",
                     "type": "Button",
                     "id": "00ae8658-3e27-4203-906a-13d6b029eb2e",
@@ -167,6 +176,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Attack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0e4090a5-d0db-445d-b90f-144629389065",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "TargetToggle",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

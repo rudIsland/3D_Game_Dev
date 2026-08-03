@@ -140,6 +140,15 @@ namespace rudIsland.RPG3D.Player.Input
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""TargetToggle"",
+                    ""type"": ""Button"",
+                    ""id"": ""b7b54323-4d3d-4d5e-aeb9-cf70ef2a0145"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""Shield"",
                     ""type"": ""Button"",
                     ""id"": ""00ae8658-3e27-4203-906a-13d6b029eb2e"",
@@ -260,6 +269,17 @@ namespace rudIsland.RPG3D.Player.Input
                 },
                 {
                     ""name"": """",
+                    ""id"": ""0e4090a5-d0db-445d-b90f-144629389065"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""TargetToggle"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""e3c7dabb-cae8-493b-b04f-79871406b38f"",
                     ""path"": ""<Mouse>/rightButton"",
                     ""interactions"": """",
@@ -292,6 +312,7 @@ namespace rudIsland.RPG3D.Player.Input
             m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
             m_Player_Roll = m_Player.FindAction("Roll", throwIfNotFound: true);
             m_Player_Attack = m_Player.FindAction("Attack", throwIfNotFound: true);
+            m_Player_TargetToggle = m_Player.FindAction("TargetToggle", throwIfNotFound: true);
             m_Player_Shield = m_Player.FindAction("Shield", throwIfNotFound: true);
             m_Player_ShieldImpactTest = m_Player.FindAction("ShieldImpactTest", throwIfNotFound: true);
         }
@@ -379,6 +400,7 @@ namespace rudIsland.RPG3D.Player.Input
         private readonly InputAction m_Player_Sprint;
         private readonly InputAction m_Player_Roll;
         private readonly InputAction m_Player_Attack;
+        private readonly InputAction m_Player_TargetToggle;
         private readonly InputAction m_Player_Shield;
         private readonly InputAction m_Player_ShieldImpactTest;
         /// <summary>
@@ -412,6 +434,10 @@ namespace rudIsland.RPG3D.Player.Input
             /// Provides access to the underlying input action "Player/Attack".
             /// </summary>
             public InputAction @Attack => m_Wrapper.m_Player_Attack;
+            /// <summary>
+            /// Provides access to the underlying input action "Player/TargetToggle".
+            /// </summary>
+            public InputAction @TargetToggle => m_Wrapper.m_Player_TargetToggle;
             /// <summary>
             /// Provides access to the underlying input action "Player/Shield".
             /// </summary>
@@ -461,6 +487,9 @@ namespace rudIsland.RPG3D.Player.Input
                 @Attack.started += instance.OnAttack;
                 @Attack.performed += instance.OnAttack;
                 @Attack.canceled += instance.OnAttack;
+                @TargetToggle.started += instance.OnTargetToggle;
+                @TargetToggle.performed += instance.OnTargetToggle;
+                @TargetToggle.canceled += instance.OnTargetToggle;
                 @Shield.started += instance.OnShield;
                 @Shield.performed += instance.OnShield;
                 @Shield.canceled += instance.OnShield;
@@ -493,6 +522,9 @@ namespace rudIsland.RPG3D.Player.Input
                 @Attack.started -= instance.OnAttack;
                 @Attack.performed -= instance.OnAttack;
                 @Attack.canceled -= instance.OnAttack;
+                @TargetToggle.started -= instance.OnTargetToggle;
+                @TargetToggle.performed -= instance.OnTargetToggle;
+                @TargetToggle.canceled -= instance.OnTargetToggle;
                 @Shield.started -= instance.OnShield;
                 @Shield.performed -= instance.OnShield;
                 @Shield.canceled -= instance.OnShield;
@@ -574,6 +606,13 @@ namespace rudIsland.RPG3D.Player.Input
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnAttack(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "TargetToggle" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnTargetToggle(InputAction.CallbackContext context);
             /// <summary>
             /// Method invoked when associated input action "Shield" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
