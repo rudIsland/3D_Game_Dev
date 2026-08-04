@@ -6,7 +6,7 @@ namespace rudIsland.RPG3D.Combat
         Ignored,
         Dodged,
         Parried,
-        Blocked,
+        Guarded,
         GuardBroken,
         Damaged,
         Staggered,

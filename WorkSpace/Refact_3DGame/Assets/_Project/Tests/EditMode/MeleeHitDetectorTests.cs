@@ -114,7 +114,7 @@ namespace rudIsland.RPG3D.Tests
         {
             MeleeHitDetector detector = CreateDetector();
             RecordingHitReceiver receiver = CreateTarget();
-            receiver.ResultToReturn = AttackHitResult.Blocked;
+            receiver.ResultToReturn = AttackHitResult.Guarded;
             int resultCount = 0;
             AttackHitResult receivedResult = AttackHitResult.Ignored;
             AttackHitInput receivedHit = default;
@@ -137,7 +137,7 @@ namespace rudIsland.RPG3D.Tests
             Assert.That(resultCount, Is.EqualTo(1));
             Assert.That(
                 receivedResult,
-                Is.EqualTo(AttackHitResult.Blocked));
+                Is.EqualTo(AttackHitResult.Guarded));
             Assert.That(
                 receivedHit.Damage.HealthDamage,
                 Is.EqualTo(10f));

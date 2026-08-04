@@ -41,7 +41,7 @@ namespace rudIsland.RPG3D.Combat
                     target.Stamina.CanSpend(hit.GuardStaminaDamage))
                 {
                     return new AttackHitResult(
-                        AttackHitResultType.Blocked,
+                        AttackHitResultType.Guarded,
                         0f,
                         hit.GuardStaminaDamage,
                         0f,

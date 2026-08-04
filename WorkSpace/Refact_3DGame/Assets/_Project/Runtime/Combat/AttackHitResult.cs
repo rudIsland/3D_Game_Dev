@@ -18,8 +18,8 @@ namespace rudIsland.RPG3D.Combat
         public static AttackHitResult Parried =>
             CreateWithoutDamage(AttackHitResultType.Parried);
 
-        public static AttackHitResult Blocked =>
-            CreateWithoutDamage(AttackHitResultType.Blocked);
+        public static AttackHitResult Guarded =>
+            CreateWithoutDamage(AttackHitResultType.Guarded);
 
         public static AttackHitResult Damaged =>
             CreateWithoutDamage(AttackHitResultType.Damaged);

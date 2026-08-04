@@ -315,7 +315,7 @@ Player와 Zombie가 서로 다른 필드 구조를 사용하지 않고 같은 �
 → 회피 중인가
 → 방어 방향 안인가
 → Stamina가 남았는가
-→ Dodged, Blocked, Guard Break 또는 Damaged
+→ Dodged, Guarded, Guard Break 또는 Damaged
 ```
 
 ### 12단계: 애니메이션 확장
@@ -402,7 +402,7 @@ AttackHitResult ReceiveHit(in AttackHitData hit);
 
 - `Ignored`
 - `Dodged`
-- `Blocked`
+- `Guarded`
 - `Damaged`
 - `Staggered`
 - `Killed`
@@ -419,7 +419,7 @@ AttackHitResult ReceiveHit(in AttackHitData hit);
 → 사망했는가
 ```
 
-2단계에서는 아직 `Dodged`, `Blocked`, `Staggered`를 실제 게임 상태에 연결하지 않고 결과 구조와 기존 피해 결과부터 안전하게 연결한다.
+2단계에서는 아직 `Dodged`, `Guarded`, `Staggered`를 실제 게임 상태에 연결하지 않고 결과 구조와 기존 피해 결과부터 안전하게 연결한다.
 
 ### 3단계: 방향성 피격 이동
 
@@ -507,7 +507,7 @@ Enemy 공격 입력
 → Player가 방어 중인지 확인
 → 공격 방향이 BlockAngle 안인지 확인
 → BlockStaminaDamage 소비
-→ Stamina가 남으면 Blocked
+→ Stamina가 남으면 Guarded
 → 부족하면 Guard Break와 Staggered
 ```
 
@@ -540,7 +540,7 @@ Damaged 또는 Staggered 결과
 
 - Light: `0.025~0.04초`
 - Heavy: `0.06~0.10초`
-- Blocked: `0.03~0.06초`
+- Guarded: `0.03~0.06초`
 
 정확한 값은 공격 애니메이션과 실제 Play 결과를 보며 조절한다.
 
@@ -572,7 +572,7 @@ Damaged 또는 Staggered 결과
 
 - Player가 공격하거나 피격된 경우만 기본 카메라 반응 허용
 - 화면 밖 Enemy끼리의 타격은 카메라를 흔들지 않음
-- Light, Heavy와 Blocked 결과에 따라 세기 구분
+- Light, Heavy와 Guarded 결과에 따라 세기 구분
 - 반복 공격에서 화면을 읽기 어려울 정도로 흔들리지 않도록 최대 세기 제한
 
 ### 11~13단계: 다른 Unit 확장
