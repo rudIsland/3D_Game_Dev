@@ -167,11 +167,75 @@ namespace rudIsland.RPG3D.Tests
             Assert.That(target.Stagger.CurrentStagger, Is.EqualTo(5f));
         }
 
+        [Test]
+        public void FrontGuardWithBlockableAttack_ReturnsGuarded()
+        {
+            var target = new TestUnit();
+            target.DefenseStatus.StartGuard();
+            var hit = CreateHit(
+                30f,
+                5f,
+                hitDirection: Vector3.back);
+
+            AttackHitResult result = target.ReceiveAttackHit(
+                in hit,
+                Vector3.forward);
+
+            Assert.That(result.Type, Is.EqualTo(AttackHitResultType.Guarded));
+            Assert.That(target.Health.CurrentHealth, Is.EqualTo(100f));
+            Assert.That(target.Stagger.CurrentStagger, Is.Zero);
+        }
+
+        [Test]
+        public void BackAttackWhileGuarding_ReturnsDamageResult()
+        {
+            var target = new TestUnit();
+            target.DefenseStatus.StartGuard();
+            var hit = CreateHit(
+                30f,
+                5f,
+                hitDirection: Vector3.forward);
+
+            AttackHitResult result = target.ReceiveAttackHit(
+                in hit,
+                Vector3.forward);
+
+            Assert.That(result.Type, Is.EqualTo(AttackHitResultType.Damaged));
+            Assert.That(target.Health.CurrentHealth, Is.EqualTo(70f));
+            Assert.That(target.Stagger.CurrentStagger, Is.EqualTo(5f));
+        }
+
+        [Test]
+        public void UnblockableAttackWhileGuarding_ReturnsDamageResult()
+        {
+            var target = new TestUnit();
+            target.DefenseStatus.StartGuard();
+            var hit = CreateHit(
+                30f,
+                5f,
+                canBeBlocked: false,
+                hitDirection: Vector3.back);
+
+            AttackHitResult result = target.ReceiveAttackHit(
+                in hit,
+                Vector3.forward);
+
+            Assert.That(result.Type, Is.EqualTo(AttackHitResultType.Damaged));
+            Assert.That(target.Health.CurrentHealth, Is.EqualTo(70f));
+        }
+
         private static AttackHitInput CreateHit(
             float healthDamage,
             float staggerDamage,
-            UnitTeam attackerTeam = UnitTeam.Player)
+            UnitTeam attackerTeam = UnitTeam.Player,
+            bool canBeBlocked = true,
+            Vector3 hitDirection = default)
         {
+            var contact = new HitContact(
+                Vector3.zero,
+                Vector3.zero,
+                hitDirection,
+                HitBodyPart.Body);
             return new AttackHitInput(
                 new AttackDamage(healthDamage),
                 attackerTeam,
@@ -179,11 +243,11 @@ namespace rudIsland.RPG3D.Tests
                 HitStrength.Light,
                 staggerDamage,
                 0f,
-                true,
+                canBeBlocked,
                 true,
                 0f,
                 0f,
-                default);
+                contact);
         }
     }
 }
