@@ -5100,7 +5100,7 @@ GameObject:
   - component: {fileID: 1699705001}
   - component: {fileID: 1699705002}
   - component: {fileID: 1699705003}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PlayerRoot
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -5222,7 +5222,12 @@ MonoBehaviour:
   staggerLimit: 10
   staggerRecoverDelay: 1
   staggerRecoverSpeed: 20
+  guardAngle: 120
   hitPushTime: 0.18
+  unitCollisionLayers:
+    serializedVersion: 2
+    m_Bits: 192
+  minimumUnitSeparation: 0.2
   testDamage: 10
   turnSpeed: 720
   walkSpeed: 2.5

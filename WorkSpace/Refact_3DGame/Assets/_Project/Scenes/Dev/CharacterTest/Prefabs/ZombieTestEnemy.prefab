@@ -1100,6 +1100,7 @@ MonoBehaviour:
       healthDamage: 10
     strength: 0
     staggerDamage: 10
+    canBeBlocked: 1
     pushDistance: 0.3
   - attackNumber: 2
     hitDetector: {fileID: 8191701687353553632}
@@ -1107,6 +1108,7 @@ MonoBehaviour:
       healthDamage: 10
     strength: 1
     staggerDamage: 10
+    canBeBlocked: 1
     pushDistance: 0.3
   - attackNumber: 3
     hitDetector: {fileID: 4652307759974324094}
@@ -1114,11 +1116,16 @@ MonoBehaviour:
       healthDamage: 10
     strength: 1
     staggerDamage: 10
+    canBeBlocked: 1
     pushDistance: 0.3
   staggerLimit: 20
   staggerRecoverDelay: 1
   staggerRecoverSpeed: 10
   hitPushTime: 0.18
+  unitCollisionLayers:
+    serializedVersion: 2
+    m_Bits: 192
+  minimumUnitSeparation: 0.2
   deadBodyKeepTime: 2
   testDamage: 100
   findRange: 30
