@@ -1,6 +1,5 @@
 using System;
 using rudIsland.RPG3D.Characters;
-using rudIsland.RPG3D.Combat;
 using rudIsland.RPG3D.Player;
 using rudIsland.RPG3D.World;
 using UnityEngine;
@@ -14,13 +13,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
     // Unity 입력과 일반 C# Nightshade 전투 로직을 연결한다.
     public sealed class NightshadeSpearController :
         WorldObjectView,
-        IAttackHitReceiver,
         IUnitDeathState
     {
         [Header("필수 연결")]
         [SerializeField] private Transform target; // 대상 참조
         [SerializeField] private Animator nightshadeAnimator; // 애니메이터 참조
-        [SerializeField] private MeleeHitDetector attackHitDetector; // 피격 또는 피해 관련 값
 
         [Header("추적 설정")]
         [SerializeField] private bool canTrackTarget = false; // 기능 사용 여부
@@ -30,11 +27,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         [SerializeField, Min(0f)] private float deadBodyKeepTime = 2f; // 시간 설정
         [SerializeField, Range(0.1f, 0.9f)] private float phaseTwoHealthRate = 0.6f;
 
-        [Header("경직")]
-        [SerializeField, Min(1f)] private float staggerLimit = 60f;
-        [SerializeField, Min(0f)] private float staggerRecoverDelay = 1.3f;
-        [SerializeField, Min(0f)] private float staggerRecoverSpeed = 18f;
-
         [Header("탐지와 이동")]
         [SerializeField, Min(0.1f)] private float findRange = 25f; // 거리 설정
         [SerializeField, Min(0.1f)] private float runStartRange = 6f; // 거리 설정
@@ -43,7 +35,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         [SerializeField, Min(1f)] private float turnSpeed = 300f; // 이동 속도
         [SerializeField] private float gravity = -22f; // Inspector 설정 값
         [SerializeField] private float groundPull = -2f; // Inspector 설정 값
-        [SerializeField, Min(0.01f)] private float hitPushTime = 0.18f;
 
         [Header("공격 목록")]
         [SerializeField] private NightshadeSpearAttackPattern[] attackPatterns = // 행동 설정 참조
@@ -119,8 +110,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 transform,
                 characterController,
                 gravity,
-                groundPull,
-                hitPushTime);
+                groundPull);
             var stateMachine = new NightshadeSpearStateMachine(
                 target,
                 movement,
@@ -140,61 +130,18 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
             nightshadeWorldUnit = new NightshadeSpearWorldUnit(
                 maxHealth,
-                stateMachine,
-                staggerLimit,
-                staggerRecoverDelay,
-                staggerRecoverSpeed);
+                stateMachine);
             return nightshadeWorldUnit;
         }
-
-        public bool CanTakeHit =>
-            nightshadeWorldUnit != null &&
-            nightshadeWorldUnit.CanTakeHit;
-
-        public int ActivationSequence =>
-            nightshadeWorldUnit != null
-                ? nightshadeWorldUnit.ActivationSequence
-                : 0;
-
-        public AttackHitResult ReceiveAttackHit(in AttackHitInput hit)
-        {
-            if (!CanTakeHit)
-            {
-                return AttackHitResult.Ignored;
-            }
-
-            return nightshadeWorldUnit.ReceiveAttackHit(
-                in hit,
-                transform.forward);
-        }
-
         private void StartAttackHit(
             NightshadeSpearAttackPattern pattern,
             int attackNumber)
         {
-            if (pattern == null || !pattern.Damage.IsValid || attackHitDetector == null) return;
-
-            var hit = new AttackHitInput(
-                pattern.Damage,
-                UnitTeam.Enemy,
-                attackNumber,
-                pattern.Strength,
-                pattern.StaggerDamage,
-                0f,
-                true,
-                true,
-                pattern.PushDistance,
-                0f,
-                default);
-            attackHitDetector.StartHit(in hit);
         }
 
         private void EndAttackHit()
         {
-            attackHitDetector?.EndHit();
-        }
-
-        private void RequestDeadNightshadeRelease()
+        }        private void RequestDeadNightshadeRelease()
         {
             if (standaloneWorldUnit != null)
             {
@@ -219,11 +166,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             if (nightshadeAnimator == null)
             {
                 nightshadeAnimator = GetComponentInChildren<Animator>(true);
-            }
-
-            if (attackHitDetector == null)
-            {
-                attackHitDetector = GetComponentInChildren<MeleeHitDetector>(true);
             }
         }
 
@@ -258,10 +200,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 phaseTwoHealthRate,
                 0.1f,
                 0.9f);
-            staggerLimit = Mathf.Max(1f, staggerLimit);
-            staggerRecoverDelay = Mathf.Max(0f, staggerRecoverDelay);
-            staggerRecoverSpeed = Mathf.Max(0f, staggerRecoverSpeed);
-            hitPushTime = Mathf.Max(0.01f, hitPushTime);
 
             if (attackPatterns == null) return;
             for (int index = 0; index < attackPatterns.Length; index++)

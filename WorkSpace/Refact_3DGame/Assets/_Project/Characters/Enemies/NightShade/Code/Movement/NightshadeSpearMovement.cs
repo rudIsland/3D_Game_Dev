@@ -1,4 +1,3 @@
-using rudIsland.RPG3D.Characters;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.NightShade
@@ -10,7 +9,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         private readonly CharacterController characterController; // 씬 또는 시스템 참조
         private readonly float gravity; // 내부에서 사용하는 값
         private readonly float groundPull; // 내부에서 사용하는 값
-        private readonly HitPushMovement hitPushMovement;
         private float verticalSpeed; // 이동 속도
 
         public Vector3 Position => nightshadeTransform.position; // 이동 정보
@@ -21,20 +19,17 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             Transform nightshadeTransform,
             CharacterController characterController,
             float gravity,
-            float groundPull,
-            float hitPushTime)
+            float groundPull)
         {
             this.nightshadeTransform = nightshadeTransform;
             this.characterController = characterController;
             this.gravity = gravity;
             this.groundPull = groundPull;
-            hitPushMovement = new HitPushMovement(hitPushTime);
         }
 
         public void Reset()
         {
             verticalSpeed = 0f;
-            hitPushMovement.StopPush();
         }
 
         public Vector3 MoveTo(
@@ -98,26 +93,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         {
             UpdateVerticalSpeed(deltaTime);
             characterController.Move(Vector3.up * (verticalSpeed * deltaTime));
-        }
-
-        public void StartHitPush(
-            Vector3 hitDirection,
-            float pushDistance)
-        {
-            hitPushMovement.StartPush(hitDirection, pushDistance);
-        }
-
-        public void UpdateHitPush(float deltaTime)
-        {
-            UpdateVerticalSpeed(deltaTime);
-            Vector3 hitMove = hitPushMovement.GetNextMove(deltaTime);
-            hitMove.y = verticalSpeed * deltaTime;
-            characterController.Move(hitMove);
-        }
-
-        public void StopHitPush()
-        {
-            hitPushMovement.StopPush();
         }
 
         private void TurnToDirection(Vector3 direction, float turnSpeed, float deltaTime)

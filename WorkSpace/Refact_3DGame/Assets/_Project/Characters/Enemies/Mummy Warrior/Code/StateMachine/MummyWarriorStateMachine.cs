@@ -1,5 +1,4 @@
 using System;
-using rudIsland.RPG3D.Combat;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
@@ -126,39 +125,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
         {
             if (!isEnabled || ReferenceEquals(currentState, deadState)) return;
             hitState.SetDirection(MummyWarriorHitDirection.Forward);
-            EndAttackHit();
-            if (ReferenceEquals(currentState, hitState))
-            {
-                hitState.Restart();
-                return;
-            }
-
-            ChangeState(hitState);
-        }
-
-        public void ChangeToHitState(in AttackHitInput hit)
-        {
-            if (!isEnabled || ReferenceEquals(currentState, deadState)) return;
-            hitState.SetDirection(GetHitDirection(hit.HitDirection));
-            EndAttackHit();
-            if (ReferenceEquals(currentState, hitState))
-            {
-                hitState.Restart();
-                return;
-            }
-
-            ChangeState(hitState);
-        }
-
-        internal void ChangeToHitState(in HitReaction reaction)
-        {
-            if (!isEnabled || ReferenceEquals(currentState, deadState))
-            {
-                return;
-            }
-
-            hitState.SetDirection(
-                (MummyWarriorHitDirection)reaction.Direction);
             EndAttackHit();
             if (ReferenceEquals(currentState, hitState))
             {

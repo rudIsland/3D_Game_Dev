@@ -1,4 +1,3 @@
-using rudIsland.RPG3D.Characters;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.Zombie
@@ -8,10 +7,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
     {
         private readonly Transform zombieTransform; // 씬 또는 시스템 참조
         private readonly CharacterController characterController; // 씬 또는 시스템 참조
-        private readonly UnitMovementSeparation movementSeparation;
         private readonly float gravity; // 내부에서 사용하는 값
         private readonly float groundPull; // 내부에서 사용하는 값
-        private readonly HitPushMovement hitPushMovement; // 피격 또는 피해 관련 값
 
         private float verticalSpeed; // 이동 속도
 
@@ -22,17 +19,13 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         public ZombieMovement(
             Transform zombieTransform,
             CharacterController characterController,
-            UnitMovementSeparation movementSeparation,
             float gravity,
-            float groundPull,
-            float hitPushTime)
+            float groundPull)
         {
             this.zombieTransform = zombieTransform;
             this.characterController = characterController;
-            this.movementSeparation = movementSeparation;
             this.gravity = gravity;
             this.groundPull = groundPull;
-            hitPushMovement = new HitPushMovement(hitPushTime);
         }
 
         public void Reset()
@@ -105,26 +98,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             ApplyMovement(Vector3.up * (verticalSpeed * deltaTime));
         }
 
-        public void StartHitPush(
-            Vector3 hitDirection,
-            float pushDistance)
-        {
-            hitPushMovement.StartPush(hitDirection, pushDistance);
-        }
-
-        public void UpdateHitPush(float deltaTime)
-        {
-            UpdateVerticalSpeed(deltaTime);
-            Vector3 hitMove = hitPushMovement.GetNextMove(deltaTime);
-            hitMove.y = verticalSpeed * deltaTime;
-            ApplyMovement(hitMove);
-        }
-
-        public void StopHitPush()
-        {
-            hitPushMovement.StopPush();
-        }
-
         private void TurnToDirection(
             Vector3 direction,
             float turnSpeed,
@@ -152,10 +125,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         private void ApplyMovement(Vector3 requestedMovement)
         {
-            Vector3 limitedMovement =
-                movementSeparation.LimitApproachMovement(
-                    requestedMovement);
-            characterController.Move(limitedMovement);
+            characterController.Move(requestedMovement);
         }
     }
 }

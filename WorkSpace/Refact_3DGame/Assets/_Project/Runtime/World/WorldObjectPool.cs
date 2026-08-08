@@ -6,20 +6,34 @@ using Object = UnityEngine.Object;
 
 namespace rudIsland.RPG3D.World
 {
-    // SpawnSettings 하나에 해당하는 뷰 인스턴스를 재사용한다.
+    // 같은 설정의 뷰를 재사용하는 객체 풀이다.
     internal sealed class WorldObjectPool : IDisposable
     {
-        private readonly WorldObjectManager manager; // 씬 또는 시스템 참조
-        private readonly SpawnSettings settings; // 행동 설정 참조
-        private readonly Transform container; // 씬 또는 시스템 참조
-        private readonly ObjectPool<WorldObjectView> pool; // 씬 또는 시스템 참조
-        private readonly List<WorldObjectView> takenViews; // 씬 또는 시스템 참조
-        private bool isDisposed; // 기능 사용 여부
+        // 뷰의 등록과 활성화를 맡은 관리자다.
+        private readonly WorldObjectManager manager;
 
-        public int UsedCount => pool.CountActive; // 개수 또는 크기
-        public int AvailableCount => pool.CountInactive; // 개수 또는 크기
+        // 이 풀이 사용할 프리팹과 크기 설정이다.
+        private readonly SpawnSettings settings;
 
-        // 설정값으로 풀을 만들고 initialSize만큼 미리 준비한다.
+        // 생성된 뷰를 담아둘 부모 Transform이다.
+        private readonly Transform container;
+
+        // 뷰를 꺼내고 되돌리는 Unity 객체 풀이다.
+        private readonly ObjectPool<WorldObjectView> pool;
+
+        // 현재 풀에서 빌려 사용 중인 뷰 목록이다.
+        private readonly List<WorldObjectView> takenViews;
+
+        // 풀이 제거되었는지 기록한다.
+        private bool isDisposed;
+
+        // 현재 사용 중인 뷰 수를 반환한다.
+        public int UsedCount => pool.CountActive;
+
+        // 현재 꺼낼 수 있는 뷰 수를 반환한다.
+        public int AvailableCount => pool.CountInactive;
+
+        // 설정값으로 풀을 만들고 시작 수만큼 미리 준비한다.
         public WorldObjectPool(
             WorldObjectManager manager,
             SpawnSettings settings,
@@ -43,10 +57,8 @@ namespace rudIsland.RPG3D.World
             WarmUp(settings.InitialSize);
         }
 
-        // 보관 중인 뷰 하나를 꺼내 위치를 먼저 지정한다.
-        public WorldObjectView Take(
-            Vector3 position,
-            Quaternion rotation)
+        // 풀에서 뷰 하나를 꺼내 위치와 회전을 지정한다.
+        public WorldObjectView Take(Vector3 position, Quaternion rotation)
         {
             if (isDisposed)
             {
@@ -60,14 +72,14 @@ namespace rudIsland.RPG3D.World
             return view;
         }
 
-        // GameObject를 켠 다음 RuntimeObject의 사용을 시작한다.
+        // GameObject를 켜고 RuntimeObject를 활성화한다.
         public void Show(WorldObjectView view)
         {
             view.gameObject.SetActive(true);
             manager.Enable(view.RuntimeObject);
         }
 
-        // RuntimeObject를 멈추고 뷰 상태를 초기화한 뒤 풀에 보관한다.
+        // RuntimeObject를 끄고 뷰 상태를 초기화한 뒤 풀에 돌려보낸다.
         public void Return(WorldObjectView view)
         {
             if (!view.IsTakenFromPool)
@@ -103,7 +115,7 @@ namespace rudIsland.RPG3D.World
             pool.Clear();
         }
 
-        // 풀이 부족할 때 프리팹과 RuntimeObject를 새로 만들어 등록한다.
+        // 꺼낼 뷰가 부족할 때 프리팹과 RuntimeObject를 새로 만든다.
         private WorldObjectView CreateView()
         {
             WorldObjectView view = Object.Instantiate(
@@ -116,11 +128,13 @@ namespace rudIsland.RPG3D.World
             return view;
         }
 
+        // 풀에 보관된 뷰의 GameObject를 끈다.
         private static void StoreView(WorldObjectView view)
         {
             view.gameObject.SetActive(false);
         }
 
+        // 풀에 보관된 뷰를 등록 해제하고 파괴한다.
         private void DestroyView(WorldObjectView view)
         {
             manager.Unregister(view.RuntimeObject);
@@ -129,6 +143,7 @@ namespace rudIsland.RPG3D.World
             DestroyGameObject(view);
         }
 
+        // 사용 중인 뷰를 비활성화하고 등록 해제한 뒤 파괴한다.
         private void DestroyTakenView(WorldObjectView view)
         {
             manager.Disable(view.RuntimeObject);
@@ -140,6 +155,7 @@ namespace rudIsland.RPG3D.World
             DestroyGameObject(view);
         }
 
+        // 실행 중인지에 따라 GameObject를 안전하게 파괴한다.
         private static void DestroyGameObject(WorldObjectView view)
         {
             if (Application.isPlaying)
@@ -152,7 +168,7 @@ namespace rudIsland.RPG3D.World
             }
         }
 
-        // 첫 Spawn에서 생성이 몰리지 않도록 지정한 개수만큼 미리 만든다.
+        // 첫 생성 순간의 부담을 줄이도록 지정한 개수만큼 미리 만든다.
         private void WarmUp(int initialSize)
         {
             if (initialSize <= 0)

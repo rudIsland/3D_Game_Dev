@@ -1,5 +1,4 @@
 using rudIsland.RPG3D.Characters;
-using rudIsland.RPG3D.Combat;
 
 namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 {
@@ -9,26 +8,14 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         private readonly NightshadeSpearStateMachine stateMachine; // 현재 행동 상태
 
         public float CurrentHealth => Health.CurrentHealth; // 현재 체력
-        public float CurrentStagger => Stagger.CurrentStagger;
         public int CurrentPhase => stateMachine.CurrentPhase;
         public string CurrentStateName => stateMachine.CurrentStateName;
         public string CurrentAttackName => stateMachine.CurrentAttackName;
 
         public NightshadeSpearWorldUnit(
             float maxHealth,
-            NightshadeSpearStateMachine stateMachine,
-            float staggerLimit,
-            float staggerRecoverDelay,
-            float staggerRecoverSpeed)
-            : base(
-                maxHealth,
-                staggerLimit,
-                staggerRecoverDelay,
-                staggerRecoverSpeed,
-                0f,
-                0f,
-                0f,
-                0f)
+            NightshadeSpearStateMachine stateMachine)
+            : base(maxHealth)
         {
             this.stateMachine = stateMachine;
         }
@@ -42,20 +29,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             stateMachine.SetHealthRatio(
                 Health.CurrentHealth / Health.MaxHealth);
             stateMachine.ChangeToHitState();
-        }
-
-        protected override void HandleAttackHitResult(
-            in AttackHitResult result)
-        {
-            if (result.Type == AttackHitResultType.Staggered ||
-                result.Type == AttackHitResultType.KnockedDown)
-            {
-                stateMachine.SetHealthRatio(
-                    Health.CurrentHealth / Health.MaxHealth);
-                HitReaction reaction = result.Reaction;
-                stateMachine.ChangeToHitState(
-                    in reaction);
-            }
         }
 
         protected override void OnUnitCreate()

@@ -1,4 +1,3 @@
-using rudIsland.RPG3D.Animation;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.NightShade
@@ -39,7 +38,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         [SerializeField] private Animator nightshadeAnimator; // 애니메이터 참조
 
         private int requestedActionStateId; // 현재 행동 상태
-        private AnimatorPlaybackReader playbackReader; // 씬 또는 시스템 참조
 
         private void Awake()
         {
@@ -147,17 +145,12 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
         internal bool IsActionTransitioning()
         {
-            return playbackReader != null &&
-                playbackReader.IsInTransition(AnimationLayerIndex);
+            return IsInTransition();
         }
 
         public void ResetAnimation()
         {
             FindNightshadeAnimator();
-            if (playbackReader == null && nightshadeAnimator != null)
-            {
-                playbackReader = new AnimatorPlaybackReader(nightshadeAnimator);
-            }
             requestedActionStateId = 0;
 
             if (nightshadeAnimator == null) return;
@@ -184,7 +177,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             }
 
             nightshadeAnimator = animator;
-            playbackReader = new AnimatorPlaybackReader(animator);
         }
 
         private void StartAction(int animatorStateId)
@@ -220,8 +212,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 return false;
             }
 
-            return playbackReader.TryGetCurrentOrNextStateTime(
-                AnimationLayerIndex,
+            return TryGetCurrentOrNextStateTime(
                 animatorStateId,
                 out normalizedTime);
         }
@@ -235,8 +226,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
         private bool CanControlAnimator()
         {
-            return playbackReader != null &&
-                playbackReader.CanRead(AnimationLayerIndex);
+            return CanReadAnimator();
         }
 
         private void FindNightshadeAnimator()
@@ -250,6 +240,67 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 #if UNITY_EDITOR
         private void OnValidate() => FindNightshadeAnimator();
 #endif
+
+        private bool CanReadAnimator()
+        {
+            return nightshadeAnimator != null &&
+                nightshadeAnimator.isActiveAndEnabled &&
+                nightshadeAnimator.runtimeAnimatorController != null &&
+                nightshadeAnimator.layerCount > AnimationLayerIndex;
+        }
+
+        private bool IsInTransition()
+        {
+            return CanReadAnimator() &&
+                nightshadeAnimator.IsInTransition(AnimationLayerIndex);
+        }
+
+        private bool TryGetCurrentState(
+            out AnimatorStateInfo stateInfo)
+        {
+            stateInfo = default;
+            if (!CanReadAnimator())
+            {
+                return false;
+            }
+
+            stateInfo = nightshadeAnimator.GetCurrentAnimatorStateInfo(
+                AnimationLayerIndex);
+            return true;
+        }
+
+        private bool TryGetCurrentOrNextStateTime(
+            int stateHash,
+            out float normalizedTime)
+        {
+            normalizedTime = 0f;
+            if (!TryGetCurrentState(out AnimatorStateInfo stateInfo))
+            {
+                return false;
+            }
+
+            if (stateInfo.shortNameHash == stateHash)
+            {
+                normalizedTime = stateInfo.normalizedTime;
+                return true;
+            }
+
+            if (!IsInTransition())
+            {
+                return false;
+            }
+
+            stateInfo = nightshadeAnimator.GetNextAnimatorStateInfo(
+                AnimationLayerIndex);
+            if (stateInfo.shortNameHash != stateHash)
+            {
+                return false;
+            }
+
+            normalizedTime = stateInfo.normalizedTime;
+            return true;
+        }
+
     }
 }
 

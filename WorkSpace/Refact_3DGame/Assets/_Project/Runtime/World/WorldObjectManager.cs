@@ -4,23 +4,32 @@ using UnityEngine;
 
 namespace rudIsland.RPG3D.World
 {
-    // 현재 씬의 등록, 갱신, 풀 반환 순서를 한곳에서 관리한다.
+    // 현재 씬의 월드 객체 등록, 갱신, 활성화와 풀 반환을 관리한다.
     public sealed class WorldObjectManager : MonoBehaviour
     {
         [Serializable]
+        // Inspector에 특정 풀의 현재 사용량을 보여준다.
         private sealed class PoolUsage
         {
-            [SerializeField] private SpawnSettings settings; //스폰 설정
-            [SerializeField] private int usedCount; //사용중인 갯수
-            [SerializeField] private int availableCount; //사용가능한 갯수
+            // 사용량을 표시할 풀 설정이다.
+            [SerializeField] private SpawnSettings settings;
 
+            // 현재 사용 중인 뷰 수다.
+            [SerializeField] private int usedCount;
+
+            // 현재 꺼낼 수 있는 뷰 수다.
+            [SerializeField] private int availableCount;
+
+            // 풀 설정을 사용량 항목에 연결한다.
             public PoolUsage(SpawnSettings settings)
             {
                 this.settings = settings;
             }
 
-            public SpawnSettings Settings => settings; // 행동 설정 참조
+            // 사용량을 계산할 풀 설정을 반환한다.
+            public SpawnSettings Settings => settings;
 
+            // 풀의 현재 사용량을 Inspector 표시값에 반영한다.
             public void UpdateCount(WorldObjectPool pool)
             {
                 usedCount = pool.UsedCount;
@@ -28,6 +37,7 @@ namespace rudIsland.RPG3D.World
             }
         }
 
+        // Tick 중 발생한 변경 요청의 종류다.
         private enum PendingActionType
         {
             Register,
@@ -38,12 +48,19 @@ namespace rudIsland.RPG3D.World
             ReturnView
         }
 
+        // Tick이 끝난 뒤 적용할 변경 요청 하나를 담는다.
         private readonly struct PendingAction
         {
-            public PendingActionType Type { get; } // 외부에 제공하는 읽기 값
-            public IWorldObject WorldObject { get; } // 씬 또는 시스템 참조
-            public WorldObjectView View { get; } // 씬 또는 시스템 참조
+            // 처리할 변경 종류다.
+            public PendingActionType Type { get; }
 
+            // 변경 대상 Runtime 객체다.
+            public IWorldObject WorldObject { get; }
+
+            // 변경 대상 Unity 뷰다.
+            public WorldObjectView View { get; }
+
+            // 대기 요청에 종류와 대상을 저장한다.
             public PendingAction(
                 PendingActionType type,
                 IWorldObject worldObject,
@@ -56,44 +73,67 @@ namespace rudIsland.RPG3D.World
         }
 
         [Header("풀 설정")]
-        [SerializeField] private SpawnSettings[] spawnSettings = // 행동 설정 참조
+        // Inspector에서 연결한 풀 생성 설정 목록이다.
+        [SerializeField] private SpawnSettings[] spawnSettings =
             Array.Empty<SpawnSettings>();
 
         [Header("실행 상태")]
-        [SerializeField] private int activeCount; // 개수 또는 크기
-        [SerializeField] private List<PoolUsage> poolUsage = new List<PoolUsage>(); // 씬 또는 시스템 참조
+        // 현재 활성화된 객체 수를 Inspector에 표시한다.
+        [SerializeField] private int activeCount;
+
+        // 각 풀의 사용량을 Inspector에 표시한다.
+        [SerializeField] private List<PoolUsage> poolUsage = new List<PoolUsage>();
 
         // List는 순회에 사용하고 HashSet은 중복 등록을 빠르게 막는다.
 
-        //Manager에 등록된 오브젝트
-        private readonly List<IWorldObject> registeredObjects = // 씬 또는 시스템 참조
+        // Manager에 등록되어 있는 모든 Runtime 객체 목록이다.
+        private readonly List<IWorldObject> registeredObjects =
             new List<IWorldObject>(64);
-        private readonly HashSet<IWorldObject> registeredSet = // 씬 또는 시스템 참조
+
+        // 중복 등록을 빠르게 확인하는 집합이다.
+        private readonly HashSet<IWorldObject> registeredSet =
             new HashSet<IWorldObject>();
 
-        //등록된 객체 중 Tick을 실행할 객체
-        private readonly List<IWorldObject> activeObjects = // 씬 또는 시스템 참조
+        // Tick을 실행할 활성 Runtime 객체 목록이다.
+        private readonly List<IWorldObject> activeObjects =
             new List<IWorldObject>(64);
-        private readonly HashSet<IWorldObject> activeSet = // 씬 또는 시스템 참조
+
+        // 중복 활성화를 빠르게 확인하는 집합이다.
+        private readonly HashSet<IWorldObject> activeSet =
             new HashSet<IWorldObject>();
-        private readonly Dictionary<SpawnSettings, WorldObjectPool> pools = // 씬 또는 시스템 참조
+
+        // SpawnSettings별로 만든 객체 풀 목록이다.
+        private readonly Dictionary<SpawnSettings, WorldObjectPool> pools =
             new Dictionary<SpawnSettings, WorldObjectPool>();
-        // Tick 도중 들어온 변경 요청을 순회가 끝날 때까지 잠시 보관한다.
-        private readonly List<PendingAction> pendingActions = // 현재 행동 상태
+
+        // Tick 중 들어온 변경 요청을 잠시 보관하는 목록이다.
+        private readonly List<PendingAction> pendingActions =
             new List<PendingAction>(16);
 
-        private bool isTicking; // 기능 사용 여부
-        private bool isShuttingDown; // 기능 사용 여부
+        // 현재 활성 객체를 순회 중인지 기록한다.
+        private bool isTicking;
 
-        public event Action<IWorldObject> WorldObjectEnabled; // 씬 또는 시스템 참조
-        public event Action<IWorldObject> WorldObjectDisabled; // 씬 또는 시스템 참조
+        // Manager가 종료 작업 중인지 기록한다.
+        private bool isShuttingDown;
 
-        public IReadOnlyList<IWorldObject> ActiveObjects => activeObjects; // 씬 또는 시스템 참조
-        public int ActiveCount => activeObjects.Count; // 개수 또는 크기
-        public int RegisteredCount => registeredObjects.Count; // 개수 또는 크기
-        public int PoolCount => pools.Count; // 개수 또는 크기
+        // Runtime 객체가 활성화될 때 알린다.
+        public event Action<IWorldObject> WorldObjectEnabled;
 
-        // Inspector에 연결한 설정마다 풀을 만들고 예열한다.
+        // Runtime 객체가 비활성화될 때 알린다.
+        public event Action<IWorldObject> WorldObjectDisabled;
+
+        // 현재 활성화된 객체 목록을 읽기 전용으로 제공한다.
+        public IReadOnlyList<IWorldObject> ActiveObjects => activeObjects;
+
+        // 현재 활성화된 객체 수를 반환한다.
+        public int ActiveCount => activeObjects.Count;
+
+        // Manager에 등록된 객체 수를 반환한다.
+        public int RegisteredCount => registeredObjects.Count;
+
+        // 현재 만들어진 풀 수를 반환한다.
+        public int PoolCount => pools.Count;
+        // Inspector 설정마다 객체 풀을 만들고 예열한다.
         private void Awake()
         {
             for (int index = 0; index < spawnSettings.Length; index++)
@@ -104,7 +144,7 @@ namespace rudIsland.RPG3D.World
             RefreshInspectorCounts();
         }
 
-        // 활성 객체만 한 번씩 갱신한다.
+        // 매 프레임 활성 객체만 한 번씩 갱신한다.
         private void Update()
         {
             TickActiveObjects(Time.deltaTime);
@@ -115,7 +155,7 @@ namespace rudIsland.RPG3D.World
             Shutdown();
         }
 
-        // 객체를 목록에 넣고 최초 준비 작업인 Create를 호출한다.
+        // 객체를 등록 목록에 넣고 Create를 호출한다.
         public void Register(IWorldObject worldObject)
         {
             ThrowIfNull(worldObject, nameof(worldObject));
@@ -147,7 +187,7 @@ namespace rudIsland.RPG3D.World
             ApplyEnable(worldObject);
         }
 
-        // 활성 목록에서 제거한 뒤 Disable을 호출한다.
+        // 활성 목록에서 제거하고 Disable을 호출한다.
         public void Disable(IWorldObject worldObject)
         {
             ThrowIfNull(worldObject, nameof(worldObject));
@@ -163,7 +203,7 @@ namespace rudIsland.RPG3D.World
             ApplyDisable(worldObject);
         }
 
-        // 비활성화한 뒤 등록 목록에서 빼고 Dispose한다.
+        // 객체를 비활성화하고 등록 해제한 뒤 Dispose한다.
         public void Unregister(IWorldObject worldObject)
         {
             ThrowIfNull(worldObject, nameof(worldObject));
@@ -179,7 +219,7 @@ namespace rudIsland.RPG3D.World
             ApplyUnregister(worldObject);
         }
 
-        // 설정에 맞는 풀에서 뷰를 꺼내 지정한 위치에 활성화한다.
+        // 설정에 맞는 풀에서 뷰를 꺼내 위치와 회전을 지정한다.
         public bool TrySpawn(
             SpawnSettings settings,
             Vector3 position,
@@ -208,7 +248,7 @@ namespace rudIsland.RPG3D.World
             return true;
         }
 
-        // 사용이 끝난 뷰를 원래 풀로 되돌린다.
+        // 사용이 끝난 뷰를 원래 풀로 돌려보낸다.
         public void Despawn(WorldObjectView view)
         {
             if (view == null ||
@@ -231,7 +271,7 @@ namespace rudIsland.RPG3D.World
             }
         }
 
-        // Tick 중 목록이 바뀌지 않도록 끝난 뒤 대기 요청을 처리한다.
+        // Tick 중 목록이 바뀌지 않도록 순회가 끝난 뒤 대기 요청을 처리한다.
         internal void TickActiveObjects(float deltaTime)
         {
             if (isShuttingDown)
@@ -255,16 +295,13 @@ namespace rudIsland.RPG3D.World
             }
         }
 
-        internal bool AddPoolForTests(SpawnSettings settings)
-        {
-            return AddPool(settings);
-        }
-
+        // 테스트에서 Manager 종료 처리를 직접 실행한다.
         internal void ShutdownForTests()
         {
             Shutdown();
         }
 
+        // 하나의 SpawnSettings에 대한 풀을 만들고 등록한다.
         private bool AddPool(SpawnSettings settings)
         {
             if (settings == null ||
@@ -289,6 +326,7 @@ namespace rudIsland.RPG3D.World
             return true;
         }
 
+        // 등록 목록에 객체를 추가하고 최초 생성한다.
         private void ApplyRegister(IWorldObject worldObject)
         {
             if (!registeredSet.Add(worldObject))
@@ -300,7 +338,7 @@ namespace rudIsland.RPG3D.World
             worldObject.Create();
         }
 
-        // 실제 활성 목록 변경과 Enable 호출은 이 메서드 한곳에서 처리한다.
+        // 활성 목록 변경과 Enable 호출을 실제로 처리한다.
         private void ApplyEnable(IWorldObject worldObject)
         {
             if (!registeredSet.Contains(worldObject))
@@ -320,6 +358,7 @@ namespace rudIsland.RPG3D.World
             RefreshInspectorCounts();
         }
 
+        // 활성 목록에서 객체를 빼고 Disable을 호출한다.
         private void ApplyDisable(IWorldObject worldObject)
         {
             if (!activeSet.Remove(worldObject))
@@ -334,6 +373,7 @@ namespace rudIsland.RPG3D.World
             RefreshInspectorCounts();
         }
 
+        // 객체를 비활성화하고 등록 목록과 자원을 정리한다.
         private void ApplyUnregister(IWorldObject worldObject)
         {
             if (!registeredSet.Remove(worldObject))
@@ -346,6 +386,7 @@ namespace rudIsland.RPG3D.World
             worldObject.Dispose();
         }
 
+        // 풀에서 꺼낸 뷰의 GameObject와 RuntimeObject를 켠다.
         private void ApplyShowView(WorldObjectView view)
         {
             if (view == null ||
@@ -359,6 +400,7 @@ namespace rudIsland.RPG3D.World
             RefreshInspectorCounts();
         }
 
+        // 뷰를 원래 풀에 반환한다.
         private void ApplyReturnView(WorldObjectView view)
         {
             if (view == null || view.OwnerPool == null)
@@ -370,6 +412,7 @@ namespace rudIsland.RPG3D.World
             RefreshInspectorCounts();
         }
 
+        // Tick 중이면 변경 요청을 목록에 저장한다.
         private bool QueueWhileTicking(
             PendingActionType type,
             IWorldObject worldObject,
@@ -423,6 +466,7 @@ namespace rudIsland.RPG3D.World
             }
         }
 
+        // 활성 목록에서 객체를 빠르게 제거한다.
         private void RemoveFromActiveList(IWorldObject worldObject)
         {
             int index = activeObjects.IndexOf(worldObject);
@@ -437,6 +481,7 @@ namespace rudIsland.RPG3D.World
             activeObjects.RemoveAt(lastIndex);
         }
 
+        // 뷰가 이 Manager가 소유한 풀에 속하는지 확인한다.
         private WorldObjectPool GetOwnedPool(WorldObjectView view)
         {
             foreach (KeyValuePair<SpawnSettings, WorldObjectPool> entry in pools)
@@ -450,6 +495,7 @@ namespace rudIsland.RPG3D.World
             return null;
         }
 
+        // 활성 객체 수와 각 풀의 사용량을 Inspector 값에 반영한다.
         private void RefreshInspectorCounts()
         {
             activeCount = activeObjects.Count;
@@ -467,7 +513,7 @@ namespace rudIsland.RPG3D.World
             }
         }
 
-        // 씬이 끝나면 활성 객체, 풀 객체, 일반 등록 객체 순서로 정리한다.
+        // 씬이 끝날 때 활성 객체, 풀, 등록 객체 순서로 정리한다.
         private void Shutdown()
         {
             if (isShuttingDown)
@@ -504,6 +550,7 @@ namespace rudIsland.RPG3D.World
             activeCount = 0;
         }
 
+        // 필수 Runtime 객체가 null인지 확인한다.
         private static void ThrowIfNull(
             IWorldObject worldObject,
             string parameterName)

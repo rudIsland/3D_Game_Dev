@@ -1,4 +1,3 @@
-using rudIsland.RPG3D.Animation;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.Zombie
@@ -32,7 +31,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         [SerializeField] private Animator zombieAnimator; // 애니메이터 참조
 
         private AnimationState requestedAnimationState; // 현재 행동 상태
-        private AnimatorPlaybackReader playbackReader; // 씬 또는 시스템 참조
 
         private void Awake()
         {
@@ -76,8 +74,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 return;
             }
 
-            bool isPlayingHit = playbackReader.IsCurrentState(0, HitStateId);
-            bool isChangingToHit = playbackReader.IsChangingTo(0, HitStateId);
+            bool isPlayingHit = IsCurrentState(HitStateId);
+            bool isChangingToHit = IsChangingTo(HitStateId);
 
             if (isPlayingHit || isChangingToHit)
             {
@@ -98,8 +96,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         {
             normalizedTime = 0f;
             if (!CanControlAnimator() ||
-                !playbackReader.TryGetCurrentState(
-                    0,
+                !TryGetCurrentState(
                     out AnimatorStateInfo stateInfo))
             {
                 return false;
@@ -119,7 +116,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         internal bool IsAnimationTransitioning()
         {
-            return playbackReader != null && playbackReader.IsInTransition(0);
+            return IsInTransition();
         }
 
         internal void ApplyAttackRootRotation(
@@ -140,7 +137,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             }
 
             zombieAnimator = animator;
-            playbackReader = new AnimatorPlaybackReader(animator);
             ZombieAnimationEventReceiver receiver =
                 animator.GetComponent<ZombieAnimationEventReceiver>();
             if (receiver == null)
@@ -155,10 +151,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         public void ResetAnimation()
         {
             FindZombieAnimator();
-            if (playbackReader == null && zombieAnimator != null)
-            {
-                playbackReader = new AnimatorPlaybackReader(zombieAnimator);
-            }
             requestedAnimationState = AnimationState.Idle;
 
             if (zombieAnimator == null)
@@ -187,7 +179,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         private bool CanControlAnimator()
         {
-            return playbackReader != null && playbackReader.CanRead(0);
+            return CanReadAnimator();
         }
 
         private int GetRequestedStateId()
@@ -226,5 +218,46 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             FindZombieAnimator();
         }
 #endif
+
+        private bool CanReadAnimator()
+        {
+            return zombieAnimator != null &&
+                zombieAnimator.isActiveAndEnabled &&
+                zombieAnimator.runtimeAnimatorController != null &&
+                zombieAnimator.layerCount > 0;
+        }
+
+        private bool IsInTransition()
+        {
+            return CanReadAnimator() &&
+                zombieAnimator.IsInTransition(0);
+        }
+
+        private bool TryGetCurrentState(
+            out AnimatorStateInfo stateInfo)
+        {
+            stateInfo = default;
+            if (!CanReadAnimator())
+            {
+                return false;
+            }
+
+            stateInfo = zombieAnimator.GetCurrentAnimatorStateInfo(0);
+            return true;
+        }
+
+        private bool IsCurrentState(int stateHash)
+        {
+            return TryGetCurrentState(out AnimatorStateInfo stateInfo) &&
+                stateInfo.shortNameHash == stateHash;
+        }
+
+        private bool IsChangingTo(int stateHash)
+        {
+            return IsInTransition() &&
+                zombieAnimator.GetNextAnimatorStateInfo(0).shortNameHash ==
+                stateHash;
+        }
+
     }
 }

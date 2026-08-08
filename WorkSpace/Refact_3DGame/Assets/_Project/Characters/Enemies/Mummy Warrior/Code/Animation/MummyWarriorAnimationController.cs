@@ -1,4 +1,3 @@
-using rudIsland.RPG3D.Animation;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
@@ -39,7 +38,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
         [SerializeField] private Animator mummyAnimator; // 애니메이터 참조
 
         private int requestedActionStateId; // 현재 행동 상태
-        private AnimatorPlaybackReader playbackReader; // 씬 또는 시스템 참조
 
         private void Awake()
         {
@@ -147,17 +145,12 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
 
         internal bool IsActionTransitioning()
         {
-            return playbackReader != null &&
-                playbackReader.IsInTransition(AnimationLayerIndex);
+            return IsInTransition();
         }
 
         public void ResetAnimation()
         {
             FindMummyAnimator();
-            if (playbackReader == null && mummyAnimator != null)
-            {
-                playbackReader = new AnimatorPlaybackReader(mummyAnimator);
-            }
             requestedActionStateId = 0;
 
             if (mummyAnimator == null) return;
@@ -184,7 +177,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
             }
 
             mummyAnimator = animator;
-            playbackReader = new AnimatorPlaybackReader(animator);
         }
 
         private void StartAction(int animatorStateId)
@@ -220,8 +212,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
                 return false;
             }
 
-            return playbackReader.TryGetCurrentOrNextStateTime(
-                AnimationLayerIndex,
+            return TryGetCurrentOrNextStateTime(
                 animatorStateId,
                 out normalizedTime);
         }
@@ -235,8 +226,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
 
         private bool CanControlAnimator()
         {
-            return playbackReader != null &&
-                playbackReader.CanRead(AnimationLayerIndex);
+            return CanReadAnimator();
         }
 
         private void FindMummyAnimator()
@@ -250,5 +240,66 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
 #if UNITY_EDITOR
         private void OnValidate() => FindMummyAnimator();
 #endif
+
+        private bool CanReadAnimator()
+        {
+            return mummyAnimator != null &&
+                mummyAnimator.isActiveAndEnabled &&
+                mummyAnimator.runtimeAnimatorController != null &&
+                mummyAnimator.layerCount > AnimationLayerIndex;
+        }
+
+        private bool IsInTransition()
+        {
+            return CanReadAnimator() &&
+                mummyAnimator.IsInTransition(AnimationLayerIndex);
+        }
+
+        private bool TryGetCurrentState(
+            out AnimatorStateInfo stateInfo)
+        {
+            stateInfo = default;
+            if (!CanReadAnimator())
+            {
+                return false;
+            }
+
+            stateInfo = mummyAnimator.GetCurrentAnimatorStateInfo(
+                AnimationLayerIndex);
+            return true;
+        }
+
+        private bool TryGetCurrentOrNextStateTime(
+            int stateHash,
+            out float normalizedTime)
+        {
+            normalizedTime = 0f;
+            if (!TryGetCurrentState(out AnimatorStateInfo stateInfo))
+            {
+                return false;
+            }
+
+            if (stateInfo.shortNameHash == stateHash)
+            {
+                normalizedTime = stateInfo.normalizedTime;
+                return true;
+            }
+
+            if (!IsInTransition())
+            {
+                return false;
+            }
+
+            stateInfo = mummyAnimator.GetNextAnimatorStateInfo(
+                AnimationLayerIndex);
+            if (stateInfo.shortNameHash != stateHash)
+            {
+                return false;
+            }
+
+            normalizedTime = stateInfo.normalizedTime;
+            return true;
+        }
+
     }
 }

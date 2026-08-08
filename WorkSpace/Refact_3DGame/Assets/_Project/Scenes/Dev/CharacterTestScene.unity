@@ -562,7 +562,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 276505471}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.022221602, y: 0.027729934, z: -0.0006165931, w: 0.99936825}
+  m_LocalRotation: {x: 0.022221606, y: 0.02772994, z: -0.0006165936, w: 0.99936825}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1032,7 +1032,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4044717213e31446939f7bd49c896ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Cinemachine::Cinemachine.CinemachineComposer
-  m_TrackedObjectOffset: {x: 0, y: 0, z: 0}
+  m_TrackedObjectOffset: {x: 0, y: 1.5, z: 0}
   m_LookaheadTime: 0
   m_LookaheadSmoothing: 0
   m_LookaheadIgnoreY: 0
@@ -1447,7 +1447,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4044717213e31446939f7bd49c896ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Cinemachine::Cinemachine.CinemachineComposer
-  m_TrackedObjectOffset: {x: 0, y: 0, z: 0}
+  m_TrackedObjectOffset: {x: 0, y: 1.5, z: 0}
   m_LookaheadTime: 0
   m_LookaheadSmoothing: 0
   m_LookaheadIgnoreY: 0
@@ -1617,7 +1617,6 @@ GameObject:
   m_Component:
   - component: {fileID: 600374220}
   - component: {fileID: 600374219}
-  - component: {fileID: 600374221}
   m_Layer: 0
   m_Name: WorldObjectManager
   m_TagString: Untagged
@@ -1657,18 +1656,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &600374221
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 600374218}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b25cd23f92ab4d00a98b21f41abcd345, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Combat.CombatHitResolver
 --- !u!1 &626820251
 GameObject:
   m_ObjectHideFlags: 3
@@ -1805,7 +1792,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 693639078}
-  - component: {fileID: 693639079}
   m_Layer: 0
   m_Name: Lance Skin 1
   m_TagString: Untagged
@@ -1831,27 +1817,6 @@ Transform:
   - {fileID: 1189274853}
   m_Father: {fileID: 3786632062415294444}
   m_LocalEulerAnglesHint: {x: 0, y: 21.232, z: 0}
---- !u!114 &693639079
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 693639077}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 323e24f05bb546dda1720c04dc24b7f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Combat.MeleeHitDetector
-  attackShape:
-    shapeType: 0
-    startPoint: {fileID: 362810116}
-    endPoint: {fileID: 1189274853}
-    radius: 0.18
-    boxSize: {x: 0, y: 0, z: 0}
-  targetLayers:
-    serializedVersion: 2
-    m_Bits: 64
 --- !u!1 &748467810
 GameObject:
   m_ObjectHideFlags: 0
@@ -4008,6 +3973,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 5.647254
       objectReference: {fileID: 0}
+    - target: {fileID: 3067069832466099523, guid: 169ad2641acc0f343ad35dbd4a954fec,
+        type: 3}
+      propertyPath: bodyPart
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3099887175951325285, guid: 169ad2641acc0f343ad35dbd4a954fec,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -4995,7 +4965,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4044717213e31446939f7bd49c896ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Cinemachine::Cinemachine.CinemachineComposer
-  m_TrackedObjectOffset: {x: 0, y: 0, z: 0}
+  m_TrackedObjectOffset: {x: 0, y: 1.5, z: 0}
   m_LookaheadTime: 0
   m_LookaheadSmoothing: 0
   m_LookaheadIgnoreY: 0
@@ -5099,7 +5069,6 @@ GameObject:
   - component: {fileID: 1699705000}
   - component: {fileID: 1699705001}
   - component: {fileID: 1699705002}
-  - component: {fileID: 1699705003}
   m_Layer: 6
   m_Name: PlayerRoot
   m_TagString: Player
@@ -5176,60 +5145,8 @@ MonoBehaviour:
   targetCameraTurnSpeed: 540
   targetCameraVerticalValue: 0.5
   maxHealth: 100
-  attackHitSettings:
-  - attackNumber: 1
-    hitDetector: {fileID: 1699705003}
-    damage:
-      healthDamage: 10
-    strength: 0
-    staggerDamage: 10
-    pushDistance: 0.4
-  - attackNumber: 2
-    hitDetector: {fileID: 1699705003}
-    damage:
-      healthDamage: 10
-    strength: 0
-    staggerDamage: 10
-    pushDistance: 0.4
-  - attackNumber: 3
-    hitDetector: {fileID: 1699705003}
-    damage:
-      healthDamage: 10
-    strength: 0
-    staggerDamage: 10
-    pushDistance: 0.4
-  - attackNumber: 4
-    hitDetector: {fileID: 1699705003}
-    damage:
-      healthDamage: 10
-    strength: 0
-    staggerDamage: 10
-    pushDistance: 0.45
-  - attackNumber: 5
-    hitDetector: {fileID: 1699705003}
-    damage:
-      healthDamage: 10
-    strength: 1
-    staggerDamage: 10
-    pushDistance: 0.55
-  - attackNumber: 6
-    hitDetector: {fileID: 1699705003}
-    damage:
-      healthDamage: 10
-    strength: 1
-    staggerDamage: 10
-    pushDistance: 0.5
-  staggerLimit: 10
-  staggerRecoverDelay: 1
-  staggerRecoverSpeed: 20
-  guardAngle: 120
-  hitPushTime: 0.18
-  unitCollisionLayers:
-    serializedVersion: 2
-    m_Bits: 192
-  minimumUnitSeparation: 0.2
   testDamage: 10
-  turnSpeed: 720
+  turnSpeed: 360
   walkSpeed: 2.5
   sprintSpeed: 5
   animationSmoothTime: 0.12
@@ -5247,27 +5164,6 @@ MonoBehaviour:
   runAttackMoveScale: 0.45
   gravity: -22
   groundPull: -2
---- !u!114 &1699705003
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1699704999}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 323e24f05bb546dda1720c04dc24b7f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Combat.MeleeHitDetector
-  attackShape:
-    shapeType: 0
-    startPoint: {fileID: 490989438}
-    endPoint: {fileID: 749509542}
-    radius: 0.12
-    boxSize: {x: 0, y: 0, z: 0}
-  targetLayers:
-    serializedVersion: 2
-    m_Bits: 262272
 --- !u!1 &1712270763
 GameObject:
   m_ObjectHideFlags: 0
@@ -5517,7 +5413,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1835938357}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.003631552, y: 0.027736608, z: 0.00010076629, w: 0.9996087}
+  m_LocalRotation: {x: -0.0036315455, y: 0.02773661, z: 0.00010076626, w: 0.9996087}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -5662,7 +5558,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2063360597}
   - component: {fileID: 2063360599}
-  - component: {fileID: 2063360598}
   m_Layer: 17
   m_Name: PlayerBodyHitBox
   m_TagString: Untagged
@@ -5685,19 +5580,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1699705000}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2063360598
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2063360596}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70a80ec996a74679a8f90a204abc1234, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Combat.UnitHitBox
-  bodyPart: 2
 --- !u!136 &2063360599
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -29911,7 +29793,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5661236694452819533}
-  - component: {fileID: 5661236694452819534}
   m_Layer: 0
   m_Name: Lance Skin 1
   m_TagString: Untagged
@@ -32257,27 +32138,6 @@ Transform:
   - {fileID: 1258303591}
   m_Father: {fileID: 4511763035387169221}
   m_LocalEulerAnglesHint: {x: 0, y: 21.232, z: 0}
---- !u!114 &5661236694452819534
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5033635064172514551}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 323e24f05bb546dda1720c04dc24b7f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Combat.MeleeHitDetector
-  attackShape:
-    shapeType: 0
-    startPoint: {fileID: 1897368758}
-    endPoint: {fileID: 1258303591}
-    radius: 0.18
-    boxSize: {x: 0, y: 0, z: 0}
-  targetLayers:
-    serializedVersion: 2
-    m_Bits: 64
 --- !u!4 &5662133537834141366
 Transform:
   m_ObjectHideFlags: 0
@@ -34594,7 +34454,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Characters.Enemies.MummyWarrior.MummyWarriorController
   target: {fileID: 0}
   mummyAnimator: {fileID: 6161520621192595812}
-  lanceHitDetector: {fileID: 5661236694452819534}
   canTrackTarget: 1
   maxHealth: 120
   deadBodyKeepTime: 2
@@ -34617,8 +34476,7 @@ MonoBehaviour:
     allowedAngle: 45
     selectionWeight: 1.2
     cooldown: 1.2
-    damage:
-      healthDamage: 15
+    damage: 15
     hitStartTime: 0.25
     hitEndTime: 0.55
     transitionTime: 0.08
@@ -34635,8 +34493,7 @@ MonoBehaviour:
     allowedAngle: 60
     selectionWeight: 1
     cooldown: 1.3
-    damage:
-      healthDamage: 16
+    damage: 15
     hitStartTime: 0.22
     hitEndTime: 0.58
     transitionTime: 0.08
@@ -34653,8 +34510,7 @@ MonoBehaviour:
     allowedAngle: 60
     selectionWeight: 1
     cooldown: 1.3
-    damage:
-      healthDamage: 16
+    damage: 15
     hitStartTime: 0.22
     hitEndTime: 0.58
     transitionTime: 0.08
@@ -34671,8 +34527,7 @@ MonoBehaviour:
     allowedAngle: 55
     selectionWeight: 1
     cooldown: 1.5
-    damage:
-      healthDamage: 18
+    damage: 15
     hitStartTime: 0.28
     hitEndTime: 0.62
     transitionTime: 0.1
@@ -34689,8 +34544,7 @@ MonoBehaviour:
     allowedAngle: 80
     selectionWeight: 0.8
     cooldown: 1.8
-    damage:
-      healthDamage: 22
+    damage: 15
     hitStartTime: 0.32
     hitEndTime: 0.68
     transitionTime: 0.12
@@ -34707,8 +34561,7 @@ MonoBehaviour:
     allowedAngle: 55
     selectionWeight: 0.9
     cooldown: 1.4
-    damage:
-      healthDamage: 17
+    damage: 15
     hitStartTime: 0.24
     hitEndTime: 0.56
     transitionTime: 0.08
@@ -34725,8 +34578,7 @@ MonoBehaviour:
     allowedAngle: 70
     selectionWeight: 0.8
     cooldown: 2
-    damage:
-      healthDamage: 24
+    damage: 15
     hitStartTime: 0.3
     hitEndTime: 0.64
     transitionTime: 0.12
@@ -34743,8 +34595,7 @@ MonoBehaviour:
     allowedAngle: 100
     selectionWeight: 0.7
     cooldown: 2.2
-    damage:
-      healthDamage: 25
+    damage: 15
     hitStartTime: 0.3
     hitEndTime: 0.68
     transitionTime: 0.12
@@ -34761,8 +34612,7 @@ MonoBehaviour:
     allowedAngle: 70
     selectionWeight: 0.8
     cooldown: 1.7
-    damage:
-      healthDamage: 20
+    damage: 15
     hitStartTime: 0.28
     hitEndTime: 0.62
     transitionTime: 0.1
@@ -34779,8 +34629,7 @@ MonoBehaviour:
     allowedAngle: 55
     selectionWeight: 0.55
     cooldown: 2.6
-    damage:
-      healthDamage: 32
+    damage: 15
     hitStartTime: 0.38
     hitEndTime: 0.76
     transitionTime: 0.14
@@ -34797,8 +34646,7 @@ MonoBehaviour:
     allowedAngle: 90
     selectionWeight: 0.65
     cooldown: 2.4
-    damage:
-      healthDamage: 27
+    damage: 15
     hitStartTime: 0.3
     hitEndTime: 0.68
     transitionTime: 0.12
@@ -34815,8 +34663,7 @@ MonoBehaviour:
     allowedAngle: 60
     selectionWeight: 0.65
     cooldown: 2.1
-    damage:
-      healthDamage: 29
+    damage: 15
     hitStartTime: 0.3
     hitEndTime: 0.67
     transitionTime: 0.12
@@ -34833,8 +34680,7 @@ MonoBehaviour:
     allowedAngle: 80
     selectionWeight: 0.35
     cooldown: 3
-    damage:
-      healthDamage: 40
+    damage: 15
     hitStartTime: 0.4
     hitEndTime: 0.8
     transitionTime: 0.16

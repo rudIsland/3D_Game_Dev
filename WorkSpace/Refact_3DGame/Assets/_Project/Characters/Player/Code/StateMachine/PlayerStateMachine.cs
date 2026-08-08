@@ -1,5 +1,3 @@
-using System;
-using rudIsland.RPG3D.Combat;
 using rudIsland.RPG3D.Player.Animations;
 using rudIsland.RPG3D.Player.Camera;
 using rudIsland.RPG3D.Player.Input;
@@ -28,9 +26,6 @@ namespace rudIsland.RPG3D.Player.States
         private readonly PlayerTargetLookState targetLookState;
         private readonly PlayerHitState hitState;
         private readonly PlayerDeadState deadState;
-        private readonly Action endAttackHit;
-        private readonly Action startGuard;
-        private readonly Action stopGuard;
         private readonly float rollDistanceScale;
 
         private IPlayerState currentState;
@@ -45,7 +40,6 @@ namespace rudIsland.RPG3D.Player.States
         public bool IsTargeting => ReferenceEquals(currentState, targetLookState);
         public bool IsDead => ReferenceEquals(currentState, deadState);
         public bool IsHit => ReferenceEquals(currentState, hitState);
-        public HitReaction LastHitReaction { get; private set; }
 
         public PlayerStateMachine(
             PlayerInputReader playerInput,
@@ -66,10 +60,7 @@ namespace rudIsland.RPG3D.Player.States
             float runAttackMoveScale,
             PlayerTargetFinder targetFinder,
             PlayerTargetCamera targetCamera,
-            float targetBreakDistance,
-            Action endAttackHit,
-            Action startGuard,
-            Action stopGuard)
+            float targetBreakDistance)
         {
             this.playerInput = playerInput;
             this.playerMovement = playerMovement;
@@ -77,9 +68,6 @@ namespace rudIsland.RPG3D.Player.States
                 playerAnimator,
                 animationSmoothTime);
             this.rollDistanceScale = Mathf.Max(0f, rollDistanceScale);
-            this.endAttackHit = endAttackHit;
-            this.startGuard = startGuard;
-            this.stopGuard = stopGuard;
 
             var moveState = new PlayerMoveState(this, animationController);
             var blockState = new PlayerBlockState(this, animationController);
@@ -229,16 +217,6 @@ namespace rudIsland.RPG3D.Player.States
             playerMovement.ClearAttackDirection();
         }
 
-        internal void StartGuard()
-        {
-            startGuard?.Invoke();
-        }
-
-        internal void StopGuard()
-        {
-            stopGuard?.Invoke();
-        }
-
         internal bool CanStartAttack()
         {
             return playerMovement.IsGrounded;
@@ -284,29 +262,11 @@ namespace rudIsland.RPG3D.Player.States
 
         internal void ChangeToHitState()
         {
-            HitReaction reaction = default;
-            ChangeToHitState(in reaction);
-        }
-
-        internal void ChangeToHitState(in AttackHitInput hit)
-        {
-            HitReaction reaction = HitReaction.Create(
-                in hit,
-                playerMovement.Forward,
-                playerMovement.Right);
-            ChangeToHitState(in reaction);
-        }
-
-        internal void ChangeToHitState(in HitReaction reaction)
-        {
             if (!isEnabled || ReferenceEquals(currentState, deadState))
             {
                 return;
             }
 
-            LastHitReaction = reaction;
-            hitState.SetHitReaction(in reaction);
-            EndAttackHit();
             if (ReferenceEquals(currentState, hitState))
             {
                 hitState.Restart();
@@ -319,7 +279,6 @@ namespace rudIsland.RPG3D.Player.States
 
         internal void EndAttackHit()
         {
-            endAttackHit?.Invoke();
         }
 
         internal void NotifyAttackAnimationEnded()

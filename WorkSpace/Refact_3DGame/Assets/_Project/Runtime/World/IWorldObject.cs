@@ -2,18 +2,25 @@ using System;
 
 namespace rudIsland.RPG3D.World
 {
-    // 씬에 존재하는 객체가 따라야 하는 공통 생명주기다.
+    // 월드 객체가 따라야 하는 공통 생명주기 규칙이다.
     public interface IWorldObject : IDisposable
     {
-        bool IsCreated { get; } //생성 여부
-        bool IsEnabled { get; } //활성화 여부
+        // 최초 생성 작업이 끝났는지 알려준다.
+        bool IsCreated { get; }
 
-        // 최초 준비 → 사용 시작 → 매 프레임 갱신 → 사용 중지 순서로 호출한다.
-        void Create();  //생성
-        void Enable();  //활성화
-        void Tick(float deltaTime); //갱신
-        void Disable(); //비활성화
+        // 현재 사용 중인 상태인지 알려준다.
+        bool IsEnabled { get; }
 
-        //void Dispose();
+        // 최초 준비 작업을 한 번 실행한다.
+        void Create();
+
+        // 객체를 사용 가능한 상태로 만든다.
+        void Enable();
+
+        // 활성 객체의 게임 로직을 한 번 갱신한다.
+        void Tick(float deltaTime);
+
+        // 객체 사용을 멈춘다.
+        void Disable();
     }
 }

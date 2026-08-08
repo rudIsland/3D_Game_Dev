@@ -1,4 +1,3 @@
-using rudIsland.RPG3D.Combat;
 
 namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 {
@@ -7,7 +6,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
     {
         private readonly ZombieStateMachine stateMachine; // 현재 행동 상태
 
-        private HitReaction hitReaction; // 이번 피격의 방향, 세기와 신체 부위
 
         public ZombieHitState(ZombieStateMachine stateMachine)
         {
@@ -21,7 +19,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         public void Update(float deltaTime)
         {
-            stateMachine.UpdateHitPush(deltaTime);
 
             if (stateMachine.TryGetCurrentAnimationTime(
                     out float normalizedTime) &&
@@ -34,20 +31,12 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         public void Exit()
         {
-            stateMachine.StopHitPush();
         }
 
         public void Restart()
         {
-            stateMachine.StartHitPush(
-                hitReaction.PushDirection,
-                hitReaction.PushDistance);
             stateMachine.PlayHitFromStart();
         }
 
-        public void SetHitReaction(in HitReaction reaction)
-        {
-            hitReaction = reaction;
-        }
     }
 }

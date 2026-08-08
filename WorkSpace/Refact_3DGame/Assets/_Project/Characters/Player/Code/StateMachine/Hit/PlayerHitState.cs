@@ -1,4 +1,3 @@
-using rudIsland.RPG3D.Combat;
 using rudIsland.RPG3D.Player.Animations;
 
 namespace rudIsland.RPG3D.Player.States.Hit
@@ -10,8 +9,6 @@ namespace rudIsland.RPG3D.Player.States.Hit
 
         private readonly PlayerStateMachine stateMachine;
         private readonly PlayerAnimationController animationController;
-
-        private HitReaction hitReaction;
 
         public PlayerHitState(
             PlayerStateMachine stateMachine,
@@ -28,7 +25,6 @@ namespace rudIsland.RPG3D.Player.States.Hit
 
         public void Update(float deltaTime, PlayerStateInput input)
         {
-            stateMachine.Movement.UpdateHitPush(deltaTime);
             animationController.StopMove();
 
             if (animationController.TryGetHitTime(
@@ -41,21 +37,13 @@ namespace rudIsland.RPG3D.Player.States.Hit
 
         public void Exit()
         {
-            stateMachine.Movement.StopHitPush();
         }
 
         internal void Restart()
         {
             stateMachine.EndAttackHit();
-            stateMachine.Movement.StartHitPush(
-                hitReaction.PushDirection,
-                hitReaction.PushDistance);
             animationController.PlayHitFromStart();
         }
 
-        internal void SetHitReaction(in HitReaction reaction)
-        {
-            hitReaction = reaction;
-        }
     }
 }

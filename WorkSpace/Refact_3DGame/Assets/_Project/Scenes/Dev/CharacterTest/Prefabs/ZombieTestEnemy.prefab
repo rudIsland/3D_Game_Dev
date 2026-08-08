@@ -477,27 +477,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4218926007317599928}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6330658553343561630
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1436194121419836223}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 323e24f05bb546dda1720c04dc24b7f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Combat.MeleeHitDetector
-  attackShape:
-    shapeType: 1
-    startPoint: {fileID: 7341035276671574659}
-    endPoint: {fileID: 0}
-    radius: 0.18
-    boxSize: {x: 0, y: 0, z: 0}
-  targetLayers:
-    serializedVersion: 2
-    m_Bits: 131073
 --- !u!1 &1696024440212956797
 GameObject:
   m_ObjectHideFlags: 0
@@ -750,19 +729,6 @@ CapsuleCollider:
   m_Height: 1.888
   m_Direction: 1
   m_Center: {x: 0.00026, y: 0.944, z: 0.0546}
---- !u!114 &3067069832466099523
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2690285843070371678}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70a80ec996a74679a8f90a204abc1234, type: 3}
-  m_Name:
-  m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Combat.UnitHitBox
-  bodyPart: 2
 --- !u!1 &2755850010944684170
 GameObject:
   m_ObjectHideFlags: 0
@@ -827,27 +793,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4218926007317599928}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8191701687353553632
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2835223609921878010}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 323e24f05bb546dda1720c04dc24b7f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Combat.MeleeHitDetector
-  attackShape:
-    shapeType: 0
-    startPoint: {fileID: 6960831650949134440}
-    endPoint: {fileID: 4995447017950012193}
-    radius: 0.18
-    boxSize: {x: 0, y: 0, z: 0}
-  targetLayers:
-    serializedVersion: 2
-    m_Bits: 131073
 --- !u!1 &2864643373496435409
 GameObject:
   m_ObjectHideFlags: 0
@@ -1588,27 +1533,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4218926007317599928}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4652307759974324094
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4848738971965418907}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 323e24f05bb546dda1720c04dc24b7f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Combat.MeleeHitDetector
-  attackShape:
-    shapeType: 0
-    startPoint: {fileID: 5000065061354086210}
-    endPoint: {fileID: 3600597762167226313}
-    radius: 0.18
-    boxSize: {x: 0, y: 0, z: 0}
-  targetLayers:
-    serializedVersion: 2
-    m_Bits: 131073
 --- !u!1 &5151366861225205955
 GameObject:
   m_ObjectHideFlags: 0

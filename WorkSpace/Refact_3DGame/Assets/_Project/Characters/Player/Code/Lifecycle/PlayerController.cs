@@ -1,6 +1,5 @@
 using rudIsland.RPG3D.Characters;
 using Cinemachine;
-using rudIsland.RPG3D.Combat;
 using rudIsland.RPG3D.Player.Camera;
 using rudIsland.RPG3D.Player.Input;
 using rudIsland.RPG3D.Player.Movement;
@@ -13,7 +12,7 @@ namespace rudIsland.RPG3D.Player
 {
     [RequireComponent(typeof(CharacterController))]
     // Unity 생명주기에서 플레이어 입력, 이동, Animator를 연결한다.
-    public sealed class PlayerController : MonoBehaviour, IAttackHitReceiver
+    public sealed class PlayerController : MonoBehaviour
     {
         private const int ActiveCameraPriority = 20;
         private const int InactiveCameraPriority = 10;
@@ -35,25 +34,6 @@ namespace rudIsland.RPG3D.Player
 
         [Header("생명")]
         [SerializeField, Min(1f)] private float maxHealth = 100f; // 최대 체력
-        [Header("공격별 타격")]
-        [SerializeField] private AttackHitSettings[] attackHitSettings; // 행동 설정 참조
-
-        [Header("경직")]
-        [SerializeField, Min(0.01f)] private float staggerLimit = 10f; // 피격 동작이 나올 경직 한계
-        [SerializeField, Min(0f)] private float staggerRecoverDelay = 1f; // 경직 회복을 기다리는 시간
-        [SerializeField, Min(0f)] private float staggerRecoverSpeed = 20f; // 1초에 회복할 경직 수치
-
-        [Header("가드")]
-        [SerializeField, Range(0f, 180f)] private float guardAngle = 120f;
-
-        [Header("피격 밀림")]
-        [SerializeField, Min(0.01f)] private float hitPushTime = 0.18f; // 피격 또는 피해 관련 값
-
-        [Header("Unit 간격")]
-        [SerializeField] private LayerMask unitCollisionLayers =
-            (1 << 6) | (1 << 7);
-        [SerializeField, Min(0f)]
-        private float minimumUnitSeparation = 0.2f;
 
 #if UNITY_EDITOR
         [Header("체력 확인")]
@@ -61,7 +41,7 @@ namespace rudIsland.RPG3D.Player
 #endif
 
         [Header("회전")]
-        [SerializeField] private float turnSpeed = 720f; // 회전 속도
+        [SerializeField] private float turnSpeed = 360f; // 이동 속도
 
         [Header("입력 이동")]
         [SerializeField, Min(0f)] private float walkSpeed = 2.5f; // 걷기 속도
@@ -105,14 +85,6 @@ namespace rudIsland.RPG3D.Player
         private PlayerStateMachine playerStateMachine; // 현재 행동 상태
         private PlayerMovement playerMovement; // 이동 정보
         private PlayerWorldUnit playerWorldUnit; // 씬 또는 시스템 참조
-        private MeleeHitDetector activeHitDetector; // 피격 또는 피해 관련 값
-
-        public bool IsAttackHitActive =>
-            activeHitDetector != null;
-        public HitReaction LastHitReaction =>
-            playerStateMachine != null
-                ? playerStateMachine.LastHitReaction
-                : default;
 
         private void Awake()
         {
@@ -129,8 +101,6 @@ namespace rudIsland.RPG3D.Player
             }
 
             characterController = GetComponent<CharacterController>();
-            EnsureAttackHitSettings(
-                GetComponentInChildren<MeleeHitDetector>(true));
             if (playerAnimator == null)
             {
                 playerAnimator = GetComponentInChildren<Animator>();
@@ -142,23 +112,16 @@ namespace rudIsland.RPG3D.Player
             }
 
             playerInput = new PlayerInputReader();
-            var movementSeparation = new UnitMovementSeparation(
-                characterController,
-                unitCollisionLayers,
-                minimumUnitSeparation);
             playerMovement = new PlayerMovement(
                 transform,
                 moveCamera,
                 characterController,
-                movementSeparation,
                 playerInput,
                 turnSpeed,
                 walkSpeed,
                 sprintSpeed,
                 gravity,
-                groundPull,
-                hitPushTime);
-            var targetFinder = new PlayerTargetFinder(
+                groundPull);            var targetFinder = new PlayerTargetFinder(
                 transform,
                 moveCamera,
                 targetLayers,
@@ -191,16 +154,9 @@ namespace rudIsland.RPG3D.Player
                 runAttackMoveScale,
                 targetFinder,
                 targetCamera,
-                Mathf.Max(targetRange, targetBreakDistance),
-                EndAttackHit,
-                StartGuard,
-                StopGuard);
+                Mathf.Max(targetRange, targetBreakDistance));
             playerWorldUnit = new PlayerWorldUnit(
                 maxHealth,
-                staggerLimit,
-                staggerRecoverDelay,
-                staggerRecoverSpeed,
-                guardAngle,
                 playerInput,
                 playerStateMachine);
             worldObjectManager.Register(playerWorldUnit);
@@ -230,87 +186,28 @@ namespace rudIsland.RPG3D.Player
             playerWorldUnit?.TakeDamage(damage);
         }
 
-        public bool CanTakeHit =>
-            playerWorldUnit != null &&
-            playerWorldUnit.CanTakeHit;
-
-        public int ActivationSequence =>
-            playerWorldUnit != null
-                ? playerWorldUnit.ActivationSequence
-                : 0;
-
-        public AttackHitResult ReceiveAttackHit(in AttackHitInput hit)
-        {
-            if (!CanTakeHit)
-            {
-                return AttackHitResult.Ignored;
-            }
-
-            return playerWorldUnit.ReceiveAttackHit(
-                in hit,
-                transform.forward);
-        }
 
         public void StartAttackHit(int attackNumber)
         {
-            EndAttackHit();
-
-            if (!AttackHitSettings.TryFind(
-                    attackHitSettings,
-                    attackNumber,
-                    out AttackHitSettings hitSettings) ||
-                hitSettings.HitDetector == null)
-            {
-                return;
-            }
-
-            var hit = new AttackHitInput(
-                hitSettings.Damage,
-                UnitTeam.Player,
-                attackNumber,
-                hitSettings.Strength,
-                hitSettings.StaggerDamage,
-                hitSettings.BlockStaminaDamage,
-                hitSettings.CanBeBlocked,
-                hitSettings.CanBeParried,
-                hitSettings.PushDistance,
-                hitSettings.HitStopTime,
-                default);
-            activeHitDetector = hitSettings.HitDetector;
-            activeHitDetector.StartHit(in hit);
+            // 기존 애니메이션 이벤트 이름은 유지하고, 새 공격 판정은 상태머신에서 구현한다.
         }
 
         public void EndAttackHit()
         {
-            activeHitDetector?.EndHit();
-            activeHitDetector = null;
-        }
-
-        private void StartGuard()
-        {
-            playerWorldUnit?.StartGuard();
-        }
-
-        private void StopGuard()
-        {
-            playerWorldUnit?.StopGuard();
         }
 
         public void NotifyAttackHitEnded()
         {
-            EndAttackHit();
             playerStateMachine?.NotifyAttackHitEnded();
         }
 
         internal void NotifyAttackAnimationEnded()
         {
-            EndAttackHit();
             playerStateMachine?.NotifyAttackAnimationEnded();
         }
 
         private void OnDisable()
         {
-            EndAttackHit();
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
 
@@ -336,62 +233,8 @@ namespace rudIsland.RPG3D.Player
             playerWorldUnit.Dispose();
         }
 
-        private void EnsureAttackHitSettings(
-            MeleeHitDetector defaultHitDetector)
-        {
-            if (attackHitSettings != null &&
-                attackHitSettings.Length > 0)
-            {
-                return;
-            }
-
-            attackHitSettings =
-                CreateDefaultAttackHitSettings(defaultHitDetector);
-        }
-
-        private static AttackHitSettings[]
-            CreateDefaultAttackHitSettings(
-                MeleeHitDetector defaultHitDetector)
-        {
-            return new[]
-            {
-                new AttackHitSettings(
-                    1, defaultHitDetector, new AttackDamage(10f), 10f, 0.40f),
-                new AttackHitSettings(
-                    2, defaultHitDetector, new AttackDamage(10f), 10f, 0.40f),
-                new AttackHitSettings(
-                    3, defaultHitDetector, new AttackDamage(10f), 10f, 0.40f),
-                new AttackHitSettings(
-                    4, defaultHitDetector, new AttackDamage(10f), 10f, 0.45f),
-                new AttackHitSettings(
-                    5,
-                    defaultHitDetector,
-                    new AttackDamage(10f),
-                    HitStrength.Heavy,
-                    10f,
-                    0.55f),
-                new AttackHitSettings(
-                    6,
-                    defaultHitDetector,
-                    new AttackDamage(10f),
-                    HitStrength.Heavy,
-                    10f,
-                    0.50f)
-            };
-        }
 
 #if UNITY_EDITOR
-        private void OnValidate()
-        {
-            if (AttackHitSettings.HasDuplicateAttackNumber(
-                    attackHitSettings))
-            {
-                Debug.LogError(
-                    "PlayerController의 공격 번호가 중복되었습니다.",
-                    this);
-            }
-        }
-
         [ContextMenu("Test Damage")]
         private void TestDamage()
         {

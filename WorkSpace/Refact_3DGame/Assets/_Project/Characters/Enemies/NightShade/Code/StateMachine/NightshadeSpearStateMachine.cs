@@ -1,5 +1,4 @@
 using System;
-using rudIsland.RPG3D.Combat;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.NightShade
@@ -156,7 +155,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             isEnabled = false;
             animation.ResetAnimation();
         }
-
         public void ChangeToHitState()
         {
             if (!isEnabled || ReferenceEquals(currentState, deadState))
@@ -164,23 +162,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 return;
             }
 
-            HitReaction reaction = default;
-            hitState.SetHitReaction(in reaction);
-            ChangeToHitStateInternal();
-        }
-
-        public void ChangeToHitState(in AttackHitInput hit)
-        {
-            if (!isEnabled || ReferenceEquals(currentState, deadState))
-            {
-                return;
-            }
-
-            HitReaction reaction = HitReaction.Create(
-                in hit,
-                movement.Forward,
-                movement.Right);
-            hitState.SetHitReaction(in reaction);
             ChangeToHitStateInternal();
         }
 
@@ -264,23 +245,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         internal void StayOnGround(float deltaTime)
         {
             movement.StayOnGround(deltaTime);
-        }
-
-        internal void StartHitPush(
-            Vector3 hitDirection,
-            float pushDistance)
-        {
-            movement.StartHitPush(hitDirection, pushDistance);
-        }
-
-        internal void UpdateHitPush(float deltaTime)
-        {
-            movement.UpdateHitPush(deltaTime);
-        }
-
-        internal void StopHitPush()
-        {
-            movement.StopHitPush();
         }
 
         internal NightshadeSpearAttackPattern ChooseAttack(out int attackNumber)
@@ -382,17 +346,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         internal bool IsActionTransitioning()
         {
             return animation.IsActionTransitioning();
-        }
-
-        internal void ChangeToHitState(in HitReaction reaction)
-        {
-            if (!isEnabled || ReferenceEquals(currentState, deadState))
-            {
-                return;
-            }
-
-            hitState.SetHitReaction(in reaction);
-            ChangeToHitStateInternal();
         }
 
         private void ChangeToHitStateInternal()

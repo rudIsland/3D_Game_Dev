@@ -91,7 +91,7 @@ namespace rudIsland.RPG3D.UI
                 return;
             }
 
-            bool isPlayer = unit.Team == UnitTeam.Player;
+            bool isPlayer = unit is PlayerUnit;
             bool isBoss = unit is EnemyUnit enemy && enemy.IsBoss;
             if ((!isPlayer && !isBoss) ||
                 trackedUnits.ContainsKey(unit.Health))
@@ -125,7 +125,7 @@ namespace rudIsland.RPG3D.UI
             unit.Health.HealthChanged -= HandleHealthChanged;
             unit.Health.Died -= HandleUnitDied;
 
-            if (unit.Team == UnitTeam.Player)
+            if (unit is PlayerUnit)
             {
                 playerHealthBar?.Hide();
             }
@@ -144,7 +144,7 @@ namespace rudIsland.RPG3D.UI
                 return;
             }
 
-            if (unit.Team == UnitTeam.Player)
+            if (unit is PlayerUnit)
             {
                 playerHealthBar?.UpdateHealth(health);
                 return;

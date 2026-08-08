@@ -1,178 +1,97 @@
-using rudIsland.RPG3D.Combat;
 using rudIsland.RPG3D.World;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters
 {
-    // 타겟을 사용하는 코드가 구체적인 유닛 클래스를 몰라도 사망 여부를 확인하게 한다.
+    // 구체적인 유닛 종류를 몰라도 사망 여부를 확인하게 한다.
     public interface IUnitDeathState
     {
+        // 유닛이 죽었는지 알려준다.
         bool IsDead { get; }
     }
 
-    // 공통 자원을 소유하고 공격 결과의 계산·반영 순서를 고정한다.
+    // 모든 유닛의 체력과 공통 생명주기를 관리한다.
     public abstract class Unit : WorldObject, IUnitDeathState
     {
-        public UnitTeam Team { get; } // 씬 또는 시스템 참조
-        public UnitHealth Health { get; } // 씬 또는 시스템 참조
-        public UnitStagger Stagger { get; } // 현재 경직 누적값과 회복 규칙
-        public UnitStamina Stamina { get; } // 현재 Stamina와 회복 규칙
-        public UnitDefenseStatus DefenseStatus { get; } // 현재 방어 상태
-        public int ActivationSequence { get; private set; } // 풀 활성화 순번
-        public bool IsDead => Health.IsDead; // 기능 사용 여부
-        public bool CanTakeHit => IsEnabled && !IsDead; // 기능 사용 여부
+        // 유닛의 현재 체력과 최대 체력을 관리한다.
+        public UnitHealth Health { get; }
 
-        private readonly AttackHitResultCalculator hitResultCalculator;
+        // 풀에서 활성화된 횟수를 구분하기 위한 번호다.
+        public int ActivationSequence { get; private set; }
 
-        protected Unit(UnitTeam team, float maxHealth)
-            : this(
-                team,
-                maxHealth,
-                1f,
-                0f,
-                0f,
-                0f,
-                0f,
-                0f,
-                0f)
+        // 유닛의 체력이 0인지 알려준다.
+        public bool IsDead => Health.IsDead;
+
+        // 유닛의 체력 객체를 만든다.
+        protected Unit(float maxHealth)
         {
-        }
-
-        protected Unit(
-            UnitTeam team,
-            float maxHealth,
-            float staggerLimit,
-            float staggerRecoverDelay,
-            float staggerRecoverSpeed,
-            float maxStamina,
-            float staminaRecoverDelay,
-            float staminaRecoverSpeed,
-            float guardAngle)
-        {
-            Team = team;
             Health = new UnitHealth(maxHealth);
-            Stagger = new UnitStagger(
-                staggerLimit,
-                staggerRecoverDelay,
-                staggerRecoverSpeed);
-            Stamina = new UnitStamina(
-                maxStamina,
-                staminaRecoverDelay,
-                staminaRecoverSpeed);
-            DefenseStatus = new UnitDefenseStatus(guardAngle);
-            hitResultCalculator = new AttackHitResultCalculator();
         }
 
-        // 계산 결과를 한 번 반영하고 파생 상태머신에 전달한다.
-        public AttackHitResult ReceiveAttackHit(
-            in AttackHitInput hit,
-            Vector3 targetForward)
-        {
-            AttackHitResult result = hitResultCalculator.CalculateResult(
-                in hit,
-                this,
-                targetForward);
-            ApplyAttackHitResult(in result);
-            HandleAttackHitResult(in result);
-            return result;
-        }
-
-        protected void ApplyAttackHitResult(in AttackHitResult result)
-        {
-            if (result.HealthDamage > 0f)
-            {
-                Health.TakeDamage(result.HealthDamage);
-            }
-
-            if (result.StaminaDamage > 0f)
-            {
-                Stamina.Spend(result.StaminaDamage);
-            }
-
-            if (result.StaggerDamage > 0f)
-            {
-                Stagger.ApplyConfirmedDamage(
-                    result.StaggerDamage,
-                    result.Type == AttackHitResultType.Staggered ||
-                    result.Type == AttackHitResultType.KnockedDown);
-            }
-        }
-
-        // WorldObject의 호출 순서를 유지하면서 Unit 전용 확장 지점으로 전달한다.
+        // 최초 생성 시 유닛 전용 생성 작업을 호출한다.
         protected sealed override void OnCreate()
         {
             OnUnitCreate();
         }
 
+        // 활성화 횟수를 올리고 유닛 전용 활성화 작업을 호출한다.
         protected sealed override void OnEnable()
         {
             IncreaseActivationSequence();
-            DefenseStatus.Reset();
-            Stagger.Reset();
             OnUnitResourceEnable();
             OnUnitEnable();
         }
 
+        // 매 프레임 유닛 전용 갱신 작업을 호출한다.
         protected sealed override void OnTick(float deltaTime)
         {
-            if (!IsDead)
-            {
-                Stagger.Update(deltaTime);
-                Stamina.Update(deltaTime, CanRecoverStamina());
-            }
-
             OnUnitTick(deltaTime);
         }
 
+        // 비활성화 시 유닛 전용 정리 작업을 호출한다.
         protected sealed override void OnDisable()
         {
-            DefenseStatus.Reset();
-            Stagger.Reset();
             OnUnitDisable();
         }
 
+        // 제거 시 유닛 전용 정리와 체력 이벤트 해제를 처리한다.
         protected sealed override void OnDispose()
         {
-            DefenseStatus.Reset();
             OnUnitDispose();
             Health.ClearListeners();
         }
 
-        // 플레이어와 적은 필요한 단계만 아래 메서드에서 구현한다.
+        // 자식 유닛이 최초 생성 시 필요한 작업을 작성하는 지점이다.
         protected virtual void OnUnitCreate()
         {
         }
 
-        protected virtual void OnUnitEnable()
-        {
-        }
-
+        // 자식 유닛이 활성화될 때 자원을 준비하는 지점이다.
         protected virtual void OnUnitResourceEnable()
         {
         }
 
+        // 자식 유닛이 활성화될 때 시작 작업을 작성하는 지점이다.
+        protected virtual void OnUnitEnable()
+        {
+        }
+
+        // 자식 유닛의 매 프레임 갱신 작업을 작성하는 지점이다.
         protected virtual void OnUnitTick(float deltaTime)
         {
         }
 
+        // 자식 유닛이 비활성화될 때 작업을 작성하는 지점이다.
         protected virtual void OnUnitDisable()
         {
         }
 
+        // 자식 유닛이 완전히 제거될 때 작업을 작성하는 지점이다.
         protected virtual void OnUnitDispose()
         {
         }
 
-        protected virtual void HandleAttackHitResult(
-            in AttackHitResult result)
-        {
-        }
-
-        protected virtual bool CanRecoverStamina()
-        {
-            return true;
-        }
-
+        // 활성화될 때마다 풀 재사용 번호를 하나 올린다.
         private void IncreaseActivationSequence()
         {
             ActivationSequence = ActivationSequence == int.MaxValue

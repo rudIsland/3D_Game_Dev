@@ -129,35 +129,35 @@ MonoBehaviour:
   - attackNumber: 2
     hitDetector: {fileID: 0}
     damage:
-      healthDamage: 10
+      healthDamage: 12
     strength: 0
     staggerDamage: 10
     pushDistance: 0.4
   - attackNumber: 3
     hitDetector: {fileID: 0}
     damage:
-      healthDamage: 10
+      healthDamage: 14
     strength: 0
     staggerDamage: 10
     pushDistance: 0.4
   - attackNumber: 4
     hitDetector: {fileID: 0}
     damage:
-      healthDamage: 10
+      healthDamage: 17
     strength: 0
     staggerDamage: 10
     pushDistance: 0.45
   - attackNumber: 5
     hitDetector: {fileID: 0}
     damage:
-      healthDamage: 10
+      healthDamage: 25
     strength: 1
     staggerDamage: 10
     pushDistance: 0.55
   - attackNumber: 6
     hitDetector: {fileID: 0}
     damage:
-      healthDamage: 10
+      healthDamage: 18
     strength: 1
     staggerDamage: 10
     pushDistance: 0.5
@@ -245,19 +245,6 @@ CapsuleCollider:
   m_Height: 1.8
   m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0}
---- !u!114 &6673914076574837219
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7112299585502653175}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70a80ec996a74679a8f90a204abc1234, type: 3}
-  m_Name:
-  m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Combat.UnitHitBox
-  bodyPart: 2
 --- !u!1001 &6586900582712672055
 PrefabInstance:
   m_ObjectHideFlags: 0

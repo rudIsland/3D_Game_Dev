@@ -1,5 +1,4 @@
 using rudIsland.RPG3D.Characters;
-using rudIsland.RPG3D.Combat;
 using rudIsland.RPG3D.Player.Input;
 using rudIsland.RPG3D.Player.States;
 
@@ -12,25 +11,11 @@ namespace rudIsland.RPG3D.Player
         private readonly PlayerStateMachine playerStateMachine; // 현재 행동 상태
 
         public float CurrentHealth => Health.CurrentHealth; // 현재 체력
-        public float CurrentStagger => Stagger.CurrentStagger; // 현재 경직 누적값
-
         public PlayerWorldUnit(
             float maxHealth,
-            float staggerLimit,
-            float staggerRecoverDelay,
-            float staggerRecoverSpeed,
-            float guardAngle,
             PlayerInputReader playerInput,
             PlayerStateMachine playerStateMachine)
-            : base(
-                maxHealth,
-                staggerLimit,
-                staggerRecoverDelay,
-                staggerRecoverSpeed,
-                0f,
-                0f,
-                0f,
-                guardAngle)
+            : base(maxHealth)
         {
             this.playerInput = playerInput;
             this.playerStateMachine = playerStateMachine;
@@ -49,33 +34,7 @@ namespace rudIsland.RPG3D.Player
             playerStateMachine.ChangeToHitState();
         }
 
-        public void StartGuard()
-        {
-            DefenseStatus.StartGuard();
-        }
 
-        public void StopGuard()
-        {
-            DefenseStatus.StopGuard();
-        }
-
-        protected override void HandleAttackHitResult(
-            in AttackHitResult result)
-        {
-            if (result.Type == AttackHitResultType.Guarded)
-            {
-                playerStateMachine.NotifyAttackBlocked();
-                return;
-            }
-
-            if (result.Type == AttackHitResultType.Staggered ||
-                result.Type == AttackHitResultType.KnockedDown)
-            {
-                HitReaction reaction = result.Reaction;
-                playerStateMachine.ChangeToHitState(
-                    in reaction);
-            }
-        }
 
         protected override void OnUnitCreate()
         {

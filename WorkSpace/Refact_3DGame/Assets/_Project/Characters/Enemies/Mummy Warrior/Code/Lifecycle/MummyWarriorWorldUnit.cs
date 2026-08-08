@@ -1,4 +1,3 @@
-using rudIsland.RPG3D.Combat;
 
 namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
 {
@@ -24,20 +23,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.MummyWarrior
             stateMachine.SetHealthRatio(
                 Health.CurrentHealth / Health.MaxHealth);
             stateMachine.ChangeToHitState();
-        }
-
-        protected override void HandleAttackHitResult(
-            in AttackHitResult result)
-        {
-            if (result.Type == AttackHitResultType.Staggered ||
-                result.Type == AttackHitResultType.KnockedDown)
-            {
-                stateMachine.SetHealthRatio(
-                    Health.CurrentHealth / Health.MaxHealth);
-                HitReaction reaction = result.Reaction;
-                stateMachine.ChangeToHitState(
-                    in reaction);
-            }
         }
 
         protected override void OnUnitCreate()

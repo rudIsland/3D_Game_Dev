@@ -1,6 +1,5 @@
 using UnityEngine;
 
-using rudIsland.RPG3D.Combat;
 
 namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 {
@@ -24,8 +23,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         private readonly ZombieAliveState aliveState; // 현재 행동 상태
         private readonly ZombieStateMachine stateMachine; // 현재 행동 상태
-        private readonly AttackPhaseTracker attackPhaseTracker =
-            new AttackPhaseTracker(); // 공격 구간
         private ZombieAttackType previousAttackType; // 공격 관련 설정 또는 상태
         private bool hasPreviousAttack; // 기능 사용 여부
         private bool animationEndedByEvent; // 기능 사용 여부
@@ -38,8 +35,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             this.stateMachine = stateMachine;
         }
 
-        internal bool CanTurn => attackPhaseTracker.CanTurn;
-
+        internal bool CanTurn => false;
         public void Enter()
         {
             StartAttack();
@@ -53,7 +49,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         private void StartAttack()
         {
             animationEndedByEvent = false;
-            attackPhaseTracker.BeginAttack();
             ZombieAttackType attackType = ChooseAttack();
             previousAttackType = attackType;
             hasPreviousAttack = true;
@@ -72,18 +67,17 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         public void Exit()
         {
-            attackPhaseTracker.EndAttack();
             stateMachine.EndAttackHit();
         }
 
         internal bool BeginAttackHit()
         {
-            return attackPhaseTracker.BeginHit();
+            return true;
         }
 
         internal bool BeginAttackRecovery()
         {
-            return attackPhaseTracker.BeginRecovery();
+            return true;
         }
 
         internal void ResetAttackHistory()

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace rudIsland.RPG3D.Player.Movement
 {
-    // 자유 시점에서는 카메라 기준으로 이동하고 이동 방향을 바라본다.
+    // 자유 시점의 카메라 기준 이동·구르기·공격 방향을 계산한다.
     internal sealed class PlayerFreeLookMovement : IPlayerMovementMode
     {
         private const float MinimumDirectionSqrMagnitude = 0.01f;
@@ -39,6 +39,31 @@ namespace rudIsland.RPG3D.Player.Movement
                 .normalized * moveInput.magnitude;
         }
 
+        public Vector2 GetRollDirection(Vector2 moveInput)
+        {
+            Vector3 cameraForward = moveCamera.forward;
+            cameraForward.y = 0f;
+            if (cameraForward.sqrMagnitude > MinimumDirectionSqrMagnitude)
+            {
+                playerTransform.rotation =
+                    Quaternion.LookRotation(cameraForward);
+            }
+
+            return moveInput;
+        }
+
+        public Vector3 GetAttackDirection()
+        {
+            Vector3 cameraForward = moveCamera.forward;
+            cameraForward.y = 0f;
+            if (cameraForward.sqrMagnitude <
+                MinimumDirectionSqrMagnitude)
+            {
+                return playerTransform.forward;
+            }
+
+            return cameraForward.normalized;
+        }
         public void UpdateFacing(Vector3 moveDirection, float deltaTime)
         {
             if (moveDirection.sqrMagnitude < MinimumDirectionSqrMagnitude ||

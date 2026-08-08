@@ -7,7 +7,7 @@ namespace rudIsland.RPG3D.Player.Camera
     public sealed class PlayerTargetCamera
     {
         private const float MinimumDirectionSqrMagnitude = 0.01f;
-        private const float TargetRootHeightOffset = 1.5f;
+        private const float TargetRootHeightOffset = 0f;
         private const int FreeLookRigCount = 3;
 
         private readonly Transform playerTransform;

@@ -1,5 +1,4 @@
 using System;
-using rudIsland.RPG3D.Combat;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.Zombie
@@ -28,7 +27,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         internal float ChaseSpeed { get; } // 이동 속도
         internal float TurnSpeed { get; } // 이동 속도
         internal float DeadBodyKeepTime { get; } // 시간 설정
-        public HitReaction LastHitReaction { get; private set; }
 
         public ZombieStateMachine(
             Transform target,
@@ -149,48 +147,13 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             movement.StayOnGround(deltaTime);
         }
 
-        internal void StartHitPush(
-            Vector3 hitDirection,
-            float pushDistance)
-        {
-            movement.StartHitPush(hitDirection, pushDistance);
-        }
-
-        internal void UpdateHitPush(float deltaTime)
-        {
-            movement.UpdateHitPush(deltaTime);
-        }
-
-        internal void StopHitPush()
-        {
-            movement.StopHitPush();
-        }
-
         internal void ChangeToHitState()
         {
-            HitReaction reaction = default;
-            ChangeToHitState(in reaction);
-        }
-
-        internal void ChangeToHitState(in AttackHitInput hit)
-        {
-            HitReaction reaction = HitReaction.Create(
-                in hit,
-                movement.Forward,
-                movement.Right);
-            ChangeToHitState(in reaction);
-        }
-
-        internal void ChangeToHitState(in HitReaction reaction)
-        {
-            if (!isEnabled ||
-                ReferenceEquals(currentState, deadState))
+            if (!isEnabled || ReferenceEquals(currentState, deadState))
             {
                 return;
             }
 
-            LastHitReaction = reaction;
-            hitState.SetHitReaction(in reaction);
             EndAttackHit();
             if (ReferenceEquals(currentState, hitState))
             {

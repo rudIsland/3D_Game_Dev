@@ -1,4 +1,3 @@
-using rudIsland.RPG3D.Animation;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Player.Animations
@@ -33,13 +32,11 @@ namespace rudIsland.RPG3D.Player.Animations
         private static readonly int PlayerRunAttackStateId = Animator.StringToHash("PlayerRunAttack"); // 공격 관련 설정 또는 상태
 
         private readonly Animator playerAnimator; // 애니메이터 참조
-        private readonly AnimatorPlaybackReader playbackReader; // 씬 또는 시스템 참조
         private readonly float smoothTime; // 시간 설정
 
         public PlayerAnimationController(Animator playerAnimator, float smoothTime)
         {
             this.playerAnimator = playerAnimator;
-            playbackReader = new AnimatorPlaybackReader(playerAnimator);
             this.smoothTime = smoothTime;
         }
 
@@ -216,8 +213,7 @@ namespace rudIsland.RPG3D.Player.Animations
 
         public bool TryGetRollTime(out float normalizedTime)
         {
-            return playbackReader.TryGetCurrentStateTime(
-                0,
+            return TryGetCurrentStateTime(
                 PlayerRollStateId,
                 out normalizedTime);
         }
@@ -235,8 +231,8 @@ namespace rudIsland.RPG3D.Player.Animations
             playerAnimator.ResetTrigger(AttackId);
             playerAnimator.SetInteger(AttackIndexId, 0);
 
-            bool isPlayingHit = playbackReader.IsCurrentState(0, PlayerHitStateId);
-            bool isChangingToHit = playbackReader.IsChangingTo(0, PlayerHitStateId);
+            bool isPlayingHit = IsCurrentState(PlayerHitStateId);
+            bool isChangingToHit = IsChangingTo(PlayerHitStateId);
 
             if (isPlayingHit || isChangingToHit)
             {
@@ -251,8 +247,7 @@ namespace rudIsland.RPG3D.Player.Animations
         public bool TryGetAttackTime(out float normalizedTime)
         {
             normalizedTime = 0f;
-            if (!playbackReader.TryGetCurrentState(
-                    0,
+            if (!TryGetCurrentState(
                     out AnimatorStateInfo stateInfo) ||
                 !IsAttackState(stateInfo.shortNameHash))
             {
@@ -265,32 +260,30 @@ namespace rudIsland.RPG3D.Player.Animations
 
         public bool IsPlayingAttack(int attackNumber)
         {
-            return playbackReader.IsCurrentState(
-                0,
+            return IsCurrentState(
                 GetAttackStateId(attackNumber));
         }
 
         public bool TryGetHitTime(out float normalizedTime)
         {
-            return playbackReader.TryGetCurrentStateTime(
-                0,
+            return TryGetCurrentStateTime(
                 PlayerHitStateId,
                 out normalizedTime);
         }
 
         public bool IsChangingAttackState()
         {
-            if (!playbackReader.IsInTransition(0))
+            if (!IsInTransition())
             {
                 return false;
             }
 
-            return playbackReader.IsCurrentOrNextState(0, PlayerAttack01StateId) ||
-                playbackReader.IsCurrentOrNextState(0, PlayerAttack02StateId) ||
-                playbackReader.IsCurrentOrNextState(0, PlayerAttack03StateId) ||
-                playbackReader.IsCurrentOrNextState(0, PlayerAttack04StateId) ||
-                playbackReader.IsCurrentOrNextState(0, PlayerAttack05StateId) ||
-                playbackReader.IsCurrentOrNextState(0, PlayerRunAttackStateId);
+            return IsCurrentOrNextState(PlayerAttack01StateId) ||
+                IsCurrentOrNextState(PlayerAttack02StateId) ||
+                IsCurrentOrNextState(PlayerAttack03StateId) ||
+                IsCurrentOrNextState(PlayerAttack04StateId) ||
+                IsCurrentOrNextState(PlayerAttack05StateId) ||
+                IsCurrentOrNextState(PlayerRunAttackStateId);
         }
 
         private static bool IsAttackState(int stateId)
@@ -320,5 +313,67 @@ namespace rudIsland.RPG3D.Player.Animations
                     return 0;
             }
         }
+
+        private bool CanReadAnimator()
+        {
+            return playerAnimator != null &&
+                playerAnimator.isActiveAndEnabled &&
+                playerAnimator.runtimeAnimatorController != null &&
+                playerAnimator.layerCount > 0;
+        }
+
+        private bool IsInTransition()
+        {
+            return CanReadAnimator() &&
+                playerAnimator.IsInTransition(0);
+        }
+
+        private bool TryGetCurrentState(
+            out AnimatorStateInfo stateInfo)
+        {
+            stateInfo = default;
+            if (!CanReadAnimator())
+            {
+                return false;
+            }
+
+            stateInfo = playerAnimator.GetCurrentAnimatorStateInfo(0);
+            return true;
+        }
+
+        private bool IsCurrentState(int stateHash)
+        {
+            return TryGetCurrentState(out AnimatorStateInfo stateInfo) &&
+                stateInfo.shortNameHash == stateHash;
+        }
+
+        private bool IsChangingTo(int stateHash)
+        {
+            return IsInTransition() &&
+                playerAnimator.GetNextAnimatorStateInfo(0).shortNameHash ==
+                stateHash;
+        }
+
+        private bool IsCurrentOrNextState(int stateHash)
+        {
+            return IsCurrentState(stateHash) ||
+                IsChangingTo(stateHash);
+        }
+
+        private bool TryGetCurrentStateTime(
+            int stateHash,
+            out float normalizedTime)
+        {
+            normalizedTime = 0f;
+            if (!TryGetCurrentState(out AnimatorStateInfo stateInfo) ||
+                stateInfo.shortNameHash != stateHash)
+            {
+                return false;
+            }
+
+            normalizedTime = stateInfo.normalizedTime;
+            return true;
+        }
+
     }
 }

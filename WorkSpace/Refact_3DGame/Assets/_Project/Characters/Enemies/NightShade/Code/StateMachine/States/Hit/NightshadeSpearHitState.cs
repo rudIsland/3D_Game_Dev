@@ -1,4 +1,3 @@
-using rudIsland.RPG3D.Combat;
 
 namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 {
@@ -7,7 +6,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
     {
         private readonly NightshadeSpearStateMachine stateMachine;
         private bool hasEnteredHit;
-        private HitReaction hitReaction;
 
         public string Name => nameof(NightshadeSpearHitState);
 
@@ -17,20 +15,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             this.stateMachine = stateMachine;
         }
 
-        internal void SetHitReaction(in HitReaction nextHitReaction)
-        {
-            hitReaction = nextHitReaction;
-        }
-
         internal void Restart()
         {
             stateMachine.Animation.SetMovement(0f, 0f);
             hasEnteredHit = false;
-            stateMachine.StartHitPush(
-                hitReaction.PushDirection,
-                hitReaction.PushDistance);
-            stateMachine.Animation.PlayHit(
-                GetHitDirection(hitReaction.Direction));
+            stateMachine.Animation.PlayHit(NightshadeSpearHitDirection.Forward);
         }
 
         public void Enter()
@@ -40,7 +29,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
         public void Update(float deltaTime)
         {
-            stateMachine.UpdateHitPush(deltaTime);
             bool hasActionTime = stateMachine.TryGetCurrentActionTime(
                 out float normalizedTime);
             if (hasActionTime)
@@ -59,24 +47,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
         public void Exit()
         {
-            stateMachine.StopHitPush();
             stateMachine.Animation.ResetActionSpeed();
         }
 
-        private static NightshadeSpearHitDirection GetHitDirection(
-            HitReactionDirection direction)
-        {
-            switch (direction)
-            {
-                case HitReactionDirection.Back:
-                    return NightshadeSpearHitDirection.Backward;
-                case HitReactionDirection.Left:
-                    return NightshadeSpearHitDirection.Left;
-                case HitReactionDirection.Right:
-                    return NightshadeSpearHitDirection.Right;
-                default:
-                    return NightshadeSpearHitDirection.Forward;
-            }
-        }
     }
 }

@@ -13,10 +13,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         private void Awake()
         {
-            zombieAnimator = GetComponent<Animator>();
-            animationController =
-                GetComponentInParent<ZombieAnimationController>();
-            zombieController = GetComponentInParent<ZombieController>();
+            zombieAnimator =        GetComponent<Animator>();
+            animationController =   GetComponentInParent<ZombieAnimationController>();
+            zombieController =      GetComponentInParent<ZombieController>();
         }
 
         internal void Initialize(

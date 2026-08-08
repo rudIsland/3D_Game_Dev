@@ -1,23 +1,19 @@
-using rudIsland.RPG3D.Characters;
 using rudIsland.RPG3D.Player.Input;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Player.Movement
 {
-    // 현재 이동 모드의 방향 계산과 구르기·방어 루트 이동을 적용한다.
+    // 공통 이동과 Root Motion을 관리하고 방향 계산은 현재 이동 모드에 맡긴다.
     public sealed class PlayerMovement
     {
         private readonly Transform playerTransform; // 씬 또는 시스템 참조
-        private readonly Transform moveCamera; // 이동 정보
         private readonly CharacterController characterController; // 씬 또는 시스템 참조
-        private readonly UnitMovementSeparation movementSeparation;
         private readonly PlayerInputReader playerInput; // 입력 또는 행동 여부
         private readonly float turnSpeed; // 이동 속도
         private readonly float walkSpeed; // 이동 속도
         private readonly float sprintSpeed; // 이동 속도
         private readonly float gravity; // 내부에서 사용하는 값
         private readonly float groundPull; // 내부에서 사용하는 값
-        private readonly HitPushMovement hitPushMovement; // 피격 또는 피해 관련 값
         private readonly PlayerFreeLookMovement freeLookMovement;
         private readonly PlayerTargetMovement targetMovement;
 
@@ -37,33 +33,27 @@ namespace rudIsland.RPG3D.Player.Movement
             Transform playerTransform,
             Transform moveCamera,
             CharacterController characterController,
-            UnitMovementSeparation movementSeparation,
             PlayerInputReader playerInput,
             float turnSpeed,
             float walkSpeed,
             float sprintSpeed,
             float gravity,
-            float groundPull,
-            float hitPushTime)
+            float groundPull)
         {
             this.playerTransform = playerTransform;
-            this.moveCamera = moveCamera;
             this.characterController = characterController;
-            this.movementSeparation = movementSeparation;
             this.playerInput = playerInput;
             this.turnSpeed = Mathf.Max(0f, turnSpeed);
             this.walkSpeed = Mathf.Max(0f, walkSpeed);
             this.sprintSpeed = Mathf.Max(this.walkSpeed, sprintSpeed);
             this.gravity = gravity;
             this.groundPull = groundPull;
-            hitPushMovement = new HitPushMovement(hitPushTime);
             freeLookMovement = new PlayerFreeLookMovement(
                 playerTransform,
                 moveCamera,
                 this.turnSpeed);
             targetMovement = new PlayerTargetMovement(
                 playerTransform,
-                moveCamera,
                 this.turnSpeed);
             currentMovementMode = freeLookMovement;
         }
@@ -97,26 +87,6 @@ namespace rudIsland.RPG3D.Player.Movement
             UpdateVerticalSpeed(deltaTime);
         }
 
-        public void StartHitPush(
-            Vector3 hitDirection,
-            float pushDistance)
-        {
-            hitPushMovement.StartPush(hitDirection, pushDistance);
-        }
-
-        public void UpdateHitPush(float deltaTime)
-        {
-            UpdateVerticalSpeed(deltaTime);
-            Vector3 hitMove = hitPushMovement.GetNextMove(deltaTime);
-            hitMove.y = verticalSpeed * deltaTime;
-            ApplyMovement(hitMove);
-        }
-
-        public void StopHitPush()
-        {
-            hitPushMovement.StopPush();
-        }
-
         public bool TryStartRoll()
         {
             if (!characterController.isGrounded)
@@ -138,28 +108,19 @@ namespace rudIsland.RPG3D.Player.Movement
         {
             Vector2 rollInput =
                 Vector2.ClampMagnitude(playerInput.MoveValue, 1f);
+
             RollDirectionInput = rollInput.sqrMagnitude < 0.01f
                 ? Vector2.down
-                : rollInput.normalized;
-
-            if (!ReferenceEquals(currentMovementMode, targetMovement))
-            {
-                Vector3 cameraForward = moveCamera.forward;
-                cameraForward.y = 0f;
-                if (cameraForward.sqrMagnitude > 0.01f)
-                {
-                    playerTransform.rotation =
-                        Quaternion.LookRotation(cameraForward);
-                }
-            }
+                : currentMovementMode.GetRollDirection(
+                    rollInput.normalized);
 
             verticalSpeed = groundPull;
         }
 
-        // 각 콤보 단계는 카메라가 바라보는 수평 방향을 공격 방향으로 사용한다.
+        // 자유 시점은 카메라 방향을, 타깃 시점은 타깃 방향을 공격 방향으로 사용한다.
         public void SetAttackDirection(bool rotateImmediately)
         {
-            attackDirection = GetAttackDirection();
+            attackDirection = currentMovementMode.GetAttackDirection();
             hasAttackDirection = true;
             if (rotateImmediately)
             {
@@ -170,7 +131,7 @@ namespace rudIsland.RPG3D.Player.Movement
 
         public void UpdateAttackDirection()
         {
-            attackDirection = GetAttackDirection();
+            attackDirection = currentMovementMode.GetAttackDirection();
             hasAttackDirection = true;
         }
 
@@ -203,7 +164,6 @@ namespace rudIsland.RPG3D.Player.Movement
             deltaPosition.y = verticalSpeed * Time.deltaTime;
             ApplyMovement(deltaPosition);
             playerTransform.rotation *= deltaRotation;
-            currentMovementMode.UpdateFacing(Vector3.zero, Time.deltaTime);
         }
 
         public Vector2 GetLocalMoveInput()
@@ -228,17 +188,6 @@ namespace rudIsland.RPG3D.Player.Movement
             return currentMovementMode.GetMoveDirection(moveInput);
         }
 
-        private Vector3 GetAttackDirection()
-        {
-            Vector3 cameraForward = moveCamera.forward;
-            cameraForward.y = 0f;
-            if (cameraForward.sqrMagnitude < 0.01f)
-            {
-                return playerTransform.forward;
-            }
-
-            return cameraForward.normalized;
-        }
 
         private void UpdateVerticalSpeed(float deltaTime)
         {
@@ -253,10 +202,7 @@ namespace rudIsland.RPG3D.Player.Movement
 
         private void ApplyMovement(Vector3 requestedMovement)
         {
-            Vector3 limitedMovement =
-                movementSeparation.LimitApproachMovement(
-                    requestedMovement);
-            characterController.Move(limitedMovement);
+            characterController.Move(requestedMovement);
         }
     }
 }

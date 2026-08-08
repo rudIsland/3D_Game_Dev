@@ -1,6 +1,5 @@
 using System;
 using rudIsland.RPG3D.Characters;
-using rudIsland.RPG3D.Combat;
 using rudIsland.RPG3D.Player;
 using rudIsland.RPG3D.World;
 using UnityEngine;
@@ -14,7 +13,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
     // Unity 씬과 일반 C# Zombie AI를 연결한다.
     public sealed class ZombieController :
         WorldObjectView,
-        IAttackHitReceiver,
         IUnitDeathState
     {
         [Header("필수 연결")]
@@ -23,23 +21,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         [Header("생명")]
         [SerializeField, Min(1f)] private float maxHealth = 100f; // 최대 체력
-
-        [Header("공격별 타격")]
-        [SerializeField] private AttackHitSettings[] attackHitSettings; // 행동 설정 참조
-
-        [Header("경직")]
-        [SerializeField, Min(0.01f)] private float staggerLimit = 20f; // 피격 동작이 나올 경직 한계
-        [SerializeField, Min(0f)] private float staggerRecoverDelay = 1f; // 경직 회복을 기다리는 시간
-        [SerializeField, Min(0f)] private float staggerRecoverSpeed = 10f; // 1초에 회복할 경직 수치
-
-        [Header("피격 밀림")]
-        [SerializeField, Min(0.01f)] private float hitPushTime = 0.18f; // 피격 또는 피해 관련 값
-
-        [Header("Unit 간격")]
-        [SerializeField] private LayerMask unitCollisionLayers =
-            (1 << 6) | (1 << 7);
-        [SerializeField, Min(0f)]
-        private float minimumUnitSeparation = 0.2f;
 
         [Header("사망 후 정리")]
         [SerializeField, Min(0f)] private float deadBodyKeepTime = 2f; // 시간 설정
@@ -66,16 +47,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         private CharacterController characterController; // 씬 또는 시스템 참조
         private ZombieAnimationController zombieAnimation; // 씬 또는 시스템 참조
         private ZombieWorldUnit zombieWorldUnit; // 씬 또는 시스템 참조
-        private MeleeHitDetector activeHitDetector; // 피격 또는 피해 관련 값
 
-        public bool IsAttackHitActive =>
-            activeHitDetector != null;
         public bool IsDead =>
             zombieWorldUnit != null && zombieWorldUnit.IsDead;
-        public HitReaction LastHitReaction =>
-            zombieWorldUnit != null
-                ? zombieWorldUnit.LastHitReaction
-                : default;
         internal bool CanTurnDuringAttack =>
             zombieWorldUnit != null &&
             zombieWorldUnit.CanTurnDuringAttack();
@@ -94,17 +68,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             zombieAnimator.applyRootMotion = true;
             zombieAnimation.ConnectAnimator(zombieAnimator);
 
-            var movementSeparation = new UnitMovementSeparation(
-                characterController,
-                unitCollisionLayers,
-                minimumUnitSeparation);
             var movement = new ZombieMovement(
                 transform,
                 characterController,
-                movementSeparation,
                 gravity,
-                groundPull,
-                hitPushTime);
+                groundPull);
             var stateMachine = new ZombieStateMachine(
                 target,
                 movement,
@@ -121,9 +89,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
             zombieWorldUnit = new ZombieWorldUnit(
                 maxHealth,
-                staggerLimit,
-                staggerRecoverDelay,
-                staggerRecoverSpeed,
                 stateMachine);
             return zombieWorldUnit;
         }
@@ -132,63 +97,10 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         {
             RequestDespawn();
         }
-
-        public bool CanTakeHit =>
-            zombieWorldUnit != null &&
-            zombieWorldUnit.CanTakeHit;
-
-        public int ActivationSequence =>
-            zombieWorldUnit != null
-                ? zombieWorldUnit.ActivationSequence
-                : 0;
-
-        public AttackHitResult ReceiveAttackHit(in AttackHitInput hit)
-        {
-            if (!CanTakeHit)
-            {
-                return AttackHitResult.Ignored;
-            }
-
-            return zombieWorldUnit.ReceiveAttackHit(
-                in hit,
-                transform.forward);
-        }
-
         public void StartAttackHit(int attackNumber)
         {
-            if (!AttackHitSettings.TryFind(
-                    attackHitSettings,
-                    attackNumber,
-                    out AttackHitSettings hitSettings) ||
-                hitSettings.HitDetector == null)
-            {
-                return;
-            }
-
-            if (zombieWorldUnit == null ||
-                !zombieWorldUnit.BeginAttackHit())
-            {
-                return;
-            }
-
-            EndAttackHit();
-
-            var hit = new AttackHitInput(
-                hitSettings.Damage,
-                UnitTeam.Enemy,
-                attackNumber,
-                hitSettings.Strength,
-                hitSettings.StaggerDamage,
-                hitSettings.BlockStaminaDamage,
-                hitSettings.CanBeBlocked,
-                hitSettings.CanBeParried,
-                hitSettings.PushDistance,
-                hitSettings.HitStopTime,
-                default);
-            activeHitDetector = hitSettings.HitDetector;
-            activeHitDetector.StartHit(in hit);
+            zombieWorldUnit?.BeginAttackHit();
         }
-
         public void EndAttackHitAnimationEvent()
         {
             if (zombieWorldUnit?.BeginAttackRecovery() == true)
@@ -199,8 +111,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         public void EndAttackHit()
         {
-            activeHitDetector?.EndHit();
-            activeHitDetector = null;
         }
 
         internal void NotifyAttackAnimationEnded()
@@ -270,14 +180,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         private void OnValidate()
         {
             FindUnityComponents();
-            if (AttackHitSettings.HasDuplicateAttackNumber(
-                    attackHitSettings))
-            {
-                Debug.LogError(
-                    "ZombieController의 공격 번호가 중복되었습니다.",
-                    this);
-            }
-
             findRange = Mathf.Max(0.1f, findRange);
             idleTargetCheckInterval =
                 Mathf.Max(0.01f, idleTargetCheckInterval);

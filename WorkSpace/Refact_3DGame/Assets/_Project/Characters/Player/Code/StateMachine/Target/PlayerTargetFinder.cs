@@ -1,5 +1,4 @@
 using rudIsland.RPG3D.Characters;
-using rudIsland.RPG3D.Combat;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Player.States.Target
@@ -137,18 +136,18 @@ namespace rudIsland.RPG3D.Player.States.Target
                 return false;
             }
 
-            IAttackHitReceiver receiver =
-                targetCollider.GetComponentInParent<IAttackHitReceiver>();
-            Component receiverComponent = receiver as Component;
-            if (receiverComponent == null ||
-                receiverComponent.transform == playerTransform ||
-                !receiverComponent.gameObject.activeInHierarchy)
+            IUnitDeathState deathState =
+                targetCollider.GetComponentInParent<IUnitDeathState>();
+            Component deathStateComponent = deathState as Component;
+            if (deathStateComponent == null ||
+                deathStateComponent.transform == playerTransform ||
+                !deathStateComponent.gameObject.activeInHierarchy)
             {
                 return false;
             }
 
-            target = receiverComponent.transform;
-            targetDeathState = receiver as IUnitDeathState;
+            target = deathStateComponent.transform;
+            targetDeathState = deathState;
             return true;
         }
     }
