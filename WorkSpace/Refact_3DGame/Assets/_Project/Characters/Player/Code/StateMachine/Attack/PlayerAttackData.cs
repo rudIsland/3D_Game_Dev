@@ -11,6 +11,9 @@ namespace rudIsland.RPG3D.Player.States.Attack
         [Header("공격 식별")]
         [SerializeField, Range(1, 6)] private int attackNumber = 1;
 
+        [Header("피해")]
+        [SerializeField, Min(0f)] private float damage = 10f;
+
         [Header("콤보 연결")]
         [SerializeField, Range(0f, 1f)] private float nextInputTime = 1f;
 
@@ -18,12 +21,14 @@ namespace rudIsland.RPG3D.Player.States.Attack
         [SerializeField, Range(0f, 1f)] private float moveScale = 1f;
 
         public int AttackNumber => attackNumber;
+        public float Damage => damage;
         public float NextInputTime => nextInputTime;
         public float MoveScale => moveScale;
 
         private void OnValidate()
         {
             attackNumber = Mathf.Clamp(attackNumber, 1, 6);
+            damage = Mathf.Max(0f, damage);
             nextInputTime = Mathf.Clamp01(nextInputTime);
             moveScale = Mathf.Clamp01(moveScale);
         }

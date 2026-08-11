@@ -1,5 +1,6 @@
 using System;
 using rudIsland.RPG3D.Characters;
+using rudIsland.RPG3D.Characters.Combat.AttackData;
 using rudIsland.RPG3D.Player;
 using rudIsland.RPG3D.World;
 using UnityEngine;
@@ -10,10 +11,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
     [RequireComponent(
         typeof(CharacterController),
         typeof(NightshadeSpearAnimationController))]
+    [RequireComponent(typeof(AudioSource))]
     // Unity 입력과 일반 C# Nightshade 전투 로직을 연결한다.
-    public sealed class NightshadeSpearController :
-        WorldObjectView,
-        IUnitDeathState
+    public sealed class NightshadeSpearController : WorldObjectView, IUnitDeathState, IEnemyDamageReceiver
     {
         [Header("필수 연결")]
         [SerializeField] private Transform target; // 대상 참조
@@ -30,15 +30,27 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         [Header("탐지와 이동")]
         [SerializeField, Min(0.1f)] private float findRange = 25f; // 거리 설정
         [SerializeField, Min(0.1f)] private float runStartRange = 6f; // 거리 설정
-        [SerializeField, Min(0.1f)] private float walkSpeed = 1.6f; // 이동 속도
-        [SerializeField, Min(0.1f)] private float runSpeed = 3.8f; // 이동 속도
-        [SerializeField, Min(1f)] private float turnSpeed = 300f; // 이동 속도
+        [SerializeField, Min(0.1f)] private float walkSpeed = 1.6f; // 걷기 속도
+        [SerializeField, Min(0.1f)] private float runSpeed = 3.8f; // 달리기 속도
+        [SerializeField, Min(1f)] private float turnSpeed = 300f; // 회전 속도
+        [SerializeField, Min(0f)] private float maximumAttackRootMotionSpeed = 6f;
+        [SerializeField, Min(0f)] private float maximumAttackRootMotionTurnSpeed = 360f;
         [SerializeField] private float gravity = -22f; // Inspector 설정 값
         [SerializeField] private float groundPull = -2f; // Inspector 설정 값
 
-        [Header("공격 목록")]
-        [SerializeField] private NightshadeSpearAttackPattern[] attackPatterns = // 행동 설정 참조
-            { new NightshadeSpearAttackPattern() };
+        [Header("공격 판정")]
+        [SerializeField] private Transform attackOrigin;
+        [SerializeField] private LayerMask targetLayers;
+        [SerializeField, Min(0f)] private float attackRange = 1.1f;
+        [SerializeField] private float attackForwardOffset = 1f;
+
+        [Header("공격 예고 음향")]
+        [SerializeField] private AudioSource attackAudioSource;
+        [SerializeField] private AudioClip attackReadyClip;
+        [SerializeField] private AudioClip lightAttackClip;
+        [SerializeField] private AudioClip strongAttackClip;
+
+        private NightShadeSpearAttackRangeDetector attackRangeDetector;
 
 #if UNITY_EDITOR
         [Header("체력 확인")]
@@ -72,6 +84,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         private void Update()
         {
             standaloneWorldUnit?.Tick(Time.deltaTime);
+            attackRangeDetector?.Tick();
         }
 
         private void OnEnable()
@@ -110,12 +123,15 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 transform,
                 characterController,
                 gravity,
-                groundPull);
+                groundPull,
+                maximumAttackRootMotionSpeed,
+                maximumAttackRootMotionTurnSpeed);
+            animationController.ConnectAttackRootMotion(
+                movement.ApplyAttackRootMotion);
             var stateMachine = new NightshadeSpearStateMachine(
                 target,
                 movement,
                 animationController,
-                attackPatterns,
                 findRange,
                 runStartRange,
                 walkSpeed,
@@ -124,6 +140,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 deadBodyKeepTime,
                 StartAttackHit,
                 EndAttackHit,
+                WasAttackDamageApplied,
+                PlayAttackReadyCue,
+                PlayAttackHitCue,
                 RequestDeadNightshadeRelease,
                 canTrackTarget,
                 phaseTwoHealthRate);
@@ -131,17 +150,70 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             nightshadeWorldUnit = new NightshadeSpearWorldUnit(
                 maxHealth,
                 stateMachine);
+
+            if (attackOrigin == null)
+            {
+                attackOrigin = transform;
+            }
+
+            attackRangeDetector = new NightShadeSpearAttackRangeDetector(
+                attackOrigin,
+                targetLayers,
+                attackRange,
+                attackForwardOffset);
             return nightshadeWorldUnit;
         }
-        private void StartAttackHit(
-            NightshadeSpearAttackPattern pattern,
-            int attackNumber)
+
+        private void StartAttackHit(AttackDamage damage, int attackNumber)
         {
+            attackRangeDetector?.Open(damage);
         }
 
         private void EndAttackHit()
         {
-        }        private void RequestDeadNightshadeRelease()
+            attackRangeDetector?.Close();
+        }
+
+        private bool WasAttackDamageApplied()
+        {
+            return attackRangeDetector != null &&
+                attackRangeDetector.WasDamageApplied;
+        }
+
+        private void PlayAttackReadyCue(int attackNumber)
+        {
+            if (attackAudioSource != null && attackReadyClip != null)
+            {
+                attackAudioSource.PlayOneShot(attackReadyClip);
+            }
+        }
+
+        private void PlayAttackHitCue(
+            int attackNumber,
+            bool isStrongAttack)
+        {
+            AudioClip attackClip = isStrongAttack
+                ? strongAttackClip
+                : lightAttackClip;
+            if (attackAudioSource != null && attackClip != null)
+            {
+                attackAudioSource.PlayOneShot(attackClip);
+            }
+        }
+
+        private void ConfigureAttackAudioSource()
+        {
+            if (attackAudioSource == null)
+            {
+                return;
+            }
+
+            attackAudioSource.playOnAwake = false;
+            attackAudioSource.spatialBlend = 1f;
+            attackAudioSource.dopplerLevel = 0f;
+        }
+
+        private void RequestDeadNightshadeRelease()
         {
             if (standaloneWorldUnit != null)
             {
@@ -163,6 +235,12 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         {
             characterController = GetComponent<CharacterController>();
             animationController = GetComponent<NightshadeSpearAnimationController>();
+            if (attackAudioSource == null)
+            {
+                attackAudioSource = GetComponent<AudioSource>();
+            }
+
+            ConfigureAttackAudioSource();
             if (nightshadeAnimator == null)
             {
                 nightshadeAnimator = GetComponentInChildren<Animator>(true);
@@ -175,6 +253,12 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             animationController?.ResetAnimation();
         }
 
+        public void TakeDamage(float damage, Vector3 hitPosition)
+        {
+            nightshadeWorldUnit?.TakeDamage(damage, hitPosition);
+        }
+
+
 #if UNITY_EDITOR
         [ContextMenu("Test Damage")]
         private void TestDamage()
@@ -185,7 +269,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 return;
             }
 
-            nightshadeWorldUnit.TakeDamage(testDamage);
+            nightshadeWorldUnit.TakeDamage(
+                testDamage,
+                transform.position);
         }
 
         private void OnValidate()
@@ -195,17 +281,19 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             runStartRange = Mathf.Clamp(runStartRange, 0.1f, findRange);
             walkSpeed = Mathf.Max(0.1f, walkSpeed);
             runSpeed = Mathf.Max(walkSpeed, runSpeed);
+            turnSpeed = Mathf.Max(1f, turnSpeed);
+            maximumAttackRootMotionSpeed = Mathf.Max(
+                0f,
+                maximumAttackRootMotionSpeed);
+            maximumAttackRootMotionTurnSpeed = Mathf.Max(
+                0f,
+                maximumAttackRootMotionTurnSpeed);
             deadBodyKeepTime = Mathf.Max(0f, deadBodyKeepTime);
             phaseTwoHealthRate = Mathf.Clamp(
                 phaseTwoHealthRate,
                 0.1f,
                 0.9f);
 
-            if (attackPatterns == null) return;
-            for (int index = 0; index < attackPatterns.Length; index++)
-            {
-                attackPatterns[index]?.ClampValues();
-            }
         }
 
         private void OnDrawGizmosSelected()

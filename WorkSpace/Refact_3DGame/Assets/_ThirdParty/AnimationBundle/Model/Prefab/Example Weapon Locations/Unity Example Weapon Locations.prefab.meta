@@ -7,9 +7,9 @@ PrefabImporter:
   assetBundleVariant: 
 AssetOrigin:
   serializedVersion: 1
-  productId: 309177
-  packageName: RPG_Animations - One Hand Base
-  packageVersion: 1.10
-  assetPath: Assets/DoubleL/Model/Prefab/Example Weapon Locations/Unity Example Weapon
-    Locations.prefab
-  uploadId: 911544
+  productId: 309180
+  packageName: RPG_Animations - Two Hand Up
+  packageVersion: 1.5
+  assetPath: Assets/_ThirdParty/AnimationBundle/Model/Prefab/Example Weapon Locations/Unity
+    Example Weapon Locations.prefab
+  uploadId: 927032

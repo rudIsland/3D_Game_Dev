@@ -1,6 +1,7 @@
 using rudIsland.RPG3D.Characters;
 using rudIsland.RPG3D.Player.Input;
 using rudIsland.RPG3D.Player.States;
+using rudIsland.RPG3D.Characters.Combat.AttackData;
 
 namespace rudIsland.RPG3D.Player
 {
@@ -23,15 +24,37 @@ namespace rudIsland.RPG3D.Player
 
         public void TakeDamage(float damage)
         {
+            ApplyDamage(damage);
+        }
+
+        public bool TryTakeDamage(AttackDamage attackDamage)
+        {
+            if (attackDamage == null ||
+                IsDead ||
+                playerStateMachine.IsInvulnerable)
+            {
+                return false;
+            }
+
+            return ApplyDamage(attackDamage.HealthDamage);
+        }
+
+        private bool ApplyDamage(float damage)
+        {
             float healthBeforeDamage = Health.CurrentHealth;
             Health.TakeDamage(damage);
 
-            if (Health.CurrentHealth >= healthBeforeDamage || IsDead)
+            if (Health.CurrentHealth >= healthBeforeDamage)
             {
-                return;
+                return false;
             }
 
-            playerStateMachine.ChangeToHitState();
+            if (!IsDead)
+            {
+                playerStateMachine.ChangeToHitState();
+            }
+
+            return true;
         }
 
 

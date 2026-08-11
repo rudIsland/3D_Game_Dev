@@ -4475,15 +4475,19 @@ MonoBehaviour:
   moveCamera: {fileID: 519073573}
   playerAnimator: {fileID: 247913600}
   maxHealth: 100
+  attackData:
+  - {fileID: 11400000, guid: a1014b8e7c624e0e91f4d0c3b2a19876, type: 2}
+  - {fileID: 11400000, guid: a2024b8e7c624e0e91f4d0c3b2a19876, type: 2}
+  - {fileID: 11400000, guid: a3034b8e7c624e0e91f4d0c3b2a19876, type: 2}
+  - {fileID: 11400000, guid: a4044b8e7c624e0e91f4d0c3b2a19876, type: 2}
+  - {fileID: 11400000, guid: a5054b8e7c624e0e91f4d0c3b2a19876, type: 2}
+  - {fileID: 11400000, guid: a6064b8e7c624e0e91f4d0c3b2a19876, type: 2}
   testDamage: 10
   turnSpeed: 720
   walkSpeed: 2.5
   sprintSpeed: 5
   animationSmoothTime: 0.12
-  attack01NextInputTime: 0.57
-  attack02NextInputTime: 0.62
-  attack03NextInputTime: 0.62
-  attack04NextInputTime: 0.58
+  comboInputBufferDuration: 0.25
   gravity: -22
   groundPull: -2
 --- !u!1 &1712270763

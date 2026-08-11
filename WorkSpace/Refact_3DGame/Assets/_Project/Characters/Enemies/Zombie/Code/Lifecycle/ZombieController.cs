@@ -13,7 +13,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
     // Unity 씬과 일반 C# Zombie AI를 연결한다.
     public sealed class ZombieController :
         WorldObjectView,
-        IUnitDeathState
+        IUnitDeathState,
+        IEnemyDamageReceiver
     {
         [Header("필수 연결")]
         [SerializeField] private Transform target; // 대상 참조
@@ -51,8 +52,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         public bool IsDead =>
             zombieWorldUnit != null && zombieWorldUnit.IsDead;
         internal bool CanTurnDuringAttack =>
-            zombieWorldUnit != null &&
-            zombieWorldUnit.CanTurnDuringAttack();
+            zombieWorldUnit != null && zombieWorldUnit.CanTurnDuringAttack();
 
         protected override IWorldObject CreateRuntimeObject()
         {
@@ -139,7 +139,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
             float healthBeforeDamage = zombieWorldUnit.CurrentHealth;
 
-            zombieWorldUnit.TakeDamage(testDamage);
+            zombieWorldUnit.TakeDamage(testDamage, transform.position);
 
             Debug.Log(
                 $"좀비 체력: {healthBeforeDamage} → {zombieWorldUnit.CurrentHealth}",
@@ -175,6 +175,13 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             EndAttackHit();
             zombieAnimation?.ResetAnimation();
         }
+
+        public void TakeDamage(float damage, Vector3 hitPosition)
+        {
+            zombieWorldUnit?.TakeDamage(damage, hitPosition);
+        }
+
+
 
 #if UNITY_EDITOR
         private void OnValidate()

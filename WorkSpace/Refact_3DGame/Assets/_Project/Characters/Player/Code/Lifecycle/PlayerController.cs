@@ -4,15 +4,18 @@ using rudIsland.RPG3D.Player.Camera;
 using rudIsland.RPG3D.Player.Input;
 using rudIsland.RPG3D.Player.Movement;
 using rudIsland.RPG3D.Player.States;
+using rudIsland.RPG3D.Player.States.Attack;
 using rudIsland.RPG3D.Player.States.Target;
 using rudIsland.RPG3D.World;
+using rudIsland.RPG3D.Player.Runtime.Hit;
+using rudIsland.RPG3D.Characters.Combat.AttackData;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Player
 {
     [RequireComponent(typeof(CharacterController))]
     // Unity 생명주기에서 플레이어 입력, 이동, Animator를 연결한다.
-    public sealed class PlayerController : MonoBehaviour
+    public sealed class PlayerController : WorldObjectView, IPlayerDamageReceiver
     {
         private const int ActiveCameraPriority = 20;
         private const int InactiveCameraPriority = 10;
@@ -54,31 +57,23 @@ namespace rudIsland.RPG3D.Player
         [Tooltip("1이면 원래 거리, 0.5면 절반, 1.5면 1.5배 이동합니다.")]
         [SerializeField, Min(0f)] private float rollDistanceScale = 0.1f; // 거리 설정
 
-        [Header("콤보 연결 시점 (0~1)")]
-        [Tooltip("1타 재생이 이 비율을 넘은 뒤부터 2타 입력을 받습니다.")]
-        [SerializeField, Range(0f, 1f)] private float attack01NextInputTime = 0.46f; // 공격 관련 설정 또는 상태
-        [Tooltip("2타 재생이 이 비율을 넘은 뒤부터 3타 입력을 받습니다.")]
-        [SerializeField, Range(0f, 1f)] private float attack02NextInputTime = 0.58f; // 공격 관련 설정 또는 상태
-        [Tooltip("3타 재생이 이 비율을 넘은 뒤부터 4타 입력을 받습니다.")]
-        [SerializeField, Range(0f, 1f)] private float attack03NextInputTime = 0.52f; // 공격 관련 설정 또는 상태
-        [Tooltip("4타 재생이 이 비율을 넘은 뒤부터 5타 입력을 받습니다.")]
-        [SerializeField, Range(0f, 1f)] private float attack04NextInputTime = 0.50f; // 공격 관련 설정 또는 상태
+        [Header("공격 데이터")]
+        [SerializeField] private PlayerAttackData[] attackData =
+            new PlayerAttackData[6];
 
         [Header("콤보 입력 버퍼")]
         [Tooltip("콤보 연결 시점 전에 누른 공격 입력을 보관하는 시간입니다.")]
         [SerializeField, Min(0f)] private float comboInputBufferDuration = 0.25f; // 시간 설정
 
-        [Header("공격 전진 거리 비율 (0~1)")]
-        [SerializeField, Range(0f, 1f)] private float attack01MoveScale = 0.35f; // 공격 관련 설정 또는 상태
-        [SerializeField, Range(0f, 1f)] private float attack02MoveScale = 0.50f; // 공격 관련 설정 또는 상태
-        [SerializeField, Range(0f, 1f)] private float attack03MoveScale = 0.45f; // 공격 관련 설정 또는 상태
-        [SerializeField, Range(0f, 1f)] private float attack04MoveScale = 0.40f; // 공격 관련 설정 또는 상태
-        [SerializeField, Range(0f, 1f)] private float attack05MoveScale = 0.30f; // 공격 관련 설정 또는 상태
-        [SerializeField, Range(0f, 1f)] private float runAttackMoveScale = 0.45f; // 공격 관련 설정 또는 상태
-
         [Header("중력")]
         [SerializeField] private float gravity = -22f; // Inspector 설정 값
         [SerializeField] private float groundPull = -2f; // Inspector 설정 값
+
+        [Header("공격 범위 확인")]
+        [SerializeField] private Transform attackOrigin;
+        [SerializeField] private LayerMask attackLayers;
+        [SerializeField, Min(0f)] private float attackRadius = 1.1f;
+        [SerializeField] private float attackForwardOffset = 1f;
 
         private CharacterController characterController; // 씬 또는 시스템 참조
         private PlayerInputReader playerInput; // 입력 또는 행동 여부
@@ -100,6 +95,15 @@ namespace rudIsland.RPG3D.Player
                 return;
             }
 
+            if (!HasValidAttackData())
+            {
+                Debug.LogError(
+                    "PlayerController에 공격 1~6 PlayerAttackData가 필요합니다.",
+                    this);
+                enabled = false;
+                return;
+            }
+
             characterController = GetComponent<CharacterController>();
             if (playerAnimator == null)
             {
@@ -111,6 +115,13 @@ namespace rudIsland.RPG3D.Player
                 playerAnimator.applyRootMotion = true;
             }
 
+            //공격자의 현재 위치가 null이면 PlayerController의 transform을 공격 시작 위치로 사용한다.
+            if(attackOrigin==null) attackOrigin = transform;
+            LayerMask attackMask =
+            attackLayers.value != 0
+                ? attackLayers
+                : targetLayers;
+
             playerInput = new PlayerInputReader();
             playerMovement = new PlayerMovement(
                 transform,
@@ -121,7 +132,8 @@ namespace rudIsland.RPG3D.Player
                 walkSpeed,
                 sprintSpeed,
                 gravity,
-                groundPull);            var targetFinder = new PlayerTargetFinder(
+                groundPull);
+            var targetFinder = new PlayerTargetFinder(
                 transform,
                 moveCamera,
                 targetLayers,
@@ -141,20 +153,16 @@ namespace rudIsland.RPG3D.Player
                 playerAnimator,
                 animationSmoothTime,
                 rollDistanceScale,
-                attack01NextInputTime,
-                attack02NextInputTime,
-                attack03NextInputTime,
-                attack04NextInputTime,
+                attackData,
                 comboInputBufferDuration,
-                attack01MoveScale,
-                attack02MoveScale,
-                attack03MoveScale,
-                attack04MoveScale,
-                attack05MoveScale,
-                runAttackMoveScale,
                 targetFinder,
                 targetCamera,
-                Mathf.Max(targetRange, targetBreakDistance));
+                Mathf.Max(targetRange, targetBreakDistance),
+                attackOrigin,
+                attackMask,
+                attackRadius,
+                attackForwardOffset
+                );
             playerWorldUnit = new PlayerWorldUnit(
                 maxHealth,
                 playerInput,
@@ -181,24 +189,27 @@ namespace rudIsland.RPG3D.Player
             playerStateMachine?.ApplyRootMotion(deltaPosition, deltaRotation);
         }
 
-        public void TakeDamage(float damage)
+        public bool TryTakeDamage(AttackDamage attackDamage)
         {
-            playerWorldUnit?.TakeDamage(damage);
+            return playerWorldUnit != null &&
+                playerWorldUnit.TryTakeDamage(attackDamage);
         }
 
 
         public void StartAttackHit(int attackNumber)
         {
-            // 기존 애니메이션 이벤트 이름은 유지하고, 새 공격 판정은 상태머신에서 구현한다.
+            playerStateMachine?.BeginAttackHit(attackNumber);
         }
 
         public void EndAttackHit()
         {
+            playerStateMachine?.EndAttackHit();
         }
 
         public void NotifyAttackHitEnded()
         {
-            playerStateMachine?.NotifyAttackHitEnded();
+            playerStateMachine?.EndAttackHit(); //공격 판정 윈도우 종료
+            playerStateMachine?.NotifyAttackHitEnded(); //콤보 공격 입력 가능 상태로 전환
         }
 
         internal void NotifyAttackAnimationEnded()
@@ -233,6 +244,25 @@ namespace rudIsland.RPG3D.Player
             playerWorldUnit.Dispose();
         }
 
+        private bool HasValidAttackData()
+        {
+            if (attackData == null || attackData.Length != 6)
+            {
+                return false;
+            }
+
+            for (int index = 0; index < attackData.Length; index++)
+            {
+                if (attackData[index] == null ||
+                    attackData[index].AttackNumber != index + 1)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
 
 #if UNITY_EDITOR
         [ContextMenu("Test Damage")]
@@ -252,6 +282,11 @@ namespace rudIsland.RPG3D.Player
             Debug.Log(
                 $"플레이어 체력: {healthBeforeDamage} → {playerWorldUnit.CurrentHealth}",
                 this);
+        }
+
+        protected override IWorldObject CreateRuntimeObject()
+        {
+            throw new System.NotImplementedException();
         }
 #endif
     }

@@ -25,19 +25,13 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 return;
             }
 
-            NightshadeSpearAttackPattern attack =
-                stateMachine.ChooseAttack(out int attackNumber);
-            if (attack != null)
-            {
-                stateMachine.ChangeToAttackState(attack, attackNumber);
-                return;
-            }
-
             if (stateMachine.GetTargetDistanceSquared() <=
                 stateMachine.MaximumAttackRangeSquared)
             {
-                stateMachine.TurnToTarget(deltaTime);
-                return;
+                if (stateMachine.TryChangeToContextAttackState())
+                {
+                    return;
+                }
             }
 
             stateMachine.MoveToTarget(deltaTime);

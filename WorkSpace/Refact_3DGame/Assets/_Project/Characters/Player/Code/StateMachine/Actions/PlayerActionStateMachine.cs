@@ -19,6 +19,9 @@ namespace rudIsland.RPG3D.Player.States.Actions
         public bool IsBlocking => ReferenceEquals(currentState, blockState);
         public bool IsRolling => ReferenceEquals(currentState, rollState);
         public bool IsAttacking => ReferenceEquals(currentState, attackState);
+        public bool IsInvulnerable =>
+            ReferenceEquals(currentState, rollState) &&
+            rollState.IsInvulnerable;
 
         public PlayerActionStateMachine(
             PlayerStateMachine stateMachine,

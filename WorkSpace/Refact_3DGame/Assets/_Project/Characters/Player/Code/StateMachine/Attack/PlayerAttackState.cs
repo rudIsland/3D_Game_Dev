@@ -25,47 +25,33 @@ namespace rudIsland.RPG3D.Player.States.Attack
 
         public bool IsFinished { get; private set; }
         public float CurrentMoveScale =>
-            currentAttackState != null
-                ? currentAttackState.MoveScale
-                : 0f;
+            currentAttackState != null ? currentAttackState.MoveScale: 0f;
+
+        public float AttackDamage => 
+            currentAttackState != null ? currentAttackState.Damage : 0f;
 
         public PlayerAttackState(
             PlayerStateMachine stateMachine,
             PlayerAnimationController animationController,
-            float attack01NextInputTime,
-            float attack02NextInputTime,
-            float attack03NextInputTime,
-            float attack04NextInputTime,
-            float comboInputBufferDuration,
-            float attack01MoveScale,
-            float attack02MoveScale,
-            float attack03MoveScale,
-            float attack04MoveScale,
-            float attack05MoveScale,
-            float runAttackMoveScale)
+            PlayerAttackData[] attackData,
+            float comboInputBufferDuration)
         {
             this.stateMachine = stateMachine;
             this.animationController = animationController;
             this.comboInputBufferDuration = comboInputBufferDuration;
 
+            ValidateAttackData(attackData);
+
             // 플레이어 생성 시 공격별 상태 객체를 한 번만 만든다.
             comboAttackStates = new IAttackState[]
             {
-                new PlayerComboAttack01State(
-                    attack01NextInputTime,
-                    attack01MoveScale),
-                new PlayerComboAttack02State(
-                    attack02NextInputTime,
-                    attack02MoveScale),
-                new PlayerComboAttack03State(
-                    attack03NextInputTime,
-                    attack03MoveScale),
-                new PlayerComboAttack04State(
-                    attack04NextInputTime,
-                    attack04MoveScale),
-                new PlayerComboAttack05State(attack05MoveScale)
+                new PlayerComboAttack01State(attackData[0]),
+                new PlayerComboAttack02State(attackData[1]),
+                new PlayerComboAttack03State(attackData[2]),
+                new PlayerComboAttack04State(attackData[3]),
+                new PlayerComboAttack05State(attackData[4])
             };
-            runAttackState = new PlayerRunAttackState(runAttackMoveScale);
+            runAttackState = new PlayerRunAttackState(attackData[5]);
         }
 
         public void Prepare(bool startAsRunAttack)
@@ -216,6 +202,27 @@ namespace rudIsland.RPG3D.Player.States.Attack
         {
             hasBufferedAttackInput = false;
             bufferedAttackInputAge = 0f;
+        }
+
+        private static void ValidateAttackData(PlayerAttackData[] attackData)
+        {
+            if (attackData == null || attackData.Length != LastComboNumber + 1)
+            {
+                throw new System.ArgumentException(
+                    "PlayerAttackData는 공격 1~6까지 6개가 필요합니다.",
+                    nameof(attackData));
+            }
+
+            for (int index = 0; index < attackData.Length; index++)
+            {
+                if (attackData[index] == null ||
+                    attackData[index].AttackNumber != index + 1)
+                {
+                    throw new System.ArgumentException(
+                        $"PlayerAttackData[{index}]의 공격 번호가 올바르지 않습니다.",
+                        nameof(attackData));
+                }
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ namespace rudIsland.RPG3D.Player.States.Attack
     internal interface IAttackState
     {
         int AttackNumber { get; }
+        float Damage { get; }
         float NextInputTime { get; }
         float MoveScale { get; }
     }

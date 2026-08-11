@@ -1,4 +1,5 @@
 using System;
+using rudIsland.RPG3D.Characters.Combat.AttackData;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.NightShade
@@ -6,27 +7,42 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
     // 상태 생성과 전환, Nightshade 공용 전투 정보를 조정한다.
     public sealed class NightshadeSpearStateMachine
     {
+        private const float PhaseOneAttackSpeedMultiplier = 0.75f;
+        private const float PhaseTwoAttackSpeedMultiplier = 0.95f;
+        private const float PhaseOneReadySpeedMultiplier = 0.55f;
+        private const float PhaseTwoReadySpeedMultiplier = 0.7f;
+        private const float PhaseOneReadyDuration = 0.5f;
+        private const float PhaseTwoReadyDuration = 0.45f;
+        private const float PhaseOneSequenceRecoveryDuration = 0.7f;
+        private const float PhaseTwoSequenceRecoveryDuration = 0.55f;
+        private const int PhaseOneMaximumSequenceCount = 2;
+        private const int PhaseTwoMaximumSequenceCount = 3;
+
         private readonly Transform target;
         private readonly NightshadeSpearMovement movement;
         private readonly NightshadeSpearAnimationController animation;
-        private readonly NightshadeSpearAttackPattern[] attackPatterns;
-        private readonly NightshadeSpearAttackChooser attackChooser;
         private readonly NightshadeSpearEnterState enterState;
         private readonly NightshadeSpearIdleState idleState;
         private readonly NightshadeSpearChaseState chaseState;
-        private readonly NightshadeSpearAttackState attackState;
+        private readonly NightshadeSpearAttackState[] attackStates;
         private readonly NightshadeSpearHitState hitState;
         private readonly NightshadeSpearDeadState deadState;
-        private readonly Action<NightshadeSpearAttackPattern, int> startAttackHit;
+        private readonly Action<AttackDamage, int> startAttackHit;
         private readonly Action endAttackHit;
+        private readonly Func<bool> wasAttackDamageApplied;
+        private readonly Action<int> playAttackReadyCue;
+        private readonly Action<int, bool> playAttackHitCue;
         private readonly Action requestRelease;
         private readonly bool canTrackTarget;
         private readonly float phaseTwoHealthRate;
 
         private INightshadeSpearState currentState;
+        private NightshadeSpearAttackState currentAttackState;
         private float currentTime;
         private bool isEnabled;
         private int currentPhase = 1;
+        private NightshadeSpearAttackId lastStartingAttackId;
+        private int sequenceAttackCount;
 
         internal Transform Target => target;
         internal NightshadeSpearMovement Movement => movement;
@@ -42,25 +58,35 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         public int CurrentPhase => currentPhase;
         public bool IsEnabled => isEnabled;
         public string CurrentStateName =>
-            currentState != null ? currentState.Name : "Disabled";
+            currentState != null
+                ? currentState.GetType().Name
+                : "Disabled";
         public string CurrentAttackName =>
-            ReferenceEquals(currentState, attackState)
-                ? attackState.CurrentAttackName
+            currentAttackState != null &&
+            ReferenceEquals(currentState, currentAttackState)
+                ? currentAttackState.AttackId.ToString()
+                : string.Empty;
+        public string CurrentAttackPhaseName =>
+            currentAttackState != null &&
+            ReferenceEquals(currentState, currentAttackState)
+                ? currentAttackState.CurrentPhase.ToString()
                 : string.Empty;
 
         public NightshadeSpearStateMachine(
             Transform target,
             NightshadeSpearMovement movement,
             NightshadeSpearAnimationController animation,
-            NightshadeSpearAttackPattern[] attackPatterns,
             float findRange,
             float runStartRange,
             float walkSpeed,
             float runSpeed,
             float turnSpeed,
             float deadBodyKeepTime,
-            Action<NightshadeSpearAttackPattern, int> startAttackHit,
+            Action<AttackDamage, int> startAttackHit,
             Action endAttackHit,
+            Func<bool> wasAttackDamageApplied,
+            Action<int> playAttackReadyCue,
+            Action<int, bool> playAttackHitCue,
             Action requestRelease,
             bool canTrackTarget = true,
             float phaseTwoHealthRate = 0.6f)
@@ -68,25 +94,33 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             this.target = target;
             this.movement = movement;
             this.animation = animation;
-            this.attackPatterns = attackPatterns ??
-                Array.Empty<NightshadeSpearAttackPattern>();
-            attackChooser = new NightshadeSpearAttackChooser(
-                this.attackPatterns);
 
             FindRangeSquared = findRange * findRange;
             RunStartRangeSquared = runStartRange * runStartRange;
 
-            float maximumAttackRangeSquared = 0f;
-            for (int index = 0; index < this.attackPatterns.Length; index++)
+            attackStates = new NightshadeSpearAttackState[]
             {
-                NightshadeSpearAttackPattern pattern =
-                    this.attackPatterns[index];
-                if (pattern != null)
-                {
-                    maximumAttackRangeSquared = Mathf.Max(
-                        maximumAttackRangeSquared,
-                        pattern.MaximumDistanceSquared);
-                }
+                new NightshadeSpearAttack01State(this),
+                new NightshadeSpearAttack02State(this),
+                new NightshadeSpearAttack03State(this),
+                new NightshadeSpearAttack04State(this),
+                new NightshadeSpearAttack05State(this),
+                new NightshadeSpearAttack06State(this),
+                new NightshadeSpearAttack07State(this),
+                new NightshadeSpearAttack08State(this),
+                new NightshadeSpearAttack09State(this),
+                new NightshadeSpearAttack10State(this),
+                new NightshadeSpearAttack11State(this),
+                new NightshadeSpearAttack12State(this),
+                new NightshadeSpearAttack13State(this)
+            };
+
+            float maximumAttackRangeSquared = 0f;
+            for (int index = 0; index < attackStates.Length; index++)
+            {
+                maximumAttackRangeSquared = Mathf.Max(
+                    maximumAttackRangeSquared,
+                    attackStates[index].MaximumAttackDistanceSquared);
             }
 
             MaximumAttackRangeSquared = maximumAttackRangeSquared;
@@ -96,6 +130,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             DeadBodyKeepTime = Mathf.Max(0f, deadBodyKeepTime);
             this.startAttackHit = startAttackHit;
             this.endAttackHit = endAttackHit;
+            this.wasAttackDamageApplied = wasAttackDamageApplied;
+            this.playAttackReadyCue = playAttackReadyCue;
+            this.playAttackHitCue = playAttackHitCue;
             this.requestRelease = requestRelease;
             this.canTrackTarget = canTrackTarget;
             this.phaseTwoHealthRate = Mathf.Clamp01(phaseTwoHealthRate);
@@ -103,7 +140,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             enterState = new NightshadeSpearEnterState(this);
             idleState = new NightshadeSpearIdleState(this);
             chaseState = new NightshadeSpearChaseState(this);
-            attackState = new NightshadeSpearAttackState(this);
             hitState = new NightshadeSpearHitState(this);
             deadState = new NightshadeSpearDeadState(this);
         }
@@ -118,12 +154,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             isEnabled = true;
             currentTime = 0f;
             currentPhase = 1;
-            attackChooser.Reset();
-
-            for (int index = 0; index < attackPatterns.Length; index++)
-            {
-                attackPatterns[index]?.Prepare();
-            }
+            lastStartingAttackId = 0;
+            sequenceAttackCount = 0;
 
             movement.Reset();
             animation.ResetAnimation();
@@ -152,17 +184,19 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             currentState?.Exit();
             EndAttackHit();
             currentState = null;
+            currentAttackState = null;
+            sequenceAttackCount = 0;
             isEnabled = false;
             animation.ResetAnimation();
         }
-        public void ChangeToHitState()
+        public void ChangeToHitState(Vector3 hitPosition)
         {
             if (!isEnabled || ReferenceEquals(currentState, deadState))
             {
                 return;
             }
 
-            ChangeToHitStateInternal();
+            ChangeToHitStateInternal(hitPosition);
         }
 
         public void SetHealthRatio(float healthRatio)
@@ -211,7 +245,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             return Vector3.Dot(movement.Forward, direction);
         }
 
-        internal void MoveToTarget(float deltaTime)
+        internal void MoveToTarget(
+            float deltaTime,
+            bool shouldTurn = true)
         {
             float distanceSquared = GetTargetDistanceSquared();
             bool shouldRun = distanceSquared >= RunStartRangeSquared;
@@ -220,26 +256,24 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 target.position,
                 moveSpeed,
                 TurnSpeed,
-                deltaTime);
+                deltaTime,
+                shouldTurn);
             float moveSide = Vector3.Dot(movement.Right, direction);
             animation.SetMovement(moveSide, shouldRun ? 1f : 0.5f);
         }
 
-        internal void MoveAwayFromTarget(float deltaTime)
+        internal void MoveAwayFromTarget(
+            float deltaTime,
+            bool shouldTurn = true)
         {
             Vector3 direction = movement.MoveAwayFrom(
                 target.position,
                 WalkSpeed,
                 TurnSpeed,
-                deltaTime);
+                deltaTime,
+                shouldTurn);
             float moveSide = Vector3.Dot(movement.Right, direction);
             animation.SetMovement(moveSide, 0.5f);
-        }
-
-        internal void TurnToTarget(float deltaTime)
-        {
-            animation.SetMovement(0f, 0f);
-            movement.TurnTo(target.position, TurnSpeed, deltaTime);
         }
 
         internal void StayOnGround(float deltaTime)
@@ -247,20 +281,185 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             movement.StayOnGround(deltaTime);
         }
 
-        internal NightshadeSpearAttackPattern ChooseAttack(out int attackNumber)
+        internal bool TryChangeToContextAttackState()
         {
-            return attackChooser.Choose(
-                GetTargetDistanceSquared(),
-                GetTargetFacingDot(),
-                currentTime,
-                currentPhase,
-                out attackNumber);
+            float targetDistanceSquared = GetTargetDistanceSquared();
+            float targetFacingDot = GetTargetFacingDot();
+            NightshadeSpearAttackState selectedAttack = null;
+            int availableAttackCount = 0;
+            NightshadeSpearAttackState repeatedAttack = null;
+
+            for (int index = 0; index < attackStates.Length; index++)
+            {
+                NightshadeSpearAttackState attackState = attackStates[index];
+                if (!CanStartAttackSequence(
+                        attackState,
+                        targetDistanceSquared,
+                        targetFacingDot))
+                {
+                    continue;
+                }
+
+                if (attackState.AttackId == lastStartingAttackId)
+                {
+                    repeatedAttack = attackState;
+                    continue;
+                }
+
+                availableAttackCount++;
+                if (UnityEngine.Random.Range(0, availableAttackCount) == 0)
+                {
+                    selectedAttack = attackState;
+                }
+            }
+
+            selectedAttack = selectedAttack ?? repeatedAttack;
+            if (selectedAttack == null)
+            {
+                return false;
+            }
+
+            lastStartingAttackId = selectedAttack.AttackId;
+            sequenceAttackCount = 1;
+            ChangeToAttackState(selectedAttack);
+            return true;
+        }
+
+        internal bool TryChangeToFollowUpState(
+            NightshadeSpearAttackState completedAttack,
+            bool wasDamageApplied)
+        {
+            if (completedAttack == null ||
+                !CanContinueAttackSequence(
+                    currentPhase,
+                    sequenceAttackCount,
+                    wasDamageApplied,
+                    completedAttack.AttackId) ||
+                !TryGetFollowUpAttackId(
+                    completedAttack.AttackId,
+                    out NightshadeSpearAttackId followUpAttackId))
+            {
+                return false;
+            }
+
+            sequenceAttackCount++;
+            completedAttack.PrepareFollowUpTransition();
+            ChangeToAttackState(GetAttackState(followUpAttackId));
+            return true;
+        }
+
+        internal static bool CanContinueAttackSequence(
+            int phase,
+            int currentSequenceCount,
+            bool wasDamageApplied,
+            NightshadeSpearAttackId completedAttackId)
+        {
+            return currentSequenceCount > 0 &&
+                currentSequenceCount < GetMaximumSequenceCount(phase) &&
+                (phase >= 2 || wasDamageApplied) &&
+                TryGetFollowUpAttackId(completedAttackId, out _);
+        }
+
+        internal bool CanStartAttackSequence(
+            NightshadeSpearAttackState attackState,
+            float targetDistanceSquared,
+            float targetFacingDot)
+        {
+            return attackState != null &&
+                attackState.IsFacingTarget(targetFacingDot) &&
+                IsContextAttackDistanceAllowed(
+                    attackState.AttackId,
+                    currentPhase,
+                    targetDistanceSquared);
+        }
+
+        internal static bool IsContextAttackDistanceAllowed(
+            NightshadeSpearAttackId attackId,
+            int phase,
+            float targetDistanceSquared)
+        {
+            float minimumDistance;
+            float maximumDistance;
+
+            switch (attackId)
+            {
+                case NightshadeSpearAttackId.Attack01:
+                case NightshadeSpearAttackId.Attack02:
+                case NightshadeSpearAttackId.Attack03:
+                    minimumDistance = 0f;
+                    maximumDistance = 2.3f;
+                    break;
+                case NightshadeSpearAttackId.Attack05:
+                    minimumDistance = 1f;
+                    maximumDistance = 2.8f;
+                    break;
+                case NightshadeSpearAttackId.Attack04:
+                    minimumDistance = 2f;
+                    maximumDistance = 3f;
+                    break;
+                case NightshadeSpearAttackId.Attack09 when phase >= 2:
+                    minimumDistance = 0f;
+                    maximumDistance = 2.6f;
+                    break;
+                case NightshadeSpearAttackId.Attack10 when phase >= 2:
+                    minimumDistance = 1.2f;
+                    maximumDistance = 2.8f;
+                    break;
+                case NightshadeSpearAttackId.Attack11 when phase >= 2:
+                    minimumDistance = 0f;
+                    maximumDistance = 1.8f;
+                    break;
+                case NightshadeSpearAttackId.Attack07 when phase >= 2:
+                    minimumDistance = 3f;
+                    maximumDistance = 5f;
+                    break;
+                default:
+                    return false;
+            }
+
+            float safeDistanceSquared = Mathf.Max(0f, targetDistanceSquared);
+            return safeDistanceSquared >= minimumDistance * minimumDistance &&
+                safeDistanceSquared <= maximumDistance * maximumDistance;
+        }
+
+        internal static bool TryGetFollowUpAttackId(
+            NightshadeSpearAttackId attackId,
+            out NightshadeSpearAttackId followUpAttackId)
+        {
+            switch (attackId)
+            {
+                case NightshadeSpearAttackId.Attack01:
+                    followUpAttackId = NightshadeSpearAttackId.Attack06;
+                    return true;
+                case NightshadeSpearAttackId.Attack02:
+                    followUpAttackId = NightshadeSpearAttackId.Attack03;
+                    return true;
+                case NightshadeSpearAttackId.Attack04:
+                    followUpAttackId = NightshadeSpearAttackId.Attack05;
+                    return true;
+                case NightshadeSpearAttackId.Attack07:
+                    followUpAttackId = NightshadeSpearAttackId.Attack08;
+                    return true;
+                case NightshadeSpearAttackId.Attack09:
+                    followUpAttackId = NightshadeSpearAttackId.Attack10;
+                    return true;
+                case NightshadeSpearAttackId.Attack10:
+                    followUpAttackId = NightshadeSpearAttackId.Attack13;
+                    return true;
+                case NightshadeSpearAttackId.Attack11:
+                    followUpAttackId = NightshadeSpearAttackId.Attack12;
+                    return true;
+                default:
+                    followUpAttackId = 0;
+                    return false;
+            }
         }
 
         internal void ChangeToIdleState()
         {
             if (!ReferenceEquals(currentState, deadState))
             {
+                sequenceAttackCount = 0;
                 ChangeState(idleState);
             }
         }
@@ -269,16 +468,23 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         {
             if (!ReferenceEquals(currentState, deadState))
             {
+                sequenceAttackCount = 0;
                 ChangeState(chaseState);
             }
         }
 
         internal void ChangeToAttackState(
-            NightshadeSpearAttackPattern pattern,
-            int attackNumber)
+            NightshadeSpearAttackState nextAttackState)
         {
-            attackState.Prepare(pattern, attackNumber);
-            ChangeState(attackState);
+            currentAttackState = nextAttackState;
+            if (ReferenceEquals(currentState, currentAttackState))
+            {
+                currentState.Exit();
+                currentState.Enter();
+                return;
+            }
+
+            ChangeState(currentAttackState);
         }
 
         internal void ChangeToAliveState()
@@ -289,43 +495,47 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             }
         }
 
-        internal void PlayAttack(
-            NightshadeSpearAttackPattern pattern,
-            int attackNumber)
+        internal void PlayAttack(NightshadeSpearAttackState attackState)
         {
-            pattern.StartCooldown(currentTime);
             animation.SetMovement(0f, 0f);
             animation.PlayAttack(
-                pattern.AnimatorStateId,
-                pattern.TransitionTime,
-                pattern.AnimationSpeed);
+                attackState.AnimatorStateId,
+                attackState.TransitionTime,
+                attackState.AnimationSpeed *
+                GetReadySpeedMultiplier());
+            playAttackReadyCue?.Invoke(attackState.AttackNumber);
         }
 
-        internal void UpdateAttackHit(
-            NightshadeSpearAttackPattern pattern,
-            int attackNumber,
-            ref bool isHitOpen,
-            ref bool hasHitWindowFinished)
+        internal void BeginAttackHit(NightshadeSpearAttackState attackState)
         {
-            if (hasHitWindowFinished ||
-                !animation.TryGetCurrentActionTime(
-                    out float normalizedTime))
-            {
-                return;
-            }
+            animation.SetActionSpeed(
+                attackState.AnimationSpeed *
+                GetAttackSpeedMultiplier());
+            playAttackHitCue?.Invoke(
+                attackState.AttackNumber,
+                IsStrongAttack(attackState.AttackId));
+            startAttackHit?.Invoke(
+                attackState.CurrentAttackDamage,
+                attackState.AttackNumber);
+        }
 
-            if (!isHitOpen && normalizedTime >= pattern.HitStartTime)
-            {
-                isHitOpen = true;
-                startAttackHit?.Invoke(pattern, attackNumber);
-            }
+        internal float GetReadyDuration()
+        {
+            return currentPhase >= 2
+                ? PhaseTwoReadyDuration
+                : PhaseOneReadyDuration;
+        }
 
-            if (isHitOpen && normalizedTime > pattern.HitEndTime)
-            {
-                isHitOpen = false;
-                hasHitWindowFinished = true;
-                EndAttackHit();
-            }
+        internal float GetSequenceRecoveryDuration()
+        {
+            return currentPhase >= 2
+                ? PhaseTwoSequenceRecoveryDuration
+                : PhaseOneSequenceRecoveryDuration;
+        }
+
+        internal bool WasAttackDamageApplied()
+        {
+            return wasAttackDamageApplied?.Invoke() ?? false;
         }
 
         internal void EndAttackHit()
@@ -348,9 +558,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             return animation.IsActionTransitioning();
         }
 
-        private void ChangeToHitStateInternal()
+        private void ChangeToHitStateInternal(Vector3 hitPosition)
         {
             EndAttackHit();
+            sequenceAttackCount = 0;
+            hitState.SetHitPosition(hitPosition);
             if (ReferenceEquals(currentState, hitState))
             {
                 hitState.Restart();
@@ -358,6 +570,45 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             }
 
             ChangeState(hitState);
+        }
+
+        private float GetAttackSpeedMultiplier()
+        {
+            return currentPhase >= 2
+                ? PhaseTwoAttackSpeedMultiplier
+                : PhaseOneAttackSpeedMultiplier;
+        }
+
+        private float GetReadySpeedMultiplier()
+        {
+            return currentPhase >= 2
+                ? PhaseTwoReadySpeedMultiplier
+                : PhaseOneReadySpeedMultiplier;
+        }
+
+        internal static int GetMaximumSequenceCount(int phase)
+        {
+            return phase >= 2
+                ? PhaseTwoMaximumSequenceCount
+                : PhaseOneMaximumSequenceCount;
+        }
+
+        private NightshadeSpearAttackState GetAttackState(
+            NightshadeSpearAttackId attackId)
+        {
+            int attackIndex = (int)attackId - 1;
+            return attackIndex >= 0 && attackIndex < attackStates.Length
+                ? attackStates[attackIndex]
+                : null;
+        }
+
+        private static bool IsStrongAttack(
+            NightshadeSpearAttackId attackId)
+        {
+            return attackId == NightshadeSpearAttackId.Attack07 ||
+                attackId == NightshadeSpearAttackId.Attack08 ||
+                attackId == NightshadeSpearAttackId.Attack10 ||
+                attackId == NightshadeSpearAttackId.Attack13;
         }
 
         private void ChangeState(INightshadeSpearState nextState)
@@ -371,5 +622,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             currentState = nextState;
             currentState.Enter();
         }
+
     }
 }

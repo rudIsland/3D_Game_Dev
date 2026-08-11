@@ -9,6 +9,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         private readonly CharacterController characterController; // 씬 또는 시스템 참조
         private readonly float gravity; // 내부에서 사용하는 값
         private readonly float groundPull; // 내부에서 사용하는 값
+        private readonly float maximumAttackRootMotionSpeed;
+        private readonly float maximumAttackRootMotionTurnSpeed;
         private float verticalSpeed; // 이동 속도
 
         public Vector3 Position => nightshadeTransform.position; // 이동 정보
@@ -19,12 +21,20 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             Transform nightshadeTransform,
             CharacterController characterController,
             float gravity,
-            float groundPull)
+            float groundPull,
+            float maximumAttackRootMotionSpeed = 6f,
+            float maximumAttackRootMotionTurnSpeed = 360f)
         {
             this.nightshadeTransform = nightshadeTransform;
             this.characterController = characterController;
             this.gravity = gravity;
             this.groundPull = groundPull;
+            this.maximumAttackRootMotionSpeed = Mathf.Max(
+                0f,
+                maximumAttackRootMotionSpeed);
+            this.maximumAttackRootMotionTurnSpeed = Mathf.Max(
+                0f,
+                maximumAttackRootMotionTurnSpeed);
         }
 
         public void Reset()
@@ -36,12 +46,13 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             Vector3 targetPosition,
             float moveSpeed,
             float turnSpeed,
-            float deltaTime)
+            float deltaTime,
+            bool shouldTurn = true)
         {
             Vector3 moveDirection = targetPosition - nightshadeTransform.position;
             moveDirection.y = 0f;
 
-            if (moveDirection.sqrMagnitude > 0.0001f)
+            if (shouldTurn && moveDirection.sqrMagnitude > 0.0001f)
             {
                 moveDirection.Normalize();
                 TurnToDirection(moveDirection, turnSpeed, deltaTime);
@@ -58,13 +69,14 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             Vector3 targetPosition,
             float moveSpeed,
             float turnSpeed,
-            float deltaTime)
+            float deltaTime,
+            bool shouldTurn = true)
         {
             Vector3 moveDirection = nightshadeTransform.position -
                 targetPosition;
             moveDirection.y = 0f;
 
-            if (moveDirection.sqrMagnitude > 0.0001f)
+            if (shouldTurn && moveDirection.sqrMagnitude > 0.0001f)
             {
                 moveDirection.Normalize();
                 TurnToDirection(moveDirection, turnSpeed, deltaTime);
@@ -93,6 +105,32 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         {
             UpdateVerticalSpeed(deltaTime);
             characterController.Move(Vector3.up * (verticalSpeed * deltaTime));
+        }
+
+        public void ApplyAttackRootMotion(
+            Vector3 deltaPosition,
+            Quaternion deltaRotation,
+            float deltaTime)
+        {
+            float safeDeltaTime = Mathf.Max(0f, deltaTime);
+            deltaPosition.y = 0f;
+
+            float maximumDistance =
+                maximumAttackRootMotionSpeed * safeDeltaTime;
+            if (deltaPosition.sqrMagnitude >
+                maximumDistance * maximumDistance)
+            {
+                deltaPosition = deltaPosition.normalized * maximumDistance;
+            }
+
+            characterController.Move(deltaPosition);
+
+            Quaternion targetRotation =
+                nightshadeTransform.rotation * deltaRotation;
+            nightshadeTransform.rotation = Quaternion.RotateTowards(
+                nightshadeTransform.rotation,
+                targetRotation,
+                maximumAttackRootMotionTurnSpeed * safeDeltaTime);
         }
 
         private void TurnToDirection(Vector3 direction, float turnSpeed, float deltaTime)

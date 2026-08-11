@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.NightShade
@@ -38,11 +39,35 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         [SerializeField] private Animator nightshadeAnimator; // 애니메이터 참조
 
         private int requestedActionStateId; // 현재 행동 상태
+        private Action<Vector3, Quaternion, float> applyAttackRootMotion;
+        private bool isAttackAction;
 
         private void Awake()
         {
             FindNightshadeAnimator();
             ConnectAnimator(nightshadeAnimator);
+        }
+
+        // 공격 Root Motion은 CharacterController를 거쳐 적용하고,
+        // 나머지 행동은 기존 Animator Root Motion 동작을 유지한다.
+        private void OnAnimatorMove()
+        {
+            if (nightshadeAnimator == null ||
+                !nightshadeAnimator.applyRootMotion)
+            {
+                return;
+            }
+
+            if (isAttackAction && applyAttackRootMotion != null)
+            {
+                applyAttackRootMotion.Invoke(
+                    nightshadeAnimator.deltaPosition,
+                    nightshadeAnimator.deltaRotation,
+                    Time.deltaTime);
+                return;
+            }
+
+            nightshadeAnimator.ApplyBuiltinRootMotion();
         }
 
         public void SetMovement(float moveSide, float moveSpeed)
@@ -60,11 +85,13 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             if (!CanControlAnimator()) return;
 
             StartAction(animatorStateId);
+            isAttackAction = false;
             nightshadeAnimator.speed = Mathf.Max(0.01f, animationSpeed);
 
             if (animatorStateId != 0 &&
                 nightshadeAnimator.HasState(AnimationLayerIndex, animatorStateId))
             {
+                isAttackAction = true;
                 nightshadeAnimator.CrossFadeInFixedTime(
                     animatorStateId,
                     Mathf.Max(0f, transitionTime),
@@ -81,6 +108,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
             int hitStateId = GetHitStateId(direction);
             nightshadeAnimator.speed = 1f;
+            isAttackAction = false;
             StartAction(hitStateId);
 
             if (nightshadeAnimator.HasState(AnimationLayerIndex, hitStateId))
@@ -96,6 +124,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         public void PlayEnter()
         {
             if (!CanControlAnimator()) return;
+            isAttackAction = false;
             StartAction(EnterStateId);
             nightshadeAnimator.SetTrigger(EnterId);
         }
@@ -106,6 +135,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
             ResetActionTriggers();
             SetMovement(0f, 0f);
+            isAttackAction = false;
             nightshadeAnimator.SetBool(IsDeadId, true);
             nightshadeAnimator.Update(0f);
             requestedActionStateId = 0;
@@ -117,6 +147,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
             nightshadeAnimator.speed = 1f;
             requestedActionStateId = 0;
+            isAttackAction = false;
             if (CanControlAnimator() &&
                 nightshadeAnimator.HasState(AnimationLayerIndex, MovementStateId))
             {
@@ -125,6 +156,16 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                     0.08f,
                     AnimationLayerIndex);
             }
+        }
+
+        public void SetActionSpeed(float animationSpeed)
+        {
+            if (nightshadeAnimator == null)
+            {
+                return;
+            }
+
+            nightshadeAnimator.speed = Mathf.Max(0.01f, animationSpeed);
         }
 
         public bool TryGetAttackNormalizedTime(
@@ -152,6 +193,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         {
             FindNightshadeAnimator();
             requestedActionStateId = 0;
+            isAttackAction = false;
 
             if (nightshadeAnimator == null) return;
 
@@ -177,6 +219,12 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             }
 
             nightshadeAnimator = animator;
+        }
+
+        internal void ConnectAttackRootMotion(
+            Action<Vector3, Quaternion, float> rootMotionAction)
+        {
+            applyAttackRootMotion = rootMotionAction;
         }
 
         private void StartAction(int animatorStateId)

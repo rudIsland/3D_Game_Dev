@@ -3,16 +3,16 @@ namespace rudIsland.RPG3D.Player.States.Attack
     // 일반 콤보 1타의 공격 설정을 가진 상태다.
     internal sealed class PlayerComboAttack01State : IAttackState
     {
-        public PlayerComboAttack01State(
-            float nextInputTime,
-            float moveScale)
+        private readonly PlayerAttackData attackData;
+
+        public PlayerComboAttack01State(PlayerAttackData attackData)
         {
-            NextInputTime = nextInputTime;
-            MoveScale = moveScale;
+            this.attackData = attackData;
         }
 
-        public int AttackNumber => 1;
-        public float NextInputTime { get; }
-        public float MoveScale { get; }
+        public int AttackNumber => attackData.AttackNumber;
+        public float Damage => attackData.Damage;
+        public float NextInputTime => attackData.NextInputTime;
+        public float MoveScale => attackData.MoveScale;
     }
 }

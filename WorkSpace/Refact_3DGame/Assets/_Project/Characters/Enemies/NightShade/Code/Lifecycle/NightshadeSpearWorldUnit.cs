@@ -1,4 +1,5 @@
 using rudIsland.RPG3D.Characters;
+using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 {
@@ -9,8 +10,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
         public float CurrentHealth => Health.CurrentHealth; // 현재 체력
         public int CurrentPhase => stateMachine.CurrentPhase;
-        public string CurrentStateName => stateMachine.CurrentStateName;
-        public string CurrentAttackName => stateMachine.CurrentAttackName;
 
         public NightshadeSpearWorldUnit(
             float maxHealth,
@@ -20,7 +19,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             this.stateMachine = stateMachine;
         }
 
-        public void TakeDamage(float damage)
+        public void TakeDamage(
+            float damage,
+            Vector3 hitPosition)
         {
             float healthBeforeDamage = Health.CurrentHealth;
             Health.TakeDamage(damage);
@@ -28,7 +29,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             if (Health.CurrentHealth >= healthBeforeDamage || IsDead) return;
             stateMachine.SetHealthRatio(
                 Health.CurrentHealth / Health.MaxHealth);
-            stateMachine.ChangeToHitState();
+            stateMachine.ChangeToHitState(hitPosition);
         }
 
         protected override void OnUnitCreate()

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 3c97a43a25ff00b42860c26bbc580f2f
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309180
+  packageName: RPG_Animations - Two Hand Up
+  packageVersion: 1.5
+  assetPath: Assets/_ThirdParty/AnimationBundle/Demo Scenes/Demo Animator Controller/TwoHand_Up_Fight_Ready_2.controller
+  uploadId: 927032

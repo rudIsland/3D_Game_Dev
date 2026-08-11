@@ -3,13 +3,16 @@ namespace rudIsland.RPG3D.Player.States.Attack
     // 달리기 공격의 공격 설정을 가진 상태다.
     internal sealed class PlayerRunAttackState : IAttackState
     {
-        public PlayerRunAttackState(float moveScale)
+        private readonly PlayerAttackData attackData;
+
+        public PlayerRunAttackState(PlayerAttackData attackData)
         {
-            MoveScale = moveScale;
+            this.attackData = attackData;
         }
 
-        public int AttackNumber => 6;
-        public float NextInputTime => 1f;
-        public float MoveScale { get; }
+        public int AttackNumber => attackData.AttackNumber;
+        public float Damage => attackData.Damage;
+        public float NextInputTime => attackData.NextInputTime;
+        public float MoveScale => attackData.MoveScale;
     }
 }

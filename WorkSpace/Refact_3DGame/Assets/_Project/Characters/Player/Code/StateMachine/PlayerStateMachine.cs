@@ -10,6 +10,7 @@ using rudIsland.RPG3D.Player.States.FreeLook;
 using rudIsland.RPG3D.Player.States.Hit;
 using rudIsland.RPG3D.Player.States.Movement;
 using rudIsland.RPG3D.Player.States.Target;
+using rudIsland.RPG3D.Player.Runtime.Attack;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Player.States
@@ -32,10 +33,14 @@ namespace rudIsland.RPG3D.Player.States
         private IPlayerState returnLookState;
         private bool isEnabled;
 
+
+        private readonly PlayerAttackRangeDetector attackRangeDetector;
+
         internal PlayerMovement Movement => playerMovement;
         internal PlayerInputReader Input => playerInput;
         public bool IsBlocking => actionStateMachine.IsBlocking;
         public bool IsRolling => actionStateMachine.IsRolling;
+        public bool IsInvulnerable => actionStateMachine.IsInvulnerable;
         public bool IsAttacking => actionStateMachine.IsAttacking;
         public bool IsTargeting => ReferenceEquals(currentState, targetLookState);
         public bool IsDead => ReferenceEquals(currentState, deadState);
@@ -47,20 +52,15 @@ namespace rudIsland.RPG3D.Player.States
             Animator playerAnimator,
             float animationSmoothTime,
             float rollDistanceScale,
-            float attack01NextInputTime,
-            float attack02NextInputTime,
-            float attack03NextInputTime,
-            float attack04NextInputTime,
+            PlayerAttackData[] attackData,
             float comboInputBufferDuration,
-            float attack01MoveScale,
-            float attack02MoveScale,
-            float attack03MoveScale,
-            float attack04MoveScale,
-            float attack05MoveScale,
-            float runAttackMoveScale,
             PlayerTargetFinder targetFinder,
             PlayerTargetCamera targetCamera,
-            float targetBreakDistance)
+            float targetBreakDistance,
+            Transform attackOrigin,
+            LayerMask attackLayers,
+            float attackRadius,
+            float attackForwardOffset)
         {
             this.playerInput = playerInput;
             this.playerMovement = playerMovement;
@@ -75,17 +75,8 @@ namespace rudIsland.RPG3D.Player.States
             attackState = new PlayerAttackState(
                 this,
                 animationController,
-                Mathf.Clamp01(attack01NextInputTime),
-                Mathf.Clamp01(attack02NextInputTime),
-                Mathf.Clamp01(attack03NextInputTime),
-                Mathf.Clamp01(attack04NextInputTime),
-                Mathf.Max(0f, comboInputBufferDuration),
-                Mathf.Clamp01(attack01MoveScale),
-                Mathf.Clamp01(attack02MoveScale),
-                Mathf.Clamp01(attack03MoveScale),
-                Mathf.Clamp01(attack04MoveScale),
-                Mathf.Clamp01(attack05MoveScale),
-                Mathf.Clamp01(runAttackMoveScale));
+                attackData,
+                Mathf.Max(0f, comboInputBufferDuration));
             actionStateMachine = new PlayerActionStateMachine(
                 this,
                 moveState,
@@ -104,6 +95,12 @@ namespace rudIsland.RPG3D.Player.States
                 targetFinder,
                 targetCamera,
                 targetBreakDistance);
+
+            attackRangeDetector = new PlayerAttackRangeDetector(
+                attackOrigin,
+                attackLayers,
+                attackRadius,
+                attackForwardOffset);
             hitState = new PlayerHitState(this, animationController);
             deadState = new PlayerDeadState(this, animationController);
         }
@@ -136,6 +133,10 @@ namespace rudIsland.RPG3D.Player.States
                 attackPressed,
                 targetTogglePressed,
                 playerInput.IsBlocking));
+
+
+            //공격 판정 윈도우 열려있으면 공격 범위 감지
+            attackRangeDetector.Tick();
         }
 
         public void Disable()
@@ -277,8 +278,18 @@ namespace rudIsland.RPG3D.Player.States
             ChangeState(hitState);
         }
 
-        internal void EndAttackHit()
+
+        internal void BeginAttackHit(int attackNumber) //공격 윈도우 시작
         {
+            if(!isEnabled || !IsAttacking)
+                return;
+
+            attackRangeDetector.Open(attackState.AttackDamage);
+        }
+
+        internal void EndAttackHit() //공격 윈도우 종료
+        {
+            attackRangeDetector.Close();
         }
 
         internal void NotifyAttackAnimationEnded()
@@ -310,6 +321,7 @@ namespace rudIsland.RPG3D.Player.States
 
             animationController.PlayBlockImpact();
         }
+
 
         private void ChangeState(IPlayerState nextState)
         {

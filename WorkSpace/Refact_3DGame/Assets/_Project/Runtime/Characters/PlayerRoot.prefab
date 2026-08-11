@@ -118,49 +118,13 @@ MonoBehaviour:
   targetCameraTurnSpeed: 540
   targetCameraVerticalValue: 0.5
   maxHealth: 100
-  attackHitSettings:
-  - attackNumber: 1
-    hitDetector: {fileID: 0}
-    damage:
-      healthDamage: 10
-    strength: 0
-    staggerDamage: 10
-    pushDistance: 0.4
-  - attackNumber: 2
-    hitDetector: {fileID: 0}
-    damage:
-      healthDamage: 12
-    strength: 0
-    staggerDamage: 10
-    pushDistance: 0.4
-  - attackNumber: 3
-    hitDetector: {fileID: 0}
-    damage:
-      healthDamage: 14
-    strength: 0
-    staggerDamage: 10
-    pushDistance: 0.4
-  - attackNumber: 4
-    hitDetector: {fileID: 0}
-    damage:
-      healthDamage: 17
-    strength: 0
-    staggerDamage: 10
-    pushDistance: 0.45
-  - attackNumber: 5
-    hitDetector: {fileID: 0}
-    damage:
-      healthDamage: 25
-    strength: 1
-    staggerDamage: 10
-    pushDistance: 0.55
-  - attackNumber: 6
-    hitDetector: {fileID: 0}
-    damage:
-      healthDamage: 18
-    strength: 1
-    staggerDamage: 10
-    pushDistance: 0.5
+  attackData:
+  - {fileID: 11400000, guid: a1014b8e7c624e0e91f4d0c3b2a19876, type: 2}
+  - {fileID: 11400000, guid: a2024b8e7c624e0e91f4d0c3b2a19876, type: 2}
+  - {fileID: 11400000, guid: a3034b8e7c624e0e91f4d0c3b2a19876, type: 2}
+  - {fileID: 11400000, guid: a4044b8e7c624e0e91f4d0c3b2a19876, type: 2}
+  - {fileID: 11400000, guid: a5054b8e7c624e0e91f4d0c3b2a19876, type: 2}
+  - {fileID: 11400000, guid: a6064b8e7c624e0e91f4d0c3b2a19876, type: 2}
   staggerLimit: 10
   staggerRecoverDelay: 1
   staggerRecoverSpeed: 20
@@ -176,17 +140,7 @@ MonoBehaviour:
   sprintSpeed: 5.5
   animationSmoothTime: 0.12
   rollDistanceScale: 0.1
-  attack01NextInputTime: 0.46
-  attack02NextInputTime: 0.58
-  attack03NextInputTime: 0.52
-  attack04NextInputTime: 0.5
   comboInputBufferDuration: 0.25
-  attack01MoveScale: 0.35
-  attack02MoveScale: 0.5
-  attack03MoveScale: 0.45
-  attack04MoveScale: 0.4
-  attack05MoveScale: 0.3
-  runAttackMoveScale: 0.45
   gravity: -22
   groundPull: -2
 --- !u!1 &7112299585502653175

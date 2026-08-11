@@ -1,4 +1,6 @@
 
+using UnityEngine;
+
 namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 {
     // EnemyUnit 생명주기에서 좀비의 탐지·추적 상태머신을 실행한다.
@@ -15,7 +17,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             this.stateMachine = stateMachine;
         }
 
-        public void TakeDamage(float damage)
+        public void TakeDamage(float damage, Vector3 hitPosition)
         {
             float healthBeforeDamage = Health.CurrentHealth;
 
