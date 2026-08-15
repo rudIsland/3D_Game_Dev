@@ -27,6 +27,8 @@ namespace rudIsland.RPG3D.Editor
         static CombatHudPrefabBuilder()
         {
             EditorApplication.delayCall += RunRequestedBuild;
+            EditorApplication.playModeStateChanged +=
+                HandlePlayModeStateChanged;
         }
 
         [MenuItem("Tools/RPG3D/Build Combat HUD")]
@@ -65,20 +67,29 @@ namespace rudIsland.RPG3D.Editor
 
         private static void RunRequestedBuild()
         {
-            if (!File.Exists(RequestPath))
+            if (!File.Exists(RequestPath) ||
+                EditorApplication.isPlayingOrWillChangePlaymode)
             {
                 return;
             }
 
-            File.Delete(RequestPath);
-
             try
             {
                 BuildCombatHud();
+                File.Delete(RequestPath);
             }
             catch (Exception exception)
             {
                 Debug.LogException(exception);
+            }
+        }
+
+        private static void HandlePlayModeStateChanged(
+            PlayModeStateChange state)
+        {
+            if (state == PlayModeStateChange.EnteredEditMode)
+            {
+                EditorApplication.delayCall += RunRequestedBuild;
             }
         }
 
@@ -179,9 +190,14 @@ namespace rudIsland.RPG3D.Editor
                     fillSprite,
                     20);
 
-                HealthBarView bossBar = CreateHealthBar(
+                StaminaBarView staminaBar = CreateStaminaBar(
                     root.transform,
-                    "BossHealthBar",
+                    frameSprite,
+                    fillSprite);
+
+                HealthBarView enemyBar = CreateHealthBar(
+                    root.transform,
+                    "EnemyHealthBar",
                     new Vector2(0.5f, 1f),
                     new Vector2(0.5f, 1f),
                     new Vector2(0.5f, 1f),
@@ -191,10 +207,17 @@ namespace rudIsland.RPG3D.Editor
                     fillSprite,
                     24);
 
+                StaggerBarView staggerBar = CreateStaggerBar(
+                    root.transform,
+                    frameSprite,
+                    fillSprite);
+
                 root.GetComponent<CombatHudController>().ConnectForEditor(
                     null,
                     playerBar,
-                    bossBar);
+                    staminaBar,
+                    enemyBar,
+                    staggerBar);
 
                 return PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
             }
@@ -283,6 +306,110 @@ namespace rudIsland.RPG3D.Editor
 
             HealthBarView view = root.GetComponent<HealthBarView>();
             view.ConnectForEditor(root, fill, healthText, nameText);
+            return view;
+        }
+
+        private static StaminaBarView CreateStaminaBar(
+            Transform parent,
+            Sprite frameSprite,
+            Sprite fillSprite)
+        {
+            var root = new GameObject(
+                "PlayerStaminaBar",
+                typeof(RectTransform),
+                typeof(StaminaBarView));
+            root.transform.SetParent(parent, false);
+
+            SetRect(
+                root.GetComponent<RectTransform>(),
+                new Vector2(0f, 0f),
+                new Vector2(0f, 0f),
+                new Vector2(0f, 0f),
+                new Vector2(48f, 16f),
+                new Vector2(360f, 24f));
+
+            GameObject bar =
+                CreateStretchChild(root.transform, "Bar", 0f, 0f);
+            Image background = bar.AddComponent<Image>();
+            background.color = new Color(0.02f, 0.035f, 0.015f, 0.96f);
+            background.raycastTarget = false;
+
+            GameObject fillObject =
+                CreateStretchChild(bar.transform, "StaminaFill", 8f, 6f);
+            Image fill = fillObject.AddComponent<Image>();
+            fill.sprite = fillSprite;
+            fill.color = new Color(0.6f, 0.82f, 0.2f, 1f);
+            fill.type = Image.Type.Filled;
+            fill.fillMethod = Image.FillMethod.Horizontal;
+            fill.fillOrigin = (int)Image.OriginHorizontal.Left;
+            fill.fillAmount = 1f;
+            fill.raycastTarget = false;
+
+            GameObject frameObject =
+                CreateStretchChild(bar.transform, "Frame", 0f, 0f);
+            Image frame = frameObject.AddComponent<Image>();
+            frame.sprite = frameSprite;
+            frame.type = Image.Type.Sliced;
+            frame.raycastTarget = false;
+
+            StaminaBarView view = root.GetComponent<StaminaBarView>();
+            view.ConnectForEditor(root, fill);
+            return view;
+        }
+
+        private static StaggerBarView CreateStaggerBar(
+            Transform parent,
+            Sprite frameSprite,
+            Sprite fillSprite)
+        {
+            var root = new GameObject(
+                "EnemyStaggerBar",
+                typeof(RectTransform),
+                typeof(StaggerBarView));
+            root.transform.SetParent(parent, false);
+
+            SetRect(
+                root.GetComponent<RectTransform>(),
+                new Vector2(0.5f, 1f),
+                new Vector2(0.5f, 1f),
+                new Vector2(0.5f, 1f),
+                new Vector2(0f, -136f),
+                new Vector2(600f, 28f));
+
+            GameObject bar =
+                CreateStretchChild(root.transform, "Bar", 0f, 0f);
+            Image background = bar.AddComponent<Image>();
+            background.color = new Color(0.04f, 0.03f, 0.015f, 0.96f);
+            background.raycastTarget = false;
+
+            GameObject fillObject =
+                CreateStretchChild(bar.transform, "StaggerFill", 8f, 6f);
+            Image fill = fillObject.AddComponent<Image>();
+            fill.sprite = fillSprite;
+            fill.color = new Color(0.95f, 0.67f, 0.18f, 1f);
+            fill.type = Image.Type.Filled;
+            fill.fillMethod = Image.FillMethod.Horizontal;
+            fill.fillOrigin = (int)Image.OriginHorizontal.Left;
+            fill.fillAmount = 0f;
+            fill.raycastTarget = false;
+
+            GameObject frameObject =
+                CreateStretchChild(bar.transform, "Frame", 0f, 0f);
+            Image frame = frameObject.AddComponent<Image>();
+            frame.sprite = frameSprite;
+            frame.type = Image.Type.Sliced;
+            frame.raycastTarget = false;
+
+            Text staggerText = CreateText(
+                bar.transform,
+                "StaggerValue",
+                18,
+                TextAnchor.MiddleCenter,
+                Color.white);
+            Stretch(staggerText.rectTransform, 0f, 0f);
+
+            StaggerBarView view = root.GetComponent<StaggerBarView>();
+            view.ConnectForEditor(root, fill, staggerText);
             return view;
         }
 
@@ -424,13 +551,25 @@ namespace rudIsland.RPG3D.Editor
 
                 HealthBarView playerBar =
                     FindBar(bars, "PlayerHealthBar");
-                HealthBarView bossBar =
-                    FindBar(bars, "BossHealthBar");
+                HealthBarView enemyBar =
+                    FindBar(bars, "EnemyHealthBar");
+                StaminaBarView staminaBar =
+                    instance.GetComponentInChildren<StaminaBarView>(true);
+                StaggerBarView staggerBar =
+                    instance.GetComponentInChildren<StaggerBarView>(true);
+
+                if (staminaBar == null || staggerBar == null)
+                {
+                    throw new InvalidOperationException(
+                        "Combat HUD resource bars are incomplete.");
+                }
 
                 controller.ConnectForEditor(
                     manager,
                     playerBar,
-                    bossBar);
+                    staminaBar,
+                    enemyBar,
+                    staggerBar);
                 EditorUtility.SetDirty(controller);
                 PrefabUtility.RecordPrefabInstancePropertyModifications(
                     controller);

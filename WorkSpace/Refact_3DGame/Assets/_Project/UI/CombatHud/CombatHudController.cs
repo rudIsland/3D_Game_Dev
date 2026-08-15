@@ -1,11 +1,15 @@
 using System.Collections.Generic;
 using rudIsland.RPG3D.Characters;
+using rudIsland.RPG3D.Characters.Enemies.Zombie;
+using rudIsland.RPG3D.Player;
+using rudIsland.RPG3D.Player.Runtime;
 using rudIsland.RPG3D.World;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace rudIsland.RPG3D.UI
 {
-    // Connects player and boss health events to their combat HUD bars.
+    // 플레이어 자원과 전투 중인 좀비 자원을 화면 HUD에 연결한다.
     public sealed class CombatHudController : MonoBehaviour
     {
         [Header("World")]
@@ -13,10 +17,18 @@ namespace rudIsland.RPG3D.UI
 
         [Header("Health Bars")]
         [SerializeField] private HealthBarView playerHealthBar; // 씬 또는 시스템 참조
-        [SerializeField] private HealthBarView bossHealthBar; // 씬 또는 시스템 참조
+        [FormerlySerializedAs("bossHealthBar")]
+        [SerializeField] private HealthBarView enemyHealthBar;
+
+        [Header("Stamina Bar")]
+        [SerializeField] private StaminaBarView playerStaminaBar;
+
+        [Header("Enemy Stagger Bar")]
+        [SerializeField] private StaggerBarView enemyStaggerBar;
 
         private readonly Dictionary<UnitHealth, Unit> trackedUnits = // 씬 또는 시스템 참조
             new Dictionary<UnitHealth, Unit>(2);
+        private ZombieWorldUnit displayedZombie;
 
         private void Awake()
         {
@@ -27,7 +39,9 @@ namespace rudIsland.RPG3D.UI
             }
 
             playerHealthBar?.Hide();
-            bossHealthBar?.Hide();
+            playerStaminaBar?.Hide();
+            enemyHealthBar?.Hide();
+            enemyStaggerBar?.Hide();
         }
 
         private void OnEnable()
@@ -64,11 +78,25 @@ namespace rudIsland.RPG3D.UI
             {
                 entry.Key.HealthChanged -= HandleHealthChanged;
                 entry.Key.Died -= HandleUnitDied;
+
+                if (entry.Value is PlayerWorldUnit player)
+                {
+                    player.Stamina.StaminaChanged -=
+                        HandleStaminaChanged;
+                }
+                else if (entry.Value is ZombieWorldUnit zombie)
+                {
+                    zombie.StaggerChanged -= HandleZombieStaggerChanged;
+                    zombie.CombatStateChanged -= HandleZombieCombatStateChanged;
+                }
             }
 
             trackedUnits.Clear();
+            displayedZombie = null;
             playerHealthBar?.Hide();
-            bossHealthBar?.Hide();
+            playerStaminaBar?.Hide();
+            enemyHealthBar?.Hide();
+            enemyStaggerBar?.Hide();
         }
 
         private void HandleWorldObjectEnabled(IWorldObject worldObject)
@@ -92,8 +120,8 @@ namespace rudIsland.RPG3D.UI
             }
 
             bool isPlayer = unit is PlayerUnit;
-            bool isBoss = unit is EnemyUnit enemy && enemy.IsBoss;
-            if ((!isPlayer && !isBoss) ||
+            bool isZombie = unit is ZombieWorldUnit;
+            if ((!isPlayer && !isZombie) ||
                 trackedUnits.ContainsKey(unit.Health))
             {
                 return;
@@ -106,10 +134,24 @@ namespace rudIsland.RPG3D.UI
             if (isPlayer)
             {
                 playerHealthBar?.Show("PLAYER", unit.Health);
+
+                if (unit is PlayerWorldUnit player)
+                {
+                    player.Stamina.StaminaChanged +=
+                        HandleStaminaChanged;
+                    playerStaminaBar?.Show(
+                        player.CurrentStamina,
+                        player.MaxStamina);
+                }
             }
-            else
+            else if (unit is ZombieWorldUnit zombie)
             {
-                bossHealthBar?.Show("DEMON SWORDSMAN", unit.Health);
+                zombie.StaggerChanged += HandleZombieStaggerChanged;
+                zombie.CombatStateChanged += HandleZombieCombatStateChanged;
+                if (zombie.IsInCombat)
+                {
+                    ShowZombie(zombie);
+                }
             }
         }
 
@@ -128,10 +170,23 @@ namespace rudIsland.RPG3D.UI
             if (unit is PlayerUnit)
             {
                 playerHealthBar?.Hide();
+
+                if (unit is PlayerWorldUnit player)
+                {
+                    player.Stamina.StaminaChanged -=
+                        HandleStaminaChanged;
+                }
+
+                playerStaminaBar?.Hide();
             }
-            else if (unit is EnemyUnit enemy && enemy.IsBoss)
+            else if (unit is ZombieWorldUnit zombie)
             {
-                bossHealthBar?.Hide();
+                zombie.StaggerChanged -= HandleZombieStaggerChanged;
+                zombie.CombatStateChanged -= HandleZombieCombatStateChanged;
+                if (ReferenceEquals(displayedZombie, zombie))
+                {
+                    HideZombie();
+                }
             }
         }
 
@@ -150,9 +205,10 @@ namespace rudIsland.RPG3D.UI
                 return;
             }
 
-            if (unit is EnemyUnit enemy && enemy.IsBoss)
+            if (unit is ZombieWorldUnit zombie &&
+                ReferenceEquals(displayedZombie, zombie))
             {
-                bossHealthBar?.UpdateHealth(health);
+                enemyHealthBar?.UpdateHealth(health);
             }
         }
 
@@ -166,22 +222,76 @@ namespace rudIsland.RPG3D.UI
                     continue;
                 }
 
-                if (unit is EnemyUnit enemy && enemy.IsBoss)
+                if (unit is ZombieWorldUnit zombie &&
+                    ReferenceEquals(displayedZombie, zombie))
                 {
-                    bossHealthBar?.Hide();
+                    HideZombie();
                 }
             }
+        }
+
+        private void HandleStaminaChanged(PlayerStamina stamina)
+        {
+            playerStaminaBar?.UpdateStamina(
+                stamina.CurrentStamina,
+                stamina.MaxStamina);
+        }
+
+        private void HandleZombieStaggerChanged(ZombieWorldUnit zombie)
+        {
+            if (!ReferenceEquals(displayedZombie, zombie))
+            {
+                return;
+            }
+
+            enemyStaggerBar?.UpdateStagger(
+                zombie.CurrentStagger,
+                zombie.MaxStagger);
+        }
+
+        private void HandleZombieCombatStateChanged(ZombieWorldUnit zombie)
+        {
+            if (zombie.IsInCombat)
+            {
+                ShowZombie(zombie);
+                return;
+            }
+
+            if (ReferenceEquals(displayedZombie, zombie))
+            {
+                HideZombie();
+            }
+        }
+
+        private void ShowZombie(ZombieWorldUnit zombie)
+        {
+            displayedZombie = zombie;
+            enemyHealthBar?.Show("ZOMBIE", zombie.Health);
+            enemyStaggerBar?.Show(
+                zombie.CurrentStagger,
+                zombie.MaxStagger);
+        }
+
+        private void HideZombie()
+        {
+            displayedZombie = null;
+            enemyHealthBar?.Hide();
+            enemyStaggerBar?.Hide();
         }
 
 #if UNITY_EDITOR
         public void ConnectForEditor(
             WorldObjectManager manager,
             HealthBarView playerBar,
-            HealthBarView bossBar)
+            StaminaBarView staminaBar,
+            HealthBarView enemyBar,
+            StaggerBarView staggerBar)
         {
             worldObjectManager = manager;
             playerHealthBar = playerBar;
-            bossHealthBar = bossBar;
+            playerStaminaBar = staminaBar;
+            enemyHealthBar = enemyBar;
+            enemyStaggerBar = staggerBar;
         }
 #endif
     }
