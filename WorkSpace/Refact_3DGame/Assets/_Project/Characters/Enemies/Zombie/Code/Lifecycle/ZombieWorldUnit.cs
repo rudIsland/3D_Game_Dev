@@ -1,4 +1,5 @@
-
+using System;
+using rudIsland.RPG3D.Characters.Combat;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.Zombie
@@ -7,33 +8,66 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
     public sealed class ZombieWorldUnit : EnemyUnit
     {
         private readonly ZombieStateMachine stateMachine; // 현재 행동 상태
+        private readonly ZombieAttackRangeDetector attackRangeDetector;
+        private readonly ZombieStagger stagger;
+        private readonly CombatHitStop hitStop;
 
         public float CurrentHealth => Health.CurrentHealth; // 현재 체력
-        public ZombieWorldUnit(
+        public float CurrentStagger => stagger.CurrentStagger;
+        public float MaxStagger => stagger.StaggerLimit;
+        public bool IsInCombat => stateMachine.IsInCombat;
+
+        public event Action<ZombieWorldUnit> StaggerChanged;
+        public event Action<ZombieWorldUnit> CombatStateChanged;
+
+        internal ZombieWorldUnit(
             float maxHealth,
-            ZombieStateMachine stateMachine)
+            ZombieStateMachine stateMachine,
+            ZombieAttackRangeDetector attackRangeDetector,
+            ZombieStagger stagger,
+            CombatHitStop hitStop)
             : base(maxHealth)
         {
             this.stateMachine = stateMachine;
+            this.attackRangeDetector = attackRangeDetector;
+            this.stagger = stagger;
+            this.hitStop = hitStop;
         }
 
-        public void TakeDamage(float damage, Vector3 hitPosition)
+        public EnemyHitResult TakeHit(in EnemyHitRequest hitRequest)
         {
             float healthBeforeDamage = Health.CurrentHealth;
 
-            Health.TakeDamage(damage);
+            Health.TakeDamage(hitRequest.Damage);
 
             if (Health.CurrentHealth >= healthBeforeDamage)
             {
-                return;
+                return EnemyHitResult.Ignored;
             }
 
             if (IsDead)
             {
-                return;
+                hitStop.Request(hitRequest.HitStopDuration);
+                return EnemyHitResult.Damaged;
             }
 
-            stateMachine.ChangeToHitState();
+            stateMachine.NotifyDamaged();
+            bool shouldEnterHitState =
+                stagger.TryAccumulate(hitRequest.StaggerDamage);
+            if (hitRequest.StaggerDamage > 0f)
+            {
+                StaggerChanged?.Invoke(this);
+            }
+
+            if (shouldEnterHitState)
+            {
+                hitStop.Request(hitRequest.HitStopDuration);
+                stateMachine.ChangeToHitState(in hitRequest);
+                return EnemyHitResult.Staggered;
+            }
+
+            hitStop.Request(hitRequest.HitStopDuration);
+            return EnemyHitResult.Damaged;
         }
 
         internal void NotifyAttackAnimationEnded()
@@ -64,31 +98,56 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         protected override void OnUnitCreate()
         {
             Health.Died += HandleHealthDied;
+            stateMachine.CombatStateChanged +=
+                HandleCombatStateChanged;
         }
 
         protected override void OnEnemyEnable()
         {
+            hitStop.Reset();
+            attackRangeDetector.Close();
+            stagger.Reset();
             stateMachine.Enable();
         }
 
         protected override void OnUnitTick(float deltaTime)
         {
+            if (hitStop.Update(deltaTime))
+            {
+                return;
+            }
+
+            if (stagger.UpdateRecovery(deltaTime))
+            {
+                StaggerChanged?.Invoke(this);
+            }
+
             stateMachine.Update(deltaTime);
+            attackRangeDetector.Tick();
         }
 
         protected override void OnUnitDisable()
         {
+            hitStop.Reset();
             stateMachine.Disable();
+            attackRangeDetector.Close();
         }
 
         protected override void OnUnitDispose()
         {
             Health.Died -= HandleHealthDied;
+            stateMachine.CombatStateChanged -=
+                HandleCombatStateChanged;
         }
 
         private void HandleHealthDied()
         {
             stateMachine.ChangeToDeadState();
+        }
+
+        private void HandleCombatStateChanged()
+        {
+            CombatStateChanged?.Invoke(this);
         }
     }
 }

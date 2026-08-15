@@ -1,5 +1,7 @@
 using System;
 using rudIsland.RPG3D.Characters;
+using rudIsland.RPG3D.Characters.Combat.AttackData;
+using rudIsland.RPG3D.Characters.Combat;
 using rudIsland.RPG3D.Player;
 using rudIsland.RPG3D.World;
 using UnityEngine;
@@ -9,7 +11,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
     [DisallowMultipleComponent]
     [RequireComponent(
         typeof(CharacterController),
-        typeof(ZombieAnimationController))]
+        typeof(ZombieAnimationController),
+        typeof(CombatHitEffectPlayer))]
     // Unity 씬과 일반 C# Zombie AI를 연결한다.
     public sealed class ZombieController :
         WorldObjectView,
@@ -23,12 +26,18 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         [Header("생명")]
         [SerializeField, Min(1f)] private float maxHealth = 100f; // 최대 체력
 
+        [Header("경직")]
+        [SerializeField, Min(1f)] private float staggerLimit = 50f;
+        [SerializeField, Min(0f)] private float staggerRecoverDelay = 3f;
+        [SerializeField, Min(0f)] private float staggerRecoverSpeed = 5f;
+
         [Header("사망 후 정리")]
         [SerializeField, Min(0f)] private float deadBodyKeepTime = 2f; // 시간 설정
 
 #if UNITY_EDITOR
         [Header("체력 확인")]
         [SerializeField, Min(0f)] private float testDamage = 10f; // 피격 또는 피해 관련 값
+        [SerializeField, Min(0f)] private float testStaggerDamage = 50f;
 #endif
 
         [Header("찾기와 공격 거리")]
@@ -39,15 +48,36 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         [SerializeField, Range(0f, 180f)]
         private float attackFacingAngle = 10f; // 공격 관련 설정 또는 상태
 
+        [Header("공격 판정")]
+        [SerializeField] private LayerMask targetLayers =
+            1 << 17;
+        [SerializeField] private ZombieAttackHitShape swingHitShape;
+        [SerializeField] private ZombieAttackHitShape kickHitShape;
+        [SerializeField] private ZombieAttackHitShape upDownHitShape;
+        [SerializeField] private AttackDamage swingAttackDamage =
+            new AttackDamage(10f, 0, 10f, 0.3f, 25f, true, 0.04f);
+        [SerializeField] private AttackDamage kickAttackDamage =
+            new AttackDamage(10f, 1, 10f, 0.3f, 25f, true, 0.05f);
+        [SerializeField] private AttackDamage upDownAttackDamage =
+            new AttackDamage(10f, 1, 10f, 0.3f, 25f, true, 0.06f);
+
         [Header("이동")]
         [SerializeField, Min(0.1f)] private float chaseSpeed = 3.5f; // 이동 속도
         [SerializeField, Min(1f)] private float turnSpeed = 360f; // 이동 속도
         [SerializeField] private float gravity = -22f; // Inspector 설정 값
         [SerializeField] private float groundPull = -2f; // Inspector 설정 값
 
+        [Header("피격 이동")]
+        [SerializeField, Min(0.01f)]
+        private float hitPushDuration = 0.15f;
+        [SerializeField]
+        private AnimationCurve hitPushCurve = CreateDefaultHitPushCurve();
+
         private CharacterController characterController; // 씬 또는 시스템 참조
         private ZombieAnimationController zombieAnimation; // 씬 또는 시스템 참조
+        private ZombieAttackRangeDetector attackRangeDetector;
         private ZombieWorldUnit zombieWorldUnit; // 씬 또는 시스템 참조
+        private CombatHitEffectPlayer hitEffectPlayer;
 
         public bool IsDead =>
             zombieWorldUnit != null && zombieWorldUnit.IsDead;
@@ -59,10 +89,12 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             FindSceneReferences();
             FindUnityComponents();
 
-            if (target == null || zombieAnimator == null)
+            if (target == null ||
+                zombieAnimator == null ||
+                !HasValidAttackHitShapes())
             {
                 throw new InvalidOperationException(
-                    "ZombieController에 Target과 자식 Animator가 필요합니다.");
+                    "ZombieController에 Target, Animator와 공격별 손·발 판정점이 필요합니다.");
             }
 
             zombieAnimator.applyRootMotion = true;
@@ -73,6 +105,15 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 characterController,
                 gravity,
                 groundPull);
+            var hitStop = new CombatHitStop(zombieAnimator);
+            attackRangeDetector = new ZombieAttackRangeDetector(
+                transform,
+                targetLayers,
+                swingHitShape,
+                kickHitShape,
+                upDownHitShape,
+                hitStop,
+                hitEffectPlayer);
             var stateMachine = new ZombieStateMachine(
                 target,
                 movement,
@@ -83,13 +124,22 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 attackFacingAngle,
                 chaseSpeed,
                 turnSpeed,
+                hitPushDuration,
+                hitPushCurve,
                 deadBodyKeepTime,
                 RequestDeadZombieRelease,
                 EndAttackHit);
+            var stagger = new ZombieStagger(
+                staggerLimit,
+                staggerRecoverDelay,
+                staggerRecoverSpeed);
 
             zombieWorldUnit = new ZombieWorldUnit(
                 maxHealth,
-                stateMachine);
+                stateMachine,
+                attackRangeDetector,
+                stagger,
+                hitStop);
             return zombieWorldUnit;
         }
 
@@ -99,7 +149,14 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         }
         public void StartAttackHit(int attackNumber)
         {
-            zombieWorldUnit?.BeginAttackHit();
+            if (zombieWorldUnit?.BeginAttackHit() != true)
+            {
+                return;
+            }
+
+            attackRangeDetector?.Open(
+                attackNumber,
+                GetAttackDamage(attackNumber));
         }
         public void EndAttackHitAnimationEvent()
         {
@@ -111,6 +168,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         public void EndAttackHit()
         {
+            attackRangeDetector?.Close();
         }
 
         internal void NotifyAttackAnimationEnded()
@@ -139,7 +197,13 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
             float healthBeforeDamage = zombieWorldUnit.CurrentHealth;
 
-            zombieWorldUnit.TakeDamage(testDamage, transform.position);
+            var hitRequest = new EnemyHitRequest(
+                testDamage,
+                testStaggerDamage,
+                transform.position,
+                -transform.forward,
+                0.25f);
+            zombieWorldUnit.TakeHit(in hitRequest);
 
             Debug.Log(
                 $"좀비 체력: {healthBeforeDamage} → {zombieWorldUnit.CurrentHealth}",
@@ -163,11 +227,37 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         {
             characterController = GetComponent<CharacterController>();
             zombieAnimation = GetComponent<ZombieAnimationController>();
+            hitEffectPlayer = GetComponent<CombatHitEffectPlayer>();
 
             if (zombieAnimator == null)
             {
                 zombieAnimator = GetComponentInChildren<Animator>(true);
             }
+        }
+
+        private AttackDamage GetAttackDamage(int attackNumber)
+        {
+            switch (attackNumber)
+            {
+                case 1:
+                    return swingAttackDamage;
+                case 2:
+                    return kickAttackDamage;
+                case 3:
+                    return upDownAttackDamage;
+                default:
+                    return null;
+            }
+        }
+
+        private bool HasValidAttackHitShapes()
+        {
+            return swingHitShape != null &&
+                swingHitShape.IsReady &&
+                kickHitShape != null &&
+                kickHitShape.IsReady &&
+                upDownHitShape != null &&
+                upDownHitShape.IsReady;
         }
 
         protected override void OnResetForPool()
@@ -176,22 +266,43 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             zombieAnimation?.ResetAnimation();
         }
 
-        public void TakeDamage(float damage, Vector3 hitPosition)
+        public EnemyHitResult TakeHit(in EnemyHitRequest hitRequest)
         {
-            zombieWorldUnit?.TakeDamage(damage, hitPosition);
+            return zombieWorldUnit != null
+                ? zombieWorldUnit.TakeHit(in hitRequest)
+                : EnemyHitResult.Ignored;
         }
 
+        private static AnimationCurve CreateDefaultHitPushCurve()
+        {
+            return new AnimationCurve(
+                new Keyframe(0f, 0f, 2f, 2f),
+                new Keyframe(1f, 1f, 0f, 0f));
+        }
 
 
 #if UNITY_EDITOR
         private void OnValidate()
         {
             FindUnityComponents();
+            staggerLimit = Mathf.Max(1f, staggerLimit);
+            staggerRecoverDelay = Mathf.Max(0f, staggerRecoverDelay);
+            staggerRecoverSpeed = Mathf.Max(0f, staggerRecoverSpeed);
+            testStaggerDamage = Mathf.Max(0f, testStaggerDamage);
             findRange = Mathf.Max(0.1f, findRange);
             idleTargetCheckInterval =
                 Mathf.Max(0.01f, idleTargetCheckInterval);
             attackRange = Mathf.Clamp(attackRange, 0.1f, findRange);
             attackFacingAngle = Mathf.Clamp(attackFacingAngle, 0f, 180f);
+            swingHitShape?.Validate();
+            kickHitShape?.Validate();
+            upDownHitShape?.Validate();
+            hitPushDuration = Mathf.Max(0.01f, hitPushDuration);
+            if (hitPushCurve == null || hitPushCurve.length < 2)
+            {
+                hitPushCurve = CreateDefaultHitPushCurve();
+            }
+
             deadBodyKeepTime = Mathf.Max(0f, deadBodyKeepTime);
         }
 
@@ -201,6 +312,30 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             Gizmos.DrawWireSphere(transform.position, findRange);
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(transform.position, attackRange);
+            DrawAttackHitShape(swingHitShape, Color.magenta);
+            DrawAttackHitShape(kickHitShape, Color.yellow);
+            DrawAttackHitShape(upDownHitShape, Color.cyan);
+        }
+
+        private static void DrawAttackHitShape(
+            ZombieAttackHitShape hitShape,
+            Color color)
+        {
+            if (hitShape == null || !hitShape.IsReady)
+            {
+                return;
+            }
+
+            Gizmos.color = color;
+            Gizmos.DrawWireSphere(
+                hitShape.StartPoint.position,
+                hitShape.Radius);
+            Gizmos.DrawWireSphere(
+                hitShape.EndPoint.position,
+                hitShape.Radius);
+            Gizmos.DrawLine(
+                hitShape.StartPoint.position,
+                hitShape.EndPoint.position);
         }
 #endif
     }

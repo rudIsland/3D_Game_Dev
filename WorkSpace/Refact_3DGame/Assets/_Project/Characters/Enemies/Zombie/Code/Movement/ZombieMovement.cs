@@ -98,6 +98,16 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             ApplyMovement(Vector3.up * (verticalSpeed * deltaTime));
         }
 
+        internal void ApplyHitMovement(
+            Vector3 horizontalMovement,
+            float deltaTime)
+        {
+            horizontalMovement.y = 0f;
+            UpdateVerticalSpeed(deltaTime);
+            horizontalMovement.y = verticalSpeed * deltaTime;
+            ApplyMovement(horizontalMovement);
+        }
+
         private void TurnToDirection(
             Vector3 direction,
             float turnSpeed,

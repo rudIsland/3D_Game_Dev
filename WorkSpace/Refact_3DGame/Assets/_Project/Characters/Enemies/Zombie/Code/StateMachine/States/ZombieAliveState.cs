@@ -42,12 +42,14 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         internal void ChangeToAlert()
         {
+            stateMachine.EnterCombat();
             ChangeChildState(alertState);
         }
 
         internal void ChangeToIdleAfterLostTarget()
         {
             hasFoundTargetBefore = false;
+            stateMachine.ExitCombat();
             ChangeChildState(idleState);
         }
 
@@ -77,6 +79,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         {
             if (!stateMachine.IsTargetFound())
             {
+                stateMachine.ExitCombat();
                 return;
             }
 

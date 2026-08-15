@@ -26,6 +26,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         private ZombieAttackType previousAttackType; // 공격 관련 설정 또는 상태
         private bool hasPreviousAttack; // 기능 사용 여부
         private bool animationEndedByEvent; // 기능 사용 여부
+        private bool isHitWindowOpen;
+        private bool isRecovery;
 
         public ZombieAttackState(
             ZombieAliveState aliveState,
@@ -49,6 +51,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         private void StartAttack()
         {
             animationEndedByEvent = false;
+            isHitWindowOpen = false;
+            isRecovery = false;
             ZombieAttackType attackType = ChooseAttack();
             previousAttackType = attackType;
             hasPreviousAttack = true;
@@ -67,16 +71,31 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         public void Exit()
         {
+            isHitWindowOpen = false;
+            isRecovery = false;
             stateMachine.EndAttackHit();
         }
 
         internal bool BeginAttackHit()
         {
+            if (isHitWindowOpen || isRecovery)
+            {
+                return false;
+            }
+
+            isHitWindowOpen = true;
             return true;
         }
 
         internal bool BeginAttackRecovery()
         {
+            if (isRecovery)
+            {
+                return false;
+            }
+
+            isHitWindowOpen = false;
+            isRecovery = true;
             return true;
         }
 
