@@ -661,9 +661,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3530221107848658303}
   - component: {fileID: 7909908668326475689}
-  - component: {fileID: 2533577829763735235}
-  - component: {fileID: 1871866226797728835}
-  - component: {fileID: 38877932889862354}
   m_Layer: 0
   m_Name: Visual
   m_TagString: Untagged
@@ -712,45 +709,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &2533577829763735235
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 667774697603535469}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 91020a523413c4f45b8dc6cfa1f11d09, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: rudIsland.RPG3D.DemonSwordsman::rudIsland.RPG3D.Characters.Enemies.Boss.DemonSwordsman.DemonSwordsmanAnimationController
-  bossAnimator: {fileID: 7909908668326475689}
-  handSword: {fileID: 5737385975246953553}
-  beltSword: {fileID: 202855318203714275}
---- !u!114 &1871866226797728835
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 667774697603535469}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 880ad8f4967f24d4d9f5294af2bd0072, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: rudIsland.RPG3D.DemonSwordsman::rudIsland.RPG3D.Characters.Enemies.Boss.DemonSwordsman.DemonSwordsmanAnimationMoveReceiver
---- !u!114 &38877932889862354
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 667774697603535469}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3dbf2e09d47847241bace6c13eb2d159, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: rudIsland.RPG3D.DemonSwordsman::rudIsland.RPG3D.Characters.Enemies.Boss.DemonSwordsman.DemonSwordsmanCombatAnimationEventReceiver
 --- !u!1 &692336677543381971
 GameObject:
   m_ObjectHideFlags: 0
@@ -2313,7 +2271,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7203590478749990962}
   - component: {fileID: 2985624785641648369}
-  - component: {fileID: 3298517866004210463}
   m_Layer: 0
   m_Name: DemonSwordsmanTestEnemy
   m_TagString: Untagged
@@ -2362,21 +2319,6 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 1.2, z: 0}
---- !u!114 &3298517866004210463
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3155176393841009419}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98e3d5d1e18342341b1adcbb5596560e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: rudIsland.RPG3D.DemonSwordsman::rudIsland.RPG3D.Characters.Enemies.Boss.DemonSwordsman.DemonSwordsmanController
-  target: {fileID: 0}
-  settings: {fileID: 11400000, guid: 2633872cc344c134e8915a37ac56170e, type: 2}
-  bossAnimation: {fileID: 2533577829763735235}
 --- !u!1 &3172386479224213335
 GameObject:
   m_ObjectHideFlags: 0

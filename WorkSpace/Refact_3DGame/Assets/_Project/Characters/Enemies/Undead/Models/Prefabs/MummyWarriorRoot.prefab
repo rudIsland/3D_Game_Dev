@@ -40,9 +40,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5187492264194672307}
-  - component: {fileID: 3943719901226601462}
   - component: {fileID: 6085190997941434459}
-  - component: {fileID: 3435650510878425175}
   - component: {fileID: 1331552245977910082}
   m_Layer: 0
   m_Name: MummyWarriorDisplay
@@ -69,51 +67,6 @@ Transform:
   - {fileID: 5464320011774930871}
   m_Father: {fileID: 4353253688586472277}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3943719901226601462
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 282877299463796652}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b39474a70ff8d1a4e8893d0130c5b1bb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Characters.Enemies.MummyWarrior.MummyWarriorController
-  target: {fileID: 0}
-  mummyAnimator: {fileID: 6085190997941434459}
-  lanceHitDetector: {fileID: 1558086056978694063}
-  canTrackTarget: 0
-  maxHealth: 120
-  deadBodyKeepTime: 2
-  findRange: 25
-  runStartRange: 6
-  walkSpeed: 1.6
-  runSpeed: 3.8
-  turnSpeed: 300
-  gravity: -22
-  groundPull: -2
-  attackPatterns:
-  - attackId: 1
-    attackGroup: 0
-    phaseMask: 1
-    displayName: Lance Attack
-    animatorStateName: Attack 1
-    minimumDistance: 0
-    maximumDistance: 2.2
-    allowedAngle: 35
-    selectionWeight: 1
-    cooldown: 1.2
-    damage:
-      healthDamage: 15
-    hitStartTime: 0.25
-    hitEndTime: 0.55
-    transitionTime: 0.08
-    animationSpeed: 1
-    canChain: 0
-    chainWeight: 0.35
-  testDamage: 10
 --- !u!95 &6085190997941434459
 Animator:
   serializedVersion: 7
@@ -136,19 +89,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &3435650510878425175
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 282877299463796652}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a5f4b93e57d4ab7ba8c6bb2893f5f18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Characters.Enemies.MummyWarrior.MummyWarriorAnimationController
-  mummyAnimator: {fileID: 6085190997941434459}
 --- !u!143 &1331552245977910082
 CharacterController:
   m_ObjectHideFlags: 0

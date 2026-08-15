@@ -1885,8 +1885,6 @@ GameObject:
   - component: {fileID: 2017743012378828785}
   - component: {fileID: 5580556959449598608}
   - component: {fileID: 3661674573274079252}
-  - component: {fileID: 662187409577285944}
-  - component: {fileID: 9186997911168388695}
   - component: {fileID: 9186997911168388696}
   m_Layer: 7
   m_Name: NightshadeSpearTestEnemy
@@ -1959,55 +1957,6 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &662187409577285944
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5663811925716629795}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1b2c3d4e5f60123456789abcdef0007, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Characters.Enemies.NightShade.NightshadeSpearAnimationController
-  nightshadeAnimator: {fileID: 5580556959449598608}
---- !u!114 &9186997911168388695
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5663811925716629795}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1b2c3d4e5f60123456789abcdef0003, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Characters.Enemies.NightShade.NightshadeController
-  target: {fileID: 0}
-  nightshadeAnimator: {fileID: 5580556959449598608}
-  canTrackTarget: 0
-  maxHealth: 240
-  deadBodyKeepTime: 2
-  phaseTwoHealthRate: 0.6
-  findRange: 25
-  runStartRange: 6
-  walkSpeed: 1.6
-  runSpeed: 3.8
-  turnSpeed: 300
-  gravity: -22
-  groundPull: -2
-  attackOrigin: {fileID: 0}
-  targetLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  attackRange: 1.1
-  attackForwardOffset: 1
-  attackAudioSource: {fileID: 9186997911168388696}
-  attackReadyClip: {fileID: 8300000, guid: ee5ccd57b04603643898737049d946bb, type: 3}
-  lightAttackClip: {fileID: 8300000, guid: 792477ef6602ff94690ab156a9dfd518, type: 3}
-  strongAttackClip: {fileID: 8300000, guid: cff475bf878d0954b9125ab8d6dbf178, type: 3}
-  testDamage: 10
 --- !u!1 &5708396319578285000
 GameObject:
   m_ObjectHideFlags: 0
