@@ -1,5 +1,7 @@
 using rudIsland.RPG3D.Player.Animations;
+using rudIsland.RPG3D.Player.Movement;
 using rudIsland.RPG3D.Player.States;
+using UnityEngine;
 
 namespace rudIsland.RPG3D.Player.States.Movement
 {
@@ -8,30 +10,45 @@ namespace rudIsland.RPG3D.Player.States.Movement
     {
         // PlayerMovement.controller의 PlayerRoll -> PlayerIdle Exit Time과 맞춘다.
         private const float RollCompleteNormalizedTime = 0.7f;
-        private const float InvulnerableStartNormalizedTime = 0.15f;
-        private const float InvulnerableEndNormalizedTime = 0.55f;
 
         private readonly PlayerStateMachine stateMachine; // 현재 행동 상태
         private readonly PlayerAnimationController animationController; // 씬 또는 시스템 참조
+        private readonly float movementDistance;
+        private readonly float sprintMovementDistance;
+        private readonly AnimationCurve movementCurve;
+        private readonly PlayerActionMovementCurve movementProgress;
         private bool startsAfterAttackCancel; // 기능 사용 여부
         private bool hasAnimationStarted; // 기능 사용 여부
 
         public bool IsFinished { get; private set; } // 기능 사용 여부
-        public bool IsInvulnerable { get; private set; }
 
         public PlayerRollState(
             PlayerStateMachine stateMachine,
-            PlayerAnimationController animationController)
+            PlayerAnimationController animationController,
+            float movementDistance,
+            float sprintMovementDistance,
+            AnimationCurve movementCurve)
         {
             this.stateMachine = stateMachine;
             this.animationController = animationController;
+            this.movementDistance = Mathf.Max(0f, movementDistance);
+            this.sprintMovementDistance = Mathf.Max(0f, sprintMovementDistance);
+            this.movementCurve = movementCurve;
+            movementProgress = new PlayerActionMovementCurve();
         }
 
         public void Enter()
         {
             hasAnimationStarted = false;
             IsFinished = false;
-            IsInvulnerable = false;
+            float selectedMovementDistance =
+                stateMachine.Input.IsSprinting &&
+                stateMachine.Input.MoveValue.sqrMagnitude >= 0.95f
+                    ? sprintMovementDistance
+                    : movementDistance;
+            movementProgress.Begin(
+                selectedMovementDistance,
+                movementCurve);
             animationController.PlayRoll(
                 stateMachine.Movement.RollDirectionInput,
                 startsAfterAttackCancel);
@@ -51,21 +68,22 @@ namespace rudIsland.RPG3D.Player.States.Movement
             if (animationController.TryGetRollTime(out float normalizedTime))
             {
                 hasAnimationStarted = true;
-                IsInvulnerable =
-                    normalizedTime >= InvulnerableStartNormalizedTime &&
-                    normalizedTime <= InvulnerableEndNormalizedTime;
+                float movementTime =
+                    normalizedTime / RollCompleteNormalizedTime;
+                float deltaDistance =
+                    movementProgress.EvaluateDeltaDistance(movementTime);
+                stateMachine.Movement.ApplyRollMovement(deltaDistance);
                 IsFinished = normalizedTime >= RollCompleteNormalizedTime;
                 return;
             }
 
-            IsInvulnerable = false;
             IsFinished = hasAnimationStarted;
         }
 
         public void Exit()
         {
             IsFinished = false;
-            IsInvulnerable = false;
+            movementProgress.Reset();
         }
     }
 }

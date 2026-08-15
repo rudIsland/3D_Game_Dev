@@ -23,10 +23,12 @@ namespace rudIsland.RPG3D.Player.States.Movement
 
         public void Update(float deltaTime, PlayerStateInput input)
         {
-            stateMachine.Movement.UpdateMove(deltaTime);
+            bool isSprinting =
+                stateMachine.TryConsumeSprintStamina(deltaTime);
+            stateMachine.Movement.UpdateMove(deltaTime, isSprinting);
             animationController.UpdateLocomotion(
                 stateMachine.Movement.GetLocalMoveInput(),
-                stateMachine.Input.IsSprinting,
+                isSprinting,
                 deltaTime);
         }
 

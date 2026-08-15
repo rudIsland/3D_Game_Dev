@@ -11,6 +11,9 @@ using rudIsland.RPG3D.Player.States.Hit;
 using rudIsland.RPG3D.Player.States.Movement;
 using rudIsland.RPG3D.Player.States.Target;
 using rudIsland.RPG3D.Player.Runtime.Attack;
+using rudIsland.RPG3D.Player.Runtime.Hit;
+using rudIsland.RPG3D.Player.Runtime;
+using rudIsland.RPG3D.Characters.Combat;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Player.States
@@ -27,8 +30,10 @@ namespace rudIsland.RPG3D.Player.States
         private readonly PlayerTargetLookState targetLookState;
         private readonly PlayerHitState hitState;
         private readonly PlayerDeadState deadState;
-        private readonly float rollDistanceScale;
-
+        private readonly PlayerStamina playerStamina;
+        private readonly float rollStaminaCost;
+        private readonly float sprintStaminaCostPerSecond;
+        private readonly float minimumGuardDot;
         private IPlayerState currentState;
         private IPlayerState returnLookState;
         private bool isEnabled;
@@ -40,38 +45,68 @@ namespace rudIsland.RPG3D.Player.States
         internal PlayerInputReader Input => playerInput;
         public bool IsBlocking => actionStateMachine.IsBlocking;
         public bool IsRolling => actionStateMachine.IsRolling;
-        public bool IsInvulnerable => actionStateMachine.IsInvulnerable;
         public bool IsAttacking => actionStateMachine.IsAttacking;
         public bool IsTargeting => ReferenceEquals(currentState, targetLookState);
         public bool IsDead => ReferenceEquals(currentState, deadState);
         public bool IsHit => ReferenceEquals(currentState, hitState);
+        public bool IsWalking =>
+            actionStateMachine.IsMoving &&
+            !playerInput.IsSprinting &&
+            playerInput.MoveValue.sqrMagnitude >= 0.01f;
 
         public PlayerStateMachine(
             PlayerInputReader playerInput,
             PlayerMovement playerMovement,
+            PlayerStamina playerStamina,
+            float rollStaminaCost,
+            float sprintStaminaCostPerSecond,
             Animator playerAnimator,
             float animationSmoothTime,
-            float rollDistanceScale,
+            float rollDistance,
+            float sprintRollDistance,
+            AnimationCurve rollMovementCurve,
             PlayerAttackData[] attackData,
             float comboInputBufferDuration,
             PlayerTargetFinder targetFinder,
             PlayerTargetCamera targetCamera,
             float targetBreakDistance,
-            Transform attackOrigin,
+            float guardAngle,
+            PlayerGuardHitBox guardHitBox,
+            float hitPushDuration,
+            AnimationCurve hitPushCurve,
+            Transform attackerRoot,
+            Transform weaponHitStart,
+            Transform weaponHitEnd,
             LayerMask attackLayers,
-            float attackRadius,
-            float attackForwardOffset)
+            float weaponHitRadius,
+            CombatHitStop hitStop,
+            CombatHitEffectPlayer hitEffectPlayer)
         {
             this.playerInput = playerInput;
             this.playerMovement = playerMovement;
+            this.playerStamina = playerStamina;
+            this.rollStaminaCost = Mathf.Max(0f, rollStaminaCost);
+            this.sprintStaminaCostPerSecond =
+                Mathf.Max(0f, sprintStaminaCostPerSecond);
             animationController = new PlayerAnimationController(
                 playerAnimator,
                 animationSmoothTime);
-            this.rollDistanceScale = Mathf.Max(0f, rollDistanceScale);
+            minimumGuardDot = Mathf.Cos(
+                Mathf.Clamp(guardAngle, 0f, 180f) *
+                0.5f *
+                Mathf.Deg2Rad);
 
             var moveState = new PlayerMoveState(this, animationController);
-            var blockState = new PlayerBlockState(this, animationController);
-            var rollState = new PlayerRollState(this, animationController);
+            var blockState = new PlayerBlockState(
+                this,
+                animationController,
+                guardHitBox);
+            var rollState = new PlayerRollState(
+                this,
+                animationController,
+                rollDistance,
+                sprintRollDistance,
+                rollMovementCurve);
             attackState = new PlayerAttackState(
                 this,
                 animationController,
@@ -97,11 +132,18 @@ namespace rudIsland.RPG3D.Player.States
                 targetBreakDistance);
 
             attackRangeDetector = new PlayerAttackRangeDetector(
-                attackOrigin,
+                attackerRoot,
+                weaponHitStart,
+                weaponHitEnd,
                 attackLayers,
-                attackRadius,
-                attackForwardOffset);
-            hitState = new PlayerHitState(this, animationController);
+                weaponHitRadius,
+                hitStop,
+                hitEffectPlayer);
+            hitState = new PlayerHitState(
+                this,
+                animationController,
+                hitPushDuration,
+                hitPushCurve);
             deadState = new PlayerDeadState(this, animationController);
         }
 
@@ -218,12 +260,64 @@ namespace rudIsland.RPG3D.Player.States
             playerMovement.ClearAttackDirection();
         }
 
-        internal bool CanStartAttack()
+        internal bool TryPrepareAttack()
         {
-            return playerMovement.IsGrounded;
+            if (!playerMovement.IsGrounded)
+            {
+                return false;
+            }
+
+            bool startAsRunAttack = ShouldStartRunAttack();
+            if (!playerStamina.TryConsume(
+                    attackState.GetInitialStaminaCost(startAsRunAttack)))
+            {
+                return false;
+            }
+
+            attackState.Prepare(startAsRunAttack);
+            return true;
         }
 
-        internal bool ShouldStartRunAttack()
+        internal bool TryConsumeAttackStamina(float staminaCost)
+        {
+            return playerStamina.TryConsume(staminaCost);
+        }
+
+        internal bool TryStartRoll()
+        {
+            if (!playerStamina.CanConsume(rollStaminaCost) ||
+                !playerMovement.TryStartRoll())
+            {
+                return false;
+            }
+
+            return playerStamina.TryConsume(rollStaminaCost);
+        }
+
+        internal bool TryStartAttackCancelRoll()
+        {
+            if (!playerStamina.TryConsume(rollStaminaCost))
+            {
+                return false;
+            }
+
+            playerMovement.StartAttackCancelRoll();
+            return true;
+        }
+
+        internal bool TryConsumeSprintStamina(float deltaTime)
+        {
+            if (!playerInput.IsSprinting ||
+                playerInput.MoveValue.sqrMagnitude < 0.01f)
+            {
+                return false;
+            }
+
+            return playerStamina.TryConsume(
+                sprintStaminaCostPerSecond * deltaTime);
+        }
+
+        private bool ShouldStartRunAttack()
         {
             return playerInput.IsSprinting &&
                 playerInput.MoveValue.sqrMagnitude >= 0.95f;
@@ -235,15 +329,12 @@ namespace rudIsland.RPG3D.Player.States
         {
             if (IsRolling || IsBlocking || IsAttacking || IsDead)
             {
-                float horizontalMoveScale = IsRolling
-                    ? rollDistanceScale
-                    : IsAttacking
-                        ? attackState.CurrentMoveScale
-                        : 1f;
+                float horizontalRootMotionScale =
+                    IsRolling || IsAttacking ? 0f : 1f;
                 playerMovement.ApplyRootMotion(
                     deltaPosition,
                     deltaRotation,
-                    horizontalMoveScale);
+                    horizontalRootMotionScale);
             }
         }
 
@@ -261,13 +352,15 @@ namespace rudIsland.RPG3D.Player.States
             ChangeState(deadState);
         }
 
-        internal void ChangeToHitState()
+        internal void ChangeToHitState(
+            in PlayerHitRequest hitRequest)
         {
             if (!isEnabled || ReferenceEquals(currentState, deadState))
             {
                 return;
             }
 
+            hitState.SetHitRequest(in hitRequest);
             if (ReferenceEquals(currentState, hitState))
             {
                 hitState.Restart();
@@ -284,7 +377,11 @@ namespace rudIsland.RPG3D.Player.States
             if(!isEnabled || !IsAttacking)
                 return;
 
-            attackRangeDetector.Open(attackState.AttackDamage);
+            attackRangeDetector.Open(
+                attackState.AttackDamage,
+                attackState.AttackStaggerDamage,
+                attackState.AttackPushDistance,
+                attackState.AttackHitStopDuration);
         }
 
         internal void EndAttackHit() //공격 윈도우 종료
@@ -320,6 +417,32 @@ namespace rudIsland.RPG3D.Player.States
             }
 
             animationController.PlayBlockImpact();
+        }
+
+        internal bool CanBlockHit(Vector3 pushDirection)
+        {
+            if (!isEnabled || !IsBlocking)
+            {
+                return false;
+            }
+
+            pushDirection.y = 0f;
+            if (pushDirection.sqrMagnitude <= 0.000001f)
+            {
+                return false;
+            }
+
+            Vector3 attackerDirection = -pushDirection.normalized;
+            Vector3 guardForward = playerMovement.Forward;
+            guardForward.y = 0f;
+            if (guardForward.sqrMagnitude <= 0.000001f)
+            {
+                return false;
+            }
+
+            return Vector3.Dot(
+                    guardForward.normalized,
+                    attackerDirection) >= minimumGuardDot;
         }
 
 

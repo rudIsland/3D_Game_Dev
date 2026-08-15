@@ -42,6 +42,7 @@ GameObject:
   - component: {fileID: 1607652367621752783}
   - component: {fileID: 6648479244505933005}
   - component: {fileID: 4308524652148546462}
+  - component: {fileID: 5180795654792450061}
   m_Layer: 6
   m_Name: PlayerRoot
   m_TagString: Untagged
@@ -118,6 +119,11 @@ MonoBehaviour:
   targetCameraTurnSpeed: 540
   targetCameraVerticalValue: 0.5
   maxHealth: 100
+  maxStamina: 100
+  staminaRecoverDelay: 1
+  staminaRecoverSpeed: 20
+  rollStaminaCost: 25
+  sprintStaminaCostPerSecond: 15
   attackData:
   - {fileID: 11400000, guid: a1014b8e7c624e0e91f4d0c3b2a19876, type: 2}
   - {fileID: 11400000, guid: a2024b8e7c624e0e91f4d0c3b2a19876, type: 2}
@@ -129,20 +135,34 @@ MonoBehaviour:
   staggerRecoverDelay: 1
   staggerRecoverSpeed: 20
   guardAngle: 120
+  guardHitBox: {fileID: 0}
   hitPushTime: 0.18
-  unitCollisionLayers:
-    serializedVersion: 2
-    m_Bits: 192
-  minimumUnitSeparation: 0.2
   testDamage: 10
   turnSpeed: 720
   walkSpeed: 2.8
   sprintSpeed: 5.5
   animationSmoothTime: 0.12
-  rollDistanceScale: 0.1
+  rollDistance: 2
+  sprintRollDistance: 2.5
   comboInputBufferDuration: 0.25
   gravity: -22
   groundPull: -2
+--- !u!114 &5180795654792450061
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6381702802126765991}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8a4c0717de6458095c2b2f7c52919cc, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Characters.Combat.CombatHitEffectPlayer
+  bodyHitEffectPrefab: {fileID: 0}
+  guardHitEffectPrefab: {fileID: 0}
+  bodyHitPoolSize: 4
+  guardHitPoolSize: 2
 --- !u!1 &7112299585502653175
 GameObject:
   m_ObjectHideFlags: 0
@@ -153,7 +173,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3945709285472504484}
   - component: {fileID: 7418619056282658818}
-  - component: {fileID: 6673914076574837219}
   m_Layer: 17
   m_Name: PlayerBodyHitBox
   m_TagString: Untagged

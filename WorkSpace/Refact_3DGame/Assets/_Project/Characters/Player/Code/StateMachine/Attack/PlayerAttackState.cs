@@ -1,5 +1,6 @@
 ﻿using rudIsland.RPG3D.Player.Animations;
 using rudIsland.RPG3D.Player.States;
+using rudIsland.RPG3D.Player.Movement;
 
 namespace rudIsland.RPG3D.Player.States.Attack
 {
@@ -14,6 +15,7 @@ namespace rudIsland.RPG3D.Player.States.Attack
         private readonly IAttackState[] comboAttackStates;
         private readonly IAttackState runAttackState;
         private readonly float comboInputBufferDuration;
+        private readonly PlayerActionMovementCurve movementCurve;
 
         private IAttackState currentAttackState;
         private bool isRunAttack;
@@ -24,11 +26,20 @@ namespace rudIsland.RPG3D.Player.States.Attack
         private float bufferedAttackInputAge;
 
         public bool IsFinished { get; private set; }
-        public float CurrentMoveScale =>
-            currentAttackState != null ? currentAttackState.MoveScale: 0f;
-
         public float AttackDamage => 
             currentAttackState != null ? currentAttackState.Damage : 0f;
+        public float AttackStaggerDamage =>
+            currentAttackState != null
+                ? currentAttackState.StaggerDamage
+                : 0f;
+        public float AttackPushDistance =>
+            currentAttackState != null
+                ? currentAttackState.PushDistance
+                : 0f;
+        public float AttackHitStopDuration =>
+            currentAttackState != null
+                ? currentAttackState.HitStopDuration
+                : 0f;
 
         public PlayerAttackState(
             PlayerStateMachine stateMachine,
@@ -39,6 +50,7 @@ namespace rudIsland.RPG3D.Player.States.Attack
             this.stateMachine = stateMachine;
             this.animationController = animationController;
             this.comboInputBufferDuration = comboInputBufferDuration;
+            movementCurve = new PlayerActionMovementCurve();
 
             ValidateAttackData(attackData);
 
@@ -57,6 +69,13 @@ namespace rudIsland.RPG3D.Player.States.Attack
         public void Prepare(bool startAsRunAttack)
         {
             isRunAttack = startAsRunAttack;
+        }
+
+        public float GetInitialStaminaCost(bool startAsRunAttack)
+        {
+            return startAsRunAttack
+                ? runAttackState.StaminaCost
+                : comboAttackStates[0].StaminaCost;
         }
 
         public void Enter()
@@ -108,6 +127,9 @@ namespace rudIsland.RPG3D.Player.States.Attack
             }
 
             hasAnimationStarted = true;
+            float deltaDistance =
+                movementCurve.EvaluateDeltaDistance(normalizedTime);
+            stateMachine.Movement.ApplyAttackMovement(deltaDistance);
             if (TryStartNextCombo(normalizedTime))
             {
                 IsFinished = false;
@@ -123,6 +145,7 @@ namespace rudIsland.RPG3D.Player.States.Attack
             ClearBufferedAttackInput();
             stateMachine.EndAttackHit();
             stateMachine.ClearAttackDirection();
+            movementCurve.Reset();
         }
 
         internal void OpenComboTurnWindow()
@@ -156,6 +179,9 @@ namespace rudIsland.RPG3D.Player.States.Attack
             isComboTurnWindowOpen = false;
             stateMachine.SetAttackDirection(
                 currentAttackState.AttackNumber == 1);
+            movementCurve.Begin(
+                currentAttackState.MoveDistance,
+                currentAttackState.MovementCurve);
             animationController.PlayAttack(currentAttackState.AttackNumber);
         }
 
@@ -169,10 +195,18 @@ namespace rudIsland.RPG3D.Player.States.Attack
                 return false;
             }
 
+            IAttackState nextAttackState = comboAttackStates[
+                currentAttackState.AttackNumber];
+            if (!stateMachine.TryConsumeAttackStamina(
+                    nextAttackState.StaminaCost))
+            {
+                ClearBufferedAttackInput();
+                return false;
+            }
+
             ClearBufferedAttackInput();
             stateMachine.EndAttackHit();
-            currentAttackState = comboAttackStates[
-                currentAttackState.AttackNumber];
+            currentAttackState = nextAttackState;
             PlayCurrentAttack();
             return true;
         }

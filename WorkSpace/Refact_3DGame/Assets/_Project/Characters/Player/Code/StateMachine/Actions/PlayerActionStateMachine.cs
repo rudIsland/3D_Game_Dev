@@ -19,9 +19,7 @@ namespace rudIsland.RPG3D.Player.States.Actions
         public bool IsBlocking => ReferenceEquals(currentState, blockState);
         public bool IsRolling => ReferenceEquals(currentState, rollState);
         public bool IsAttacking => ReferenceEquals(currentState, attackState);
-        public bool IsInvulnerable =>
-            ReferenceEquals(currentState, rollState) &&
-            rollState.IsInvulnerable;
+        public bool IsMoving => ReferenceEquals(currentState, moveState);
 
         public PlayerActionStateMachine(
             PlayerStateMachine stateMachine,
@@ -68,9 +66,9 @@ namespace rudIsland.RPG3D.Player.States.Actions
 
             if (ReferenceEquals(currentState, attackState))
             {
-                if (input.RollPressed)
+                if (input.RollPressed &&
+                    stateMachine.TryStartAttackCancelRoll())
                 {
-                    stateMachine.Movement.StartAttackCancelRoll();
                     rollState.StartAfterAttackCancel();
                     ChangeState(rollState);
                     currentState.Update(deltaTime, input);
@@ -104,16 +102,15 @@ namespace rudIsland.RPG3D.Player.States.Actions
                 return;
             }
 
-            if (input.RollPressed && stateMachine.Movement.TryStartRoll())
+            if (input.RollPressed && stateMachine.TryStartRoll())
             {
                 ChangeState(rollState);
                 currentState.Update(deltaTime, input);
                 return;
             }
 
-            if (input.AttackPressed && stateMachine.CanStartAttack())
+            if (input.AttackPressed && stateMachine.TryPrepareAttack())
             {
-                attackState.Prepare(stateMachine.ShouldStartRunAttack());
                 ChangeState(attackState);
                 currentState.Update(deltaTime, new PlayerStateInput(
                     false,

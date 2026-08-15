@@ -1,4 +1,5 @@
 using rudIsland.RPG3D.Player.Animations;
+using rudIsland.RPG3D.Player.Runtime.Hit;
 using rudIsland.RPG3D.Player.States;
 
 namespace rudIsland.RPG3D.Player.States.Block
@@ -8,13 +9,16 @@ namespace rudIsland.RPG3D.Player.States.Block
     {
         private readonly PlayerStateMachine stateMachine; // 현재 행동 상태
         private readonly PlayerAnimationController animationController; // 씬 또는 시스템 참조
+        private readonly PlayerGuardHitBox guardHitBox;
 
         public PlayerBlockState(
             PlayerStateMachine stateMachine,
-            PlayerAnimationController animationController)
+            PlayerAnimationController animationController,
+            PlayerGuardHitBox guardHitBox)
         {
             this.stateMachine = stateMachine;
             this.animationController = animationController;
+            this.guardHitBox = guardHitBox;
         }
 
         public void Enter()
@@ -22,6 +26,7 @@ namespace rudIsland.RPG3D.Player.States.Block
             animationController.StopMove();
             stateMachine.SetAttackDirection(true);
             animationController.SetBlocking(true);
+            guardHitBox?.SetGuardActive(false);
         }
 
         public void Update(float deltaTime, PlayerStateInput input)
@@ -30,12 +35,15 @@ namespace rudIsland.RPG3D.Player.States.Block
             animationController.UpdateBlockMove(
                 stateMachine.Movement.GetLocalMoveInput(),
                 deltaTime);
+            guardHitBox?.SetGuardActive(
+                animationController.IsPlayingBlockIdle());
         }
 
         public void Exit()
         {
             animationController.StopMove();
             animationController.SetBlocking(false);
+            guardHitBox?.SetGuardActive(false);
             stateMachine.ClearAttackDirection();
         }
     }

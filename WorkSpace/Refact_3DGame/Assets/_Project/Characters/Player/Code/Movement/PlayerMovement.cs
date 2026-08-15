@@ -18,6 +18,7 @@ namespace rudIsland.RPG3D.Player.Movement
         private readonly PlayerTargetMovement targetMovement;
 
         private float verticalSpeed; // 이동 속도
+        private Vector3 rollWorldDirection;
         private Vector3 attackDirection; // 공격 관련 설정 또는 상태
         private bool hasAttackDirection; // 기능 사용 여부
         private IPlayerMovementMode currentMovementMode;
@@ -58,13 +59,13 @@ namespace rudIsland.RPG3D.Player.Movement
             currentMovementMode = freeLookMovement;
         }
 
-        public void UpdateMove(float deltaTime)
+        public void UpdateMove(float deltaTime, bool isSprinting)
         {
             Vector3 moveDirection = GetMoveDirection();
             currentMovementMode.UpdateFacing(moveDirection, deltaTime);
             UpdateVerticalSpeed(deltaTime);
 
-            float moveSpeed = playerInput.IsSprinting ? sprintSpeed : walkSpeed;
+            float moveSpeed = isSprinting ? sprintSpeed : walkSpeed;
             Vector3 moveVelocity = moveDirection * moveSpeed;
             moveVelocity.y = verticalSpeed;
             ApplyMovement(moveVelocity * deltaTime);
@@ -114,6 +115,18 @@ namespace rudIsland.RPG3D.Player.Movement
                 : currentMovementMode.GetRollDirection(
                     rollInput.normalized);
 
+            rollWorldDirection =
+                playerTransform.right * RollDirectionInput.x +
+                playerTransform.forward * RollDirectionInput.y;
+            rollWorldDirection.y = 0f;
+            if (rollWorldDirection.sqrMagnitude <= 0.000001f)
+            {
+                rollWorldDirection = -playerTransform.forward;
+                rollWorldDirection.y = 0f;
+            }
+
+            rollWorldDirection.Normalize();
+
             verticalSpeed = groundPull;
         }
 
@@ -157,13 +170,44 @@ namespace rudIsland.RPG3D.Player.Movement
         public void ApplyRootMotion(
             Vector3 deltaPosition,
             Quaternion deltaRotation,
-            float horizontalMoveScale)
+            float horizontalRootMotionScale)
         {
-            deltaPosition.x *= horizontalMoveScale;
-            deltaPosition.z *= horizontalMoveScale;
+            deltaPosition.x *= horizontalRootMotionScale;
+            deltaPosition.z *= horizontalRootMotionScale;
             deltaPosition.y = verticalSpeed * Time.deltaTime;
             ApplyMovement(deltaPosition);
             playerTransform.rotation *= deltaRotation;
+        }
+
+        public void ApplyAttackMovement(float deltaDistance)
+        {
+            if (Mathf.Abs(deltaDistance) <= 0.000001f)
+            {
+                return;
+            }
+
+            Vector3 movement = playerTransform.forward * deltaDistance;
+            movement.y = 0f;
+            ApplyMovement(movement);
+        }
+
+        public void ApplyRollMovement(float deltaDistance)
+        {
+            if (Mathf.Abs(deltaDistance) <= 0.000001f)
+            {
+                return;
+            }
+
+            ApplyMovement(rollWorldDirection * deltaDistance);
+        }
+
+        public void ApplyHitMovement(
+            Vector3 horizontalMovement,
+            float deltaTime)
+        {
+            UpdateVerticalSpeed(deltaTime);
+            horizontalMovement.y = verticalSpeed * deltaTime;
+            ApplyMovement(horizontalMovement);
         }
 
         public Vector2 GetLocalMoveInput()

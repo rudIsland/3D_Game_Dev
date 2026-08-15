@@ -24,6 +24,8 @@ namespace rudIsland.RPG3D.Player.Animations
             Animator.StringToHash("PlayerHit");
         private static readonly int PlayerRollStateId = // 현재 행동 상태
             Animator.StringToHash("PlayerRoll");
+        private static readonly int PlayerBlockIdleStateId =
+            Animator.StringToHash("PlayerBlockIdle");
         private static readonly int PlayerAttack01StateId = Animator.StringToHash("PlayerAttack01"); // 공격 관련 설정 또는 상태
         private static readonly int PlayerAttack02StateId = Animator.StringToHash("PlayerAttack02"); // 공격 관련 설정 또는 상태
         private static readonly int PlayerAttack03StateId = Animator.StringToHash("PlayerAttack03"); // 공격 관련 설정 또는 상태
@@ -152,6 +154,12 @@ namespace rudIsland.RPG3D.Player.Animations
 
             playerAnimator.ResetTrigger(BlockImpactId);
             playerAnimator.SetTrigger(BlockImpactId);
+        }
+
+        public bool IsPlayingBlockIdle()
+        {
+            return !IsInTransition() &&
+                IsCurrentState(PlayerBlockIdleStateId);
         }
 
         public void PlayRoll(

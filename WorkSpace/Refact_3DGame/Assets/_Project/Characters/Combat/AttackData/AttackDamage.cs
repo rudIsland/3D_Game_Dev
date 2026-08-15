@@ -1,4 +1,5 @@
 using System;
+using rudIsland.RPG3D.Characters.Combat;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Combat.AttackData
@@ -14,8 +15,13 @@ namespace rudIsland.RPG3D.Characters.Combat.AttackData
         private float staggerDamage;
         [SerializeField, Min(0f)]
         private float pushDistance;
+        [SerializeField, Min(0f)]
+        private float hitStopDuration =
+            CombatHitStop.DefaultDamageDuration;
+        [SerializeField, Min(0f)]
+        private float guardStaminaDamage = 25f;
         [SerializeField]
-        private bool canBeBlocked = true;
+        private bool canBlock = true;
 
         public AttackDamage()
         {
@@ -26,19 +32,26 @@ namespace rudIsland.RPG3D.Characters.Combat.AttackData
             int strength,
             float staggerDamage,
             float pushDistance,
-            bool canBeBlocked)
+            float guardStaminaDamage,
+            bool canBeBlocked,
+            float hitStopDuration =
+                CombatHitStop.DefaultDamageDuration)
         {
             this.healthDamage = Mathf.Max(0f, healthDamage);
             this.strength = Mathf.Max(0, strength);
             this.staggerDamage = Mathf.Max(0f, staggerDamage);
             this.pushDistance = Mathf.Max(0f, pushDistance);
-            this.canBeBlocked = canBeBlocked;
+            this.hitStopDuration = Mathf.Max(0f, hitStopDuration);
+            this.guardStaminaDamage = Mathf.Max(0f, guardStaminaDamage);
+            this.canBlock = canBeBlocked;
         }
 
         public float HealthDamage => healthDamage;
         public int Strength => strength;
         public float StaggerDamage => staggerDamage;
         public float PushDistance => pushDistance;
-        public bool CanBeBlocked => canBeBlocked;
+        public float HitStopDuration => hitStopDuration;
+        public float GuardStaminaDamage => guardStaminaDamage;
+        public bool CanBeBlocked => canBlock;
     }
 }

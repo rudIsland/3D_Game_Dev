@@ -12,7 +12,13 @@ namespace rudIsland.RPG3D.Player.States.Attack
 
         public int AttackNumber => attackData.AttackNumber;
         public float Damage => attackData.Damage;
+        public float StaggerDamage => attackData.StaggerDamage;
+        public float PushDistance => attackData.PushDistance;
+        public float HitStopDuration => attackData.HitStopDuration;
+        public float StaminaCost => attackData.StaminaCost;
         public float NextInputTime => attackData.NextInputTime;
-        public float MoveScale => attackData.MoveScale;
+        public float MoveDistance => attackData.MoveDistance;
+        public UnityEngine.AnimationCurve MovementCurve =>
+            attackData.MovementCurve;
     }
 }

@@ -8,12 +8,16 @@ using rudIsland.RPG3D.Player.States.Attack;
 using rudIsland.RPG3D.Player.States.Target;
 using rudIsland.RPG3D.World;
 using rudIsland.RPG3D.Player.Runtime.Hit;
-using rudIsland.RPG3D.Characters.Combat.AttackData;
+using rudIsland.RPG3D.Player.Runtime;
 using UnityEngine;
+using rudIsland.RPG3D.Characters.Combat;
+using UnityEngine.Serialization;
 
 namespace rudIsland.RPG3D.Player
 {
-    [RequireComponent(typeof(CharacterController))]
+    [RequireComponent(
+        typeof(CharacterController),
+        typeof(CombatHitEffectPlayer))]
     // Unity 생명주기에서 플레이어 입력, 이동, Animator를 연결한다.
     public sealed class PlayerController : WorldObjectView, IPlayerDamageReceiver
     {
@@ -38,6 +42,14 @@ namespace rudIsland.RPG3D.Player
         [Header("생명")]
         [SerializeField, Min(1f)] private float maxHealth = 100f; // 최대 체력
 
+        [Header("Stamina")]
+        [SerializeField, Min(1f)] private float maxStamina = 100f;
+        [SerializeField, Min(0f)] private float staminaRecoverDelay = 1f;
+        [SerializeField, Min(0f)] private float staminaRecoverSpeed = 20f;
+        [SerializeField, Min(0f)] private float rollStaminaCost = 25f;
+        [SerializeField, Min(0f)]
+        private float sprintStaminaCostPerSecond = 15f;
+
 #if UNITY_EDITOR
         [Header("체력 확인")]
         [SerializeField, Min(0f)] private float testDamage = 10f; // 피격 또는 피해 관련 값
@@ -53,9 +65,13 @@ namespace rudIsland.RPG3D.Player
         [Header("이동 애니메이션")]
         [SerializeField] private float animationSmoothTime = 0.12f; // 시간 설정
 
-        [Header("구르기 이동 거리")]
-        [Tooltip("1이면 원래 거리, 0.5면 절반, 1.5면 1.5배 이동합니다.")]
-        [SerializeField, Min(0f)] private float rollDistanceScale = 0.1f; // 거리 설정
+        [Header("구르기 동작 이동")]
+        [FormerlySerializedAs("rollDistanceScale")]
+        [SerializeField, Min(0f)] private float rollDistance = 2f;
+        [SerializeField, Min(0f)] private float sprintRollDistance = 2.5f;
+        [SerializeField]
+        private AnimationCurve rollMovementCurve =
+            CreateDefaultRollMovementCurve();
 
         [Header("공격 데이터")]
         [SerializeField] private PlayerAttackData[] attackData =
@@ -69,17 +85,29 @@ namespace rudIsland.RPG3D.Player
         [SerializeField] private float gravity = -22f; // Inspector 설정 값
         [SerializeField] private float groundPull = -2f; // Inspector 설정 값
 
-        [Header("공격 범위 확인")]
-        [SerializeField] private Transform attackOrigin;
+        [Header("검 공격 판정")]
+        [SerializeField] private Transform weaponHitStart;
+        [SerializeField] private Transform weaponHitEnd;
         [SerializeField] private LayerMask attackLayers;
-        [SerializeField, Min(0f)] private float attackRadius = 1.1f;
-        [SerializeField] private float attackForwardOffset = 1f;
+        [FormerlySerializedAs("attackRadius")]
+        [SerializeField, Min(0f)] private float weaponHitRadius = 0.12f;
+
+        [Header("방어 판정")]
+        [SerializeField, Range(0f, 180f)] private float guardAngle = 120f;
+        [SerializeField] private PlayerGuardHitBox guardHitBox;
+
+        [Header("피격 이동")]
+        [SerializeField, Min(0.01f)] private float hitPushDuration = 0.15f;
+        [SerializeField]
+        private AnimationCurve hitPushCurve =
+            CreateDefaultHitPushCurve();
 
         private CharacterController characterController; // 씬 또는 시스템 참조
         private PlayerInputReader playerInput; // 입력 또는 행동 여부
         private PlayerStateMachine playerStateMachine; // 현재 행동 상태
         private PlayerMovement playerMovement; // 이동 정보
         private PlayerWorldUnit playerWorldUnit; // 씬 또는 시스템 참조
+        private CombatHitEffectPlayer hitEffectPlayer;
 
         private void Awake()
         {
@@ -110,17 +138,41 @@ namespace rudIsland.RPG3D.Player
                 playerAnimator = GetComponentInChildren<Animator>();
             }
 
+            hitEffectPlayer = GetComponent<CombatHitEffectPlayer>();
+
             if (playerAnimator != null)
             {
                 playerAnimator.applyRootMotion = true;
             }
 
-            //공격자의 현재 위치가 null이면 PlayerController의 transform을 공격 시작 위치로 사용한다.
-            if(attackOrigin==null) attackOrigin = transform;
+            if (guardHitBox == null)
+            {
+                Debug.LogError(
+                    "PlayerController에 방패의 PlayerGuardHitBox 연결이 필요합니다.",
+                    this);
+            }
+
+            if (rollMovementCurve == null || rollMovementCurve.length < 2)
+            {
+                rollMovementCurve = CreateDefaultRollMovementCurve();
+            }
+
+            if (hitPushCurve == null || hitPushCurve.length < 2)
+            {
+                hitPushCurve = CreateDefaultHitPushCurve();
+            }
+
+            if (weaponHitStart == null || weaponHitEnd == null)
+            {
+                Debug.LogError(
+                    "PlayerController에 검의 Weapon Hit Start와 End가 필요합니다.",
+                    this);
+            }
+
             LayerMask attackMask =
-            attackLayers.value != 0
-                ? attackLayers
-                : targetLayers;
+                attackLayers.value != 0
+                    ? attackLayers
+                    : targetLayers;
 
             playerInput = new PlayerInputReader();
             playerMovement = new PlayerMovement(
@@ -147,26 +199,45 @@ namespace rudIsland.RPG3D.Player
                 InactiveCameraPriority,
                 targetCameraTurnSpeed,
                 targetCameraVerticalValue);
+            var playerStamina = new PlayerStamina(
+                maxStamina,
+                staminaRecoverDelay,
+                staminaRecoverSpeed);
+            var hitStop = new CombatHitStop(playerAnimator);
             playerStateMachine = new PlayerStateMachine(
                 playerInput,
                 playerMovement,
+                playerStamina,
+                rollStaminaCost,
+                sprintStaminaCostPerSecond,
                 playerAnimator,
                 animationSmoothTime,
-                rollDistanceScale,
+                rollDistance,
+                sprintRollDistance,
+                rollMovementCurve,
                 attackData,
                 comboInputBufferDuration,
                 targetFinder,
                 targetCamera,
                 Mathf.Max(targetRange, targetBreakDistance),
-                attackOrigin,
+                guardAngle,
+                guardHitBox,
+                hitPushDuration,
+                hitPushCurve,
+                transform,
+                weaponHitStart,
+                weaponHitEnd,
                 attackMask,
-                attackRadius,
-                attackForwardOffset
+                weaponHitRadius,
+                hitStop,
+                hitEffectPlayer
                 );
             playerWorldUnit = new PlayerWorldUnit(
                 maxHealth,
+                playerStamina,
                 playerInput,
-                playerStateMachine);
+                playerStateMachine,
+                hitStop);
             worldObjectManager.Register(playerWorldUnit);
         }
 
@@ -189,10 +260,11 @@ namespace rudIsland.RPG3D.Player
             playerStateMachine?.ApplyRootMotion(deltaPosition, deltaRotation);
         }
 
-        public bool TryTakeDamage(AttackDamage attackDamage)
+        public PlayerHitResult TryTakeHit(in PlayerHitRequest hitRequest)
         {
-            return playerWorldUnit != null &&
-                playerWorldUnit.TryTakeDamage(attackDamage);
+            return playerWorldUnit != null
+                ? playerWorldUnit.TryTakeHit(in hitRequest)
+                : PlayerHitResult.Ignored;
         }
 
 
@@ -263,6 +335,26 @@ namespace rudIsland.RPG3D.Player
             return true;
         }
 
+        private static AnimationCurve CreateDefaultRollMovementCurve()
+        {
+            var curve = new AnimationCurve(
+                new Keyframe(0f, 0f, 0f, 3f),
+                new Keyframe(0.15f, 0.45f, 1.2f, 1.2f),
+                new Keyframe(0.35f, 0.75f, 0.6f, 0.6f),
+                new Keyframe(0.7f, 0.95f, 0.1f, 0.1f),
+                new Keyframe(1f, 1f, 0f, 0f));
+            curve.preWrapMode = WrapMode.Clamp;
+            curve.postWrapMode = WrapMode.Clamp;
+            return curve;
+        }
+
+        private static AnimationCurve CreateDefaultHitPushCurve()
+        {
+            return new AnimationCurve(
+                new Keyframe(0f, 0f, 2f, 2f),
+                new Keyframe(1f, 1f, 0f, 0f));
+        }
+
 
 #if UNITY_EDITOR
         [ContextMenu("Test Damage")]
@@ -282,6 +374,41 @@ namespace rudIsland.RPG3D.Player
             Debug.Log(
                 $"플레이어 체력: {healthBeforeDamage} → {playerWorldUnit.CurrentHealth}",
                 this);
+        }
+
+        private void OnValidate()
+        {
+            maxStamina = Mathf.Max(1f, maxStamina);
+            staminaRecoverDelay = Mathf.Max(0f, staminaRecoverDelay);
+            staminaRecoverSpeed = Mathf.Max(0f, staminaRecoverSpeed);
+            rollStaminaCost = Mathf.Max(0f, rollStaminaCost);
+            sprintStaminaCostPerSecond =
+                Mathf.Max(0f, sprintStaminaCostPerSecond);
+            weaponHitRadius = Mathf.Max(0f, weaponHitRadius);
+            guardAngle = Mathf.Clamp(guardAngle, 0f, 180f);
+            hitPushDuration = Mathf.Max(0.01f, hitPushDuration);
+            if (hitPushCurve == null || hitPushCurve.length < 2)
+            {
+                hitPushCurve = CreateDefaultHitPushCurve();
+            }
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            if (weaponHitStart != null && weaponHitEnd != null)
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawWireSphere(
+                    weaponHitStart.position,
+                    weaponHitRadius);
+                Gizmos.DrawWireSphere(
+                    weaponHitEnd.position,
+                    weaponHitRadius);
+                Gizmos.DrawLine(
+                    weaponHitStart.position,
+                    weaponHitEnd.position);
+            }
+
         }
 
         protected override IWorldObject CreateRuntimeObject()

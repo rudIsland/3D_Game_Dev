@@ -1,86 +1,285 @@
 using UnityEngine;
 using System.Collections.Generic;
 using rudIsland.RPG3D.Characters;
+using rudIsland.RPG3D.Characters.Combat;
 
 namespace rudIsland.RPG3D.Player.Runtime.Attack
 {
+    // 공격 Window 동안 검의 현재 Capsule과 프레임 사이 궤적을 검사한다.
     internal sealed class PlayerAttackRangeDetector
     {
-        private const int MaximumDetectedColliderCount = 32; //최대 충돌 collider 갯수
+        private const int MaximumDetectedColliderCount = 32;
+        private const float MinimumSweepDistance = 0.0001f;
 
-        private readonly Transform attackOrigin; // 공격 시작 위치
-        private readonly LayerMask enemyLayers; // 적 레이어 마스크
-        private readonly float attackRange; //공격 범위
-        private readonly float attackForwardOffset; //공격 전방 오프셋
-        
-
-        private readonly Collider[] detectedColliders = new Collider[MaximumDetectedColliderCount]; //감지된 충돌체 배열;
+        private readonly Transform attackerRoot;
+        private readonly Transform weaponHitStart;
+        private readonly Transform weaponHitEnd;
+        private readonly LayerMask enemyLayers;
+        private readonly float weaponHitRadius;
+        private readonly CombatHitStop attackerHitStop;
+        private readonly CombatHitEffectPlayer hitEffectPlayer;
+        private readonly Collider[] detectedColliders =
+            new Collider[MaximumDetectedColliderCount];
+        private readonly RaycastHit[] sweepHits =
+            new RaycastHit[MaximumDetectedColliderCount];
+        private readonly HashSet<IEnemyDamageReceiver> hitTargets =
+            new HashSet<IEnemyDamageReceiver>(16);
 
         private bool isWindowOpen;
-
-        private float attackDamage; //공격 피해량
-
-        //같은 적을 참조하지 않고 Hash로 빠르게 타깃을 가리키기 위해 HashSet을 사용한다. HashSet은 중복을 허용하지 않으며, O(1) 시간 복잡도로 요소를 추가, 제거 및 검색할 수 있다.
-        private readonly HashSet<IEnemyDamageReceiver> hitTargets = new HashSet<IEnemyDamageReceiver>(); //감지된 적 객체 집합
-
-
+        private bool hasPreviousWeaponPositions;
+        private float attackDamage;
+        private float attackStaggerDamage;
+        private float attackPushDistance;
+        private float attackHitStopDuration;
+        private Vector3 previousStartPosition;
+        private Vector3 previousMiddlePosition;
+        private Vector3 previousEndPosition;
 
         public PlayerAttackRangeDetector(
-            Transform attackOrigin, LayerMask enemyLayers, 
-            float attackRange, float attackForwardOffset)
+            Transform attackerRoot,
+            Transform weaponHitStart,
+            Transform weaponHitEnd,
+            LayerMask enemyLayers,
+            float weaponHitRadius,
+            CombatHitStop attackerHitStop,
+            CombatHitEffectPlayer hitEffectPlayer)
         {
-            this.attackOrigin = attackOrigin;
+            this.attackerRoot = attackerRoot;
+            this.weaponHitStart = weaponHitStart;
+            this.weaponHitEnd = weaponHitEnd;
             this.enemyLayers = enemyLayers;
-            this.attackRange = Mathf.Max(0f, attackRange);
-            this.attackForwardOffset = attackForwardOffset;
+            this.weaponHitRadius = Mathf.Max(0f, weaponHitRadius);
+            this.attackerHitStop = attackerHitStop;
+            this.hitEffectPlayer = hitEffectPlayer;
         }
 
-        public void Open(float damage)
+        public void Open(
+            float damage,
+            float staggerDamage,
+            float pushDistance,
+            float hitStopDuration)
         {
             isWindowOpen = true;
             attackDamage = Mathf.Max(0f, damage);
+            attackStaggerDamage = Mathf.Max(0f, staggerDamage);
+            attackPushDistance = Mathf.Max(0f, pushDistance);
+            attackHitStopDuration = Mathf.Max(0f, hitStopDuration);
             hitTargets.Clear();
+            SaveCurrentWeaponPositions();
         }
 
         public void Tick()
         {
-            if(!isWindowOpen || attackOrigin == null || enemyLayers.value == 0 || attackRange <= 0f)
-                return;
-            Vector3 center = attackOrigin.position + attackOrigin.forward * attackForwardOffset;
-
-            //탐지 갯수 확인
-            int detectedCount = Physics.OverlapSphereNonAlloc(
-                center,
-                attackRange,
-                detectedColliders,
-                enemyLayers,
-                QueryTriggerInteraction.Collide);
-
-            if (detectedCount <= 0)
+            if (!CanDetectHit())
             {
                 return;
             }
 
-            for(int i=0; i<detectedCount; i++)
+            Vector3 currentStartPosition = weaponHitStart.position;
+            Vector3 currentEndPosition = weaponHitEnd.position;
+            Vector3 currentMiddlePosition =
+                (currentStartPosition + currentEndPosition) * 0.5f;
+
+            DetectCurrentWeapon(
+                currentStartPosition,
+                currentEndPosition);
+
+            if (hasPreviousWeaponPositions)
             {
-                Collider detectedCollider = detectedColliders[i];
-                if(detectedCollider == null)
-                {
-                    continue;
-                }
-
-                IEnemyDamageReceiver target = detectedCollider.GetComponentInParent<IEnemyDamageReceiver>();
-                if(target == null || !hitTargets.Add(target))
-                    continue;
-
-                Vector3 hitPosition = detectedCollider.ClosestPoint(center);
-                target.TakeDamage(attackDamage, hitPosition);
+                DetectMovedPoint(
+                    previousStartPosition,
+                    currentStartPosition);
+                DetectMovedPoint(
+                    previousMiddlePosition,
+                    currentMiddlePosition);
+                DetectMovedPoint(
+                    previousEndPosition,
+                    currentEndPosition);
             }
+
+            SaveWeaponPositions(
+                currentStartPosition,
+                currentMiddlePosition,
+                currentEndPosition);
         }
 
         public void Close()
         {
             isWindowOpen = false;
+            hasPreviousWeaponPositions = false;
+            attackDamage = 0f;
+            attackStaggerDamage = 0f;
+            attackPushDistance = 0f;
+            attackHitStopDuration = 0f;
+            hitTargets.Clear();
+        }
+
+        private bool CanDetectHit()
+        {
+            return isWindowOpen &&
+                attackerRoot != null &&
+                weaponHitStart != null &&
+                weaponHitEnd != null &&
+                enemyLayers.value != 0 &&
+                weaponHitRadius > 0f;
+        }
+
+        private void DetectCurrentWeapon(
+            Vector3 startPosition,
+            Vector3 endPosition)
+        {
+            int detectedCount = Physics.OverlapCapsuleNonAlloc(
+                startPosition,
+                endPosition,
+                weaponHitRadius,
+                detectedColliders,
+                enemyLayers,
+                QueryTriggerInteraction.Collide);
+
+            ApplyCurrentHits(
+                detectedCount,
+                startPosition,
+                endPosition);
+        }
+
+        private void ApplyCurrentHits(
+            int detectedCount,
+            Vector3 startPosition,
+            Vector3 endPosition)
+        {
+            for (int index = 0; index < detectedCount; index++)
+            {
+                Collider detectedCollider = detectedColliders[index];
+                if (detectedCollider == null)
+                {
+                    continue;
+                }
+
+                Vector3 shapePoint = GetClosestPointOnLine(
+                    startPosition,
+                    endPosition,
+                    detectedCollider.bounds.center);
+                Vector3 hitPosition =
+                    detectedCollider.ClosestPoint(shapePoint);
+                TryApplyHit(detectedCollider, hitPosition);
+            }
+        }
+
+        private void DetectMovedPoint(
+            Vector3 previousPosition,
+            Vector3 currentPosition)
+        {
+            Vector3 movement = currentPosition - previousPosition;
+            float movementSqrMagnitude = movement.sqrMagnitude;
+            if (movementSqrMagnitude <=
+                MinimumSweepDistance * MinimumSweepDistance)
+            {
+                return;
+            }
+
+            float distance = Mathf.Sqrt(movementSqrMagnitude);
+            Vector3 direction = movement / distance;
+            int detectedCount = Physics.SphereCastNonAlloc(
+                previousPosition,
+                weaponHitRadius,
+                direction,
+                sweepHits,
+                distance,
+                enemyLayers,
+                QueryTriggerInteraction.Collide);
+
+            for (int index = 0; index < detectedCount; index++)
+            {
+                RaycastHit sweepHit = sweepHits[index];
+                if (sweepHit.collider == null)
+                {
+                    continue;
+                }
+
+                TryApplyHit(sweepHit.collider, sweepHit.point);
+            }
+        }
+
+        private void TryApplyHit(
+            Collider detectedCollider,
+            Vector3 hitPosition)
+        {
+            IEnemyDamageReceiver target =
+                detectedCollider.GetComponentInParent<IEnemyDamageReceiver>();
+            if (target == null || !hitTargets.Add(target))
+            {
+                return;
+            }
+
+            Vector3 pushDirection =
+                hitPosition - attackerRoot.position;
+            pushDirection.y = 0f;
+            if (pushDirection.sqrMagnitude <= 0.000001f)
+            {
+                pushDirection = attackerRoot.forward;
+            }
+
+            var hitRequest = new EnemyHitRequest(
+                attackDamage,
+                attackStaggerDamage,
+                hitPosition,
+                pushDirection,
+                attackPushDistance,
+                attackHitStopDuration);
+            EnemyHitResult hitResult = target.TakeHit(in hitRequest);
+            if (hitResult == EnemyHitResult.Staggered || hitResult == EnemyHitResult.Damaged)
+            {
+                attackerHitStop?.Request(hitRequest.HitStopDuration);
+                hitEffectPlayer?.PlayBodyHit(
+                    hitRequest.HitPosition,
+                    hitRequest.PushDirection);
+            }
+        }
+
+        private void SaveCurrentWeaponPositions()
+        {
+            if (weaponHitStart == null || weaponHitEnd == null)
+            {
+                hasPreviousWeaponPositions = false;
+                return;
+            }
+
+            Vector3 startPosition = weaponHitStart.position;
+            Vector3 endPosition = weaponHitEnd.position;
+            SaveWeaponPositions(
+                startPosition,
+                (startPosition + endPosition) * 0.5f,
+                endPosition);
+        }
+
+        private void SaveWeaponPositions(
+            Vector3 startPosition,
+            Vector3 middlePosition,
+            Vector3 endPosition)
+        {
+            previousStartPosition = startPosition;
+            previousMiddlePosition = middlePosition;
+            previousEndPosition = endPosition;
+            hasPreviousWeaponPositions = true;
+        }
+
+        private static Vector3 GetClosestPointOnLine(
+            Vector3 lineStart,
+            Vector3 lineEnd,
+            Vector3 targetPosition)
+        {
+            Vector3 line = lineEnd - lineStart;
+            float lineLengthSqr = line.sqrMagnitude;
+            if (lineLengthSqr <=
+                MinimumSweepDistance * MinimumSweepDistance)
+            {
+                return lineStart;
+            }
+
+            float distanceRate = Mathf.Clamp01(
+                Vector3.Dot(targetPosition - lineStart, line) /
+                lineLengthSqr);
+            return lineStart + line * distanceRate;
         }
     }
 }
