@@ -37,7 +37,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             this.stateMachine = stateMachine;
         }
 
-        internal bool CanTurn => false;
+
         public void Enter()
         {
             StartAttack();

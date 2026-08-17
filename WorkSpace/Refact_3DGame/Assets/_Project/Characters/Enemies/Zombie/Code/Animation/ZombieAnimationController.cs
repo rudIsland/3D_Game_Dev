@@ -119,16 +119,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             return IsInTransition();
         }
 
-        internal void ApplyAttackRootRotation(
-            Quaternion deltaRotation,
-            bool canTurn)
-        {
-            if (requestedAnimationState == AnimationState.Attack && canTurn)
-            {
-                transform.rotation *= deltaRotation;
-            }
-        }
-
         internal void ConnectAnimator(Animator animator)
         {
             if (animator == null)
@@ -145,7 +135,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                     animator.gameObject.AddComponent<ZombieAnimationEventReceiver>();
             }
 
-            receiver.Initialize(this);
+            receiver.Initialize();
         }
 
         public void ResetAnimation()

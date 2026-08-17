@@ -21,14 +21,14 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         public void Update(float deltaTime)
         {
-            float targetDistanceSquared =
-                stateMachine.GetTargetDistanceSquared();
-            if (targetDistanceSquared > stateMachine.FindRangeSquared)
+            if (!stateMachine.IsTargetFound())
             {
                 aliveState.ChangeToIdleAfterLostTarget();
                 return;
             }
 
+            float targetDistanceSquared =
+                stateMachine.GetTargetDistanceSquared();
             if (targetDistanceSquared <= stateMachine.AttackRangeSquared)
             {
                 if (stateMachine.IsFacingTarget())

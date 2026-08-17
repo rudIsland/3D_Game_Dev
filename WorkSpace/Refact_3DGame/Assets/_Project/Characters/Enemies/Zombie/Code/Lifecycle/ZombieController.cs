@@ -61,6 +61,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         [SerializeField] private AttackDamage upDownAttackDamage =
             new AttackDamage(10f, 1, 10f, 0.3f, 25f, true, 0.06f);
 
+
         [Header("이동")]
         [SerializeField, Min(0.1f)] private float chaseSpeed = 3.5f; // 이동 속도
         [SerializeField, Min(1f)] private float turnSpeed = 360f; // 이동 속도
@@ -79,11 +80,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         private ZombieWorldUnit zombieWorldUnit; // 씬 또는 시스템 참조
         private CombatHitEffectPlayer hitEffectPlayer;
 
+
         public bool IsDead =>
             zombieWorldUnit != null && zombieWorldUnit.IsDead;
-        internal bool CanTurnDuringAttack =>
-            zombieWorldUnit != null && zombieWorldUnit.CanTurnDuringAttack();
-
         protected override IWorldObject CreateRuntimeObject()
         {
             FindSceneReferences();
@@ -97,8 +96,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                     "ZombieController에 Target, Animator와 공격별 손·발 판정점이 필요합니다.");
             }
 
-            zombieAnimator.applyRootMotion = true;
+
             zombieAnimation.ConnectAnimator(zombieAnimator);
+
 
             var movement = new ZombieMovement(
                 transform,
@@ -106,6 +106,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 gravity,
                 groundPull);
             var hitStop = new CombatHitStop(zombieAnimator);
+            IUnitDeathState targetDeathState =
+                target.GetComponentInParent<IUnitDeathState>();
             attackRangeDetector = new ZombieAttackRangeDetector(
                 transform,
                 targetLayers,
@@ -116,6 +118,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 hitEffectPlayer);
             var stateMachine = new ZombieStateMachine(
                 target,
+                targetDeathState,
                 movement,
                 zombieAnimation,
                 findRange,
@@ -157,6 +160,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             attackRangeDetector?.Open(
                 attackNumber,
                 GetAttackDamage(attackNumber));
+
         }
         public void EndAttackHitAnimationEvent()
         {
@@ -169,6 +173,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         public void EndAttackHit()
         {
             attackRangeDetector?.Close();
+
         }
 
         internal void NotifyAttackAnimationEnded()
@@ -235,6 +240,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             }
         }
 
+
         private AttackDamage GetAttackDamage(int attackNumber)
         {
             switch (attackNumber)
@@ -249,6 +255,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                     return null;
             }
         }
+
 
         private bool HasValidAttackHitShapes()
         {

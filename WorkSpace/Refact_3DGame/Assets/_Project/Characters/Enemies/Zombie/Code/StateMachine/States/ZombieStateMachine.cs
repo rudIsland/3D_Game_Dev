@@ -1,4 +1,5 @@
 using System;
+using rudIsland.RPG3D.Characters;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.Zombie
@@ -7,6 +8,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
     public sealed class ZombieStateMachine
     {
         private readonly Transform target; // 대상 참조
+        private readonly IUnitDeathState targetDeathState; // 목표 사망 여부
         private readonly ZombieMovement movement; // 이동 정보
         private readonly ZombieAnimationController animation; // 씬 또는 시스템 참조
         private readonly ZombieAliveState aliveState; // 현재 행동 상태
@@ -37,6 +39,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         public ZombieStateMachine(
             Transform target,
+            IUnitDeathState targetDeathState,
             ZombieMovement movement,
             ZombieAnimationController animation,
             float findRange,
@@ -52,6 +55,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             Action endAttackHit)
         {
             this.target = target;
+            this.targetDeathState = targetDeathState ??
+                throw new ArgumentNullException(nameof(targetDeathState));
             this.movement = movement;
             this.animation = animation;
             FindRangeSquared = findRange * findRange;
@@ -96,16 +101,25 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         public void Update(float deltaTime)
         {
-            if (isEnabled && currentState != null)
+            if (!isEnabled || currentState == null)
             {
-                if (ReferenceEquals(currentState, aliveState) &&
-                    aliveState.NeedsTargetUpdateEveryFrame)
-                {
-                    UpdateTargetSnapshot();
-                }
-
-                currentState.Update(deltaTime);
+                return;
             }
+
+            if (ReferenceEquals(currentState, aliveState) &&
+                IsInCombat &&
+                !CanTrackTarget())
+            {
+                aliveState.ChangeToIdleAfterLostTarget();
+            }
+
+            if (ReferenceEquals(currentState, aliveState) &&
+                aliveState.NeedsTargetUpdateEveryFrame)
+            {
+                UpdateTargetSnapshot();
+            }
+
+            currentState.Update(deltaTime);
         }
 
         public void Disable()
@@ -125,7 +139,16 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         internal bool IsTargetFound()
         {
-            return targetDistanceSquared <= FindRangeSquared;
+            return CanTrackTarget() &&
+                targetDistanceSquared <= FindRangeSquared;
+        }
+
+        // 목표가 활성 상태이고 살아 있을 때만 추적을 허용한다.
+        internal bool CanTrackTarget()
+        {
+            return target != null &&
+                target.gameObject.activeInHierarchy &&
+                !targetDeathState.IsDead;
         }
 
         internal bool IsTargetInAttackRange()
@@ -247,12 +270,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             endAttackHit?.Invoke();
         }
 
-        internal bool CanTurnDuringAttack()
-        {
-            return ReferenceEquals(currentState, aliveState) &&
-                aliveState.CanTurnDuringAttack();
-        }
-
         internal bool BeginAttackHit()
         {
             return isEnabled &&
@@ -329,6 +346,12 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         internal void UpdateTargetSnapshot()
         {
+            if (!CanTrackTarget())
+            {
+                targetDistanceSquared = float.PositiveInfinity;
+                return;
+            }
+
             targetPosition = target.position;
             Vector3 distance = targetPosition - movement.Position;
             distance.y = 0f;

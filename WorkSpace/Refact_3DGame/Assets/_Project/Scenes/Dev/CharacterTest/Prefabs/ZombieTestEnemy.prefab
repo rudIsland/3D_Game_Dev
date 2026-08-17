@@ -942,6 +942,13 @@ MonoBehaviour:
   staggerLimit: 50
   staggerRecoverDelay: 3
   staggerRecoverSpeed: 5
+  deadBodyKeepTime: 2
+  testDamage: 100
+  testStaggerDamage: 50
+  findRange: 30
+  idleTargetCheckInterval: 0.1
+  attackRange: 1.4
+  attackFacingAngle: 10
   targetLayers:
     serializedVersion: 2
     m_Bits: 131072
@@ -981,13 +988,7 @@ MonoBehaviour:
     hitStopDuration: 0.06
     guardStaminaDamage: 25
     canBlock: 1
-  deadBodyKeepTime: 2
-  testDamage: 100
-  testStaggerDamage: 50
-  findRange: 30
-  idleTargetCheckInterval: 0.1
-  attackRange: 1.4
-  attackFacingAngle: 10
+
   chaseSpeed: 3.5
   turnSpeed: 360
   gravity: -22
@@ -1027,7 +1028,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c8a4c0717de6458095c2b2f7c52919cc, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Characters.Combat.CombatHitEffectPlayer
   bodyHitEffectPrefab: {fileID: 0}
   guardHitEffectPrefab: {fileID: 0}
