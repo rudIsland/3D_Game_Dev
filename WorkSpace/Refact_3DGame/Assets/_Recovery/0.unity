@@ -4487,7 +4487,7 @@ MonoBehaviour:
   walkSpeed: 2.5
   sprintSpeed: 5
   animationSmoothTime: 0.12
-  comboInputBufferDuration: 0.25
+  attackInputBufferDuration: 0.25
   gravity: -22
   groundPull: -2
 --- !u!1 &1712270763
