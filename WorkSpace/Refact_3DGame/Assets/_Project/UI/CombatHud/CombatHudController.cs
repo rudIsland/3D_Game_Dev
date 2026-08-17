@@ -1,15 +1,15 @@
 using System.Collections.Generic;
 using rudIsland.RPG3D.Characters;
+using rudIsland.RPG3D.Characters.Enemies.NightShade;
 using rudIsland.RPG3D.Characters.Enemies.Zombie;
 using rudIsland.RPG3D.Player;
 using rudIsland.RPG3D.Player.Runtime;
 using rudIsland.RPG3D.World;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace rudIsland.RPG3D.UI
 {
-    // 플레이어 자원과 전투 중인 좀비 자원을 화면 HUD에 연결한다.
+    // 플레이어 자원과 현재 전투 중인 적 자원을 화면 HUD에 연결한다.
     public sealed class CombatHudController : MonoBehaviour
     {
         [Header("World")]
@@ -17,7 +17,6 @@ namespace rudIsland.RPG3D.UI
 
         [Header("Health Bars")]
         [SerializeField] private HealthBarView playerHealthBar; // 씬 또는 시스템 참조
-        [FormerlySerializedAs("bossHealthBar")]
         [SerializeField] private HealthBarView enemyHealthBar;
 
         [Header("Stamina Bar")]
@@ -27,8 +26,8 @@ namespace rudIsland.RPG3D.UI
         [SerializeField] private StaggerBarView enemyStaggerBar;
 
         private readonly Dictionary<UnitHealth, Unit> trackedUnits = // 씬 또는 시스템 참조
-            new Dictionary<UnitHealth, Unit>(2);
-        private ZombieWorldUnit displayedZombie;
+            new Dictionary<UnitHealth, Unit>(3);
+        private Unit displayedEnemy;
 
         private void Awake()
         {
@@ -89,10 +88,16 @@ namespace rudIsland.RPG3D.UI
                     zombie.StaggerChanged -= HandleZombieStaggerChanged;
                     zombie.CombatStateChanged -= HandleZombieCombatStateChanged;
                 }
+                else if (entry.Value is NightShadeSwordWorldUnit nightShade)
+                {
+                    nightShade.StaggerChanged -= HandleNightShadeStaggerChanged;
+                    nightShade.CombatStateChanged -=
+                        HandleNightShadeCombatStateChanged;
+                }
             }
 
             trackedUnits.Clear();
-            displayedZombie = null;
+            displayedEnemy = null;
             playerHealthBar?.Hide();
             playerStaminaBar?.Hide();
             enemyHealthBar?.Hide();
@@ -121,7 +126,8 @@ namespace rudIsland.RPG3D.UI
 
             bool isPlayer = unit is PlayerUnit;
             bool isZombie = unit is ZombieWorldUnit;
-            if ((!isPlayer && !isZombie) ||
+            bool isNightShade = unit is NightShadeSwordWorldUnit;
+            if ((!isPlayer && !isZombie && !isNightShade) ||
                 trackedUnits.ContainsKey(unit.Health))
             {
                 return;
@@ -151,6 +157,16 @@ namespace rudIsland.RPG3D.UI
                 if (zombie.IsInCombat)
                 {
                     ShowZombie(zombie);
+                }
+            }
+            else if (unit is NightShadeSwordWorldUnit nightShade)
+            {
+                nightShade.StaggerChanged += HandleNightShadeStaggerChanged;
+                nightShade.CombatStateChanged +=
+                    HandleNightShadeCombatStateChanged;
+                if (nightShade.IsInCombat)
+                {
+                    ShowNightShade(nightShade);
                 }
             }
         }
@@ -183,10 +199,14 @@ namespace rudIsland.RPG3D.UI
             {
                 zombie.StaggerChanged -= HandleZombieStaggerChanged;
                 zombie.CombatStateChanged -= HandleZombieCombatStateChanged;
-                if (ReferenceEquals(displayedZombie, zombie))
-                {
-                    HideZombie();
-                }
+                HideEnemy(zombie);
+            }
+            else if (unit is NightShadeSwordWorldUnit nightShade)
+            {
+                nightShade.StaggerChanged -= HandleNightShadeStaggerChanged;
+                nightShade.CombatStateChanged -=
+                    HandleNightShadeCombatStateChanged;
+                HideEnemy(nightShade);
             }
         }
 
@@ -205,8 +225,7 @@ namespace rudIsland.RPG3D.UI
                 return;
             }
 
-            if (unit is ZombieWorldUnit zombie &&
-                ReferenceEquals(displayedZombie, zombie))
+            if (ReferenceEquals(displayedEnemy, unit))
             {
                 enemyHealthBar?.UpdateHealth(health);
             }
@@ -222,10 +241,9 @@ namespace rudIsland.RPG3D.UI
                     continue;
                 }
 
-                if (unit is ZombieWorldUnit zombie &&
-                    ReferenceEquals(displayedZombie, zombie))
+                if (ReferenceEquals(displayedEnemy, unit))
                 {
-                    HideZombie();
+                    HideEnemy(unit);
                 }
             }
         }
@@ -239,7 +257,7 @@ namespace rudIsland.RPG3D.UI
 
         private void HandleZombieStaggerChanged(ZombieWorldUnit zombie)
         {
-            if (!ReferenceEquals(displayedZombie, zombie))
+            if (!ReferenceEquals(displayedEnemy, zombie))
             {
                 return;
             }
@@ -257,24 +275,71 @@ namespace rudIsland.RPG3D.UI
                 return;
             }
 
-            if (ReferenceEquals(displayedZombie, zombie))
-            {
-                HideZombie();
-            }
+            HideEnemy(zombie);
         }
 
         private void ShowZombie(ZombieWorldUnit zombie)
         {
-            displayedZombie = zombie;
-            enemyHealthBar?.Show("ZOMBIE", zombie.Health);
-            enemyStaggerBar?.Show(
+            ShowEnemy(
+                "ZOMBIE",
+                zombie,
                 zombie.CurrentStagger,
                 zombie.MaxStagger);
         }
 
-        private void HideZombie()
+        private void HandleNightShadeStaggerChanged(
+            NightShadeSwordWorldUnit nightShade)
         {
-            displayedZombie = null;
+            if (!ReferenceEquals(displayedEnemy, nightShade))
+            {
+                return;
+            }
+
+            enemyStaggerBar?.UpdateStagger(
+                nightShade.CurrentStagger,
+                nightShade.MaxStagger);
+        }
+
+        private void HandleNightShadeCombatStateChanged(
+            NightShadeSwordWorldUnit nightShade)
+        {
+            if (nightShade.IsInCombat)
+            {
+                ShowNightShade(nightShade);
+                return;
+            }
+
+            HideEnemy(nightShade);
+        }
+
+        private void ShowNightShade(NightShadeSwordWorldUnit nightShade)
+        {
+            ShowEnemy(
+                "NIGHTSHADE",
+                nightShade,
+                nightShade.CurrentStagger,
+                nightShade.MaxStagger);
+        }
+
+        private void ShowEnemy(
+            string enemyName,
+            Unit enemy,
+            float currentStagger,
+            float maxStagger)
+        {
+            displayedEnemy = enemy;
+            enemyHealthBar?.Show(enemyName, enemy.Health);
+            enemyStaggerBar?.Show(currentStagger, maxStagger);
+        }
+
+        private void HideEnemy(Unit enemy)
+        {
+            if (!ReferenceEquals(displayedEnemy, enemy))
+            {
+                return;
+            }
+
+            displayedEnemy = null;
             enemyHealthBar?.Hide();
             enemyStaggerBar?.Hide();
         }
