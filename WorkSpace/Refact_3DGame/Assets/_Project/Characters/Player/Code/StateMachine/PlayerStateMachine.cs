@@ -34,6 +34,8 @@ namespace rudIsland.RPG3D.Player.States
         private readonly float rollStaminaCost;
         private readonly float sprintStaminaCostPerSecond;
         private readonly float minimumGuardDot;
+        private readonly PlayerGuardHitBox guardHitBox;
+        private readonly PlayerAttackEffectPlayer attackEffectPlayer;
         private IPlayerState currentState;
         private IPlayerState returnLookState;
         private bool isEnabled;
@@ -45,6 +47,7 @@ namespace rudIsland.RPG3D.Player.States
         internal PlayerInputReader Input => playerInput;
         public bool IsBlocking => actionStateMachine.IsBlocking;
         public bool IsRolling => actionStateMachine.IsRolling;
+        public bool IsRollInvulnerable { get; private set; }
         public bool IsAttacking => actionStateMachine.IsAttacking;
         public bool IsTargeting => ReferenceEquals(currentState, targetLookState);
         public bool IsDead => ReferenceEquals(currentState, deadState);
@@ -66,7 +69,7 @@ namespace rudIsland.RPG3D.Player.States
             float sprintRollDistance,
             AnimationCurve rollMovementCurve,
             PlayerAttackData[] attackData,
-            float comboInputBufferDuration,
+            float attackInputBufferDuration,
             PlayerTargetFinder targetFinder,
             PlayerTargetCamera targetCamera,
             float targetBreakDistance,
@@ -80,7 +83,8 @@ namespace rudIsland.RPG3D.Player.States
             LayerMask attackLayers,
             float weaponHitRadius,
             CombatHitStop hitStop,
-            CombatHitEffectPlayer hitEffectPlayer)
+            CombatHitEffectPlayer hitEffectPlayer,
+            PlayerAttackEffectPlayer attackEffectPlayer)
         {
             this.playerInput = playerInput;
             this.playerMovement = playerMovement;
@@ -88,6 +92,8 @@ namespace rudIsland.RPG3D.Player.States
             this.rollStaminaCost = Mathf.Max(0f, rollStaminaCost);
             this.sprintStaminaCostPerSecond =
                 Mathf.Max(0f, sprintStaminaCostPerSecond);
+            this.guardHitBox = guardHitBox;
+            this.attackEffectPlayer = attackEffectPlayer;
             animationController = new PlayerAnimationController(
                 playerAnimator,
                 animationSmoothTime);
@@ -111,7 +117,7 @@ namespace rudIsland.RPG3D.Player.States
                 this,
                 animationController,
                 attackData,
-                Mathf.Max(0f, comboInputBufferDuration));
+                Mathf.Max(0f, attackInputBufferDuration));
             actionStateMachine = new PlayerActionStateMachine(
                 this,
                 moveState,
@@ -155,6 +161,7 @@ namespace rudIsland.RPG3D.Player.States
             }
 
             isEnabled = true;
+            IsRollInvulnerable = false;
             returnLookState = freeLookState;
             ChangeState(freeLookState);
         }
@@ -194,6 +201,7 @@ namespace rudIsland.RPG3D.Player.States
             EndAttackHit();
             currentState = null;
             returnLookState = null;
+            IsRollInvulnerable = false;
             isEnabled = false;
             animationController.Reset();
         }
@@ -323,21 +331,6 @@ namespace rudIsland.RPG3D.Player.States
                 playerInput.MoveValue.sqrMagnitude >= 0.95f;
         }
 
-        internal void ApplyRootMotion(
-            Vector3 deltaPosition,
-            Quaternion deltaRotation)
-        {
-            if (IsRolling || IsBlocking || IsAttacking || IsDead)
-            {
-                float horizontalRootMotionScale =
-                    IsRolling || IsAttacking ? 0f : 1f;
-                playerMovement.ApplyRootMotion(
-                    deltaPosition,
-                    deltaRotation,
-                    horizontalRootMotionScale);
-            }
-        }
-
         internal void ChangeToDeadState()
         {
             if (!isEnabled || ReferenceEquals(currentState, deadState))
@@ -372,21 +365,59 @@ namespace rudIsland.RPG3D.Player.States
         }
 
 
+        internal void PlayAttackSound(int attackNumber)
+        {
+            if (!IsCurrentAttack(attackNumber))
+            {
+                return;
+            }
+
+            attackEffectPlayer?.PlaySound(
+                attackState.CurrentAttackData);
+        }
+
         internal void BeginAttackHit(int attackNumber) //공격 윈도우 시작
         {
-            if(!isEnabled || !IsAttacking)
+            if (!IsCurrentAttack(attackNumber))
+            {
                 return;
+            }
 
             attackRangeDetector.Open(
                 attackState.AttackDamage,
                 attackState.AttackStaggerDamage,
                 attackState.AttackPushDistance,
                 attackState.AttackHitStopDuration);
+            attackEffectPlayer?.BeginTrail();
         }
 
         internal void EndAttackHit() //공격 윈도우 종료
         {
             attackRangeDetector.Close();
+            attackEffectPlayer?.Stop();
+        }
+
+        private bool IsCurrentAttack(int attackNumber)
+        {
+            return isEnabled &&
+                IsAttacking &&
+                attackState.CurrentAttackData != null &&
+                attackState.CurrentAttackData.AttackNumber == attackNumber;
+        }
+
+        internal void BeginRollInvulnerability()
+        {
+            if (!isEnabled || !IsRolling)
+            {
+                return;
+            }
+
+            IsRollInvulnerable = true;
+        }
+
+        internal void EndRollInvulnerability()
+        {
+            IsRollInvulnerable = false;
         }
 
         internal void NotifyAttackAnimationEnded()
@@ -421,7 +452,9 @@ namespace rudIsland.RPG3D.Player.States
 
         internal bool CanBlockHit(Vector3 pushDirection)
         {
-            if (!isEnabled || !IsBlocking)
+            if (!isEnabled ||
+                !IsBlocking ||
+                guardHitBox?.IsGuardActive != true)
             {
                 return false;
             }

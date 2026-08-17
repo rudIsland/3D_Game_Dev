@@ -34,27 +34,19 @@ namespace rudIsland.RPG3D.Player
             this.hitStop = hitStop;
         }
 
-        public void TakeDamage(float damage)
-        {
-            if (TryApplyDamage(damage) && !IsDead)
-            {
-                hitStop.Request(
-                    CombatHitStop.DefaultDamageDuration);
-                PlayerHitRequest hitRequest = default;
-                playerStateMachine.ChangeToHitState(in hitRequest);
-            }
-        }
-
         public PlayerHitResult TryTakeHit(in PlayerHitRequest hitRequest)
         {
-            if (hitRequest.Damage == null ||
-                IsDead)
+            if (hitRequest.Damage == null || IsDead)
             {
                 return PlayerHitResult.Ignored;
             }
 
-            if (hitRequest.HitSurface == PlayerHitSurface.Guard &&
-                hitRequest.Damage.CanBeBlocked &&
+            if (playerStateMachine.IsRollInvulnerable)
+            {
+                return PlayerHitResult.Avoided;
+            }
+
+            if (hitRequest.Damage.CanBlock &&
                 playerStateMachine.CanBlockHit(hitRequest.PushDirection))
             {
                 if (playerStamina.TryConsumeGuard(

@@ -66,7 +66,8 @@ namespace rudIsland.RPG3D.Player.States.Actions
 
             if (ReferenceEquals(currentState, attackState))
             {
-                if (input.RollPressed &&
+                currentState.Update(deltaTime, input);
+                if (attackState.TryTakeRollRequest() &&
                     stateMachine.TryStartAttackCancelRoll())
                 {
                     rollState.StartAfterAttackCancel();
@@ -75,7 +76,6 @@ namespace rudIsland.RPG3D.Player.States.Actions
                     return;
                 }
 
-                currentState.Update(deltaTime, input);
                 if (attackState.IsFinished)
                 {
                     ChangeState(input.IsBlocking ? blockState : moveState);

@@ -18,7 +18,9 @@ MonoBehaviour:
   pushDistance: 0.25
   hitStopDuration: 0.045
   staminaCost: 20
+  swingSound: {fileID: 8300000, guid: bc0d800b2a79c004e8b1a9e9b16df148, type: 3}
   nextInputTime: 0.52
+  rollCancelStartTime: 0.52
   moveDistance: 0.55
   movementCurve:
     serializedVersion: 2

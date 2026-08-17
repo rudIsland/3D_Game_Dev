@@ -9,17 +9,24 @@ using rudIsland.RPG3D.Player.States.Target;
 using rudIsland.RPG3D.World;
 using rudIsland.RPG3D.Player.Runtime.Hit;
 using rudIsland.RPG3D.Player.Runtime;
+using rudIsland.RPG3D.Player.Runtime.Attack;
+using rudIsland.RPG3D.Player.Runtime.Audio;
 using UnityEngine;
 using rudIsland.RPG3D.Characters.Combat;
+using rudIsland.RPG3D.Characters.Combat.AttackData;
 using UnityEngine.Serialization;
 
 namespace rudIsland.RPG3D.Player
 {
     [RequireComponent(
         typeof(CharacterController),
-        typeof(CombatHitEffectPlayer))]
+        typeof(CombatHitEffectPlayer),
+        typeof(PlayerAttackEffectPlayer))]
     // Unity 생명주기에서 플레이어 입력, 이동, Animator를 연결한다.
-    public sealed class PlayerController : WorldObjectView, IPlayerDamageReceiver
+    public sealed class PlayerController :
+        MonoBehaviour,
+        IPlayerDamageReceiver,
+        IUnitDeathState
     {
         private const int ActiveCameraPriority = 20;
         private const int InactiveCameraPriority = 10;
@@ -73,13 +80,25 @@ namespace rudIsland.RPG3D.Player
         private AnimationCurve rollMovementCurve =
             CreateDefaultRollMovementCurve();
 
+        [Header("이동 소리")]
+        [SerializeField] private AudioClip[] walkFootstepSounds;
+        [SerializeField] private AudioClip[] runFootstepSounds;
+        [SerializeField] private AudioClip rollSound;
+        [SerializeField, Range(0f, 1f)] private float walkFootstepVolume = 0.7f;
+        [SerializeField, Range(0f, 1f)] private float runFootstepVolume = 0.9f;
+        [SerializeField, Range(0f, 1f)] private float rollSoundVolume = 0.8f;
+        [SerializeField, Range(0f, 0.2f)] private float footstepPitchChange = 0.05f;
+
+        [Header("피격음")]
+        [SerializeField] private PlayerDamageAudio playerDamageAudio;
+
         [Header("공격 데이터")]
         [SerializeField] private PlayerAttackData[] attackData =
             new PlayerAttackData[6];
 
-        [Header("콤보 입력 버퍼")]
-        [Tooltip("콤보 연결 시점 전에 누른 공격 입력을 보관하는 시간입니다.")]
-        [SerializeField, Min(0f)] private float comboInputBufferDuration = 0.25f; // 시간 설정
+        [Header("공격 입력 버퍼")]
+        [Tooltip("공격 중 미리 누른 다음 공격과 구르기 입력을 보관하는 시간입니다.")]
+        [SerializeField, Min(0f)] private float attackInputBufferDuration = 0.25f; // 시간 설정
 
         [Header("중력")]
         [SerializeField] private float gravity = -22f; // Inspector 설정 값
@@ -108,6 +127,12 @@ namespace rudIsland.RPG3D.Player
         private PlayerMovement playerMovement; // 이동 정보
         private PlayerWorldUnit playerWorldUnit; // 씬 또는 시스템 참조
         private CombatHitEffectPlayer hitEffectPlayer;
+        private PlayerAttackEffectPlayer attackEffectPlayer;
+        private PlayerFootstepAudio footstepAudio;
+
+        // 적이 플레이어를 계속 추적할 수 있는지 확인할 때 사용한다.
+        public bool IsDead =>
+            playerWorldUnit != null && playerWorldUnit.IsDead;
 
         private void Awake()
         {
@@ -139,10 +164,45 @@ namespace rudIsland.RPG3D.Player
             }
 
             hitEffectPlayer = GetComponent<CombatHitEffectPlayer>();
+            attackEffectPlayer = GetComponent<PlayerAttackEffectPlayer>();
+            if (attackEffectPlayer == null)
+            {
+                attackEffectPlayer =
+                    gameObject.AddComponent<PlayerAttackEffectPlayer>();
+            }
+
+            if (playerDamageAudio == null)
+            {
+                playerDamageAudio =
+                    GetComponentInChildren<PlayerDamageAudio>(true);
+            }
+
+            if (playerDamageAudio == null)
+            {
+                Debug.LogError(
+                    "PlayerController에 PlayerDamageAudio 연결이 필요합니다.",
+                    this);
+            }
 
             if (playerAnimator != null)
             {
-                playerAnimator.applyRootMotion = true;
+                footstepAudio =
+                    playerAnimator.GetComponent<PlayerFootstepAudio>();
+                if (footstepAudio == null)
+                {
+                    footstepAudio =
+                        playerAnimator.gameObject
+                            .AddComponent<PlayerFootstepAudio>();
+                }
+
+                footstepAudio.Create(
+                    walkFootstepSounds,
+                    runFootstepSounds,
+                    rollSound,
+                    walkFootstepVolume,
+                    runFootstepVolume,
+                    rollSoundVolume,
+                    footstepPitchChange);
             }
 
             if (guardHitBox == null)
@@ -173,6 +233,10 @@ namespace rudIsland.RPG3D.Player
                 attackLayers.value != 0
                     ? attackLayers
                     : targetLayers;
+
+            attackEffectPlayer.Create(
+                weaponHitStart,
+                weaponHitEnd);
 
             playerInput = new PlayerInputReader();
             playerMovement = new PlayerMovement(
@@ -216,7 +280,7 @@ namespace rudIsland.RPG3D.Player
                 sprintRollDistance,
                 rollMovementCurve,
                 attackData,
-                comboInputBufferDuration,
+                attackInputBufferDuration,
                 targetFinder,
                 targetCamera,
                 Mathf.Max(targetRange, targetBreakDistance),
@@ -230,7 +294,8 @@ namespace rudIsland.RPG3D.Player
                 attackMask,
                 weaponHitRadius,
                 hitStop,
-                hitEffectPlayer
+                hitEffectPlayer,
+                attackEffectPlayer
                 );
             playerWorldUnit = new PlayerWorldUnit(
                 maxHealth,
@@ -252,21 +317,37 @@ namespace rudIsland.RPG3D.Player
             }
         }
 
-        // 구르기·방어·공격·사망 애니메이션의 루트 모션을 플레이어 루트에 적용한다.
-        public void ApplyRootMotion(
-            Vector3 deltaPosition,
-            Quaternion deltaRotation)
-        {
-            playerStateMachine?.ApplyRootMotion(deltaPosition, deltaRotation);
-        }
 
         public PlayerHitResult TryTakeHit(in PlayerHitRequest hitRequest)
         {
-            return playerWorldUnit != null
+            PlayerHitResult hitResult = playerWorldUnit != null
                 ? playerWorldUnit.TryTakeHit(in hitRequest)
                 : PlayerHitResult.Ignored;
+
+            if (hitResult == PlayerHitResult.Damaged)
+            {
+                playerDamageAudio?.Play(
+                    hitRequest.Damage.DamageSoundType);
+            }
+
+            return hitResult;
         }
 
+
+        public void PlayDeathKneeImpact()
+        {
+            playerDamageAudio?.PlayDeathKneeImpact();
+        }
+
+        public void PlayDeathBodyImpact()
+        {
+            playerDamageAudio?.PlayDeathBodyImpact();
+        }
+
+        public void PlayAttackSound(int attackNumber)
+        {
+            playerStateMachine?.PlayAttackSound(attackNumber);
+        }
 
         public void StartAttackHit(int attackNumber)
         {
@@ -287,6 +368,16 @@ namespace rudIsland.RPG3D.Player
         internal void NotifyAttackAnimationEnded()
         {
             playerStateMachine?.NotifyAttackAnimationEnded();
+        }
+
+        internal void BeginRollInvulnerability()
+        {
+            playerStateMachine?.BeginRollInvulnerability();
+        }
+
+        internal void EndRollInvulnerability()
+        {
+            playerStateMachine?.EndRollInvulnerability();
         }
 
         private void OnDisable()
@@ -369,7 +460,18 @@ namespace rudIsland.RPG3D.Player
             }
 
             float healthBeforeDamage = playerWorldUnit.CurrentHealth;
-            playerWorldUnit.TakeDamage(testDamage);
+            var damage = new AttackDamage(
+                testDamage,
+                0,
+                0f,
+                0f,
+                0f,
+                false);
+            var hitRequest = new PlayerHitRequest(
+                damage,
+                transform.position,
+                Vector3.zero);
+            TryTakeHit(in hitRequest);
 
             Debug.Log(
                 $"플레이어 체력: {healthBeforeDamage} → {playerWorldUnit.CurrentHealth}",
@@ -411,10 +513,6 @@ namespace rudIsland.RPG3D.Player
 
         }
 
-        protected override IWorldObject CreateRuntimeObject()
-        {
-            throw new System.NotImplementedException();
-        }
 #endif
     }
 }

@@ -82,6 +82,7 @@ namespace rudIsland.RPG3D.Player.States.Movement
 
         public void Exit()
         {
+            stateMachine.EndRollInvulnerability();
             IsFinished = false;
             movementProgress.Reset();
         }

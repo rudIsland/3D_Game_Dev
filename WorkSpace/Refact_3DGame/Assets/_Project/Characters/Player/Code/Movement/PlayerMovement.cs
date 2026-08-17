@@ -86,6 +86,7 @@ namespace rudIsland.RPG3D.Player.Movement
         public void UpdateStoppedMove(float deltaTime)
         {
             UpdateVerticalSpeed(deltaTime);
+            ApplyMovement(Vector3.up * (verticalSpeed * deltaTime));
         }
 
         public bool TryStartRoll()
@@ -110,10 +111,8 @@ namespace rudIsland.RPG3D.Player.Movement
             Vector2 rollInput =
                 Vector2.ClampMagnitude(playerInput.MoveValue, 1f);
 
-            RollDirectionInput = rollInput.sqrMagnitude < 0.01f
-                ? Vector2.down
-                : currentMovementMode.GetRollDirection(
-                    rollInput.normalized);
+            RollDirectionInput = rollInput.sqrMagnitude < 0.01f ? Vector2.down
+                : currentMovementMode.GetRollDirection(rollInput.normalized);
 
             rollWorldDirection =
                 playerTransform.right * RollDirectionInput.x +
@@ -167,17 +166,6 @@ namespace rudIsland.RPG3D.Player.Movement
             hasAttackDirection = false;
         }
 
-        public void ApplyRootMotion(
-            Vector3 deltaPosition,
-            Quaternion deltaRotation,
-            float horizontalRootMotionScale)
-        {
-            deltaPosition.x *= horizontalRootMotionScale;
-            deltaPosition.z *= horizontalRootMotionScale;
-            deltaPosition.y = verticalSpeed * Time.deltaTime;
-            ApplyMovement(deltaPosition);
-            playerTransform.rotation *= deltaRotation;
-        }
 
         public void ApplyAttackMovement(float deltaDistance)
         {

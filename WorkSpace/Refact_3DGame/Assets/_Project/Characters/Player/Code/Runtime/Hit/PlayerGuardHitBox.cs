@@ -9,6 +9,9 @@ namespace rudIsland.RPG3D.Player.Runtime.Hit
     {
         private BoxCollider guardCollider;
 
+        internal bool IsGuardActive =>
+            guardCollider != null && guardCollider.enabled;
+
         internal void SetGuardActive(bool isActive)
         {
             if (guardCollider != null &&

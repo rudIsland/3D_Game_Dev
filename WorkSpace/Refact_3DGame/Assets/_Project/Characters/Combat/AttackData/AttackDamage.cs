@@ -4,6 +4,12 @@ using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Combat.AttackData
 {
+    public enum DamageSoundType
+    {
+        BodyImpact = 0,
+        SwordCut = 1
+    }
+
     [Serializable]
     public sealed class AttackDamage
     {
@@ -22,6 +28,9 @@ namespace rudIsland.RPG3D.Characters.Combat.AttackData
         private float guardStaminaDamage = 25f;
         [SerializeField]
         private bool canBlock = true;
+        [SerializeField]
+        private DamageSoundType damageSoundType =
+            DamageSoundType.BodyImpact;
 
         public AttackDamage()
         {
@@ -33,9 +42,11 @@ namespace rudIsland.RPG3D.Characters.Combat.AttackData
             float staggerDamage,
             float pushDistance,
             float guardStaminaDamage,
-            bool canBeBlocked,
+            bool canBlock,
             float hitStopDuration =
-                CombatHitStop.DefaultDamageDuration)
+                CombatHitStop.DefaultDamageDuration,
+            DamageSoundType damageSoundType =
+                DamageSoundType.BodyImpact)
         {
             this.healthDamage = Mathf.Max(0f, healthDamage);
             this.strength = Mathf.Max(0, strength);
@@ -43,7 +54,8 @@ namespace rudIsland.RPG3D.Characters.Combat.AttackData
             this.pushDistance = Mathf.Max(0f, pushDistance);
             this.hitStopDuration = Mathf.Max(0f, hitStopDuration);
             this.guardStaminaDamage = Mathf.Max(0f, guardStaminaDamage);
-            this.canBlock = canBeBlocked;
+            this.canBlock = canBlock;
+            this.damageSoundType = damageSoundType;
         }
 
         public float HealthDamage => healthDamage;
@@ -52,6 +64,7 @@ namespace rudIsland.RPG3D.Characters.Combat.AttackData
         public float PushDistance => pushDistance;
         public float HitStopDuration => hitStopDuration;
         public float GuardStaminaDamage => guardStaminaDamage;
-        public bool CanBeBlocked => canBlock;
+        public bool CanBlock => canBlock;
+        public DamageSoundType DamageSoundType => damageSoundType;
     }
 }

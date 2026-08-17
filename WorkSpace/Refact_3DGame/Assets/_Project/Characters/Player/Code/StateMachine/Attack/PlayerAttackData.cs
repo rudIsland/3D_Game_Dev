@@ -23,8 +23,12 @@ namespace rudIsland.RPG3D.Player.States.Attack
         [Header("Stamina")]
         [SerializeField, Min(0f)] private float staminaCost = 20f;
 
+        [SerializeField] private AudioClip swingSound;
+
         [Header("콤보 연결")]
         [SerializeField, Range(0f, 1f)] private float nextInputTime = 1f;
+        [Header("구르기 취소")]
+        [SerializeField, Range(0f, 1f)] private float rollCancelStartTime = 0.6f;
 
         [Header("동작 이동")]
         [FormerlySerializedAs("moveScale")]
@@ -38,7 +42,9 @@ namespace rudIsland.RPG3D.Player.States.Attack
         public float PushDistance => pushDistance;
         public float HitStopDuration => hitStopDuration;
         public float StaminaCost => staminaCost;
+        public AudioClip SwingSound => swingSound;
         public float NextInputTime => nextInputTime;
+        public float RollCancelStartTime => rollCancelStartTime;
         public float MoveDistance => moveDistance;
         public AnimationCurve MovementCurve => movementCurve;
 
@@ -51,6 +57,7 @@ namespace rudIsland.RPG3D.Player.States.Attack
             hitStopDuration = Mathf.Max(0f, hitStopDuration);
             staminaCost = Mathf.Max(0f, staminaCost);
             nextInputTime = Mathf.Clamp01(nextInputTime);
+            rollCancelStartTime = Mathf.Clamp01(rollCancelStartTime);
             moveDistance = Mathf.Max(0f, moveDistance);
             if (movementCurve == null || movementCurve.length < 2)
             {

@@ -1,19 +1,21 @@
+using rudIsland.RPG3D.Player.Runtime.Audio;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Player.Animations
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Animator))]
-    // Animator의 루트 이동을 전달하며, 상태 머신이 행동 루트 모션만 적용한다.
+    [RequireComponent(typeof(PlayerFootstepAudio))]
+    // 플레이어 애니메이션 이벤트를 이동·공격·오디오 기능에 전달한다.
     public sealed class PlayerAnimationEventReceiver : MonoBehaviour
     {
-        private Animator playerAnimator; // 애니메이터 참조
         private PlayerController playerController; // 씬 또는 시스템 참조
+        private PlayerFootstepAudio footstepAudio; // 걷기·달리기·구르기 이동음 재생
 
         private void Awake()
         {
-            playerAnimator = GetComponent<Animator>();
             playerController = GetComponentInParent<PlayerController>();
+            footstepAudio = GetComponent<PlayerFootstepAudio>();
 
             if (playerController == null)
             {
@@ -24,16 +26,10 @@ namespace rudIsland.RPG3D.Player.Animations
             }
         }
 
-        private void OnAnimatorMove()
-        {
-            if (playerController == null)
-            {
-                return;
-            }
 
-            playerController.ApplyRootMotion(
-                playerAnimator.deltaPosition,
-                playerAnimator.deltaRotation);
+        public void PlayAttackSoundAnimationEvent(int attackNumber)
+        {
+            playerController?.PlayAttackSound(attackNumber);
         }
 
         public void StartAttackHitAnimationEvent(int attackNumber)
@@ -51,8 +47,55 @@ namespace rudIsland.RPG3D.Player.Animations
             playerController?.NotifyAttackAnimationEnded();
         }
 
+        public void BeginRollInvulnerabilityAnimationEvent()
+        {
+            playerController?.BeginRollInvulnerability();
+        }
+
+        public void EndRollInvulnerabilityAnimationEvent()
+        {
+            playerController?.EndRollInvulnerability();
+        }
+
+        public void PlayRollSoundAnimationEvent()
+        {
+            FindFootstepAudio();
+            footstepAudio?.PlayRollSound();
+        }
+
+        public void PlayWalkFootstepAnimationEvent()
+        {
+            FindFootstepAudio();
+            footstepAudio?.PlayWalkFootstep();
+        }
+
+        public void PlayRunFootstepAnimationEvent()
+        {
+            FindFootstepAudio();
+            footstepAudio?.PlayRunFootstep();
+        }
+
+        public void PlayDeathKneeImpactAnimationEvent()
+        {
+            playerController?.PlayDeathKneeImpact();
+        }
+
+        public void PlayDeathBodyImpactAnimationEvent()
+        {
+            playerController?.PlayDeathBodyImpact();
+        }
+
+        private void FindFootstepAudio()
+        {
+            if (footstepAudio == null)
+            {
+                footstepAudio = GetComponent<PlayerFootstepAudio>();
+            }
+        }
+
         private void OnDisable()
         {
+            playerController?.EndRollInvulnerability();
             playerController?.EndAttackHit();
         }
     }

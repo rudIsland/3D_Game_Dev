@@ -31,6 +31,158 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1607652367621752783}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5004883000846071684
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 509249310203970220}
+  - component: {fileID: 5661110348020723103}
+  - component: {fileID: 3329236849620706126}
+  m_Layer: 0
+  m_Name: DamageAudio
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &509249310203970220
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5004883000846071684}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1607652367621752783}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &5661110348020723103
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5004883000846071684}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 0
+  MinDistance: 1.5
+  MaxDistance: 24
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &3329236849620706126
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5004883000846071684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 644db9acc682c7349a6555b12f452292, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Player.Runtime.Audio.PlayerDamageAudio
+  damageAudioSource: {fileID: 5661110348020723103}
+  bodyImpactSound: {fileID: 8300000, guid: 581741dc8a5fb1d43b66c0489ff77fa7, type: 3}
+  swordCutSound: {fileID: 8300000, guid: 9fe1486028123884d8fe0e2c7d1732ed, type: 3}
+  deathKneeImpactSound: {fileID: 8300000, guid: c06fd26112ffad04696a63c4f71c1174,
+    type: 3}
+  deathBodyImpactSound: {fileID: 8300000, guid: 868e13cdd672f4d4ab63d03f676253bf,
+    type: 3}
+  volume: 0.9
+  deathKneeVolume: 0.3
+  deathBodyVolume: 0.7
 --- !u!1 &6381702802126765991
 GameObject:
   m_ObjectHideFlags: 0
@@ -43,6 +195,8 @@ GameObject:
   - component: {fileID: 6648479244505933005}
   - component: {fileID: 4308524652148546462}
   - component: {fileID: 5180795654792450061}
+  - component: {fileID: 5495058732513574150}
+  - component: {fileID: 7680108299689711903}
   m_Layer: 6
   m_Name: PlayerRoot
   m_TagString: Untagged
@@ -66,6 +220,7 @@ Transform:
   - {fileID: 6693446715994511580}
   - {fileID: 684135341859363741}
   - {fileID: 3945709285472504484}
+  - {fileID: 509249310203970220}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!143 &6648479244505933005
@@ -124,19 +279,6 @@ MonoBehaviour:
   staminaRecoverSpeed: 20
   rollStaminaCost: 25
   sprintStaminaCostPerSecond: 15
-  attackData:
-  - {fileID: 11400000, guid: a1014b8e7c624e0e91f4d0c3b2a19876, type: 2}
-  - {fileID: 11400000, guid: a2024b8e7c624e0e91f4d0c3b2a19876, type: 2}
-  - {fileID: 11400000, guid: a3034b8e7c624e0e91f4d0c3b2a19876, type: 2}
-  - {fileID: 11400000, guid: a4044b8e7c624e0e91f4d0c3b2a19876, type: 2}
-  - {fileID: 11400000, guid: a5054b8e7c624e0e91f4d0c3b2a19876, type: 2}
-  - {fileID: 11400000, guid: a6064b8e7c624e0e91f4d0c3b2a19876, type: 2}
-  staggerLimit: 10
-  staggerRecoverDelay: 1
-  staggerRecoverSpeed: 20
-  guardAngle: 120
-  guardHitBox: {fileID: 0}
-  hitPushTime: 0.18
   testDamage: 10
   turnSpeed: 720
   walkSpeed: 2.8
@@ -144,9 +286,108 @@ MonoBehaviour:
   animationSmoothTime: 0.12
   rollDistance: 2
   sprintRollDistance: 2.5
-  comboInputBufferDuration: 0.25
+  rollMovementCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 3
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.15
+      value: 0.45
+      inSlope: 1.2
+      outSlope: 1.2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.35
+      value: 0.75
+      inSlope: 0.6
+      outSlope: 0.6
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.7
+      value: 0.95
+      inSlope: 0.1
+      outSlope: 0.1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  walkFootstepSounds: []
+  runFootstepSounds: []
+  rollSound: {fileID: 0}
+  walkFootstepVolume: 0.7
+  runFootstepVolume: 0.9
+  rollSoundVolume: 0.8
+  footstepPitchChange: 0.05
+  playerDamageAudio: {fileID: 3329236849620706126}
+  attackData:
+  - {fileID: 11400000, guid: a1014b8e7c624e0e91f4d0c3b2a19876, type: 2}
+  - {fileID: 11400000, guid: a2024b8e7c624e0e91f4d0c3b2a19876, type: 2}
+  - {fileID: 11400000, guid: a3034b8e7c624e0e91f4d0c3b2a19876, type: 2}
+  - {fileID: 11400000, guid: a4044b8e7c624e0e91f4d0c3b2a19876, type: 2}
+  - {fileID: 11400000, guid: a5054b8e7c624e0e91f4d0c3b2a19876, type: 2}
+  - {fileID: 11400000, guid: a6064b8e7c624e0e91f4d0c3b2a19876, type: 2}
+  attackInputBufferDuration: 0.25
   gravity: -22
   groundPull: -2
+  weaponHitStart: {fileID: 0}
+  weaponHitEnd: {fileID: 0}
+  attackLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  weaponHitRadius: 0.12
+  guardAngle: 120
+  guardHitBox: {fileID: 0}
+  hitPushDuration: 0.15
+  hitPushCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!114 &5180795654792450061
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -157,12 +398,121 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c8a4c0717de6458095c2b2f7c52919cc, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Characters.Combat.CombatHitEffectPlayer
   bodyHitEffectPrefab: {fileID: 0}
   guardHitEffectPrefab: {fileID: 0}
   bodyHitPoolSize: 4
   guardHitPoolSize: 2
+--- !u!82 &5495058732513574150
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6381702802126765991}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &7680108299689711903
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6381702802126765991}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc5c30e0e1ad420a87008871f98796e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Player.Runtime.Attack.PlayerAttackEffectPlayer
 --- !u!1 &7112299585502653175
 GameObject:
   m_ObjectHideFlags: 0
@@ -309,7 +659,7 @@ PrefabInstance:
     - target: {fileID: 5866666021909216657, guid: 7954cdbd4d66f3648837abb35c3f8e35,
         type: 3}
       propertyPath: m_ApplyRootMotion
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -319,6 +669,14 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 8505962822767329000}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7954cdbd4d66f3648837abb35c3f8e35,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3143976212965087379}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7954cdbd4d66f3648837abb35c3f8e35,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1506602812511100108}
   m_SourcePrefab: {fileID: 100100000, guid: 7954cdbd4d66f3648837abb35c3f8e35, type: 3}
 --- !u!95 &721643049174057638 stripped
 Animator:
@@ -344,6 +702,115 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70987d43b83ad76429a31e43b3ef129e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Player.Animations.PlayerAnimationMoveReceiver
+--- !u!82 &3143976212965087379
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6316358949443191398}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 20
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &1506602812511100108
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6316358949443191398}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2109e09cb84bf3846935c98285101aff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Player.Runtime.Audio.PlayerFootstepAudio
 --- !u!4 &6693446715994511580 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 7954cdbd4d66f3648837abb35c3f8e35,

@@ -11,14 +11,16 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f0e34cba584e7804f946eddb1b27683f, type: 3}
   m_Name: PlayerAttack04Data
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   attackNumber: 4
   damage: 17
   staggerDamage: 18
   pushDistance: 0.25
   hitStopDuration: 0.05
   staminaCost: 25
+  swingSound: {fileID: 8300000, guid: 73a4d51aa961c2b49b4a0da526da3727, type: 3}
   nextInputTime: 0.5
+  rollCancelStartTime: 0.5
   moveDistance: 0.5
   movementCurve:
     serializedVersion: 2
