@@ -60,13 +60,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             this.movement = movement;
             this.animation = animation;
             FindRangeSquared = findRange * findRange;
-            IdleTargetCheckInterval = Mathf.Max(
-                0.01f,
-                idleTargetCheckInterval);
+            IdleTargetCheckInterval = Mathf.Max(0.01f, idleTargetCheckInterval);
             AttackRangeSquared = attackRange * attackRange;
-            minimumAttackFacingDot = Mathf.Cos(
-                Mathf.Clamp(attackFacingAngle, 0f, 180f) *
-                Mathf.Deg2Rad);
+            minimumAttackFacingDot = Mathf.Cos(Mathf.Clamp(attackFacingAngle, 0f, 180f) * Mathf.Deg2Rad);
             ChaseSpeed = chaseSpeed;
             TurnSpeed = turnSpeed;
             HitPushDuration = Mathf.Max(0.01f, hitPushDuration);
@@ -163,9 +159,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         internal bool IsFacingTarget()
         {
-            return movement.IsFacing(
-                targetPosition,
-                minimumAttackFacingDot);
+            return movement.IsFacing(targetPosition, minimumAttackFacingDot);
         }
 
         internal void MoveToTarget(float deltaTime)
@@ -187,9 +181,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             movement.StayOnGround(deltaTime);
         }
 
-        internal void ApplyHitMovement(
-            Vector3 horizontalMovement,
-            float deltaTime)
+        internal void ApplyHitMovement(Vector3 horizontalMovement, float deltaTime)
         {
             movement.ApplyHitMovement(horizontalMovement, deltaTime);
         }
@@ -202,14 +194,10 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 return normalizedTime;
             }
 
-            return Mathf.Clamp01(
-                (hitPushCurve.Evaluate(normalizedTime) -
-                    hitPushCurveStart) /
-                hitPushCurveRange);
+            return Mathf.Clamp01((hitPushCurve.Evaluate(normalizedTime) - hitPushCurveStart) / hitPushCurveRange);
         }
 
-        internal void ChangeToHitState(
-            in EnemyHitRequest hitRequest)
+        internal void ChangeToHitState(in EnemyHitRequest hitRequest)
         {
             if (!isEnabled || ReferenceEquals(currentState, deadState))
             {

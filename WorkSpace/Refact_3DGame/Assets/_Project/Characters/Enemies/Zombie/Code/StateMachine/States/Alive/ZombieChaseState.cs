@@ -6,9 +6,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         private readonly ZombieAliveState aliveState; // 현재 행동 상태
         private readonly ZombieStateMachine stateMachine; // 현재 행동 상태
 
-        public ZombieChaseState(
-            ZombieAliveState aliveState,
-            ZombieStateMachine stateMachine)
+        public ZombieChaseState(ZombieAliveState aliveState, ZombieStateMachine stateMachine)
         {
             this.aliveState = aliveState;
             this.stateMachine = stateMachine;

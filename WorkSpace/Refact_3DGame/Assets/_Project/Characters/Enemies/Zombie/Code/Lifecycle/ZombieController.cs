@@ -157,9 +157,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 return;
             }
 
-            attackRangeDetector?.Open(
-                attackNumber,
-                GetAttackDamage(attackNumber));
+            attackRangeDetector?.Open(attackNumber, GetAttackDamage(attackNumber));
 
         }
         public void EndAttackHitAnimationEvent()
@@ -194,9 +192,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         {
             if (!Application.isPlaying || zombieWorldUnit == null)
             {
-                Debug.LogWarning(
-                    "Test Damage는 Play 중이고 좀비 준비가 끝난 뒤 사용할 수 있습니다.",
-                    this);
+                Debug.LogWarning("Test Damage는 Play 중이고 좀비 준비가 끝난 뒤 사용할 수 있습니다.", this);
                 return;
             }
 
@@ -210,9 +206,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 0.25f);
             zombieWorldUnit.TakeHit(in hitRequest);
 
-            Debug.Log(
-                $"좀비 체력: {healthBeforeDamage} → {zombieWorldUnit.CurrentHealth}",
-                this);
+            Debug.Log($"좀비 체력: {healthBeforeDamage} → {zombieWorldUnit.CurrentHealth}", this);
         }
 #endif
 
@@ -282,9 +276,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         private static AnimationCurve CreateDefaultHitPushCurve()
         {
-            return new AnimationCurve(
-                new Keyframe(0f, 0f, 2f, 2f),
-                new Keyframe(1f, 1f, 0f, 0f));
+            return new AnimationCurve(new Keyframe(0f, 0f, 2f, 2f), new Keyframe(1f, 1f, 0f, 0f));
         }
 
 
@@ -324,9 +316,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             DrawAttackHitShape(upDownHitShape, Color.cyan);
         }
 
-        private static void DrawAttackHitShape(
-            ZombieAttackHitShape hitShape,
-            Color color)
+        private static void DrawAttackHitShape(ZombieAttackHitShape hitShape, Color color)
         {
             if (hitShape == null || !hitShape.IsReady)
             {
@@ -334,15 +324,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             }
 
             Gizmos.color = color;
-            Gizmos.DrawWireSphere(
-                hitShape.StartPoint.position,
-                hitShape.Radius);
-            Gizmos.DrawWireSphere(
-                hitShape.EndPoint.position,
-                hitShape.Radius);
-            Gizmos.DrawLine(
-                hitShape.StartPoint.position,
-                hitShape.EndPoint.position);
+            Gizmos.DrawWireSphere(hitShape.StartPoint.position, hitShape.Radius);
+            Gizmos.DrawWireSphere(hitShape.EndPoint.position, hitShape.Radius);
+            Gizmos.DrawLine(hitShape.StartPoint.position, hitShape.EndPoint.position);
         }
 #endif
     }

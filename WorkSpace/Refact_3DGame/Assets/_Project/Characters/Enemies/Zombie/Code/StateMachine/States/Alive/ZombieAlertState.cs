@@ -6,9 +6,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         private readonly ZombieAliveState aliveState; // 현재 행동 상태
         private readonly ZombieStateMachine stateMachine; // 현재 행동 상태
         private bool animationEndedByEvent; // 기능 사용 여부
-        public ZombieAlertState(
-            ZombieAliveState aliveState,
-            ZombieStateMachine stateMachine)
+        public ZombieAlertState(ZombieAliveState aliveState, ZombieStateMachine stateMachine)
         {
             this.aliveState = aliveState;
             this.stateMachine = stateMachine;
@@ -30,8 +28,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 return;
             }
 
-            if (stateMachine.TryGetCurrentAnimationTime(
-                    out float normalizedTime) &&
+            if (stateMachine.TryGetCurrentAnimationTime(out float normalizedTime) &&
                 !stateMachine.IsAnimationTransitioning() &&
                 normalizedTime >= 1f)
             {

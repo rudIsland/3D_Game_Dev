@@ -54,14 +54,10 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         private void ApplyHitMovement(float deltaTime)
         {
-            elapsedPushTime = Mathf.Min(
-                elapsedPushTime + Mathf.Max(0f, deltaTime),
-                stateMachine.HitPushDuration);
+            elapsedPushTime = Mathf.Min(elapsedPushTime + Mathf.Max(0f, deltaTime), stateMachine.HitPushDuration);
             float normalizedTime =
                 elapsedPushTime / stateMachine.HitPushDuration;
-            float pushProgress = Mathf.Max(
-                previousPushProgress,
-                stateMachine.EvaluateHitPushProgress(normalizedTime));
+            float pushProgress = Mathf.Max(previousPushProgress, stateMachine.EvaluateHitPushProgress(normalizedTime));
             float deltaProgress =
                 pushProgress - previousPushProgress;
             Vector3 horizontalMovement =
@@ -69,9 +65,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 (hitRequest.PushDistance * deltaProgress);
 
             previousPushProgress = pushProgress;
-            stateMachine.ApplyHitMovement(
-                horizontalMovement,
-                deltaTime);
+            stateMachine.ApplyHitMovement(horizontalMovement, deltaTime);
         }
     }
 }

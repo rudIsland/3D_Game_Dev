@@ -73,9 +73,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             StayOnGround(deltaTime);
         }
 
-        public bool IsFacing(
-            Vector3 targetPosition,
-            float minimumFacingDot)
+        public bool IsFacing(Vector3 targetPosition, float minimumFacingDot)
         {
             Vector3 targetDirection =
                 targetPosition - zombieTransform.position;
@@ -87,9 +85,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             }
 
             targetDirection.Normalize();
-            return Vector3.Dot(
-                    zombieTransform.forward,
-                    targetDirection) >= minimumFacingDot;
+            return Vector3.Dot(zombieTransform.forward, targetDirection) >= minimumFacingDot;
         }
 
         public void StayOnGround(float deltaTime)
@@ -98,9 +94,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             ApplyMovement(Vector3.up * (verticalSpeed * deltaTime));
         }
 
-        internal void ApplyHitMovement(
-            Vector3 horizontalMovement,
-            float deltaTime)
+        internal void ApplyHitMovement(Vector3 horizontalMovement, float deltaTime)
         {
             horizontalMovement.y = 0f;
             UpdateVerticalSpeed(deltaTime);

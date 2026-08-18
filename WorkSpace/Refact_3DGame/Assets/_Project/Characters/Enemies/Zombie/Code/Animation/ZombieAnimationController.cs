@@ -96,8 +96,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         {
             normalizedTime = 0f;
             if (!CanControlAnimator() ||
-                !TryGetCurrentState(
-                    out AnimatorStateInfo stateInfo))
+                !TryGetCurrentState(out AnimatorStateInfo stateInfo))
             {
                 return false;
             }
@@ -223,8 +222,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 zombieAnimator.IsInTransition(0);
         }
 
-        private bool TryGetCurrentState(
-            out AnimatorStateInfo stateInfo)
+        private bool TryGetCurrentState(out AnimatorStateInfo stateInfo)
         {
             stateInfo = default;
             if (!CanReadAnimator())

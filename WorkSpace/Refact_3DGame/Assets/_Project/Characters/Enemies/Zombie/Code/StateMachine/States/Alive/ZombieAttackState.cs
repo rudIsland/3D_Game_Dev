@@ -29,9 +29,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         private bool isHitWindowOpen;
         private bool isRecovery;
 
-        public ZombieAttackState(
-            ZombieAliveState aliveState,
-            ZombieStateMachine stateMachine)
+        public ZombieAttackState(ZombieAliveState aliveState, ZombieStateMachine stateMachine)
         {
             this.aliveState = aliveState;
             this.stateMachine = stateMachine;
@@ -111,8 +109,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         private bool IsAnimationComplete()
         {
-            return stateMachine.TryGetCurrentAnimationTime(
-                       out float normalizedTime) &&
+            return stateMachine.TryGetCurrentAnimationTime(out float normalizedTime) &&
                 !stateMachine.IsAnimationTransitioning() &&
                 normalizedTime >= 1f;
         }
@@ -147,9 +144,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 }
             }
 
-            float randomWeight = Random.Range(
-                0f,
-                swingWeight + kickWeight + upDownWeight);
+            float randomWeight = Random.Range(0f, swingWeight + kickWeight + upDownWeight);
 
             if (randomWeight < swingWeight)
             {

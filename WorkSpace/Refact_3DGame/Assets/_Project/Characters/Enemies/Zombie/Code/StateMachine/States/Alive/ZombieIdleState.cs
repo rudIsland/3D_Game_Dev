@@ -7,9 +7,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         private readonly ZombieStateMachine stateMachine; // 현재 행동 상태
         private float timeUntilTargetCheck; // 대상 참조
 
-        public ZombieIdleState(
-            ZombieAliveState aliveState,
-            ZombieStateMachine stateMachine)
+        public ZombieIdleState(ZombieAliveState aliveState, ZombieStateMachine stateMachine)
         {
             this.aliveState = aliveState;
             this.stateMachine = stateMachine;

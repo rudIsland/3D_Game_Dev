@@ -100,15 +100,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
             if (hasPreviousShapePositions)
             {
-                CollectMovedPoint(
-                    previousStartPosition,
-                    currentStartPosition);
-                CollectMovedPoint(
-                    previousMiddlePosition,
-                    currentMiddlePosition);
-                CollectMovedPoint(
-                    previousEndPosition,
-                    currentEndPosition);
+                CollectMovedPoint(previousStartPosition, currentStartPosition);
+                CollectMovedPoint(previousMiddlePosition, currentMiddlePosition);
+                CollectMovedPoint(previousEndPosition, currentEndPosition);
             }
 
             if (TryApplyPendingContact())
@@ -236,9 +230,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             bool hasSameTargetGuardContact =
                 pendingGuardContact.IsValid &&
                 pendingBodyContact.IsValid &&
-                ReferenceEquals(
-                    pendingGuardContact.Target,
-                    pendingBodyContact.Target);
+                ReferenceEquals(pendingGuardContact.Target, pendingBodyContact.Target);
             bool tryGuardFirst = hasSameTargetGuardContact ||
                 (pendingGuardContact.IsValid &&
                 (!pendingBodyContact.IsValid ||
@@ -247,25 +239,15 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
             if (tryGuardFirst)
             {
-                return TryApplyContact(
-                        in pendingGuardContact,
-                        PlayerHitSurface.Guard) ||
-                    TryApplyContact(
-                        in pendingBodyContact,
-                        PlayerHitSurface.Body);
+                return TryApplyContact(in pendingGuardContact, PlayerHitSurface.Guard) ||
+                    TryApplyContact(in pendingBodyContact, PlayerHitSurface.Body);
             }
 
-            return TryApplyContact(
-                    in pendingBodyContact,
-                    PlayerHitSurface.Body) ||
-                TryApplyContact(
-                    in pendingGuardContact,
-                    PlayerHitSurface.Guard);
+            return TryApplyContact(in pendingBodyContact, PlayerHitSurface.Body) ||
+                TryApplyContact(in pendingGuardContact, PlayerHitSurface.Guard);
         }
 
-        private bool TryApplyContact(
-            in PendingPlayerContact contact,
-            PlayerHitSurface hitSurface)
+        private bool TryApplyContact(in PendingPlayerContact contact, PlayerHitSurface hitSurface)
         {
             if (!contact.IsValid)
             {
@@ -294,19 +276,13 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
             if (hitResult == PlayerHitResult.Blocked)
             {
-                attackerHitStop?.Request(
-                    CombatHitStop.GuardDuration);
-                hitEffectPlayer?.PlayGuardHit(
-                    hitRequest.HitPosition,
-                    hitRequest.PushDirection);
+                attackerHitStop?.Request(CombatHitStop.GuardDuration);
+                hitEffectPlayer?.PlayGuardHit(hitRequest.HitPosition, hitRequest.PushDirection);
             }
             else if (hitResult != PlayerHitResult.Avoided)
             {
-                attackerHitStop?.Request(
-                    attackDamage.HitStopDuration);
-                hitEffectPlayer?.PlayBodyHit(
-                    hitRequest.HitPosition,
-                    hitRequest.PushDirection);
+                attackerHitStop?.Request(attackDamage.HitStopDuration);
+                hitEffectPlayer?.PlayBodyHit(hitRequest.HitPosition, hitRequest.PushDirection);
             }
 
             hasHitTarget = true;
@@ -376,9 +352,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 return lineStart;
             }
 
-            float distanceRate = Mathf.Clamp01(
-                Vector3.Dot(targetPosition - lineStart, line) /
-                lineLengthSqr);
+            float distanceRate = Mathf.Clamp01(Vector3.Dot(targetPosition - lineStart, line) / lineLengthSqr);
             return lineStart + line * distanceRate;
         }
 

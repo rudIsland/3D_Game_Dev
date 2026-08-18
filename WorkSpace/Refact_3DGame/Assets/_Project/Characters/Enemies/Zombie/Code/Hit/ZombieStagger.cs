@@ -34,9 +34,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             }
 
             recoverElapsedTime = 0f;
-            currentStagger = Mathf.Min(
-                staggerLimit,
-                currentStagger + staggerDamage);
+            currentStagger = Mathf.Min(staggerLimit, currentStagger + staggerDamage);
             if (currentStagger < staggerLimit)
             {
                 return false;
@@ -60,9 +58,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             }
 
             float staggerBeforeRecovery = currentStagger;
-            currentStagger = Mathf.Max(
-                0f,
-                currentStagger - recoverSpeed * deltaTime);
+            currentStagger = Mathf.Max(0f, currentStagger - recoverSpeed * deltaTime);
             return currentStagger < staggerBeforeRecovery;
         }
 

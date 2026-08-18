@@ -32,8 +32,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
             if (!isAnimationComplete)
             {
-                if (!stateMachine.TryGetCurrentAnimationTime(
-                        out float normalizedTime) ||
+                if (!stateMachine.TryGetCurrentAnimationTime(out float normalizedTime) ||
                     stateMachine.IsAnimationTransitioning() ||
                     normalizedTime < 1f)
                 {
