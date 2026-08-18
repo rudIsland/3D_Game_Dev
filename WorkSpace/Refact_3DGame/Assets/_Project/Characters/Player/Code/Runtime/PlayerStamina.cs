@@ -70,7 +70,7 @@ namespace rudIsland.RPG3D.Player.Runtime
                 CurrentStamina >= staminaCost;
         }
 
-        public void UpdateRecovery(float deltaTime, bool canRecover)
+        public void UpdateRecovery(float deltaTime, float recoveryRate)
         {
             if (deltaTime <= 0f || CurrentStamina >= maxStamina)
             {
@@ -78,15 +78,13 @@ namespace rudIsland.RPG3D.Player.Runtime
             }
 
             recoverElapsedTime += deltaTime;
-            if (!canRecover || recoverElapsedTime < recoverDelay)
+            recoveryRate = Mathf.Clamp01(recoveryRate);
+            if (recoveryRate <= 0f || recoverElapsedTime < recoverDelay)
             {
                 return;
             }
 
-            SetCurrentStamina(
-                Mathf.Min(
-                    maxStamina,
-                    CurrentStamina + recoverSpeed * deltaTime));
+            SetCurrentStamina(Mathf.Min(maxStamina, CurrentStamina + recoverSpeed * recoveryRate * deltaTime));
         }
 
         private void SetCurrentStamina(float nextStamina)

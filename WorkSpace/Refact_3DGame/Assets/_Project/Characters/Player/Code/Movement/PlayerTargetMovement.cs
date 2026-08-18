@@ -11,9 +11,7 @@ namespace rudIsland.RPG3D.Player.Movement
         private readonly float turnSpeed;
         private Transform target;
 
-        public PlayerTargetMovement(
-            Transform playerTransform,
-            float turnSpeed)
+        public PlayerTargetMovement(Transform playerTransform, float turnSpeed)
         {
             this.playerTransform = playerTransform;
             this.turnSpeed = turnSpeed;
@@ -41,9 +39,7 @@ namespace rudIsland.RPG3D.Player.Movement
                 targetForward * moveInput.y +
                 targetRight * moveInput.x;
 
-            return Vector3.ClampMagnitude(
-                moveDirection,
-                1f) * moveInput.magnitude;
+            return Vector3.ClampMagnitude(moveDirection, 1f) * moveInput.magnitude;
         }
 
         public Vector2 GetRollDirection(Vector2 moveInput)
@@ -55,19 +51,14 @@ namespace rudIsland.RPG3D.Player.Movement
                 return moveInput;
             }
 
-            Vector3 localDirection =
-                playerTransform.InverseTransformDirection(
-                    targetMoveDirection.normalized);
+            Vector3 localDirection = playerTransform.InverseTransformDirection(targetMoveDirection.normalized);
 
-            return Vector2.ClampMagnitude(
-                new Vector2(localDirection.x, localDirection.z),
-                1f);
+            return Vector2.ClampMagnitude(new Vector2(localDirection.x, localDirection.z), 1f);
         }
 
         public Vector3 GetAttackDirection()
         {
-            return TryGetTargetDirection(
-                out Vector3 targetDirection)
+            return TryGetTargetDirection(out Vector3 targetDirection)
                 ? targetDirection
                 : playerTransform.forward;
         }
@@ -105,9 +96,7 @@ namespace rudIsland.RPG3D.Player.Movement
             return true;
         }
 
-        private bool TryGetTargetMoveBasis(
-            out Vector3 targetForward,
-            out Vector3 targetRight)
+        private bool TryGetTargetMoveBasis(out Vector3 targetForward, out Vector3 targetRight)
         {
             targetForward = Vector3.zero;
             targetRight = Vector3.zero;

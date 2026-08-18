@@ -1,3 +1,4 @@
+using Cinemachine;
 using rudIsland.RPG3D.Player.States.Attack;
 using UnityEngine;
 
@@ -9,18 +10,28 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
     public sealed class PlayerAttackEffectPlayer : MonoBehaviour
     {
         private AudioSource attackAudioSource;
+        private CinemachineImpulseSource hitImpulseSource;
         private PlayerBladeTrailRenderer bladeTrailRenderer;
         private bool isCreated;
+
+        [Header("확정 타격")]
+        [SerializeField] private AudioClip confirmedHitSound;
+        [SerializeField, Range(0f, 1f)]
+        private float confirmedHitSoundVolume = 0.8f;
+        [SerializeField, Min(0f)] private float confirmedHitImpulseForce = 0.12f;
 
         private void Awake()
         {
             attackAudioSource = GetComponent<AudioSource>();
             attackAudioSource.playOnAwake = false;
+            hitImpulseSource = GetComponent<CinemachineImpulseSource>();
+            if (hitImpulseSource == null)
+            {
+                hitImpulseSource = gameObject.AddComponent<CinemachineImpulseSource>();
+            }
         }
 
-        public void Create(
-            Transform weaponHitStart,
-            Transform weaponHitEnd)
+        public void Create(Transform weaponHitStart, Transform weaponHitEnd)
         {
             if (isCreated)
             {
@@ -28,17 +39,13 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
             }
 
             isCreated = true;
-            bladeTrailRenderer =
-                GetComponent<PlayerBladeTrailRenderer>();
+            bladeTrailRenderer = GetComponent<PlayerBladeTrailRenderer>();
             if (bladeTrailRenderer == null)
             {
-                bladeTrailRenderer =
-                    gameObject.AddComponent<PlayerBladeTrailRenderer>();
+                bladeTrailRenderer = gameObject.AddComponent<PlayerBladeTrailRenderer>();
             }
 
-            bladeTrailRenderer.Create(
-                weaponHitStart,
-                weaponHitEnd);
+            bladeTrailRenderer.Create(weaponHitStart, weaponHitEnd);
         }
 
         public void PlaySound(PlayerAttackData attackData)
@@ -59,6 +66,18 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
             bladeTrailRenderer?.BeginTrail();
         }
 
+        public void PlayConfirmedHit()
+        {
+            if (attackAudioSource != null && confirmedHitSound != null)
+            {
+                attackAudioSource.PlayOneShot(
+                    confirmedHitSound,
+                    confirmedHitSoundVolume);
+            }
+
+            hitImpulseSource?.GenerateImpulse(confirmedHitImpulseForce);
+        }
+
         public void Stop()
         {
             bladeTrailRenderer?.EndTrail();
@@ -70,5 +89,13 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
             attackAudioSource?.Stop();
             bladeTrailRenderer?.ClearTrail();
         }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            confirmedHitSoundVolume = Mathf.Clamp01(confirmedHitSoundVolume);
+            confirmedHitImpulseForce = Mathf.Max(0f, confirmedHitImpulseForce);
+        }
+#endif
     }
 }

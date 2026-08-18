@@ -5,6 +5,8 @@ namespace rudIsland.RPG3D.Player.Animations
     // 플레이어 Animator의 파라미터와 재생 시간을 한곳에서 관리한다.
     public sealed class PlayerAnimationController
     {
+        private const int BaseLayerIndex = 0;
+
         private static readonly int MoveAmountId = Animator.StringToHash("MoveAmount"); // 이동 정보
         private static readonly int InputDirXId = Animator.StringToHash("InputDirX"); // 이동 정보
         private static readonly int InputDirYId = Animator.StringToHash("InputDirY"); // 이동 정보
@@ -18,14 +20,10 @@ namespace rudIsland.RPG3D.Player.Animations
         private static readonly int AttackIndexId = Animator.StringToHash("AttackIndex"); // 공격 관련 설정 또는 상태
         private static readonly int HitId = Animator.StringToHash("Hit"); // 피격 또는 피해 관련 값
         private static readonly int DeathId = Animator.StringToHash("Death"); // 내부에서 사용하는 값
-        private static readonly int PlayerHitStateId = // 피격 또는 피해 관련 값
-            Animator.StringToHash("PlayerHit");
-        private static readonly int PlayerHitFullPathId = // 피격 또는 피해 관련 값
-            Animator.StringToHash("PlayerHit");
-        private static readonly int PlayerRollStateId = // 현재 행동 상태
-            Animator.StringToHash("PlayerRoll");
-        private static readonly int PlayerBlockIdleStateId =
-            Animator.StringToHash("PlayerBlockIdle");
+        private static readonly int PlayerHitShortNameId = Animator.StringToHash("PlayerHit");
+        private static readonly int PlayerHitFullPathId = Animator.StringToHash("Base Layer.PlayerHit");
+        private static readonly int PlayerRollStateId = Animator.StringToHash("PlayerRoll"); // 현재 행동 상태
+        private static readonly int PlayerBlockIdleStateId = Animator.StringToHash("PlayerBlockIdle");
         private static readonly int PlayerAttack01StateId = Animator.StringToHash("PlayerAttack01"); // 공격 관련 설정 또는 상태
         private static readonly int PlayerAttack02StateId = Animator.StringToHash("PlayerAttack02"); // 공격 관련 설정 또는 상태
         private static readonly int PlayerAttack03StateId = Animator.StringToHash("PlayerAttack03"); // 공격 관련 설정 또는 상태
@@ -132,7 +130,7 @@ namespace rudIsland.RPG3D.Player.Animations
             }
 
             playerAnimator.SetFloat(BlockMoveXId, moveInput.x, smoothTime, deltaTime);
-            playerAnimator.SetFloat(BlockMoveYId, Mathf.Max(0f, moveInput.y), smoothTime, deltaTime);
+            playerAnimator.SetFloat(BlockMoveYId, moveInput.y, smoothTime, deltaTime);
         }
 
         public void StopMove()
@@ -162,9 +160,7 @@ namespace rudIsland.RPG3D.Player.Animations
                 IsCurrentState(PlayerBlockIdleStateId);
         }
 
-        public void PlayRoll(
-            Vector2 rollInput,
-            bool startsAfterAttackCancel)
+        public void PlayRoll(Vector2 rollInput, bool startsAfterAttackCancel)
         {
             if (playerAnimator == null)
             {
@@ -221,9 +217,7 @@ namespace rudIsland.RPG3D.Player.Animations
 
         public bool TryGetRollTime(out float normalizedTime)
         {
-            return TryGetCurrentStateTime(
-                PlayerRollStateId,
-                out normalizedTime);
+            return TryGetCurrentStateTime(PlayerRollStateId, out normalizedTime);
         }
 
         public void PlayHitFromStart()
@@ -239,12 +233,15 @@ namespace rudIsland.RPG3D.Player.Animations
             playerAnimator.ResetTrigger(AttackId);
             playerAnimator.SetInteger(AttackIndexId, 0);
 
-            bool isPlayingHit = IsCurrentState(PlayerHitStateId);
-            bool isChangingToHit = IsChangingTo(PlayerHitStateId);
+            bool isPlayingHit = IsCurrentState(PlayerHitShortNameId);
+            bool isChangingToHit = IsChangingTo(PlayerHitShortNameId);
 
             if (isPlayingHit || isChangingToHit)
             {
-                playerAnimator.Play(PlayerHitFullPathId, 0, 0f);
+                playerAnimator.Play(
+                    PlayerHitFullPathId,
+                    BaseLayerIndex,
+                    0f);
                 return;
             }
 
@@ -255,8 +252,7 @@ namespace rudIsland.RPG3D.Player.Animations
         public bool TryGetAttackTime(out float normalizedTime)
         {
             normalizedTime = 0f;
-            if (!TryGetCurrentState(
-                    out AnimatorStateInfo stateInfo) ||
+            if (!TryGetCurrentState(out AnimatorStateInfo stateInfo) ||
                 !IsAttackState(stateInfo.shortNameHash))
             {
                 return false;
@@ -268,14 +264,13 @@ namespace rudIsland.RPG3D.Player.Animations
 
         public bool IsPlayingAttack(int attackNumber)
         {
-            return IsCurrentState(
-                GetAttackStateId(attackNumber));
+            return IsCurrentState(GetAttackStateId(attackNumber));
         }
 
         public bool TryGetHitTime(out float normalizedTime)
         {
             return TryGetCurrentStateTime(
-                PlayerHitStateId,
+                PlayerHitShortNameId,
                 out normalizedTime);
         }
 
@@ -333,11 +328,10 @@ namespace rudIsland.RPG3D.Player.Animations
         private bool IsInTransition()
         {
             return CanReadAnimator() &&
-                playerAnimator.IsInTransition(0);
+                playerAnimator.IsInTransition(BaseLayerIndex);
         }
 
-        private bool TryGetCurrentState(
-            out AnimatorStateInfo stateInfo)
+        private bool TryGetCurrentState(out AnimatorStateInfo stateInfo)
         {
             stateInfo = default;
             if (!CanReadAnimator())
@@ -345,7 +339,8 @@ namespace rudIsland.RPG3D.Player.Animations
                 return false;
             }
 
-            stateInfo = playerAnimator.GetCurrentAnimatorStateInfo(0);
+            stateInfo = playerAnimator.GetCurrentAnimatorStateInfo(
+                BaseLayerIndex);
             return true;
         }
 
@@ -358,8 +353,9 @@ namespace rudIsland.RPG3D.Player.Animations
         private bool IsChangingTo(int stateHash)
         {
             return IsInTransition() &&
-                playerAnimator.GetNextAnimatorStateInfo(0).shortNameHash ==
-                stateHash;
+                playerAnimator
+                    .GetNextAnimatorStateInfo(BaseLayerIndex)
+                    .shortNameHash == stateHash;
         }
 
         private bool IsCurrentOrNextState(int stateHash)
@@ -368,9 +364,7 @@ namespace rudIsland.RPG3D.Player.Animations
                 IsChangingTo(stateHash);
         }
 
-        private bool TryGetCurrentStateTime(
-            int stateHash,
-            out float normalizedTime)
+        private bool TryGetCurrentStateTime(int stateHash, out float normalizedTime)
         {
             normalizedTime = 0f;
             if (!TryGetCurrentState(out AnimatorStateInfo stateInfo) ||

@@ -19,9 +19,7 @@ namespace rudIsland.RPG3D.Player.Animations
 
             if (playerController == null)
             {
-                Debug.LogError(
-                    "PlayerAnimationEventReceiver가 PlayerController를 찾지 못했습니다.",
-                    this);
+                Debug.LogError("PlayerAnimationEventReceiver가 PlayerController를 찾지 못했습니다.", this);
                 enabled = false;
             }
         }
@@ -42,9 +40,9 @@ namespace rudIsland.RPG3D.Player.Animations
             playerController?.NotifyAttackHitEnded();
         }
 
-        public void EndAttackAnimationEvent()
+        public void EndAttackAnimationEvent(int attackNumber)
         {
-            playerController?.NotifyAttackAnimationEnded();
+            playerController?.NotifyAttackAnimationEnded(attackNumber);
         }
 
         public void BeginRollInvulnerabilityAnimationEvent()

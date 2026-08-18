@@ -1,4 +1,4 @@
-﻿using rudIsland.RPG3D.Player.Animations;
+using rudIsland.RPG3D.Player.Animations;
 using rudIsland.RPG3D.Player.States;
 using rudIsland.RPG3D.Player.Movement;
 
@@ -13,19 +13,15 @@ namespace rudIsland.RPG3D.Player.States.Attack
         private readonly PlayerStateMachine stateMachine;
         private readonly PlayerAnimationController animationController;
         private readonly PlayerAttackData[] attackData;
-        private readonly float inputBufferDuration;
         private readonly PlayerActionMovementCurve movementCurve;
 
         private PlayerAttackData currentAttackData;
         private bool isRunAttack;
         private bool hasAnimationStarted;
         private bool animationEndedByEvent;
-        private bool hasBufferedAttackInput;
-        private bool hasBufferedRollInput;
-        private bool isComboTurnWindowOpen;
-        private bool canStartRoll;
-        private float bufferedAttackInputAge;
-        private float bufferedRollInputAge;
+        private bool hasAttackHitEnded;
+        private bool hasAttackTime;
+        private float currentNormalizedTime;
 
         public bool IsFinished { get; private set; }
         public float AttackDamage => 
@@ -43,17 +39,27 @@ namespace rudIsland.RPG3D.Player.States.Attack
                 ? currentAttackData.HitStopDuration
                 : 0f;
         public PlayerAttackData CurrentAttackData => currentAttackData;
+        internal bool CanCancelToRoll =>
+            currentAttackData != null &&
+            hasAttackTime &&
+            currentAttackData.CanCancelToRollAt(currentNormalizedTime);
+        internal bool CanStartNextCombo =>
+            !isRunAttack &&
+            currentAttackData != null &&
+            currentAttackData.AttackNumber < LastComboNumber &&
+            hasAttackTime &&
+            currentAttackData.CanStartComboAt(
+                currentNormalizedTime,
+                hasAttackHitEnded);
 
         public PlayerAttackState(
             PlayerStateMachine stateMachine,
             PlayerAnimationController animationController,
-            PlayerAttackData[] attackData,
-            float inputBufferDuration)
+            PlayerAttackData[] attackData)
         {
             this.stateMachine = stateMachine;
             this.animationController = animationController;
             this.attackData = attackData;
-            this.inputBufferDuration = inputBufferDuration;
             movementCurve = new PlayerActionMovementCurve();
 
             ValidateAttackData(attackData);
@@ -76,9 +82,9 @@ namespace rudIsland.RPG3D.Player.States.Attack
             IsFinished = false;
             hasAnimationStarted = false;
             animationEndedByEvent = false;
-            isComboTurnWindowOpen = false;
-            ClearBufferedAttackInput();
-            ClearBufferedRollInput();
+            hasAttackHitEnded = false;
+            hasAttackTime = false;
+            currentNormalizedTime = 0f;
 
             currentAttackData = isRunAttack
                 ? attackData[LastComboNumber]
@@ -88,16 +94,8 @@ namespace rudIsland.RPG3D.Player.States.Attack
 
         public void Update(float deltaTime, PlayerStateInput input)
         {
-            CaptureAttackInput(deltaTime, input.AttackPressed);
-            CaptureRollInput(deltaTime, input.RollPressed);
             stateMachine.Movement.UpdateStoppedMove(deltaTime);
             animationController.StopMove();
-
-            if (isComboTurnWindowOpen)
-            {
-                stateMachine.UpdateAttackDirection();
-                stateMachine.UpdateAttackTurn(deltaTime);
-            }
 
             if (animationEndedByEvent)
             {
@@ -122,69 +120,44 @@ namespace rudIsland.RPG3D.Player.States.Attack
             }
 
             hasAnimationStarted = true;
-            canStartRoll =
-                normalizedTime >= currentAttackData.RollCancelStartTime;
-
-            // 같은 프레임에는 구르기를 콤보보다 먼저 처리한다.
-            if (canStartRoll && hasBufferedRollInput)
+            hasAttackTime = true;
+            currentNormalizedTime = normalizedTime;
+            if (currentAttackData.CanTurnAt(normalizedTime))
             {
-                return;
+                stateMachine.UpdateAttackDirection();
+                stateMachine.UpdateAttackTurn(deltaTime);
             }
 
-            float deltaDistance =
-                movementCurve.EvaluateDeltaDistance(normalizedTime);
+            float deltaDistance = movementCurve.EvaluateDeltaDistance(normalizedTime);
             stateMachine.Movement.ApplyAttackMovement(deltaDistance);
-
-            if (TryStartNextCombo(normalizedTime))
-            {
-                IsFinished = false;
-                return;
-            }
 
             IsFinished = normalizedTime >= AttackCompleteNormalizedTime;
         }
 
         public void Exit()
         {
-            isComboTurnWindowOpen = false;
-            ClearBufferedAttackInput();
-            ClearBufferedRollInput();
+            hasAttackHitEnded = false;
+            hasAttackTime = false;
             stateMachine.EndAttackHit();
             stateMachine.ClearAttackDirection();
             movementCurve.Reset();
         }
 
-        internal bool TryTakeRollRequest()
+        internal void NotifyAttackHitEnded()
         {
-            if (!canStartRoll || !hasBufferedRollInput)
-            {
-                return false;
-            }
-
-            ClearBufferedRollInput();
-            return true;
+            hasAttackHitEnded = true;
         }
 
-        internal void OpenComboTurnWindow()
+        internal void NotifyAnimationEnded(int attackNumber)
         {
-            if (isRunAttack ||
-                currentAttackData == null ||
-                currentAttackData.AttackNumber >= LastComboNumber)
-            {
-                return;
-            }
-
-            isComboTurnWindowOpen = true;
-        }
-
-        internal void NotifyAnimationEnded()
-        {
-            if (!hasAnimationStarted ||
-                !animationController.TryGetAttackTime(
-                    out float normalizedTime) ||
-                normalizedTime < AttackCompleteNormalizedTime ||
-                !animationController.IsPlayingAttack(
-                    currentAttackData.AttackNumber))
+            int currentAttackNumber = currentAttackData != null
+                ? currentAttackData.AttackNumber
+                : 0;
+            if (!CanAcceptAnimationEnd(
+                    attackNumber,
+                    currentAttackNumber,
+                    hasAnimationStarted,
+                    animationController.IsPlayingAttack(attackNumber)))
             {
                 return;
             }
@@ -192,26 +165,20 @@ namespace rudIsland.RPG3D.Player.States.Attack
             animationEndedByEvent = true;
         }
 
-        private void PlayCurrentAttack()
+        internal static bool CanAcceptAnimationEnd(
+            int eventAttackNumber,
+            int currentAttackNumber,
+            bool hasAnimationStarted,
+            bool isPlayingCurrentAttack)
         {
-            hasAnimationStarted = false;
-            animationEndedByEvent = false;
-            isComboTurnWindowOpen = false;
-            canStartRoll = false;
-            stateMachine.SetAttackDirection(
-                currentAttackData.AttackNumber == 1);
-            movementCurve.Begin(
-                currentAttackData.MoveDistance,
-                currentAttackData.MovementCurve);
-            animationController.PlayAttack(currentAttackData.AttackNumber);
+            return hasAnimationStarted &&
+                eventAttackNumber == currentAttackNumber &&
+                isPlayingCurrentAttack;
         }
 
-        private bool TryStartNextCombo(float normalizedTime)
+        internal bool TryStartNextCombo()
         {
-            if (isRunAttack ||
-                currentAttackData.AttackNumber >= LastComboNumber ||
-                normalizedTime < currentAttackData.NextInputTime ||
-                !hasBufferedAttackInput)
+            if (!CanStartNextCombo)
             {
                 return false;
             }
@@ -221,78 +188,33 @@ namespace rudIsland.RPG3D.Player.States.Attack
             if (!stateMachine.TryConsumeAttackStamina(
                     nextAttackData.StaminaCost))
             {
-                ClearBufferedAttackInput();
                 return false;
             }
 
-            ClearBufferedAttackInput();
             stateMachine.EndAttackHit();
             currentAttackData = nextAttackData;
             PlayCurrentAttack();
+            IsFinished = false;
             return true;
         }
 
-        private void CaptureAttackInput(float deltaTime, bool attackPressed)
+        private void PlayCurrentAttack()
         {
-            if (attackPressed)
-            {
-                hasBufferedAttackInput = true;
-                bufferedAttackInputAge = 0f;
-                return;
-            }
-
-            if (!hasBufferedAttackInput)
-            {
-                return;
-            }
-
-            bufferedAttackInputAge += deltaTime;
-            if (bufferedAttackInputAge > inputBufferDuration)
-            {
-                ClearBufferedAttackInput();
-            }
-        }
-
-        private void ClearBufferedAttackInput()
-        {
-            hasBufferedAttackInput = false;
-            bufferedAttackInputAge = 0f;
-        }
-
-        private void CaptureRollInput(float deltaTime, bool rollPressed)
-        {
-            if (rollPressed)
-            {
-                hasBufferedRollInput = true;
-                bufferedRollInputAge = 0f;
-                return;
-            }
-
-            if (!hasBufferedRollInput)
-            {
-                return;
-            }
-
-            bufferedRollInputAge += deltaTime;
-            if (bufferedRollInputAge > inputBufferDuration)
-            {
-                ClearBufferedRollInput();
-            }
-        }
-
-        private void ClearBufferedRollInput()
-        {
-            hasBufferedRollInput = false;
-            bufferedRollInputAge = 0f;
+            hasAnimationStarted = false;
+            animationEndedByEvent = false;
+            hasAttackHitEnded = false;
+            hasAttackTime = false;
+            currentNormalizedTime = 0f;
+            stateMachine.SetAttackDirection(false);
+            movementCurve.Begin(currentAttackData.MoveDistance, currentAttackData.MovementCurve);
+            animationController.PlayAttack(currentAttackData.AttackNumber);
         }
 
         private static void ValidateAttackData(PlayerAttackData[] attackData)
         {
             if (attackData == null || attackData.Length != LastComboNumber + 1)
             {
-                throw new System.ArgumentException(
-                    "PlayerAttackData는 공격 1~6까지 6개가 필요합니다.",
-                    nameof(attackData));
+                throw new System.ArgumentException("PlayerAttackData는 공격 1~6까지 6개가 필요합니다.", nameof(attackData));
             }
 
             for (int index = 0; index < attackData.Length; index++)
@@ -300,9 +222,7 @@ namespace rudIsland.RPG3D.Player.States.Attack
                 if (attackData[index] == null ||
                     attackData[index].AttackNumber != index + 1)
                 {
-                    throw new System.ArgumentException(
-                        $"PlayerAttackData[{index}]의 공격 번호가 올바르지 않습니다.",
-                        nameof(attackData));
+                    throw new System.ArgumentException($"PlayerAttackData[{index}]의 공격 번호가 올바르지 않습니다.", nameof(attackData));
                 }
             }
         }

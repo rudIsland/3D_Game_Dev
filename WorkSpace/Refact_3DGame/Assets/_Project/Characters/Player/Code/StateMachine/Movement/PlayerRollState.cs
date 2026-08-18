@@ -8,14 +8,12 @@ namespace rudIsland.RPG3D.Player.States.Movement
     // 구르기 애니메이션이 끝날 때까지 중력과 이동 Blend Tree 값을 갱신한다.
     internal sealed class PlayerRollState : IPlayerState
     {
-        // PlayerMovement.controller의 PlayerRoll -> PlayerIdle Exit Time과 맞춘다.
-        private const float RollCompleteNormalizedTime = 0.7f;
-
         private readonly PlayerStateMachine stateMachine; // 현재 행동 상태
         private readonly PlayerAnimationController animationController; // 씬 또는 시스템 참조
         private readonly float movementDistance;
         private readonly float sprintMovementDistance;
         private readonly AnimationCurve movementCurve;
+        private readonly float completeNormalizedTime;
         private readonly PlayerActionMovementCurve movementProgress;
         private bool startsAfterAttackCancel; // 기능 사용 여부
         private bool hasAnimationStarted; // 기능 사용 여부
@@ -27,13 +25,15 @@ namespace rudIsland.RPG3D.Player.States.Movement
             PlayerAnimationController animationController,
             float movementDistance,
             float sprintMovementDistance,
-            AnimationCurve movementCurve)
+            AnimationCurve movementCurve,
+            float completeNormalizedTime)
         {
             this.stateMachine = stateMachine;
             this.animationController = animationController;
             this.movementDistance = Mathf.Max(0f, movementDistance);
             this.sprintMovementDistance = Mathf.Max(0f, sprintMovementDistance);
             this.movementCurve = movementCurve;
+            this.completeNormalizedTime = Mathf.Clamp(completeNormalizedTime, 0.01f, 1f);
             movementProgress = new PlayerActionMovementCurve();
         }
 
@@ -46,12 +46,8 @@ namespace rudIsland.RPG3D.Player.States.Movement
                 stateMachine.Input.MoveValue.sqrMagnitude >= 0.95f
                     ? sprintMovementDistance
                     : movementDistance;
-            movementProgress.Begin(
-                selectedMovementDistance,
-                movementCurve);
-            animationController.PlayRoll(
-                stateMachine.Movement.RollDirectionInput,
-                startsAfterAttackCancel);
+            movementProgress.Begin(selectedMovementDistance, movementCurve);
+            animationController.PlayRoll(stateMachine.Movement.RollDirectionInput, startsAfterAttackCancel);
             startsAfterAttackCancel = false;
         }
 
@@ -68,12 +64,10 @@ namespace rudIsland.RPG3D.Player.States.Movement
             if (animationController.TryGetRollTime(out float normalizedTime))
             {
                 hasAnimationStarted = true;
-                float movementTime =
-                    normalizedTime / RollCompleteNormalizedTime;
-                float deltaDistance =
-                    movementProgress.EvaluateDeltaDistance(movementTime);
+                float movementTime = normalizedTime / completeNormalizedTime;
+                float deltaDistance = movementProgress.EvaluateDeltaDistance(movementTime);
                 stateMachine.Movement.ApplyRollMovement(deltaDistance);
-                IsFinished = normalizedTime >= RollCompleteNormalizedTime;
+                IsFinished = normalizedTime >= completeNormalizedTime;
                 return;
             }
 

@@ -3,18 +3,19 @@ using UnityEngine;
 
 namespace rudIsland.RPG3D.Player.States.Target
 {
-    // 카메라 전방 범위에서 가장 가까운 공격 가능 대상을 찾는다.
+    // 카메라 중심에 가까운 공격 가능 대상을 우선해 찾고 시야를 검사한다.
     public sealed class PlayerTargetFinder
     {
         private const int MaximumDetectedTargetCount = 32;
         private const float MinimumDirectionSqrMagnitude = 0.01f;
 
-        private readonly Collider[] detectedTargets =
-            new Collider[MaximumDetectedTargetCount];
+        private readonly Collider[] detectedTargets = new Collider[MaximumDetectedTargetCount];
         private readonly Transform playerTransform;
         private readonly Transform viewTransform;
         private readonly LayerMask targetLayers;
+        private readonly LayerMask obstructionLayers;
         private readonly float targetRange;
+        private readonly float targetHeightOffset;
         private readonly float minimumFacingDot;
         private Transform selectedTarget;
         private IUnitDeathState selectedTargetDeathState;
@@ -24,15 +25,17 @@ namespace rudIsland.RPG3D.Player.States.Target
             Transform viewTransform,
             LayerMask targetLayers,
             float targetRange,
-            float maximumTargetAngle)
+            float maximumTargetAngle,
+            LayerMask obstructionLayers,
+            float targetHeightOffset)
         {
             this.playerTransform = playerTransform;
             this.viewTransform = viewTransform;
             this.targetLayers = targetLayers;
+            this.obstructionLayers = obstructionLayers;
             this.targetRange = Mathf.Max(0f, targetRange);
-            minimumFacingDot = Mathf.Cos(
-                Mathf.Clamp(maximumTargetAngle, 0f, 180f) *
-                Mathf.Deg2Rad);
+            this.targetHeightOffset = Mathf.Max(0f, targetHeightOffset);
+            minimumFacingDot = Mathf.Cos(Mathf.Clamp(maximumTargetAngle, 0f, 180f) * Mathf.Deg2Rad);
         }
 
         public bool TryFindTarget(out Transform target)
@@ -53,7 +56,6 @@ namespace rudIsland.RPG3D.Player.States.Target
                 QueryTriggerInteraction.Collide);
 
             Vector3 viewForward = viewTransform.forward;
-            viewForward.y = 0f;
             if (viewForward.sqrMagnitude < MinimumDirectionSqrMagnitude)
             {
                 viewForward = playerTransform.forward;
@@ -63,7 +65,7 @@ namespace rudIsland.RPG3D.Player.States.Target
                 viewForward.Normalize();
             }
 
-            float nearestDistanceSquared = float.PositiveInfinity;
+            float bestScore = float.PositiveInfinity;
             for (int index = 0; index < detectedCount; index++)
             {
                 if (!TryGetTargetTransform(
@@ -75,25 +77,41 @@ namespace rudIsland.RPG3D.Player.States.Target
                     continue;
                 }
 
-                Vector3 toCandidate =
-                    candidate.position - playerTransform.position;
-                toCandidate.y = 0f;
-                float distanceSquared = toCandidate.sqrMagnitude;
+                Vector3 playerToCandidate = candidate.position - playerTransform.position;
+                playerToCandidate.y = 0f;
+                float distanceSquared = playerToCandidate.sqrMagnitude;
                 if (distanceSquared < MinimumDirectionSqrMagnitude ||
-                    distanceSquared >= nearestDistanceSquared)
+                    !IsTargetVisible(candidate))
+                {
+                    continue;
+                }
+
+                Vector3 viewToCandidate = GetTargetPoint(candidate) - viewTransform.position;
+                if (viewToCandidate.sqrMagnitude <
+                    MinimumDirectionSqrMagnitude)
                 {
                     continue;
                 }
 
                 float facingDot = Vector3.Dot(
                     viewForward,
-                    toCandidate / Mathf.Sqrt(distanceSquared));
+                    viewToCandidate.normalized);
                 if (facingDot < minimumFacingDot)
                 {
                     continue;
                 }
 
-                nearestDistanceSquared = distanceSquared;
+                float score = CalculateTargetScore(
+                    facingDot,
+                    minimumFacingDot,
+                    Mathf.Sqrt(distanceSquared),
+                    targetRange);
+                if (score >= bestScore)
+                {
+                    continue;
+                }
+
+                bestScore = score;
                 target = candidate;
                 selectedTarget = candidate;
                 selectedTargetDeathState = candidateDeathState;
@@ -102,7 +120,7 @@ namespace rudIsland.RPG3D.Player.States.Target
             return target != null;
         }
 
-        public bool IsTargetAvailable(
+        public bool IsTargetAliveAndInRange(
             Transform target,
             float maximumDistance)
         {
@@ -124,6 +142,56 @@ namespace rudIsland.RPG3D.Player.States.Target
                 clampedMaximumDistance * clampedMaximumDistance;
         }
 
+        public bool IsTargetVisible(Transform target)
+        {
+            if (target == null || obstructionLayers.value == 0)
+            {
+                return target != null;
+            }
+
+            Vector3 start = viewTransform.position;
+            Vector3 toTarget = GetTargetPoint(target) - start;
+            float distance = toTarget.magnitude;
+            if (distance <= 0.0001f ||
+                !Physics.Raycast(
+                    start,
+                    toTarget / distance,
+                    out RaycastHit hit,
+                    distance,
+                    obstructionLayers,
+                    QueryTriggerInteraction.Ignore))
+            {
+                return true;
+            }
+
+            Transform hitTransform = hit.collider.transform;
+            return hitTransform == target ||
+                hitTransform.IsChildOf(target) ||
+                target.IsChildOf(hitTransform);
+        }
+
+        internal static float CalculateTargetScore(
+            float facingDot,
+            float minimumFacingDot,
+            float distance,
+            float maximumDistance)
+        {
+            float angleRange = Mathf.Max(
+                0.0001f,
+                1f - minimumFacingDot);
+            float angleScore = Mathf.Clamp01(
+                (1f - facingDot) / angleRange);
+            float distanceScore = maximumDistance > 0f
+                ? Mathf.Clamp01(distance / maximumDistance)
+                : 1f;
+            return angleScore * 0.8f + distanceScore * 0.2f;
+        }
+
+        private Vector3 GetTargetPoint(Transform target)
+        {
+            return target.position + Vector3.up * targetHeightOffset;
+        }
+
         private bool TryGetTargetTransform(
             Collider targetCollider,
             out Transform target,
@@ -136,8 +204,7 @@ namespace rudIsland.RPG3D.Player.States.Target
                 return false;
             }
 
-            IUnitDeathState deathState =
-                targetCollider.GetComponentInParent<IUnitDeathState>();
+            IUnitDeathState deathState = targetCollider.GetComponentInParent<IUnitDeathState>();
             Component deathStateComponent = deathState as Component;
             if (deathStateComponent == null ||
                 deathStateComponent.transform == playerTransform ||

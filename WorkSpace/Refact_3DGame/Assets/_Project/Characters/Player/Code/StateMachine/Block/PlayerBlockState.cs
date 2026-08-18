@@ -1,6 +1,7 @@
 using rudIsland.RPG3D.Player.Animations;
 using rudIsland.RPG3D.Player.Runtime.Hit;
 using rudIsland.RPG3D.Player.States;
+using UnityEngine;
 
 namespace rudIsland.RPG3D.Player.States.Block
 {
@@ -10,41 +11,74 @@ namespace rudIsland.RPG3D.Player.States.Block
         private readonly PlayerStateMachine stateMachine; // 현재 행동 상태
         private readonly PlayerAnimationController animationController; // 씬 또는 시스템 참조
         private readonly PlayerGuardHitBox guardHitBox;
+        private readonly float guardRaiseDuration;
+        private float guardRaiseElapsedTime;
+
+        internal bool IsGuardReady { get; private set; }
 
         public PlayerBlockState(
             PlayerStateMachine stateMachine,
             PlayerAnimationController animationController,
-            PlayerGuardHitBox guardHitBox)
+            PlayerGuardHitBox guardHitBox,
+            float guardRaiseDuration)
         {
             this.stateMachine = stateMachine;
             this.animationController = animationController;
             this.guardHitBox = guardHitBox;
+            this.guardRaiseDuration = Mathf.Max(0f, guardRaiseDuration);
         }
 
         public void Enter()
         {
+            guardRaiseElapsedTime = 0f;
+            IsGuardReady = guardRaiseDuration <= 0f;
             animationController.StopMove();
             stateMachine.SetAttackDirection(true);
             animationController.SetBlocking(true);
-            guardHitBox?.SetGuardActive(false);
+            guardHitBox?.SetGuardActive(IsGuardReady);
         }
 
         public void Update(float deltaTime, PlayerStateInput input)
         {
-            stateMachine.Movement.UpdateStoppedMove(deltaTime);
-            animationController.UpdateBlockMove(
-                stateMachine.Movement.GetLocalMoveInput(),
-                deltaTime);
-            guardHitBox?.SetGuardActive(
-                animationController.IsPlayingBlockIdle());
+            UpdateGuardReady(deltaTime);
+
+            bool canGuardMove =
+                IsGuardReady &&
+                animationController.IsPlayingBlockIdle();
+            if (canGuardMove)
+            {
+                stateMachine.UpdateAttackDirection();
+                stateMachine.UpdateAttackTurn(deltaTime);
+                stateMachine.Movement.UpdateGuardMove(deltaTime);
+            }
+            else
+            {
+                stateMachine.Movement.UpdateStoppedMove(deltaTime);
+            }
+
+            animationController.UpdateBlockMove(stateMachine.Movement.GetLocalMoveInput(), deltaTime);
+            guardHitBox?.SetGuardActive(IsGuardReady);
         }
 
         public void Exit()
         {
+            guardRaiseElapsedTime = 0f;
+            IsGuardReady = false;
             animationController.StopMove();
             animationController.SetBlocking(false);
             guardHitBox?.SetGuardActive(false);
             stateMachine.ClearAttackDirection();
+        }
+
+        private void UpdateGuardReady(float deltaTime)
+        {
+            if (IsGuardReady)
+            {
+                return;
+            }
+
+            guardRaiseElapsedTime += Mathf.Max(0f, deltaTime);
+            IsGuardReady = guardRaiseElapsedTime >= guardRaiseDuration;
         }
     }
 }

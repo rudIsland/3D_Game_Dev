@@ -12,6 +12,7 @@ namespace rudIsland.RPG3D.Player.States.Actions
         private readonly PlayerBlockState blockState;
         private readonly PlayerRollState rollState;
         private readonly PlayerAttackState attackState;
+        private readonly PlayerActionInputBuffer inputBuffer;
 
         private IPlayerState currentState;
         private bool isEnabled;
@@ -20,19 +21,23 @@ namespace rudIsland.RPG3D.Player.States.Actions
         public bool IsRolling => ReferenceEquals(currentState, rollState);
         public bool IsAttacking => ReferenceEquals(currentState, attackState);
         public bool IsMoving => ReferenceEquals(currentState, moveState);
+        public bool IsGuardReady =>
+            IsBlocking && blockState.IsGuardReady;
 
         public PlayerActionStateMachine(
             PlayerStateMachine stateMachine,
             PlayerMoveState moveState,
             PlayerBlockState blockState,
             PlayerRollState rollState,
-            PlayerAttackState attackState)
+            PlayerAttackState attackState,
+            float inputBufferDuration)
         {
             this.stateMachine = stateMachine;
             this.moveState = moveState;
             this.blockState = blockState;
             this.rollState = rollState;
             this.attackState = attackState;
+            inputBuffer = new PlayerActionInputBuffer(inputBufferDuration);
         }
 
         public void Enable()
@@ -43,6 +48,7 @@ namespace rudIsland.RPG3D.Player.States.Actions
             }
 
             isEnabled = true;
+            inputBuffer.Clear();
             ChangeState(moveState);
         }
 
@@ -53,12 +59,18 @@ namespace rudIsland.RPG3D.Player.States.Actions
                 return;
             }
 
+            inputBuffer.Update(
+                deltaTime,
+                input.RollPressed,
+                input.AttackPressed);
+
             if (ReferenceEquals(currentState, rollState))
             {
                 currentState.Update(deltaTime, input);
                 if (rollState.IsFinished)
                 {
                     ChangeState(input.IsBlocking ? blockState : moveState);
+                    TryStartReadyAction(deltaTime, input);
                 }
 
                 return;
@@ -67,18 +79,28 @@ namespace rudIsland.RPG3D.Player.States.Actions
             if (ReferenceEquals(currentState, attackState))
             {
                 currentState.Update(deltaTime, input);
-                if (attackState.TryTakeRollRequest() &&
-                    stateMachine.TryStartAttackCancelRoll())
+                if (attackState.CanCancelToRoll && inputBuffer.TryTake(PlayerBufferedAction.Roll))
                 {
-                    rollState.StartAfterAttackCancel();
-                    ChangeState(rollState);
-                    currentState.Update(deltaTime, input);
+                    if (stateMachine.TryStartAttackCancelRoll())
+                    {
+                        rollState.StartAfterAttackCancel();
+                        ChangeState(rollState);
+                        currentState.Update(deltaTime, input);
+                    }
+
+                    return;
+                }
+
+                if (attackState.CanStartNextCombo && inputBuffer.TryTake(PlayerBufferedAction.Attack))
+                {
+                    attackState.TryStartNextCombo();
                     return;
                 }
 
                 if (attackState.IsFinished)
                 {
                     ChangeState(input.IsBlocking ? blockState : moveState);
+                    TryStartReadyAction(deltaTime, input);
                 }
 
                 return;
@@ -86,6 +108,17 @@ namespace rudIsland.RPG3D.Player.States.Actions
 
             if (ReferenceEquals(currentState, blockState))
             {
+                if (inputBuffer.TryTake(PlayerBufferedAction.Roll))
+                {
+                    if (stateMachine.TryStartRoll())
+                    {
+                        ChangeState(rollState);
+                        currentState.Update(deltaTime, input);
+                    }
+
+                    return;
+                }
+
                 currentState.Update(deltaTime, input);
                 if (!input.IsBlocking)
                 {
@@ -102,30 +135,12 @@ namespace rudIsland.RPG3D.Player.States.Actions
                 return;
             }
 
-            if (input.RollPressed && stateMachine.TryStartRoll())
-            {
-                ChangeState(rollState);
-                currentState.Update(deltaTime, input);
-                return;
-            }
-
-            if (input.AttackPressed && stateMachine.TryPrepareAttack())
-            {
-                ChangeState(attackState);
-                currentState.Update(deltaTime, new PlayerStateInput(
-                    false,
-                    false,
-                    false,
-                    input.IsBlocking));
-                return;
-            }
-
-            ChangeState(moveState);
-            currentState.Update(deltaTime, input);
+            TryStartReadyAction(deltaTime, input);
         }
 
         public void Disable()
         {
+            inputBuffer.Clear();
             if (!isEnabled)
             {
                 return;
@@ -134,6 +149,38 @@ namespace rudIsland.RPG3D.Player.States.Actions
             currentState?.Exit();
             currentState = null;
             isEnabled = false;
+        }
+
+        private void TryStartReadyAction(float deltaTime, PlayerStateInput input)
+        {
+            if (!ReferenceEquals(currentState, moveState))
+            {
+                return;
+            }
+
+            if (inputBuffer.TryTake(PlayerBufferedAction.Roll))
+            {
+                if (stateMachine.TryStartRoll())
+                {
+                    ChangeState(rollState);
+                    currentState.Update(deltaTime, input);
+                }
+
+                return;
+            }
+
+            if (inputBuffer.TryTake(PlayerBufferedAction.Attack))
+            {
+                if (stateMachine.TryPrepareAttack())
+                {
+                    ChangeState(attackState);
+                    currentState.Update(deltaTime, input);
+                }
+
+                return;
+            }
+
+            currentState.Update(deltaTime, input);
         }
 
         private void ChangeState(IPlayerState nextState)

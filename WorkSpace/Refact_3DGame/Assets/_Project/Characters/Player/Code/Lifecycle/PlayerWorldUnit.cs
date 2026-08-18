@@ -46,11 +46,9 @@ namespace rudIsland.RPG3D.Player
                 return PlayerHitResult.Avoided;
             }
 
-            if (hitRequest.Damage.CanBlock &&
-                playerStateMachine.CanBlockHit(hitRequest.PushDirection))
+            if (hitRequest.Damage.CanBlock && playerStateMachine.CanBlockHit(hitRequest.PushDirection))
             {
-                if (playerStamina.TryConsumeGuard(
-                    hitRequest.Damage.GuardStaminaDamage))
+                if (playerStamina.TryConsumeGuard(hitRequest.Damage.GuardStaminaDamage))
                 {
                     hitStop.Request(CombatHitStop.GuardDuration);
                     playerStateMachine.NotifyAttackBlocked();
@@ -58,7 +56,7 @@ namespace rudIsland.RPG3D.Player
                 }
 
                 hitStop.Request(hitRequest.Damage.HitStopDuration);
-                playerStateMachine.ChangeToHitState(in hitRequest);
+                playerStateMachine.ChangeToGuardBreakState(in hitRequest);
                 return PlayerHitResult.GuardBroken;
             }
 
@@ -123,9 +121,7 @@ namespace rudIsland.RPG3D.Player
                 playerInput.TakeRollInput(),
                 playerInput.TakeAttackInput(),
                 playerInput.TakeTargetToggleInput());
-            playerStamina.UpdateRecovery(
-                deltaTime,
-                playerStateMachine.IsWalking);
+            playerStamina.UpdateRecovery(deltaTime, playerStateMachine.StaminaRecoveryRate);
         }
 
         protected override void OnUnitDisable()

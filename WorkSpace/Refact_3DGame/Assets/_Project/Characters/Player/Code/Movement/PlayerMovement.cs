@@ -9,15 +9,19 @@ namespace rudIsland.RPG3D.Player.Movement
         private readonly Transform playerTransform; // 씬 또는 시스템 참조
         private readonly CharacterController characterController; // 씬 또는 시스템 참조
         private readonly PlayerInputReader playerInput; // 입력 또는 행동 여부
-        private readonly float turnSpeed; // 이동 속도
+        private readonly float attackTurnSpeed;
         private readonly float walkSpeed; // 이동 속도
+        private readonly float guardMoveSpeed;
         private readonly float sprintSpeed; // 이동 속도
+        private readonly float moveAcceleration;
+        private readonly float moveDeceleration;
         private readonly float gravity; // 내부에서 사용하는 값
         private readonly float groundPull; // 내부에서 사용하는 값
         private readonly PlayerFreeLookMovement freeLookMovement;
         private readonly PlayerTargetMovement targetMovement;
 
         private float verticalSpeed; // 이동 속도
+        private Vector3 horizontalVelocity;
         private Vector3 rollWorldDirection;
         private Vector3 attackDirection; // 공격 관련 설정 또는 상태
         private bool hasAttackDirection; // 기능 사용 여부
@@ -35,27 +39,35 @@ namespace rudIsland.RPG3D.Player.Movement
             Transform moveCamera,
             CharacterController characterController,
             PlayerInputReader playerInput,
-            float turnSpeed,
+            float freeMoveTurnSpeed,
+            float targetMoveTurnSpeed,
+            float attackTurnSpeed,
             float walkSpeed,
+            float guardMoveSpeed,
             float sprintSpeed,
+            float moveAcceleration,
+            float moveDeceleration,
             float gravity,
             float groundPull)
         {
             this.playerTransform = playerTransform;
             this.characterController = characterController;
             this.playerInput = playerInput;
-            this.turnSpeed = Mathf.Max(0f, turnSpeed);
+            this.attackTurnSpeed = Mathf.Max(0f, attackTurnSpeed);
             this.walkSpeed = Mathf.Max(0f, walkSpeed);
+            this.guardMoveSpeed = Mathf.Clamp(guardMoveSpeed, 0f, this.walkSpeed);
             this.sprintSpeed = Mathf.Max(this.walkSpeed, sprintSpeed);
+            this.moveAcceleration = Mathf.Max(0f, moveAcceleration);
+            this.moveDeceleration = Mathf.Max(0f, moveDeceleration);
             this.gravity = gravity;
             this.groundPull = groundPull;
             freeLookMovement = new PlayerFreeLookMovement(
                 playerTransform,
                 moveCamera,
-                this.turnSpeed);
+                Mathf.Max(0f, freeMoveTurnSpeed));
             targetMovement = new PlayerTargetMovement(
                 playerTransform,
-                this.turnSpeed);
+                Mathf.Max(0f, targetMoveTurnSpeed));
             currentMovementMode = freeLookMovement;
         }
 
@@ -66,7 +78,21 @@ namespace rudIsland.RPG3D.Player.Movement
             UpdateVerticalSpeed(deltaTime);
 
             float moveSpeed = isSprinting ? sprintSpeed : walkSpeed;
-            Vector3 moveVelocity = moveDirection * moveSpeed;
+            UpdateHorizontalVelocity(moveDirection * moveSpeed, deltaTime);
+            Vector3 moveVelocity = horizontalVelocity;
+            moveVelocity.y = verticalSpeed;
+            ApplyMovement(moveVelocity * deltaTime);
+        }
+
+        public void UpdateGuardMove(float deltaTime)
+        {
+            Vector3 moveDirection = GetMoveDirection();
+            UpdateVerticalSpeed(deltaTime);
+
+            UpdateHorizontalVelocity(
+                moveDirection * guardMoveSpeed,
+                deltaTime);
+            Vector3 moveVelocity = horizontalVelocity;
             moveVelocity.y = verticalSpeed;
             ApplyMovement(moveVelocity * deltaTime);
         }
@@ -85,6 +111,7 @@ namespace rudIsland.RPG3D.Player.Movement
 
         public void UpdateStoppedMove(float deltaTime)
         {
+            UpdateHorizontalVelocity(Vector3.zero, deltaTime);
             UpdateVerticalSpeed(deltaTime);
             ApplyMovement(Vector3.up * (verticalSpeed * deltaTime));
         }
@@ -108,8 +135,8 @@ namespace rudIsland.RPG3D.Player.Movement
 
         private void SetRollDirection()
         {
-            Vector2 rollInput =
-                Vector2.ClampMagnitude(playerInput.MoveValue, 1f);
+            horizontalVelocity = Vector3.zero;
+            Vector2 rollInput = Vector2.ClampMagnitude(playerInput.MoveValue, 1f);
 
             RollDirectionInput = rollInput.sqrMagnitude < 0.01f ? Vector2.down
                 : currentMovementMode.GetRollDirection(rollInput.normalized);
@@ -136,8 +163,7 @@ namespace rudIsland.RPG3D.Player.Movement
             hasAttackDirection = true;
             if (rotateImmediately)
             {
-                playerTransform.rotation =
-                    Quaternion.LookRotation(attackDirection);
+                playerTransform.rotation = Quaternion.LookRotation(attackDirection);
             }
         }
 
@@ -149,7 +175,7 @@ namespace rudIsland.RPG3D.Player.Movement
 
         public void UpdateAttackTurn(float deltaTime)
         {
-            if (!hasAttackDirection || turnSpeed <= 0f)
+            if (!hasAttackDirection || attackTurnSpeed <= 0f)
             {
                 return;
             }
@@ -158,7 +184,7 @@ namespace rudIsland.RPG3D.Player.Movement
             playerTransform.rotation = Quaternion.RotateTowards(
                 playerTransform.rotation,
                 wantedRotation,
-                turnSpeed * deltaTime);
+                attackTurnSpeed * deltaTime);
         }
 
         public void ClearAttackDirection()
@@ -189,10 +215,9 @@ namespace rudIsland.RPG3D.Player.Movement
             ApplyMovement(rollWorldDirection * deltaDistance);
         }
 
-        public void ApplyHitMovement(
-            Vector3 horizontalMovement,
-            float deltaTime)
+        public void ApplyHitMovement(Vector3 horizontalMovement, float deltaTime)
         {
+            horizontalVelocity = Vector3.zero;
             UpdateVerticalSpeed(deltaTime);
             horizontalMovement.y = verticalSpeed * deltaTime;
             ApplyMovement(horizontalMovement);
@@ -206,17 +231,13 @@ namespace rudIsland.RPG3D.Player.Movement
                 return Vector2.zero;
             }
 
-            Vector3 localDirection = playerTransform.InverseTransformDirection(
-                moveDirection.normalized);
-            return Vector2.ClampMagnitude(
-                new Vector2(localDirection.x, localDirection.z),
-                1f);
+            Vector3 localDirection = playerTransform.InverseTransformDirection(moveDirection.normalized);
+            return Vector2.ClampMagnitude(new Vector2(localDirection.x, localDirection.z), 1f);
         }
 
         private Vector3 GetMoveDirection()
         {
-            Vector2 moveInput =
-                Vector2.ClampMagnitude(playerInput.MoveValue, 1f);
+            Vector2 moveInput = Vector2.ClampMagnitude(playerInput.MoveValue, 1f);
             return currentMovementMode.GetMoveDirection(moveInput);
         }
 
@@ -230,6 +251,22 @@ namespace rudIsland.RPG3D.Player.Movement
             }
 
             verticalSpeed += gravity * deltaTime;
+        }
+
+        private void UpdateHorizontalVelocity(
+            Vector3 wantedVelocity,
+            float deltaTime)
+        {
+            bool isSlowingDown =
+                wantedVelocity.sqrMagnitude < horizontalVelocity.sqrMagnitude ||
+                Vector3.Dot(wantedVelocity, horizontalVelocity) < 0f;
+            float speedChange = isSlowingDown
+                ? moveDeceleration
+                : moveAcceleration;
+            horizontalVelocity = Vector3.MoveTowards(
+                horizontalVelocity,
+                wantedVelocity,
+                speedChange * deltaTime);
         }
 
         private void ApplyMovement(Vector3 requestedMovement)

@@ -32,8 +32,7 @@ namespace rudIsland.RPG3D.Player.Input
         {
             if (playerControls == null)
             {
-                throw new InvalidOperationException(
-                    "PlayerInputReader.Create()를 먼저 호출해야 합니다.");
+                throw new InvalidOperationException("PlayerInputReader.Create()를 먼저 호출해야 합니다.");
             }
 
             playerControls.Player.Enable();
@@ -90,7 +89,6 @@ namespace rudIsland.RPG3D.Player.Input
             }
 
             hasRollInput = false;
-            hasAttackInput = false;
             return true;
         }
 

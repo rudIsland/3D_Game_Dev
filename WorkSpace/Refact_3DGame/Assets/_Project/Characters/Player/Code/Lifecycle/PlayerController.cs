@@ -28,34 +28,35 @@ namespace rudIsland.RPG3D.Player
         IPlayerDamageReceiver,
         IUnitDeathState
     {
-        private const int ActiveCameraPriority = 20;
-        private const int InactiveCameraPriority = 10;
-
         [Header("필수 연결")]
         [SerializeField] private WorldObjectManager worldObjectManager; // 씬 또는 시스템 참조
         [SerializeField] private Transform moveCamera; // 이동 정보
         [SerializeField] private Animator playerAnimator; // 애니메이터 참조
 
-        [Header("타깃 전환")]
+        [Header("락온")]
         [SerializeField] private CinemachineFreeLook playerFreeLookCamera;
         [SerializeField] private CinemachineFreeLook playerTargetLookCamera;
         [SerializeField] private LayerMask targetLayers;
+        [SerializeField] private LayerMask targetObstructionLayers;
         [SerializeField, Min(0f)] private float targetRange = 12f;
         [SerializeField, Min(0f)] private float targetBreakDistance = 15f;
         [SerializeField, Range(0f, 180f)] private float targetMaximumAngle = 70f;
-        [SerializeField, Min(0f)] private float targetCameraTurnSpeed = 540f;
-        [SerializeField, Range(0f, 1f)] private float targetCameraVerticalValue = 0.5f;
+        [SerializeField, Min(0f)] private float targetHiddenGraceDuration = 0.35f;
+        [SerializeField, Min(0f)] private float targetHeightOffset = 1.2f;
 
         [Header("생명")]
         [SerializeField, Min(1f)] private float maxHealth = 100f; // 최대 체력
 
         [Header("Stamina")]
         [SerializeField, Min(1f)] private float maxStamina = 100f;
-        [SerializeField, Min(0f)] private float staminaRecoverDelay = 1f;
-        [SerializeField, Min(0f)] private float staminaRecoverSpeed = 20f;
+        [SerializeField, Min(0f)] private float staminaRecoverDelay = 0.8f;
+        [SerializeField, Min(0f)] private float staminaRecoverSpeed = 35f;
+        [SerializeField, Range(0f, 1f)]
+        private float guardStaminaRecoveryRate = 0f;
         [SerializeField, Min(0f)] private float rollStaminaCost = 25f;
         [SerializeField, Min(0f)]
         private float sprintStaminaCostPerSecond = 15f;
+        [SerializeField, Min(0f)] private float sprintRestartStamina = 20f;
 
 #if UNITY_EDITOR
         [Header("체력 확인")]
@@ -63,22 +64,29 @@ namespace rudIsland.RPG3D.Player
 #endif
 
         [Header("회전")]
-        [SerializeField] private float turnSpeed = 360f; // 이동 속도
+        [FormerlySerializedAs("turnSpeed")]
+        [SerializeField, Min(0f)] private float freeMoveTurnSpeed = 720f;
+        [SerializeField, Min(0f)] private float targetMoveTurnSpeed = 540f;
+        [SerializeField, Min(0f)] private float attackTurnSpeed = 360f;
 
         [Header("입력 이동")]
-        [SerializeField, Min(0f)] private float walkSpeed = 2.5f; // 걷기 속도
-        [SerializeField, Min(0f)] private float sprintSpeed = 5f; // 달리기 속도
+        [SerializeField, Min(0f)] private float walkSpeed = 2.8f; // 걷기 속도
+        [SerializeField, Min(0f)] private float guardMoveSpeed = 1.5f;
+        [SerializeField, Min(0f)] private float sprintSpeed = 5.5f; // 달리기 속도
+        [SerializeField, Min(0f)] private float moveAcceleration = 30f;
+        [SerializeField, Min(0f)] private float moveDeceleration = 40f;
 
         [Header("이동 애니메이션")]
-        [SerializeField] private float animationSmoothTime = 0.12f; // 시간 설정
+        [SerializeField] private float animationSmoothTime = 0.06f; // 시간 설정
 
         [Header("구르기 동작 이동")]
         [FormerlySerializedAs("rollDistanceScale")]
-        [SerializeField, Min(0f)] private float rollDistance = 2f;
+        [SerializeField, Min(0f)] private float rollDistance = 2.2f;
         [SerializeField, Min(0f)] private float sprintRollDistance = 2.5f;
+        [SerializeField, Range(0.01f, 1f)]
+        private float rollCompleteNormalizedTime = 0.7f;
         [SerializeField]
-        private AnimationCurve rollMovementCurve =
-            CreateDefaultRollMovementCurve();
+        private AnimationCurve rollMovementCurve = CreateDefaultRollMovementCurve();
 
         [Header("이동 소리")]
         [SerializeField] private AudioClip[] walkFootstepSounds;
@@ -93,12 +101,13 @@ namespace rudIsland.RPG3D.Player
         [SerializeField] private PlayerDamageAudio playerDamageAudio;
 
         [Header("공격 데이터")]
-        [SerializeField] private PlayerAttackData[] attackData =
-            new PlayerAttackData[6];
+        [SerializeField] private PlayerAttackData[] attackData = new PlayerAttackData[6];
 
-        [Header("공격 입력 버퍼")]
+        [Header("행동 입력 버퍼")]
         [Tooltip("공격 중 미리 누른 다음 공격과 구르기 입력을 보관하는 시간입니다.")]
-        [SerializeField, Min(0f)] private float attackInputBufferDuration = 0.25f; // 시간 설정
+        [FormerlySerializedAs("attackInputBufferDuration")]
+        [SerializeField, Min(0f)]
+        private float actionInputBufferDuration = 0.2f;
 
         [Header("중력")]
         [SerializeField] private float gravity = -22f; // Inspector 설정 값
@@ -113,13 +122,15 @@ namespace rudIsland.RPG3D.Player
 
         [Header("방어 판정")]
         [SerializeField, Range(0f, 180f)] private float guardAngle = 120f;
+        [SerializeField, Min(0f)] private float guardRaiseDuration = 0.1f;
+        [SerializeField, Min(0f)]
+        private float guardBreakControlLockDuration = 1f;
         [SerializeField] private PlayerGuardHitBox guardHitBox;
 
         [Header("피격 이동")]
         [SerializeField, Min(0.01f)] private float hitPushDuration = 0.15f;
         [SerializeField]
-        private AnimationCurve hitPushCurve =
-            CreateDefaultHitPushCurve();
+        private AnimationCurve hitPushCurve = CreateDefaultHitPushCurve();
 
         private CharacterController characterController; // 씬 또는 시스템 참조
         private PlayerInputReader playerInput; // 입력 또는 행동 여부
@@ -141,18 +152,14 @@ namespace rudIsland.RPG3D.Player
                 playerFreeLookCamera == null ||
                 playerTargetLookCamera == null)
             {
-                Debug.LogError(
-                    "PlayerController에 WorldObjectManager와 이동 기준 카메라가 필요합니다.",
-                    this);
+                Debug.LogError("PlayerController에 WorldObjectManager와 이동 기준 카메라가 필요합니다.", this);
                 enabled = false;
                 return;
             }
 
             if (!HasValidAttackData())
             {
-                Debug.LogError(
-                    "PlayerController에 공격 1~6 PlayerAttackData가 필요합니다.",
-                    this);
+                Debug.LogError("PlayerController에 공격 1~6 PlayerAttackData가 필요합니다.", this);
                 enabled = false;
                 return;
             }
@@ -167,27 +174,22 @@ namespace rudIsland.RPG3D.Player
             attackEffectPlayer = GetComponent<PlayerAttackEffectPlayer>();
             if (attackEffectPlayer == null)
             {
-                attackEffectPlayer =
-                    gameObject.AddComponent<PlayerAttackEffectPlayer>();
+                attackEffectPlayer = gameObject.AddComponent<PlayerAttackEffectPlayer>();
             }
 
             if (playerDamageAudio == null)
             {
-                playerDamageAudio =
-                    GetComponentInChildren<PlayerDamageAudio>(true);
+                playerDamageAudio = GetComponentInChildren<PlayerDamageAudio>(true);
             }
 
             if (playerDamageAudio == null)
             {
-                Debug.LogError(
-                    "PlayerController에 PlayerDamageAudio 연결이 필요합니다.",
-                    this);
+                Debug.LogError("PlayerController에 PlayerDamageAudio 연결이 필요합니다.", this);
             }
 
             if (playerAnimator != null)
             {
-                footstepAudio =
-                    playerAnimator.GetComponent<PlayerFootstepAudio>();
+                footstepAudio = playerAnimator.GetComponent<PlayerFootstepAudio>();
                 if (footstepAudio == null)
                 {
                     footstepAudio =
@@ -207,9 +209,7 @@ namespace rudIsland.RPG3D.Player
 
             if (guardHitBox == null)
             {
-                Debug.LogError(
-                    "PlayerController에 방패의 PlayerGuardHitBox 연결이 필요합니다.",
-                    this);
+                Debug.LogError("PlayerController에 방패의 PlayerGuardHitBox 연결이 필요합니다.", this);
             }
 
             if (rollMovementCurve == null || rollMovementCurve.length < 2)
@@ -224,9 +224,7 @@ namespace rudIsland.RPG3D.Player
 
             if (weaponHitStart == null || weaponHitEnd == null)
             {
-                Debug.LogError(
-                    "PlayerController에 검의 Weapon Hit Start와 End가 필요합니다.",
-                    this);
+                Debug.LogError("PlayerController에 검의 Weapon Hit Start와 End가 필요합니다.", this);
             }
 
             LayerMask attackMask =
@@ -234,9 +232,7 @@ namespace rudIsland.RPG3D.Player
                     ? attackLayers
                     : targetLayers;
 
-            attackEffectPlayer.Create(
-                weaponHitStart,
-                weaponHitEnd);
+            attackEffectPlayer.Create(weaponHitStart, weaponHitEnd);
 
             playerInput = new PlayerInputReader();
             playerMovement = new PlayerMovement(
@@ -244,9 +240,14 @@ namespace rudIsland.RPG3D.Player
                 moveCamera,
                 characterController,
                 playerInput,
-                turnSpeed,
+                freeMoveTurnSpeed,
+                targetMoveTurnSpeed,
+                attackTurnSpeed,
                 walkSpeed,
+                guardMoveSpeed,
                 sprintSpeed,
+                moveAcceleration,
+                moveDeceleration,
                 gravity,
                 groundPull);
             var targetFinder = new PlayerTargetFinder(
@@ -254,15 +255,12 @@ namespace rudIsland.RPG3D.Player
                 moveCamera,
                 targetLayers,
                 targetRange,
-                targetMaximumAngle);
+                targetMaximumAngle,
+                targetObstructionLayers,
+                targetHeightOffset);
             var targetCamera = new PlayerTargetCamera(
-                transform,
                 playerFreeLookCamera,
-                playerTargetLookCamera,
-                ActiveCameraPriority,
-                InactiveCameraPriority,
-                targetCameraTurnSpeed,
-                targetCameraVerticalValue);
+                playerTargetLookCamera);
             var playerStamina = new PlayerStamina(
                 maxStamina,
                 staminaRecoverDelay,
@@ -272,20 +270,26 @@ namespace rudIsland.RPG3D.Player
                 playerInput,
                 playerMovement,
                 playerStamina,
+                guardStaminaRecoveryRate,
                 rollStaminaCost,
                 sprintStaminaCostPerSecond,
+                sprintRestartStamina,
                 playerAnimator,
                 animationSmoothTime,
                 rollDistance,
                 sprintRollDistance,
                 rollMovementCurve,
+                rollCompleteNormalizedTime,
                 attackData,
-                attackInputBufferDuration,
+                actionInputBufferDuration,
                 targetFinder,
                 targetCamera,
                 Mathf.Max(targetRange, targetBreakDistance),
+                targetHiddenGraceDuration,
                 guardAngle,
+                guardRaiseDuration,
                 guardHitBox,
+                guardBreakControlLockDuration,
                 hitPushDuration,
                 hitPushCurve,
                 transform,
@@ -326,8 +330,7 @@ namespace rudIsland.RPG3D.Player
 
             if (hitResult == PlayerHitResult.Damaged)
             {
-                playerDamageAudio?.Play(
-                    hitRequest.Damage.DamageSoundType);
+                playerDamageAudio?.Play(hitRequest.Damage.DamageSoundType);
             }
 
             return hitResult;
@@ -365,9 +368,9 @@ namespace rudIsland.RPG3D.Player
             playerStateMachine?.NotifyAttackHitEnded(); //콤보 공격 입력 가능 상태로 전환
         }
 
-        internal void NotifyAttackAnimationEnded()
+        internal void NotifyAttackAnimationEnded(int attackNumber)
         {
-            playerStateMachine?.NotifyAttackAnimationEnded();
+            playerStateMachine?.NotifyAttackAnimationEnded(attackNumber);
         }
 
         internal void BeginRollInvulnerability()
@@ -416,8 +419,7 @@ namespace rudIsland.RPG3D.Player
 
             for (int index = 0; index < attackData.Length; index++)
             {
-                if (attackData[index] == null ||
-                    attackData[index].AttackNumber != index + 1)
+                if (attackData[index] == null || attackData[index].AttackNumber != index + 1)
                 {
                     return false;
                 }
@@ -441,9 +443,7 @@ namespace rudIsland.RPG3D.Player
 
         private static AnimationCurve CreateDefaultHitPushCurve()
         {
-            return new AnimationCurve(
-                new Keyframe(0f, 0f, 2f, 2f),
-                new Keyframe(1f, 1f, 0f, 0f));
+            return new AnimationCurve(new Keyframe(0f, 0f, 2f, 2f), new Keyframe(1f, 1f, 0f, 0f));
         }
 
 
@@ -453,9 +453,7 @@ namespace rudIsland.RPG3D.Player
         {
             if (!Application.isPlaying || playerWorldUnit == null)
             {
-                Debug.LogWarning(
-                    "Test Damage는 Play 중이고 플레이어 준비가 끝난 뒤 사용할 수 있습니다.",
-                    this);
+                Debug.LogWarning("Test Damage는 Play 중이고 플레이어 준비가 끝난 뒤 사용할 수 있습니다.", this);
                 return;
             }
 
@@ -473,9 +471,7 @@ namespace rudIsland.RPG3D.Player
                 Vector3.zero);
             TryTakeHit(in hitRequest);
 
-            Debug.Log(
-                $"플레이어 체력: {healthBeforeDamage} → {playerWorldUnit.CurrentHealth}",
-                this);
+            Debug.Log($"플레이어 체력: {healthBeforeDamage} → {playerWorldUnit.CurrentHealth}", this);
         }
 
         private void OnValidate()
@@ -483,11 +479,27 @@ namespace rudIsland.RPG3D.Player
             maxStamina = Mathf.Max(1f, maxStamina);
             staminaRecoverDelay = Mathf.Max(0f, staminaRecoverDelay);
             staminaRecoverSpeed = Mathf.Max(0f, staminaRecoverSpeed);
+            guardStaminaRecoveryRate = Mathf.Clamp01(guardStaminaRecoveryRate);
             rollStaminaCost = Mathf.Max(0f, rollStaminaCost);
-            sprintStaminaCostPerSecond =
-                Mathf.Max(0f, sprintStaminaCostPerSecond);
+            sprintStaminaCostPerSecond = Mathf.Max(0f, sprintStaminaCostPerSecond);
+            sprintRestartStamina = Mathf.Clamp(sprintRestartStamina, 0f, maxStamina);
+            targetHiddenGraceDuration = Mathf.Max(0f, targetHiddenGraceDuration);
+            targetHeightOffset = Mathf.Max(0f, targetHeightOffset);
+            freeMoveTurnSpeed = Mathf.Max(0f, freeMoveTurnSpeed);
+            targetMoveTurnSpeed = Mathf.Max(0f, targetMoveTurnSpeed);
+            attackTurnSpeed = Mathf.Max(0f, attackTurnSpeed);
+            guardMoveSpeed = Mathf.Clamp(guardMoveSpeed, 0f, walkSpeed);
+            moveAcceleration = Mathf.Max(0f, moveAcceleration);
+            moveDeceleration = Mathf.Max(0f, moveDeceleration);
+            rollCompleteNormalizedTime = Mathf.Clamp(
+                rollCompleteNormalizedTime,
+                0.01f,
+                1f);
+            actionInputBufferDuration = Mathf.Max(0f, actionInputBufferDuration);
             weaponHitRadius = Mathf.Max(0f, weaponHitRadius);
             guardAngle = Mathf.Clamp(guardAngle, 0f, 180f);
+            guardRaiseDuration = Mathf.Max(0f, guardRaiseDuration);
+            guardBreakControlLockDuration = Mathf.Max(0f, guardBreakControlLockDuration);
             hitPushDuration = Mathf.Max(0.01f, hitPushDuration);
             if (hitPushCurve == null || hitPushCurve.length < 2)
             {
@@ -500,15 +512,9 @@ namespace rudIsland.RPG3D.Player
             if (weaponHitStart != null && weaponHitEnd != null)
             {
                 Gizmos.color = Color.red;
-                Gizmos.DrawWireSphere(
-                    weaponHitStart.position,
-                    weaponHitRadius);
-                Gizmos.DrawWireSphere(
-                    weaponHitEnd.position,
-                    weaponHitRadius);
-                Gizmos.DrawLine(
-                    weaponHitStart.position,
-                    weaponHitEnd.position);
+                Gizmos.DrawWireSphere(weaponHitStart.position, weaponHitRadius);
+                Gizmos.DrawWireSphere(weaponHitEnd.position, weaponHitRadius);
+                Gizmos.DrawLine(weaponHitStart.position, weaponHitEnd.position);
             }
 
         }

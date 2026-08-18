@@ -45,8 +45,7 @@ namespace rudIsland.RPG3D.Player.Movement
             cameraForward.y = 0f;
             if (cameraForward.sqrMagnitude > MinimumDirectionSqrMagnitude)
             {
-                playerTransform.rotation =
-                    Quaternion.LookRotation(cameraForward);
+                playerTransform.rotation = Quaternion.LookRotation(cameraForward);
             }
 
             return moveInput;

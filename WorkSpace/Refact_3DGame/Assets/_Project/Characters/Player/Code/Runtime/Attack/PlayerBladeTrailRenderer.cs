@@ -13,25 +13,16 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
         private const float MinimumSampleDistance = 0.015f;
         private const float TrailBladeLengthRatio = 0.12f;
 
-        private static readonly Color BladeStartColor =
-            new Color(0.18f, 0.55f, 1f, 0.08f);
-        private static readonly Color BladeEndColor =
-            new Color(0.65f, 0.92f, 1f, 0.50f);
+        private static readonly Color BladeStartColor = new Color(0.18f, 0.55f, 1f, 0.08f);
+        private static readonly Color BladeEndColor = new Color(0.65f, 0.92f, 1f, 0.50f);
 
-        private readonly Vector3[] bladeStartPositions =
-            new Vector3[MaxSampleCount];
-        private readonly Vector3[] bladeEndPositions =
-            new Vector3[MaxSampleCount];
-        private readonly float[] sampleTimes =
-            new float[MaxSampleCount];
-        private readonly Vector3[] meshVertices =
-            new Vector3[MaxSampleCount * 2];
-        private readonly Color[] meshColors =
-            new Color[MaxSampleCount * 2];
-        private readonly Vector2[] meshUvs =
-            new Vector2[MaxSampleCount * 2];
-        private readonly int[] meshTriangles =
-            new int[(MaxSampleCount - 1) * 12];
+        private readonly Vector3[] bladeStartPositions = new Vector3[MaxSampleCount];
+        private readonly Vector3[] bladeEndPositions = new Vector3[MaxSampleCount];
+        private readonly float[] sampleTimes = new float[MaxSampleCount];
+        private readonly Vector3[] meshVertices = new Vector3[MaxSampleCount * 2];
+        private readonly Color[] meshColors = new Color[MaxSampleCount * 2];
+        private readonly Vector2[] meshUvs = new Vector2[MaxSampleCount * 2];
+        private readonly int[] meshTriangles = new int[(MaxSampleCount - 1) * 12];
 
         private Transform weaponHitStart;
         private Transform weaponHitEnd;
@@ -43,9 +34,7 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
         private bool isCreated;
         private bool isEmitting;
 
-        internal void Create(
-            Transform hitStart,
-            Transform hitEnd)
+        internal void Create(Transform hitStart, Transform hitEnd)
         {
             if (isCreated)
             {
@@ -144,19 +133,14 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
         private void CreateTrailObject()
         {
             trailObject = new GameObject($"{name} Blade Trail");
-            SceneManager.MoveGameObjectToScene(
-                trailObject,
-                gameObject.scene);
+            SceneManager.MoveGameObjectToScene(trailObject, gameObject.scene);
 
-            MeshFilter meshFilter =
-                trailObject.AddComponent<MeshFilter>();
-            trailMeshRenderer =
-                trailObject.AddComponent<MeshRenderer>();
+            MeshFilter meshFilter = trailObject.AddComponent<MeshFilter>();
+            trailMeshRenderer = trailObject.AddComponent<MeshRenderer>();
             trailMeshRenderer.shadowCastingMode = ShadowCastingMode.Off;
             trailMeshRenderer.receiveShadows = false;
             trailMeshRenderer.lightProbeUsage = LightProbeUsage.Off;
-            trailMeshRenderer.reflectionProbeUsage =
-                ReflectionProbeUsage.Off;
+            trailMeshRenderer.reflectionProbeUsage = ReflectionProbeUsage.Off;
 
             trailMesh = new Mesh
             {
@@ -168,9 +152,7 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
             Shader trailShader = Shader.Find("Sprites/Default");
             if (trailShader == null)
             {
-                Debug.LogError(
-                    "검 궤적에 필요한 Sprites/Default Shader를 찾지 못했습니다.",
-                    this);
+                Debug.LogError("검 궤적에 필요한 Sprites/Default Shader를 찾지 못했습니다.", this);
                 return;
             }
 
@@ -219,11 +201,9 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
             if (sampleCount > 0)
             {
                 int lastIndex = sampleCount - 1;
-                bool startMoved = Vector3.SqrMagnitude(
-                    currentStart - bladeStartPositions[lastIndex]) >=
+                bool startMoved = Vector3.SqrMagnitude(currentStart - bladeStartPositions[lastIndex]) >=
                     MinimumSampleDistance * MinimumSampleDistance;
-                bool endMoved = Vector3.SqrMagnitude(
-                    currentEnd - bladeEndPositions[lastIndex]) >=
+                bool endMoved = Vector3.SqrMagnitude(currentEnd - bladeEndPositions[lastIndex]) >=
                     MinimumSampleDistance * MinimumSampleDistance;
                 if (!startMoved && !endMoved)
                 {
@@ -270,10 +250,8 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
             for (int index = 0; index < remainingCount; index++)
             {
                 int sourceIndex = index + moveCount;
-                bladeStartPositions[index] =
-                    bladeStartPositions[sourceIndex];
-                bladeEndPositions[index] =
-                    bladeEndPositions[sourceIndex];
+                bladeStartPositions[index] = bladeStartPositions[sourceIndex];
+                bladeEndPositions[index] = bladeEndPositions[sourceIndex];
                 sampleTimes[index] = sampleTimes[sourceIndex];
             }
         }
@@ -293,15 +271,11 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
                  sampleIndex++)
             {
                 int vertexIndex = sampleIndex * 2;
-                float ageRatio = Mathf.Clamp01(
-                    (currentTime - sampleTimes[sampleIndex]) /
-                    TrailKeepTime);
+                float ageRatio = Mathf.Clamp01((currentTime - sampleTimes[sampleIndex]) / TrailKeepTime);
                 float alpha = 1f - ageRatio;
 
-                meshVertices[vertexIndex] =
-                    bladeStartPositions[sampleIndex];
-                meshVertices[vertexIndex + 1] =
-                    bladeEndPositions[sampleIndex];
+                meshVertices[vertexIndex] = bladeStartPositions[sampleIndex];
+                meshVertices[vertexIndex + 1] = bladeEndPositions[sampleIndex];
                 meshColors[vertexIndex] = new Color(
                     BladeStartColor.r,
                     BladeStartColor.g,

@@ -70,8 +70,7 @@ namespace rudIsland.RPG3D.Player.Runtime.Audio
                 return;
             }
 
-            footstepAudioSource.pitch =
-                1f + Random.Range(-pitchChange, pitchChange);
+            footstepAudioSource.pitch = 1f + Random.Range(-pitchChange, pitchChange);
             footstepAudioSource.PlayOneShot(rollSound, rollVolume);
         }
 
@@ -110,8 +109,7 @@ namespace rudIsland.RPG3D.Player.Runtime.Audio
             }
 
             lastSoundIndex = soundIndex;
-            footstepAudioSource.pitch =
-                1f + Random.Range(-pitchChange, pitchChange);
+            footstepAudioSource.pitch = 1f + Random.Range(-pitchChange, pitchChange);
             footstepAudioSource.PlayOneShot(sound, volume);
         }
 

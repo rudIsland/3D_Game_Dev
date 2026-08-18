@@ -14,6 +14,7 @@ namespace rudIsland.RPG3D.Player.States.Target
         private readonly PlayerTargetFinder targetFinder;
         private readonly PlayerTargetCamera targetCamera;
         private readonly float targetBreakDistance;
+        private readonly PlayerTargetVisibilityGrace visibilityGrace;
 
         private Transform currentTarget;
 
@@ -23,7 +24,8 @@ namespace rudIsland.RPG3D.Player.States.Target
             PlayerMovement playerMovement,
             PlayerTargetFinder targetFinder,
             PlayerTargetCamera targetCamera,
-            float targetBreakDistance)
+            float targetBreakDistance,
+            float targetHiddenGraceDuration)
         {
             this.stateMachine = stateMachine;
             this.actionStateMachine = actionStateMachine;
@@ -31,16 +33,20 @@ namespace rudIsland.RPG3D.Player.States.Target
             this.targetFinder = targetFinder;
             this.targetCamera = targetCamera;
             this.targetBreakDistance = Mathf.Max(0f, targetBreakDistance);
+            visibilityGrace = new PlayerTargetVisibilityGrace(
+                targetHiddenGraceDuration);
         }
 
         public bool TrySelectTarget()
         {
-            return targetFinder.TryFindTarget(out currentTarget);
+            bool hasTarget = targetFinder.TryFindTarget(out currentTarget);
+            visibilityGrace.Reset();
+            return hasTarget;
         }
 
         public bool IsTargetAvailable()
         {
-            return targetFinder.IsTargetAvailable(
+            return targetFinder.IsTargetAliveAndInRange(
                 currentTarget,
                 targetBreakDistance);
         }
@@ -48,6 +54,7 @@ namespace rudIsland.RPG3D.Player.States.Target
         public void ReleaseTarget()
         {
             currentTarget = null;
+            visibilityGrace.Reset();
             playerMovement.SetFreeLookMovement();
             targetCamera.SetFreeLook();
         }
@@ -60,6 +67,7 @@ namespace rudIsland.RPG3D.Player.States.Target
                 return;
             }
 
+            visibilityGrace.Reset();
             playerMovement.SetTargetMovement(currentTarget);
             targetCamera.SetTarget(currentTarget);
             actionStateMachine.Enable();
@@ -67,13 +75,21 @@ namespace rudIsland.RPG3D.Player.States.Target
 
         public void Update(float deltaTime, PlayerStateInput input)
         {
-            targetCamera.Update(deltaTime);
-            actionStateMachine.Update(deltaTime, input);
-
             if (input.TargetTogglePressed || !IsTargetAvailable())
             {
                 stateMachine.ChangeToFreeLookState();
+                return;
             }
+
+            if (!visibilityGrace.CanKeepTarget(
+                    targetFinder.IsTargetVisible(currentTarget),
+                    deltaTime))
+            {
+                stateMachine.ChangeToFreeLookState();
+                return;
+            }
+
+            actionStateMachine.Update(deltaTime, input);
         }
 
         public void Exit()

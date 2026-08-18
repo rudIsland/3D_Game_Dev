@@ -8,9 +8,7 @@ namespace rudIsland.RPG3D.Player.States.Death
         private readonly PlayerStateMachine stateMachine;
         private readonly PlayerAnimationController animationController;
 
-        public PlayerDeadState(
-            PlayerStateMachine stateMachine,
-            PlayerAnimationController animationController)
+        public PlayerDeadState(PlayerStateMachine stateMachine, PlayerAnimationController animationController)
         {
             this.stateMachine = stateMachine;
             this.animationController = animationController;

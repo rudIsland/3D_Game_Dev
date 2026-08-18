@@ -11,9 +11,7 @@ namespace rudIsland.RPG3D.Player.Movement
         private float curveRange;
         private float previousProgress;
 
-        public void Begin(
-            float distance,
-            AnimationCurve curve)
+        public void Begin(float distance, AnimationCurve curve)
         {
             movementDistance = Mathf.Max(0f, distance);
             movementCurve = curve;
@@ -34,8 +32,7 @@ namespace rudIsland.RPG3D.Player.Movement
         public float EvaluateDeltaDistance(float normalizedTime)
         {
             float progress = EvaluateProgress(normalizedTime);
-            float deltaDistance =
-                (progress - previousProgress) * movementDistance;
+            float deltaDistance = (progress - previousProgress) * movementDistance;
             previousProgress = progress;
             return deltaDistance;
         }

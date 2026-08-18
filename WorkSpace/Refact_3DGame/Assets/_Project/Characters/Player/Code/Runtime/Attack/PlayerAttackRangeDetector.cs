@@ -18,12 +18,10 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
         private readonly float weaponHitRadius;
         private readonly CombatHitStop attackerHitStop;
         private readonly CombatHitEffectPlayer hitEffectPlayer;
-        private readonly Collider[] detectedColliders =
-            new Collider[MaximumDetectedColliderCount];
-        private readonly RaycastHit[] sweepHits =
-            new RaycastHit[MaximumDetectedColliderCount];
-        private readonly HashSet<IEnemyDamageReceiver> hitTargets =
-            new HashSet<IEnemyDamageReceiver>(16);
+        private readonly PlayerAttackEffectPlayer attackEffectPlayer;
+        private readonly Collider[] detectedColliders = new Collider[MaximumDetectedColliderCount];
+        private readonly RaycastHit[] sweepHits = new RaycastHit[MaximumDetectedColliderCount];
+        private readonly HashSet<IEnemyDamageReceiver> hitTargets = new HashSet<IEnemyDamageReceiver>(16);
 
         private bool isWindowOpen;
         private bool hasPreviousWeaponPositions;
@@ -42,7 +40,8 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
             LayerMask enemyLayers,
             float weaponHitRadius,
             CombatHitStop attackerHitStop,
-            CombatHitEffectPlayer hitEffectPlayer)
+            CombatHitEffectPlayer hitEffectPlayer,
+            PlayerAttackEffectPlayer attackEffectPlayer)
         {
             this.attackerRoot = attackerRoot;
             this.weaponHitStart = weaponHitStart;
@@ -51,6 +50,7 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
             this.weaponHitRadius = Mathf.Max(0f, weaponHitRadius);
             this.attackerHitStop = attackerHitStop;
             this.hitEffectPlayer = hitEffectPlayer;
+            this.attackEffectPlayer = attackEffectPlayer;
         }
 
         public void Open(
@@ -77,24 +77,15 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
 
             Vector3 currentStartPosition = weaponHitStart.position;
             Vector3 currentEndPosition = weaponHitEnd.position;
-            Vector3 currentMiddlePosition =
-                (currentStartPosition + currentEndPosition) * 0.5f;
+            Vector3 currentMiddlePosition = (currentStartPosition + currentEndPosition) * 0.5f;
 
-            DetectCurrentWeapon(
-                currentStartPosition,
-                currentEndPosition);
+            DetectCurrentWeapon(currentStartPosition, currentEndPosition);
 
             if (hasPreviousWeaponPositions)
             {
-                DetectMovedPoint(
-                    previousStartPosition,
-                    currentStartPosition);
-                DetectMovedPoint(
-                    previousMiddlePosition,
-                    currentMiddlePosition);
-                DetectMovedPoint(
-                    previousEndPosition,
-                    currentEndPosition);
+                DetectMovedPoint(previousStartPosition, currentStartPosition);
+                DetectMovedPoint(previousMiddlePosition, currentMiddlePosition);
+                DetectMovedPoint(previousEndPosition, currentEndPosition);
             }
 
             SaveWeaponPositions(
@@ -124,9 +115,7 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
                 weaponHitRadius > 0f;
         }
 
-        private void DetectCurrentWeapon(
-            Vector3 startPosition,
-            Vector3 endPosition)
+        private void DetectCurrentWeapon(Vector3 startPosition, Vector3 endPosition)
         {
             int detectedCount = Physics.OverlapCapsuleNonAlloc(
                 startPosition,
@@ -159,15 +148,12 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
                     startPosition,
                     endPosition,
                     detectedCollider.bounds.center);
-                Vector3 hitPosition =
-                    detectedCollider.ClosestPoint(shapePoint);
+                Vector3 hitPosition = detectedCollider.ClosestPoint(shapePoint);
                 TryApplyHit(detectedCollider, hitPosition);
             }
         }
 
-        private void DetectMovedPoint(
-            Vector3 previousPosition,
-            Vector3 currentPosition)
+        private void DetectMovedPoint(Vector3 previousPosition, Vector3 currentPosition)
         {
             Vector3 movement = currentPosition - previousPosition;
             float movementSqrMagnitude = movement.sqrMagnitude;
@@ -200,19 +186,15 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
             }
         }
 
-        private void TryApplyHit(
-            Collider detectedCollider,
-            Vector3 hitPosition)
+        private void TryApplyHit(Collider detectedCollider, Vector3 hitPosition)
         {
-            IEnemyDamageReceiver target =
-                detectedCollider.GetComponentInParent<IEnemyDamageReceiver>();
+            IEnemyDamageReceiver target = detectedCollider.GetComponentInParent<IEnemyDamageReceiver>();
             if (target == null || !hitTargets.Add(target))
             {
                 return;
             }
 
-            Vector3 pushDirection =
-                hitPosition - attackerRoot.position;
+            Vector3 pushDirection = hitPosition - attackerRoot.position;
             pushDirection.y = 0f;
             if (pushDirection.sqrMagnitude <= 0.000001f)
             {
@@ -230,9 +212,8 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
             if (hitResult == EnemyHitResult.Staggered || hitResult == EnemyHitResult.Damaged)
             {
                 attackerHitStop?.Request(hitRequest.HitStopDuration);
-                hitEffectPlayer?.PlayBodyHit(
-                    hitRequest.HitPosition,
-                    hitRequest.PushDirection);
+                hitEffectPlayer?.PlayBodyHit(hitRequest.HitPosition, hitRequest.PushDirection);
+                attackEffectPlayer?.PlayConfirmedHit();
             }
         }
 
@@ -276,9 +257,7 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
                 return lineStart;
             }
 
-            float distanceRate = Mathf.Clamp01(
-                Vector3.Dot(targetPosition - lineStart, line) /
-                lineLengthSqr);
+            float distanceRate = Mathf.Clamp01(Vector3.Dot(targetPosition - lineStart, line) / lineLengthSqr);
             return lineStart + line * distanceRate;
         }
     }

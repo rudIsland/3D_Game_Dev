@@ -19,8 +19,10 @@ MonoBehaviour:
   hitStopDuration: 0.06
   staminaCost: 30
   swingSound: {fileID: 8300000, guid: bc0d800b2a79c004e8b1a9e9b16df148, type: 3}
-  nextInputTime: 1
-  rollCancelStartTime: 0.6
+  comboOpenNormalizedTime: 0.9
+  comboCloseNormalizedTime: 0.9
+  rollCancelOpenNormalizedTime: 0.6
+  turnEndNormalizedTime: 0.29333332
   moveDistance: 0.4
   movementCurve:
     serializedVersion: 2
@@ -28,6 +30,15 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.36
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
