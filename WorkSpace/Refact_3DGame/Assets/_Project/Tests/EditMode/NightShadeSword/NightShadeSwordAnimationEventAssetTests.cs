@@ -86,7 +86,9 @@ namespace rudIsland.RPG3D.Tests
                     speedEventCount++;
                 }
                 else if (animationEvent.functionName ==
-                    "SetAttackPlaybackSpeed")
+                        "SetAttackPlaybackSpeed" ||
+                    animationEvent.functionName ==
+                        "ResetAttackPlaybackSpeed")
                 {
                     unsupportedSpeedEventCount++;
                 }
