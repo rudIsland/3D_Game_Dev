@@ -902,10 +902,10 @@ MonoBehaviour:
   groundPull: -2
   lightAttackRecovery: 2
   comboAttackRecovery: 2.5
-  comboFirstExitNormalizedTime: 0.4
-  comboSecondDelay: 0.15
   wideSwingAttackRecovery: 2.5
   heavyAttackRecovery: 3
+  comboFirstExitNormalizedTime: 0.4
+  comboSecondDelay: 0.15
   combatMoveSpeed: 2
   combatMoveDuration: 0.6
   attacksBeforeCombatMove: 2
