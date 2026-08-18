@@ -1,0 +1,22 @@
+{
+  "name": "rudIsland.RPG3D.EditModeTests",
+  "rootNamespace": "rudIsland.RPG3D.Tests",
+  "references": [
+    "rudIsland.RPG3D.Runtime",
+    "Cinemachine"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}
