@@ -25,7 +25,7 @@ namespace rudIsland.RPG3D.Tests
                 });
             AssertClip(
                 $"{ClipFolder}/NightShadeSword_ComboFirst.anim",
-                0,
+                2,
                 new[]
                 {
                     Expected(0.36666667f, "PlayAttackSoundAnimationEvent", 0),
@@ -35,7 +35,7 @@ namespace rudIsland.RPG3D.Tests
                 });
             AssertClip(
                 $"{ClipFolder}/NightShadeSword_ComboSecond.anim",
-                0,
+                2,
                 new[]
                 {
                     Expected(0.23333334f, "PlayAttackSoundAnimationEvent", 0),

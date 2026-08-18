@@ -748,6 +748,7 @@ namespace rudIsland.RPG3D.EditorTools
                 functionName == "CloseAttackHitAnimationEvent" ||
                 functionName == "SetAttackSpeed" ||
                 functionName == "ResetAttackSpeed" ||
+                functionName == "SetAttackPlaybackSpeed" ||
                 functionName == "ResetAttackPlaybackSpeed";
         }
 

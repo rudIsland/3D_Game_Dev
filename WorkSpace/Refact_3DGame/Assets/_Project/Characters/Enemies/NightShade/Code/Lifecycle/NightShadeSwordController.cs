@@ -67,11 +67,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         [SerializeField, Min(0f)] private float wideSwingAttackRecovery = 2.5f;
         [SerializeField, Min(0f)] private float heavyAttackRecovery = 3f;
 
-
         [Header("콤보 연결")]
         [SerializeField, Range(0.35f, 1f)]
         private float comboFirstExitNormalizedTime = 0.4f;
         [SerializeField, Min(0f)] private float comboSecondDelay = 0.15f;
+
         [Header("전투 거리 조절")]
         [SerializeField, Min(0.1f)] private float combatMoveSpeed = 2f;
         [SerializeField, Min(0.1f)] private float combatMoveDuration = 0.6f;
@@ -135,8 +135,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 attackTurnSpeed,
                 lightAttackRecovery,
                 comboAttackRecovery,
-                comboSecondDelay,
                 comboFirstExitNormalizedTime,
+                comboSecondDelay,
                 wideSwingAttackRecovery,
                 heavyAttackRecovery,
                 combatMoveSpeed,
@@ -305,11 +305,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             attackTurnSpeed = Mathf.Max(1f, attackTurnSpeed);
             lightAttackRecovery = Mathf.Max(0f, lightAttackRecovery);
             comboAttackRecovery = Mathf.Max(0f, comboAttackRecovery);
-            comboSecondDelay = Mathf.Max(0f, comboSecondDelay);
             comboFirstExitNormalizedTime = Mathf.Clamp(
                 comboFirstExitNormalizedTime,
                 0.35f,
                 1f);
+            comboSecondDelay = Mathf.Max(0f, comboSecondDelay);
             wideSwingAttackRecovery =
                 Mathf.Max(0f, wideSwingAttackRecovery);
             heavyAttackRecovery = Mathf.Max(0f, heavyAttackRecovery);

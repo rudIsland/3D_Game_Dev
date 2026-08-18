@@ -106,7 +106,12 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 movement.StayOnGround(deltaTime);
             }
 
-            return !animation.IsTransitioning() && normalizedTime >= 1f
+            float attackExitNormalizedTime =
+                attackType == NightShadeSwordAttackType.ComboFirst
+                    ? settings.ComboFirstExitNormalizedTime
+                    : 1f;
+            return !animation.IsTransitioning() &&
+                normalizedTime >= attackExitNormalizedTime
                 ? FinishAttack()
                 : null;
         }

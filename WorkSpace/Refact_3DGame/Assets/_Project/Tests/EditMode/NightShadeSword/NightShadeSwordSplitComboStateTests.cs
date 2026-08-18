@@ -8,7 +8,7 @@ namespace rudIsland.RPG3D.Tests
     public sealed class NightShadeSwordSplitComboStateTests
     {
         [Test]
-        public void ComboFirst종료_0점7초대기후ComboSecond를실행한다()
+        public void ComboFirst_0점4에종료하고_0점15초대기후ComboSecond를실행한다()
         {
             using var scope = new NightShadeSwordTestScope(
                 new Vector3(0f, 0f, 1f));
@@ -19,15 +19,15 @@ namespace rudIsland.RPG3D.Tests
 
             Assert.That(machine.CurrentStateId, Is.EqualTo(NightShadeSwordStateId.Walk));
             Assert.That(machine.FightMemory.HasPendingComboSecond, Is.True);
-            Assert.That(machine.FightMemory.RemainingAttackCooldown, Is.EqualTo(0.7f));
+            Assert.That(machine.FightMemory.RemainingAttackCooldown, Is.EqualTo(0.15f));
             Assert.That(machine.FightMemory.CompletedAttackCount, Is.Zero);
 
-            machine.Update(0.6f);
+            machine.Update(0.14f);
             Assert.That(scope.Animation.AttackCount, Is.EqualTo(1));
             Assert.That(scope.Animation.IdleCount, Is.GreaterThan(0));
 
             scope.Movement.IsFacingTarget = false;
-            machine.Update(0.11f);
+            machine.Update(0.02f);
             Assert.That(machine.CurrentStateId, Is.EqualTo(NightShadeSwordStateId.Walk));
             Assert.That(scope.Animation.AttackCount, Is.EqualTo(1));
 
@@ -119,7 +119,7 @@ namespace rudIsland.RPG3D.Tests
                 Is.EqualTo(NightShadeSwordStateId.Attack));
 
             scope.TargetDeathState.IsDead = true;
-            scope.Animation.NormalizedTime = 0.5f;
+            scope.Animation.NormalizedTime = 0.3f;
             machine.Update(0.1f);
 
             Assert.That(
@@ -154,7 +154,13 @@ namespace rudIsland.RPG3D.Tests
             machine.Update(0.1f);
             Assert.That(scope.Animation.LastAttackType, Is.EqualTo(NightShadeSwordAttackType.ComboFirst));
 
-            scope.Animation.NormalizedTime = 1f;
+            scope.Animation.NormalizedTime = 0.39f;
+            machine.Update(0.1f);
+            Assert.That(
+                machine.CurrentStateId,
+                Is.EqualTo(NightShadeSwordStateId.Attack));
+
+            scope.Animation.NormalizedTime = 0.4f;
             machine.Update(0.1f);
         }
     }

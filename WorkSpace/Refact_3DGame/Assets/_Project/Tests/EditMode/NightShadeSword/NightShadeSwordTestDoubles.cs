@@ -30,7 +30,9 @@ namespace rudIsland.RPG3D.Tests
             float walkStartRange = 5f,
             float runStartRange = 6f,
             int attacksBeforeCombatMove = 2,
-            float deadBodyKeepTime = 1f)
+            float deadBodyKeepTime = 1f,
+            float comboFirstExitNormalizedTime = 0.4f,
+            float comboSecondDelay = 0.15f)
         {
             return new NightShadeSwordSettings(
                 findRange,
@@ -44,7 +46,8 @@ namespace rudIsland.RPG3D.Tests
                 180f,
                 2f,
                 2.5f,
-                0.7f,
+                comboFirstExitNormalizedTime,
+                comboSecondDelay,
                 2.5f,
                 3f,
                 2f,

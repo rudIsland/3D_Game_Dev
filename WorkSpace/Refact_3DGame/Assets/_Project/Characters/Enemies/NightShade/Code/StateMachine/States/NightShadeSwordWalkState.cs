@@ -31,7 +31,10 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 targetReader.DistanceSquared <= settings.AttackRangeSquared;
             if (isWaitingInAttackRange)
             {
-                animation.PlayIdle();
+                if (!fightMemory.HasPendingComboSecond)
+                {
+                    animation.PlayIdle();
+                }
                 return;
             }
 

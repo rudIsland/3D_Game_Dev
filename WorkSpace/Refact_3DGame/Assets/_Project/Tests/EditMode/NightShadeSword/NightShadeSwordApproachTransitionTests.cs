@@ -36,6 +36,7 @@ namespace rudIsland.RPG3D.Tests
             machine.Enable();
             EnterAttack(machine);
             scope.TargetDeathState.IsDead = true;
+            scope.Animation.NormalizedTime = 1f;
 
             machine.Update(0.1f);
 
