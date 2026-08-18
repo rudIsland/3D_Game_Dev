@@ -38,16 +38,13 @@ namespace rudIsland.RPG3D.Editor
             ConfigureCopiedSprites();
 
             Sprite frameSprite =
-                AssetDatabase.LoadAssetAtPath<Sprite>(
-                    SpriteFolder + "/Hp_frame.png");
+                AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFolder + "/Hp_frame.png");
             Sprite fillSprite =
-                AssetDatabase.LoadAssetAtPath<Sprite>(
-                    SpriteFolder + "/Hp_line.png");
+                AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFolder + "/Hp_line.png");
 
             if (frameSprite == null || fillSprite == null)
             {
-                throw new InvalidOperationException(
-                    "Combat HUD copied sprites could not be loaded.");
+                throw new InvalidOperationException("Combat HUD copied sprites could not be loaded.");
             }
 
             GameObject prefab = CreatePrefab(frameSprite, fillSprite);
@@ -61,8 +58,7 @@ namespace rudIsland.RPG3D.Editor
                 true);
 
             AssetDatabase.SaveAssets();
-            Debug.Log(
-                "Combat HUD prefab and scene instances were built from copied sprites.");
+            Debug.Log("Combat HUD prefab and scene instances were built from copied sprites.");
         }
 
         private static void RunRequestedBuild()
@@ -84,8 +80,7 @@ namespace rudIsland.RPG3D.Editor
             }
         }
 
-        private static void HandlePlayModeStateChanged(
-            PlayModeStateChange state)
+        private static void HandlePlayModeStateChanged(PlayModeStateChange state)
         {
             if (state == PlayModeStateChange.EnteredEditMode)
             {
@@ -111,33 +106,20 @@ namespace rudIsland.RPG3D.Editor
 
         private static void ConfigureCopiedSprites()
         {
-            ConfigureSprite(
-                SpriteFolder + "/Hp_frame.png",
-                new Vector4(20f, 20f, 20f, 20f));
-            ConfigureSprite(
-                SpriteFolder + "/Hp_line.png",
-                Vector4.zero);
-            ConfigureSprite(
-                SpriteFolder + "/big_bar_bg.png",
-                Vector4.zero);
-            ConfigureSprite(
-                SpriteFolder + "/big_bar.png",
-                Vector4.zero);
-            ConfigureSprite(
-                SpriteFolder + "/big_bar_frame.png",
-                new Vector4(96f, 96f, 96f, 96f));
+            ConfigureSprite(SpriteFolder + "/Hp_frame.png", new Vector4(20f, 20f, 20f, 20f));
+            ConfigureSprite(SpriteFolder + "/Hp_line.png", Vector4.zero);
+            ConfigureSprite(SpriteFolder + "/big_bar_bg.png", Vector4.zero);
+            ConfigureSprite(SpriteFolder + "/big_bar.png", Vector4.zero);
+            ConfigureSprite(SpriteFolder + "/big_bar_frame.png", new Vector4(96f, 96f, 96f, 96f));
         }
 
-        private static void ConfigureSprite(
-            string assetPath,
-            Vector4 border)
+        private static void ConfigureSprite(string assetPath, Vector4 border)
         {
             var importer =
                 AssetImporter.GetAtPath(assetPath) as TextureImporter;
             if (importer == null)
             {
-                throw new InvalidOperationException(
-                    "Missing copied GUI image: " + assetPath);
+                throw new InvalidOperationException("Missing copied GUI image: " + assetPath);
             }
 
             importer.textureType = TextureImporterType.Sprite;
@@ -153,9 +135,7 @@ namespace rudIsland.RPG3D.Editor
             importer.SaveAndReimport();
         }
 
-        private static GameObject CreatePrefab(
-            Sprite frameSprite,
-            Sprite fillSprite)
+        private static GameObject CreatePrefab(Sprite frameSprite, Sprite fillSprite)
         {
             var root = new GameObject(
                 "CombatHud",
@@ -413,9 +393,7 @@ namespace rudIsland.RPG3D.Editor
             return view;
         }
 
-        private static GameObject CreateRectChild(
-            Transform parent,
-            string name)
+        private static GameObject CreateRectChild(Transform parent, string name)
         {
             var child = new GameObject(name, typeof(RectTransform));
             child.transform.SetParent(parent, false);
@@ -501,15 +479,11 @@ namespace rudIsland.RPG3D.Editor
 
             if (closeAfterSave)
             {
-                scene = EditorSceneManager.OpenScene(
-                    scenePath,
-                    OpenSceneMode.Additive);
+                scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Additive);
             }
             else if (scene.isDirty)
             {
-                throw new InvalidOperationException(
-                    "Save the open scene before building Combat HUD: " +
-                    scenePath);
+                throw new InvalidOperationException("Save the open scene before building Combat HUD: " + scenePath);
             }
 
             try
@@ -527,23 +501,18 @@ namespace rudIsland.RPG3D.Editor
                 {
                     var managerObject =
                         new GameObject("WorldObjectManager");
-                    SceneManager.MoveGameObjectToScene(
-                        managerObject,
-                        scene);
+                    SceneManager.MoveGameObjectToScene(managerObject, scene);
                     manager =
                         managerObject.AddComponent<WorldObjectManager>();
                 }
 
                 if (manager == null)
                 {
-                    throw new InvalidOperationException(
-                        "WorldObjectManager is missing in " + scenePath);
+                    throw new InvalidOperationException("WorldObjectManager is missing in " + scenePath);
                 }
 
                 var instance =
-                    (GameObject)PrefabUtility.InstantiatePrefab(
-                        prefab,
-                        scene);
+                    (GameObject)PrefabUtility.InstantiatePrefab(prefab, scene);
                 CombatHudController controller =
                     instance.GetComponent<CombatHudController>();
                 HealthBarView[] bars =
@@ -560,8 +529,7 @@ namespace rudIsland.RPG3D.Editor
 
                 if (staminaBar == null || staggerBar == null)
                 {
-                    throw new InvalidOperationException(
-                        "Combat HUD resource bars are incomplete.");
+                    throw new InvalidOperationException("Combat HUD resource bars are incomplete.");
                 }
 
                 controller.ConnectForEditor(
@@ -571,8 +539,7 @@ namespace rudIsland.RPG3D.Editor
                     enemyBar,
                     staggerBar);
                 EditorUtility.SetDirty(controller);
-                PrefabUtility.RecordPrefabInstancePropertyModifications(
-                    controller);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(controller);
 
                 EditorSceneManager.MarkSceneDirty(scene);
                 EditorSceneManager.SaveScene(scene);
@@ -586,9 +553,7 @@ namespace rudIsland.RPG3D.Editor
             }
         }
 
-        private static HealthBarView FindBar(
-            HealthBarView[] bars,
-            string name)
+        private static HealthBarView FindBar(HealthBarView[] bars, string name)
         {
             for (int index = 0; index < bars.Length; index++)
             {
@@ -598,13 +563,10 @@ namespace rudIsland.RPG3D.Editor
                 }
             }
 
-            throw new InvalidOperationException(
-                "Missing health bar in prefab: " + name);
+            throw new InvalidOperationException("Missing health bar in prefab: " + name);
         }
 
-        private static GameObject FindRootObject(
-            Scene scene,
-            string name)
+        private static GameObject FindRootObject(Scene scene, string name)
         {
             GameObject[] roots = scene.GetRootGameObjects();
             for (int index = 0; index < roots.Length; index++)

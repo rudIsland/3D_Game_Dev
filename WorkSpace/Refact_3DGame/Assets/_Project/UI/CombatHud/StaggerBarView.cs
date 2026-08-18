@@ -24,9 +24,7 @@ namespace rudIsland.RPG3D.UI
             barRoot.SetActive(true);
         }
 
-        public void UpdateStagger(
-            float currentStagger,
-            float maxStagger)
+        public void UpdateStagger(float currentStagger, float maxStagger)
         {
             if (staggerFill != null)
             {
@@ -47,9 +45,7 @@ namespace rudIsland.RPG3D.UI
             }
         }
 
-        private void UpdateStaggerText(
-            float currentStagger,
-            float maxStagger)
+        private void UpdateStaggerText(float currentStagger, float maxStagger)
         {
             if (staggerText == null)
             {

@@ -1,7 +1,10 @@
 {
   "name": "rudIsland.RPG3D.Runtime",
   "rootNamespace": "rudIsland.RPG3D",
-  "references": [],
+  "references": [
+    "Cinemachine",
+    "Unity.InputSystem"
+  ],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

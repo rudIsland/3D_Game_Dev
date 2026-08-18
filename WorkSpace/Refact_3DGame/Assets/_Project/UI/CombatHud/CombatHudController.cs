@@ -47,9 +47,7 @@ namespace rudIsland.RPG3D.UI
         {
             if (worldObjectManager == null)
             {
-                Debug.LogError(
-                    "CombatHudController requires a WorldObjectManager.",
-                    this);
+                Debug.LogError("CombatHudController requires a WorldObjectManager.", this);
                 enabled = false;
                 return;
             }
@@ -145,9 +143,7 @@ namespace rudIsland.RPG3D.UI
                 {
                     player.Stamina.StaminaChanged +=
                         HandleStaminaChanged;
-                    playerStaminaBar?.Show(
-                        player.CurrentStamina,
-                        player.MaxStamina);
+                    playerStaminaBar?.Show(player.CurrentStamina, player.MaxStamina);
                 }
             }
             else if (unit is ZombieWorldUnit zombie)
@@ -173,9 +169,7 @@ namespace rudIsland.RPG3D.UI
 
         private void StopTracking(Unit unit)
         {
-            if (!trackedUnits.Remove(
-                    unit.Health,
-                    out _))
+            if (!trackedUnits.Remove(unit.Health, out _))
             {
                 return;
             }
@@ -212,9 +206,7 @@ namespace rudIsland.RPG3D.UI
 
         private void HandleHealthChanged(UnitHealth health)
         {
-            if (!trackedUnits.TryGetValue(
-                    health,
-                    out Unit unit))
+            if (!trackedUnits.TryGetValue(health, out Unit unit))
             {
                 return;
             }
@@ -250,9 +242,7 @@ namespace rudIsland.RPG3D.UI
 
         private void HandleStaminaChanged(PlayerStamina stamina)
         {
-            playerStaminaBar?.UpdateStamina(
-                stamina.CurrentStamina,
-                stamina.MaxStamina);
+            playerStaminaBar?.UpdateStamina(stamina.CurrentStamina, stamina.MaxStamina);
         }
 
         private void HandleZombieStaggerChanged(ZombieWorldUnit zombie)
@@ -262,9 +252,7 @@ namespace rudIsland.RPG3D.UI
                 return;
             }
 
-            enemyStaggerBar?.UpdateStagger(
-                zombie.CurrentStagger,
-                zombie.MaxStagger);
+            enemyStaggerBar?.UpdateStagger(zombie.CurrentStagger, zombie.MaxStagger);
         }
 
         private void HandleZombieCombatStateChanged(ZombieWorldUnit zombie)
@@ -287,21 +275,17 @@ namespace rudIsland.RPG3D.UI
                 zombie.MaxStagger);
         }
 
-        private void HandleNightShadeStaggerChanged(
-            NightShadeSwordWorldUnit nightShade)
+        private void HandleNightShadeStaggerChanged(NightShadeSwordWorldUnit nightShade)
         {
             if (!ReferenceEquals(displayedEnemy, nightShade))
             {
                 return;
             }
 
-            enemyStaggerBar?.UpdateStagger(
-                nightShade.CurrentStagger,
-                nightShade.MaxStagger);
+            enemyStaggerBar?.UpdateStagger(nightShade.CurrentStagger, nightShade.MaxStagger);
         }
 
-        private void HandleNightShadeCombatStateChanged(
-            NightShadeSwordWorldUnit nightShade)
+        private void HandleNightShadeCombatStateChanged(NightShadeSwordWorldUnit nightShade)
         {
             if (nightShade.IsInCombat)
             {

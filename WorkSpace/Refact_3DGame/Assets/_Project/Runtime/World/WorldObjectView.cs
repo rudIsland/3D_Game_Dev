@@ -27,9 +27,7 @@ namespace rudIsland.RPG3D.World
         }
 
         // 처음 생성된 뷰에 관리자, 풀, RuntimeObject를 연결한다.
-        internal void Prepare(
-            WorldObjectManager objectManager,
-            WorldObjectPool objectPool)
+        internal void Prepare(WorldObjectManager objectManager, WorldObjectPool objectPool)
         {
             manager = objectManager;
             OwnerPool = objectPool;
@@ -43,8 +41,7 @@ namespace rudIsland.RPG3D.World
 
             if (RuntimeObject == null)
             {
-                throw new InvalidOperationException(
-                    $"{GetType().Name}.CreateRuntimeObject()가 null을 반환했습니다.");
+                throw new InvalidOperationException($"{GetType().Name}.CreateRuntimeObject()가 null을 반환했습니다.");
             }
         }
 

@@ -268,24 +268,35 @@ MonoBehaviour:
   targetLayers:
     serializedVersion: 2
     m_Bits: 262272
+  targetObstructionLayers:
+    serializedVersion: 2
+    m_Bits: 70657
   targetRange: 12
   targetBreakDistance: 15
   targetMaximumAngle: 70
-  targetCameraTurnSpeed: 540
-  targetCameraVerticalValue: 0.5
+  targetHiddenGraceDuration: 0.35
+  targetHeightOffset: 1.2
   maxHealth: 100
   maxStamina: 100
-  staminaRecoverDelay: 1
-  staminaRecoverSpeed: 20
+  staminaRecoverDelay: 0.8
+  staminaRecoverSpeed: 35
+  guardStaminaRecoveryRate: 0
   rollStaminaCost: 25
   sprintStaminaCostPerSecond: 15
+  sprintRestartStamina: 20
   testDamage: 10
-  turnSpeed: 720
+  freeMoveTurnSpeed: 720
+  targetMoveTurnSpeed: 540
+  attackTurnSpeed: 360
   walkSpeed: 2.8
+  guardMoveSpeed: 1.5
   sprintSpeed: 5.5
-  animationSmoothTime: 0.12
-  rollDistance: 2
+  moveAcceleration: 30
+  moveDeceleration: 40
+  animationSmoothTime: 0.06
+  rollDistance: 2.2
   sprintRollDistance: 2.5
+  rollCompleteNormalizedTime: 0.7
   rollMovementCurve:
     serializedVersion: 2
     m_Curve:
@@ -352,7 +363,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a4044b8e7c624e0e91f4d0c3b2a19876, type: 2}
   - {fileID: 11400000, guid: a5054b8e7c624e0e91f4d0c3b2a19876, type: 2}
   - {fileID: 11400000, guid: a6064b8e7c624e0e91f4d0c3b2a19876, type: 2}
-  attackInputBufferDuration: 0.25
+  actionInputBufferDuration: 0.2
   gravity: -22
   groundPull: -2
   weaponHitStart: {fileID: 0}
@@ -362,6 +373,8 @@ MonoBehaviour:
     m_Bits: 0
   weaponHitRadius: 0.12
   guardAngle: 120
+  guardRaiseDuration: 0.1
+  guardBreakControlLockDuration: 1
   guardHitBox: {fileID: 0}
   hitPushDuration: 0.15
   hitPushCurve:
@@ -513,6 +526,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc5c30e0e1ad420a87008871f98796e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Player.Runtime.Attack.PlayerAttackEffectPlayer
+  confirmedHitSound: {fileID: 8300000, guid: a848f901dd0ca264a8ae871d3e2bc7d5, type: 3}
+  confirmedHitSoundVolume: 0.8
+  confirmedHitImpulseForce: 0.12
 --- !u!1 &7112299585502653175
 GameObject:
   m_ObjectHideFlags: 0

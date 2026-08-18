@@ -38,8 +38,7 @@ namespace rudIsland.RPG3D.World
             // 생성 전에 활성화하면 호출 순서를 잘못 사용한 것이다.
             if (!IsCreated)
             {
-                throw new InvalidOperationException(
-                    "WorldObject.Create()를 먼저 호출해야 합니다.");
+                throw new InvalidOperationException("WorldObject.Create()를 먼저 호출해야 합니다.");
             }
 
             // 이미 활성화된 객체는 중복 처리하지 않는다.

@@ -36,9 +36,7 @@ namespace rudIsland.RPG3D.Characters.Combat
                 isActive = true;
             }
 
-            remainingDuration = Mathf.Max(
-                remainingDuration,
-                duration);
+            remainingDuration = Mathf.Max(remainingDuration, duration);
         }
 
         public bool Update(float deltaTime)

@@ -311,8 +311,7 @@ namespace rudIsland.RPG3D.World
                 return false;
             }
 
-            var poolContainer = new GameObject(
-                $"{settings.name} Pool").transform;
+            var poolContainer = new GameObject($"{settings.name} Pool").transform;
             poolContainer.SetParent(transform, false);
 
             var pool = new WorldObjectPool(
@@ -343,8 +342,7 @@ namespace rudIsland.RPG3D.World
         {
             if (!registeredSet.Contains(worldObject))
             {
-                throw new InvalidOperationException(
-                    "WorldObjectManager.Register()를 먼저 호출해야 합니다.");
+                throw new InvalidOperationException("WorldObjectManager.Register()를 먼저 호출해야 합니다.");
             }
 
             if (!activeSet.Add(worldObject))
@@ -423,8 +421,7 @@ namespace rudIsland.RPG3D.World
                 return false;
             }
 
-            pendingActions.Add(
-                new PendingAction(type, worldObject, view));
+            pendingActions.Add(new PendingAction(type, worldObject, view));
             return true;
         }
 
@@ -504,9 +501,7 @@ namespace rudIsland.RPG3D.World
             {
                 PoolUsage status = poolUsage[index];
 
-                if (pools.TryGetValue(
-                        status.Settings,
-                        out WorldObjectPool pool))
+                if (pools.TryGetValue(status.Settings, out WorldObjectPool pool))
                 {
                     status.UpdateCount(pool);
                 }
@@ -540,8 +535,7 @@ namespace rudIsland.RPG3D.World
 
             while (registeredObjects.Count > 0)
             {
-                ApplyUnregister(
-                    registeredObjects[registeredObjects.Count - 1]);
+                ApplyUnregister(registeredObjects[registeredObjects.Count - 1]);
             }
 
             registeredSet.Clear();
@@ -551,9 +545,7 @@ namespace rudIsland.RPG3D.World
         }
 
         // 필수 Runtime 객체가 null인지 확인한다.
-        private static void ThrowIfNull(
-            IWorldObject worldObject,
-            string parameterName)
+        private static void ThrowIfNull(IWorldObject worldObject, string parameterName)
         {
             if (worldObject == null)
             {

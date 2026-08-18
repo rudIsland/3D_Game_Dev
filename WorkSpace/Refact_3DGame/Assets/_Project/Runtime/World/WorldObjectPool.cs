@@ -118,9 +118,7 @@ namespace rudIsland.RPG3D.World
         // 꺼낼 뷰가 부족할 때 프리팹과 RuntimeObject를 새로 만든다.
         private WorldObjectView CreateView()
         {
-            WorldObjectView view = Object.Instantiate(
-                settings.Prefab,
-                container);
+            WorldObjectView view = Object.Instantiate(settings.Prefab, container);
 
             view.gameObject.SetActive(false);
             view.Prepare(manager, this);

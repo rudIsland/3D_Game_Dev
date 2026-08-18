@@ -20,9 +20,7 @@ namespace rudIsland.RPG3D.UI
             barRoot.SetActive(true);
         }
 
-        public void UpdateStamina(
-            float currentStamina,
-            float maxStamina)
+        public void UpdateStamina(float currentStamina, float maxStamina)
         {
             if (staminaFill == null)
             {

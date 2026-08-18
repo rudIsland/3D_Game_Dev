@@ -3,9 +3,7 @@ using UnityEngine;
 namespace rudIsland.RPG3D.World
 {
     // 하나의 프리팹을 몇 개 준비하고 보관할지 설정한다.
-    [CreateAssetMenu(
-        fileName = "SpawnSettings",
-        menuName = "rudIsland/RPG3D/Spawn Settings")]
+    [CreateAssetMenu(fileName = "SpawnSettings", menuName = "rudIsland/RPG3D/Spawn Settings")]
     public sealed class SpawnSettings : ScriptableObject
     {
         // 풀에서 복제할 프리팹이다.

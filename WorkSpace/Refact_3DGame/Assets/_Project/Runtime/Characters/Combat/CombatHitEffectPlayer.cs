@@ -27,31 +27,22 @@ namespace rudIsland.RPG3D.Characters.Combat
             Create();
         }
 
-        public void PlayBodyHit(
-            Vector3 hitPosition,
-            Vector3 incomingDirection)
+        public void PlayBodyHit(Vector3 hitPosition, Vector3 incomingDirection)
         {
             Create();
-            bodyHitPool?.Play(
-                hitPosition,
-                GetEffectRotation(incomingDirection));
+            bodyHitPool?.Play(hitPosition, GetEffectRotation(incomingDirection));
         }
 
-        public void PlayGuardHit(
-            Vector3 hitPosition,
-            Vector3 incomingDirection)
+        public void PlayGuardHit(Vector3 hitPosition, Vector3 incomingDirection)
         {
             Create();
-            guardHitPool?.Play(
-                hitPosition,
-                GetEffectRotation(incomingDirection));
+            guardHitPool?.Play(hitPosition, GetEffectRotation(incomingDirection));
         }
 
         private void Create()
         {
             if (isCreated ||
-                (bodyHitEffectPrefab == null &&
-                 guardHitEffectPrefab == null))
+                (bodyHitEffectPrefab == null && guardHitEffectPrefab == null))
             {
                 return;
             }
@@ -61,9 +52,7 @@ namespace rudIsland.RPG3D.Characters.Combat
             Scene ownerScene = gameObject.scene;
             if (ownerScene.IsValid())
             {
-                SceneManager.MoveGameObjectToScene(
-                    effectRoot,
-                    ownerScene);
+                SceneManager.MoveGameObjectToScene(effectRoot, ownerScene);
             }
 
             bodyHitPool = new HitEffectPool(
@@ -102,9 +91,7 @@ namespace rudIsland.RPG3D.Characters.Combat
                 return Quaternion.identity;
             }
 
-            return Quaternion.LookRotation(
-                -incomingDirection.normalized,
-                Vector3.up);
+            return Quaternion.LookRotation(-incomingDirection.normalized, Vector3.up);
         }
 
 #if UNITY_EDITOR
@@ -135,17 +122,13 @@ namespace rudIsland.RPG3D.Characters.Combat
                 effects = new HitEffect[validPoolSize];
                 for (int index = 0; index < validPoolSize; index++)
                 {
-                    GameObject effectObject = Object.Instantiate(
-                        effectPrefab,
-                        effectParent);
+                    GameObject effectObject = Object.Instantiate(effectPrefab, effectParent);
                     effectObject.name = effectPrefab.name;
                     effects[index] = new HitEffect(effectObject);
                 }
             }
 
-            public void Play(
-                Vector3 hitPosition,
-                Quaternion hitRotation)
+            public void Play(Vector3 hitPosition, Quaternion hitRotation)
             {
                 if (effects == null || effects.Length == 0)
                 {
@@ -153,9 +136,7 @@ namespace rudIsland.RPG3D.Characters.Combat
                 }
 
                 int selectedIndex = FindAvailableEffectIndex();
-                effects[selectedIndex].Play(
-                    hitPosition,
-                    hitRotation);
+                effects[selectedIndex].Play(hitPosition, hitRotation);
                 nextEffectIndex =
                     (selectedIndex + 1) % effects.Length;
             }
@@ -229,23 +210,17 @@ namespace rudIsland.RPG3D.Characters.Combat
                 }
             }
 
-            public void Play(
-                Vector3 hitPosition,
-                Quaternion hitRotation)
+            public void Play(Vector3 hitPosition, Quaternion hitRotation)
             {
                 effectObject.SetActive(true);
-                effectTransform.SetPositionAndRotation(
-                    hitPosition,
-                    hitRotation);
+                effectTransform.SetPositionAndRotation(hitPosition, hitRotation);
 
                 for (int index = 0;
                      index < particleSystems.Length;
                      index++)
                 {
                     ParticleSystem particleSystem = particleSystems[index];
-                    particleSystem.Stop(
-                        false,
-                        ParticleSystemStopBehavior.StopEmittingAndClear);
+                    particleSystem.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
                     particleSystem.Play(false);
                 }
             }
@@ -256,9 +231,7 @@ namespace rudIsland.RPG3D.Characters.Combat
                      index < particleSystems.Length;
                      index++)
                 {
-                    particleSystems[index].Stop(
-                        false,
-                        ParticleSystemStopBehavior.StopEmittingAndClear);
+                    particleSystems[index].Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
                 }
             }
 

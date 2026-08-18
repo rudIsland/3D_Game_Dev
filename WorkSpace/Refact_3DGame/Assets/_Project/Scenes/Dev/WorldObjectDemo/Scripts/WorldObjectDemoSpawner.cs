@@ -15,9 +15,7 @@ namespace rudIsland.RPG3D.Dev.WorldDemo
         {
             if (worldObjectManager == null || spawnSettings == null)
             {
-                Debug.LogError(
-                    "WorldObjectDemoSpawner에 Manager와 SpawnSettings가 필요합니다.",
-                    this);
+                Debug.LogError("WorldObjectDemoSpawner에 Manager와 SpawnSettings가 필요합니다.", this);
                 return;
             }
 
@@ -27,9 +25,7 @@ namespace rudIsland.RPG3D.Dev.WorldDemo
                     transform.rotation,
                     out spawnedView))
             {
-                Debug.LogError(
-                    "테스트 WorldObject를 풀에서 꺼내지 못했습니다.",
-                    this);
+                Debug.LogError("테스트 WorldObject를 풀에서 꺼내지 못했습니다.", this);
             }
         }
 

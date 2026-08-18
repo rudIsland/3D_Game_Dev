@@ -26,9 +26,7 @@ namespace rudIsland.RPG3D.Dev.WorldDemo
             private readonly Transform target; // 대상 참조
             private readonly float turnSpeed; // 이동 속도
 
-            public RotatingWorldObject(
-                Transform target,
-                float turnSpeed)
+            public RotatingWorldObject(Transform target, float turnSpeed)
             {
                 this.target = target;
                 this.turnSpeed = turnSpeed;
