@@ -14,10 +14,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         typeof(CombatHitEffectPlayer))]
     [RequireComponent(typeof(NightShadeSwordAttackAudio))]
     // Unity 프리팹과 일반 C# NightShade 양손검 전투를 연결한다.
-    public sealed class NightShadeSwordController :
-        WorldObjectView,
-        IUnitDeathState,
-        IEnemyDamageReceiver
+    public sealed class NightShadeSwordController : WorldObjectView, IUnitDeathState, IEnemyDamageReceiver
     {
         [Header("필수 연결")]
         [SerializeField] private Transform target;
@@ -37,6 +34,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         [Header("찾기와 공격 거리")]
         [SerializeField, Min(0.1f)] private float findRange = 24f;
         [SerializeField, Min(0.1f)] private float attackRange = 2.4f;
+        [SerializeField, Min(0.1f)] private float walkStartRange = 5f;
+        [SerializeField, Min(0.1f)] private float runStartRange = 6f;
         [SerializeField, Range(0f, 180f)]
         private float attackFacingAngle = 14f;
 
@@ -44,27 +43,18 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         [SerializeField] private LayerMask targetLayers = 1 << 17;
         [SerializeField] private NightShadeSwordHitShape swordHitShape;
         [SerializeField] private AttackDamage lightAttackDamage =
-            new AttackDamage(
-                18f, 1, 18f, 0.4f, 30f, true, 0.06f,
-                DamageSoundType.SwordCut);
+            new AttackDamage(18f, 1, 18f, 0.4f, 30f, true, 0.06f, DamageSoundType.SwordCut);
         [SerializeField] private AttackDamage comboFirstAttackDamage =
-            new AttackDamage(
-                12f, 1, 12f, 0.25f, 20f, true, 0.045f,
-                DamageSoundType.SwordCut);
+            new AttackDamage(12f, 1, 12f, 0.25f, 20f, true, 0.045f, DamageSoundType.SwordCut);
         [SerializeField] private AttackDamage comboSecondAttackDamage =
-            new AttackDamage(
-                16f, 1, 18f, 0.4f, 25f, true, 0.06f,
-                DamageSoundType.SwordCut);
+            new AttackDamage(16f, 1, 18f, 0.4f, 25f, true, 0.06f, DamageSoundType.SwordCut);
         [SerializeField] private AttackDamage heavyAttackDamage =
-            new AttackDamage(
-                28f, 2, 35f, 0.75f, 45f, true, 0.08f,
-                DamageSoundType.SwordCut);
+            new AttackDamage(28f, 2, 35f, 0.75f, 45f, true, 0.08f, DamageSoundType.SwordCut);
         [SerializeField] private AttackDamage wideSwingAttackDamage =
-            new AttackDamage(
-                22f, 1, 24f, 0.55f, 35f, true, 0.07f,
-                DamageSoundType.SwordCut);
+            new AttackDamage(22f, 1, 24f, 0.55f, 35f, true, 0.07f, DamageSoundType.SwordCut);
 
         [Header("이동")]
+        [SerializeField, Min(0.1f)] private float walkSpeed = 1.8f;
         [SerializeField, Min(0.1f)] private float chaseSpeed = 3.8f;
         [SerializeField, Min(1f)] private float turnSpeed = 420f;
         [SerializeField, Min(1f)] private float attackTurnSpeed = 180f;
@@ -72,11 +62,16 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         [SerializeField] private float groundPull = -2f;
 
         [Header("공격 후 쉬는 시간")]
-        [SerializeField, Min(0f)] private float lightAttackRecovery = 0.25f;
-        [SerializeField, Min(0f)] private float comboAttackRecovery = 0.45f;
-        [SerializeField, Min(0f)] private float wideSwingAttackRecovery = 0.65f;
-        [SerializeField, Min(0f)] private float heavyAttackRecovery = 0.9f;
+        [SerializeField, Min(0f)] private float lightAttackRecovery = 2f;
+        [SerializeField, Min(0f)] private float comboAttackRecovery = 2.5f;
+        [SerializeField, Min(0f)] private float wideSwingAttackRecovery = 2.5f;
+        [SerializeField, Min(0f)] private float heavyAttackRecovery = 3f;
 
+
+        [Header("콤보 연결")]
+        [SerializeField, Range(0.35f, 1f)]
+        private float comboFirstExitNormalizedTime = 0.4f;
+        [SerializeField, Min(0f)] private float comboSecondDelay = 0.15f;
         [Header("전투 거리 조절")]
         [SerializeField, Min(0.1f)] private float combatMoveSpeed = 2f;
         [SerializeField, Min(0.1f)] private float combatMoveDuration = 0.6f;
@@ -84,8 +79,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
         [Header("피격 이동")]
         [SerializeField, Min(0.01f)] private float hitPushDuration = 0.18f;
-        [SerializeField] private AnimationCurve hitPushCurve =
-            CreateDefaultHitPushCurve();
+        [SerializeField] private AnimationCurve hitPushCurve = CreateDefaultHitPushCurve();
 
         private CharacterController characterController;
         private NightShadeSwordAnimationController swordAnimation;
@@ -95,6 +89,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         private NightShadeSwordAttackAudio attackAudio;
 
         public bool IsDead => swordWorldUnit != null && swordWorldUnit.IsDead;
+        internal bool IsAttackStateActive =>
+            swordWorldUnit != null && swordWorldUnit.IsAttackStateActive;
 
         protected override IWorldObject CreateRuntimeObject()
         {
@@ -127,19 +123,20 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 hitEffectPlayer);
             IUnitDeathState targetDeathState =
                 target.GetComponentInParent<IUnitDeathState>();
-            var stateMachine = new NightShadeSwordStateMachine(
-                target,
-                targetDeathState,
-                movement,
-                swordAnimation,
+            var settings = new NightShadeSwordSettings(
                 findRange,
                 attackRange,
+                walkStartRange,
+                runStartRange,
                 attackFacingAngle,
+                walkSpeed,
                 chaseSpeed,
                 turnSpeed,
                 attackTurnSpeed,
                 lightAttackRecovery,
                 comboAttackRecovery,
+                comboSecondDelay,
+                comboFirstExitNormalizedTime,
                 wideSwingAttackRecovery,
                 heavyAttackRecovery,
                 combatMoveSpeed,
@@ -147,11 +144,19 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 attacksBeforeCombatMove,
                 hitPushDuration,
                 hitPushCurve,
-                deadBodyKeepTime,
+                deadBodyKeepTime);
+            var actions = new NightShadeSwordActions(
                 PlayAttackSound,
                 OpenAttackHit,
                 CloseAttackHit,
                 RequestDespawn);
+            var stateMachine = new NightShadeSwordStateMachine(
+                target,
+                targetDeathState,
+                movement,
+                swordAnimation,
+                settings,
+                actions);
             var stagger = new NightShadeSwordStagger(
                 staggerLimit,
                 staggerRecoverDelay,
@@ -180,19 +185,34 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             swordAnimation?.ResetAnimation();
         }
 
-        private void PlayAttackSound(
-            NightShadeSwordAttackType attackType,
-            int hitIndex)
+        internal void StopAttackTurnAnimationEvent()
+        {
+            swordWorldUnit?.StopAttackTurnAnimationEvent();
+        }
+
+        internal void PlayAttackSoundAnimationEvent(int hitIndex)
+        {
+            swordWorldUnit?.PlayAttackSoundAnimationEvent(hitIndex);
+        }
+
+        internal void OpenAttackHitAnimationEvent(int hitIndex)
+        {
+            swordWorldUnit?.OpenAttackHitAnimationEvent(hitIndex);
+        }
+
+        internal void CloseAttackHitAnimationEvent()
+        {
+            swordWorldUnit?.CloseAttackHitAnimationEvent();
+        }
+
+        private void PlayAttackSound(NightShadeSwordAttackType attackType, int hitIndex)
         {
             attackAudio?.Play(attackType, hitIndex);
         }
 
-        private void OpenAttackHit(
-            NightShadeSwordAttackType attackType,
-            int hitIndex)
+        private void OpenAttackHit(NightShadeSwordAttackType attackType, int hitIndex)
         {
-            attackRangeDetector?.Open(
-                GetAttackDamage(attackType, hitIndex));
+            attackRangeDetector?.Open(GetAttackDamage(attackType, hitIndex));
         }
 
         private void CloseAttackHit()
@@ -200,16 +220,14 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             attackRangeDetector?.Close();
         }
 
-        private AttackDamage GetAttackDamage(
-            NightShadeSwordAttackType attackType,
-            int hitIndex)
+        private AttackDamage GetAttackDamage(NightShadeSwordAttackType attackType, int hitIndex)
         {
             switch (attackType)
             {
-                case NightShadeSwordAttackType.Combo:
-                    return hitIndex == 0
-                        ? comboFirstAttackDamage
-                        : comboSecondAttackDamage;
+                case NightShadeSwordAttackType.ComboFirst:
+                    return comboFirstAttackDamage;
+                case NightShadeSwordAttackType.ComboSecond:
+                    return comboSecondAttackDamage;
                 case NightShadeSwordAttackType.Heavy:
                     return heavyAttackDamage;
                 case NightShadeSwordAttackType.WideSwing:
@@ -244,9 +262,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
         private static AnimationCurve CreateDefaultHitPushCurve()
         {
-            return new AnimationCurve(
-                new Keyframe(0f, 0f, 2f, 2f),
-                new Keyframe(1f, 1f, 0f, 0f));
+            return new AnimationCurve(new Keyframe(0f, 0f, 2f, 2f), new Keyframe(1f, 1f, 0f, 0f));
         }
 
 #if UNITY_EDITOR
@@ -274,12 +290,26 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             deadBodyKeepTime = Mathf.Max(0f, deadBodyKeepTime);
             findRange = Mathf.Max(0.1f, findRange);
             attackRange = Mathf.Clamp(attackRange, 0.1f, findRange);
+            walkStartRange = Mathf.Clamp(
+                walkStartRange,
+                attackRange,
+                findRange);
+            runStartRange = Mathf.Clamp(
+                runStartRange,
+                walkStartRange,
+                findRange);
             attackFacingAngle = Mathf.Clamp(attackFacingAngle, 0f, 180f);
+            walkSpeed = Mathf.Max(0.1f, walkSpeed);
             chaseSpeed = Mathf.Max(0.1f, chaseSpeed);
             turnSpeed = Mathf.Max(1f, turnSpeed);
             attackTurnSpeed = Mathf.Max(1f, attackTurnSpeed);
             lightAttackRecovery = Mathf.Max(0f, lightAttackRecovery);
             comboAttackRecovery = Mathf.Max(0f, comboAttackRecovery);
+            comboSecondDelay = Mathf.Max(0f, comboSecondDelay);
+            comboFirstExitNormalizedTime = Mathf.Clamp(
+                comboFirstExitNormalizedTime,
+                0.35f,
+                1f);
             wideSwingAttackRecovery =
                 Mathf.Max(0f, wideSwingAttackRecovery);
             heavyAttackRecovery = Mathf.Max(0f, heavyAttackRecovery);
@@ -309,15 +339,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             }
 
             Gizmos.color = Color.cyan;
-            Gizmos.DrawWireSphere(
-                swordHitShape.StartPoint.position,
-                swordHitShape.Radius);
-            Gizmos.DrawWireSphere(
-                swordHitShape.EndPoint.position,
-                swordHitShape.Radius);
-            Gizmos.DrawLine(
-                swordHitShape.StartPoint.position,
-                swordHitShape.EndPoint.position);
+            Gizmos.DrawWireSphere(swordHitShape.StartPoint.position, swordHitShape.Radius);
+            Gizmos.DrawWireSphere(swordHitShape.EndPoint.position, swordHitShape.Radius);
+            Gizmos.DrawLine(swordHitShape.StartPoint.position, swordHitShape.EndPoint.position);
         }
 #endif
     }

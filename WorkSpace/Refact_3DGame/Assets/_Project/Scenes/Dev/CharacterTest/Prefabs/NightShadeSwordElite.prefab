@@ -583,6 +583,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Characters.Enemies.NightShade.NightShadeSwordAnimationEventReceiver
   animationController: {fileID: 7267387225351355008}
+  swordController: {fileID: 600740620912470681}
 --- !u!114 &5198446659506177195
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -838,6 +839,8 @@ MonoBehaviour:
   deadBodyKeepTime: 3
   findRange: 24
   attackRange: 2.4
+  walkStartRange: 5
+  runStartRange: 6
   attackFacingAngle: 14
   targetLayers:
     serializedVersion: 2
@@ -891,15 +894,17 @@ MonoBehaviour:
     guardStaminaDamage: 35
     canBlock: 1
     damageSoundType: 1
+  walkSpeed: 1.8
   chaseSpeed: 3.8
   turnSpeed: 420
   attackTurnSpeed: 180
   gravity: -22
   groundPull: -2
-  lightAttackRecovery: 0.25
-  comboAttackRecovery: 0.45
-  wideSwingAttackRecovery: 0.65
-  heavyAttackRecovery: 0.9
+  lightAttackRecovery: 2
+  comboAttackRecovery: 2.5
+  comboSecondDelay: 0.7
+  wideSwingAttackRecovery: 2.5
+  heavyAttackRecovery: 3
   combatMoveSpeed: 2
   combatMoveDuration: 0.6
   attacksBeforeCombatMove: 2
@@ -966,52 +971,52 @@ PrefabInstance:
     - target: {fileID: 4818472777831986682, guid: 9891eec797d45634dbf057ab61a81d15,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 0.055877283
       objectReference: {fileID: 0}
     - target: {fileID: 4818472777831986682, guid: 9891eec797d45634dbf057ab61a81d15,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.071063146
       objectReference: {fileID: 0}
     - target: {fileID: 4818472777831986682, guid: 9891eec797d45634dbf057ab61a81d15,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 0.0667227
       objectReference: {fileID: 0}
     - target: {fileID: 4818472777831986682, guid: 9891eec797d45634dbf057ab61a81d15,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.5694464
+      value: 0.7247238
       objectReference: {fileID: 0}
     - target: {fileID: 4818472777831986682, guid: 9891eec797d45634dbf057ab61a81d15,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.47612476
+      value: -0.19782917
       objectReference: {fileID: 0}
     - target: {fileID: 4818472777831986682, guid: 9891eec797d45634dbf057ab61a81d15,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: 0.095419735
       objectReference: {fileID: 0}
     - target: {fileID: 4818472777831986682, guid: 9891eec797d45634dbf057ab61a81d15,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.6701015
+      value: 0.65309584
       objectReference: {fileID: 0}
     - target: {fileID: 4818472777831986682, guid: 9891eec797d45634dbf057ab61a81d15,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
+      value: -24.292
       objectReference: {fileID: 0}
     - target: {fileID: 4818472777831986682, guid: 9891eec797d45634dbf057ab61a81d15,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: -7.571
       objectReference: {fileID: 0}
     - target: {fileID: 4818472777831986682, guid: 9891eec797d45634dbf057ab61a81d15,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
+      value: 85.68
       objectReference: {fileID: 0}
     - target: {fileID: 8024583501847441683, guid: 9891eec797d45634dbf057ab61a81d15,
         type: 3}

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using rudIsland.RPG3D.Characters.Combat;
 using rudIsland.RPG3D.Characters.Enemies.NightShade;
@@ -28,22 +29,38 @@ namespace rudIsland.RPG3D.EditorTools
             "Assets/_Project/Scenes/Dev/CharacterTest/Settings/NightShadeTestSpawnSettings.asset";
         private const string AnimationCopyFolder =
             "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Clips/TwoHandSword";
+        private const string WalkClipPath =
+            "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Clips/TwoHandSword/NightShadeSword_Walk.anim";
+        private const string LightAttackClipPath =
+            "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Clips/TwoHandSword/NightShadeSword_LightAttack.anim";
+        private const string ComboFirstClipPath =
+            "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Clips/TwoHandSword/NightShadeSword_ComboFirst.anim";
+        private const string ComboSecondClipPath =
+            "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Clips/TwoHandSword/NightShadeSword_ComboSecond.anim";
+        private const string HeavyAttackClipPath =
+            "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Clips/TwoHandSword/NightShadeSword_HeavyAttack.anim";
+        private const string WideSwingClipPath =
+            "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Clips/TwoHandSword/NightShadeSword_WideSwing.anim";
         private const string AttackSpeedParameterName = "AttackSpeed";
 
         private const string IdleSourcePath =
             "Assets/_ThirdParty/AnimationBundle/FBX_Animations/Two Hand Up/Movement/Idle/Idle/2Hand_Up_Idle_A_1.fbx";
         private const string ChaseSourcePath =
             "Assets/_ThirdParty/AnimationBundle/FBX_Animations/Two Hand Up/Movement/Run/Type A/Base/InPlace/2Hand_Up_Run_A_F_InPlace.fbx";
+        private const string WalkSourcePath =
+            "Assets/_ThirdParty/AnimationBundle/FBX_Animations/Two Hand Up/Movement/Walk/Type A/Base/InPlace/2Hand_Up_Walk_A_F_InPlace.fbx";
         private const string CombatBackSourcePath =
-            "Assets/_ThirdParty/AnimationBundle/FBX_Animations/Two Hand Up/Movement/Block A Walk Slow/InPlace/2Hand_Up_Block_Walk_Slow_B_InPlace.fbx";
+            "Assets/_ThirdParty/AnimationBundle/FBX_Animations/Two Hand Up/Movement/Walk Slow/Type B/InPlace/2Hand_Up_Walk_Slow_B_B_InPlace.fbx";
         private const string CombatLeftSourcePath =
             "Assets/_ThirdParty/AnimationBundle/FBX_Animations/Two Hand Up/Movement/Block A Walk Slow/InPlace/2Hand_Up_Block_Walk_Slow_F_L90_A_InPlace.fbx";
         private const string CombatRightSourcePath =
             "Assets/_ThirdParty/AnimationBundle/FBX_Animations/Two Hand Up/Movement/Block A Walk Slow/InPlace/2Hand_Up_Block_Walk_Slow_F_R90_A_InPlace.fbx";
         private const string LightAttackSourcePath =
             "Assets/_ThirdParty/AnimationBundle/FBX_Animations/Two Hand Up/Attack_A/2Hand_Up_Attack_A_1.fbx";
-        private const string ComboAttackSourcePath =
-            "Assets/_ThirdParty/AnimationBundle/FBX_Animations/Two Hand Up/Attack_A/2Hand_Up_Attack_A_Combo_12.fbx";
+        private const string ComboFirstSourcePath =
+            "Assets/_ThirdParty/AnimationBundle/FBX_Animations/Two Hand Up/Attack_A/2Hand_Up_Attack_A_1.fbx";
+        private const string ComboSecondSourcePath =
+            "Assets/_ThirdParty/AnimationBundle/FBX_Animations/Two Hand Up/Attack_A/2Hand_Up_Attack_A_2_Combo.fbx";
         private const string HeavyAttackSourcePath =
             "Assets/_ThirdParty/AnimationBundle/FBX_Animations/Two Hand Up/Attack_B/2Hand_Up_Attack_B_1.fbx";
         private const string WideSwingSourcePath =
@@ -67,8 +84,101 @@ namespace rudIsland.RPG3D.EditorTools
             ConnectSpawnSettings(enemyPrefab);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Debug.Log(
-                "NightShadeSwordElite 프리팹과 양손검 Animator를 만들었습니다.");
+            Debug.Log("NightShadeSwordElite 프리팹과 양손검 Animator를 만들었습니다.");
+        }
+
+        [MenuItem("Tools/rudIsland/Apply NightShade Sword Attack Events")]
+        public static void ApplyAttackAnimationEvents()
+        {
+            ApplyAttackAnimationEvents(LoadClip(LightAttackClipPath), CreateLightAttackEvents());
+            ApplyAttackAnimationEvents(LoadClip(ComboFirstClipPath), CreateComboFirstEvents());
+            ApplyAttackAnimationEvents(LoadClip(ComboSecondClipPath), CreateComboSecondEvents());
+            ApplyAttackAnimationEvents(LoadClip(HeavyAttackClipPath), CreateHeavyAttackEvents());
+            ApplyAttackAnimationEvents(LoadClip(WideSwingClipPath), CreateWideSwingAttackEvents());
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            Debug.Log("NightShade 양손검 공격 이벤트만 적용했습니다.");
+        }
+
+        [MenuItem("Tools/rudIsland/Apply NightShade Sword Sound Timing")]
+        public static void ApplyAttackSoundTiming()
+        {
+            ApplyAttackSoundTiming(
+                LoadClip(LightAttackClipPath),
+                0.36666667f);
+            ApplyAttackSoundTiming(
+                LoadClip(ComboFirstClipPath),
+                0.36666667f);
+            ApplyAttackSoundTiming(
+                LoadClip(ComboSecondClipPath),
+                0.23333334f);
+            ApplyAttackSoundTiming(
+                LoadClip(HeavyAttackClipPath),
+                0.6333333f);
+            ApplyAttackSoundTiming(
+                LoadClip(WideSwingClipPath),
+                0.43333334f);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            Debug.Log("NightShade 양손검 사운드 이벤트 시간만 적용했습니다.");
+        }
+
+        [MenuItem("Tools/rudIsland/Apply NightShade Sword Split Combo")]
+        public static void ApplySplitCombo()
+        {
+            EnsureAssetFolder(AnimationCopyFolder);
+            AnimationClip comboFirstClip = CopyAnimationClip(
+                ComboFirstSourcePath,
+                ComboFirstClipPath,
+                false);
+            AnimationClip comboSecondClip = CopyAnimationClip(
+                ComboSecondSourcePath,
+                ComboSecondClipPath,
+                false);
+            ApplyAttackAnimationEvents(
+                comboFirstClip,
+                CreateComboFirstEvents());
+            ApplyAttackAnimationEvents(
+                comboSecondClip,
+                CreateComboSecondEvents());
+
+            AnimatorController controller =
+                AssetDatabase.LoadAssetAtPath<AnimatorController>(
+                    AnimatorControllerPath);
+            if (controller == null)
+            {
+                throw new InvalidOperationException(
+                    $"NightShade Animator Controller를 찾지 못했습니다: {AnimatorControllerPath}");
+            }
+
+            AddOrUpdateSplitComboStates(
+                controller,
+                comboFirstClip,
+                comboSecondClip);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            Debug.Log("NightShade 양손검 Combo First와 Combo Second만 적용했습니다.");
+        }
+
+        [MenuItem("Tools/rudIsland/Apply NightShade Sword Walk")]
+        public static void ApplyWalkAnimation()
+        {
+            EnsureAssetFolder(AnimationCopyFolder);
+            AnimationClip walkClip = CopyAnimationClip(
+                WalkSourcePath,
+                WalkClipPath,
+                true);
+            AnimatorController controller =
+                AssetDatabase.LoadAssetAtPath<AnimatorController>(AnimatorControllerPath);
+            if (controller == null)
+            {
+                throw new InvalidOperationException($"NightShade Animator Controller를 찾지 못했습니다: {AnimatorControllerPath}");
+            }
+
+            AddOrUpdateWalkState(controller, walkClip);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            Debug.Log("NightShade 양손검 Walk 클립과 상태만 적용했습니다.");
         }
 
         public static void BuildFromCommandLine()
@@ -95,6 +205,10 @@ namespace rudIsland.RPG3D.EditorTools
                 ChaseSourcePath,
                 $"{AnimationCopyFolder}/NightShadeSword_Chase.anim",
                 true);
+            AnimationClip walkClip = CopyAnimationClip(
+                WalkSourcePath,
+                WalkClipPath,
+                true);
             AnimationClip combatBackClip = CopyAnimationClip(
                 CombatBackSourcePath,
                 $"{AnimationCopyFolder}/NightShadeSword_CombatBack.anim",
@@ -111,9 +225,13 @@ namespace rudIsland.RPG3D.EditorTools
                 LightAttackSourcePath,
                 $"{AnimationCopyFolder}/NightShadeSword_LightAttack.anim",
                 false);
-            AnimationClip comboAttackClip = CopyAnimationClip(
-                ComboAttackSourcePath,
-                $"{AnimationCopyFolder}/NightShadeSword_ComboAttack.anim",
+            AnimationClip comboFirstClip = CopyAnimationClip(
+                ComboFirstSourcePath,
+                ComboFirstClipPath,
+                false);
+            AnimationClip comboSecondClip = CopyAnimationClip(
+                ComboSecondSourcePath,
+                ComboSecondClipPath,
                 false);
             AnimationClip heavyAttackClip = CopyAnimationClip(
                 HeavyAttackSourcePath,
@@ -124,19 +242,21 @@ namespace rudIsland.RPG3D.EditorTools
                 $"{AnimationCopyFolder}/NightShadeSword_WideSwing.anim",
                 false);
 
+            ApplyAttackAnimationEvents(lightAttackClip, CreateLightAttackEvents());
+            ApplyAttackAnimationEvents(comboFirstClip, CreateComboFirstEvents());
+            ApplyAttackAnimationEvents(comboSecondClip, CreateComboSecondEvents());
+            ApplyAttackAnimationEvents(heavyAttackClip, CreateHeavyAttackEvents());
+            ApplyAttackAnimationEvents(wideSwingClip, CreateWideSwingAttackEvents());
+
             AnimatorController controller =
-                AssetDatabase.LoadAssetAtPath<AnimatorController>(
-                    AnimatorControllerPath);
+                AssetDatabase.LoadAssetAtPath<AnimatorController>(AnimatorControllerPath);
             if (controller == null)
             {
                 controller =
-                    AnimatorController.CreateAnimatorControllerAtPath(
-                        AnimatorControllerPath);
+                    AnimatorController.CreateAnimatorControllerAtPath(AnimatorControllerPath);
             }
 
-            EnsureFloatParameter(
-                controller,
-                AttackSpeedParameterName);
+            EnsureFloatParameter(controller, AttackSpeedParameterName);
             AnimatorStateMachine stateMachine =
                 controller.layers[0].stateMachine;
             AnimatorState[] oldStates = new AnimatorState[
@@ -163,6 +283,11 @@ namespace rudIsland.RPG3D.EditorTools
                 new Vector3(260f, 0f));
             AddState(
                 stateMachine,
+                "Walk",
+                walkClip,
+                new Vector3(390f, 0f));
+            AddState(
+                stateMachine,
                 "Combat Back",
                 combatBackClip,
                 new Vector3(520f, 0f));
@@ -184,9 +309,15 @@ namespace rudIsland.RPG3D.EditorTools
                 true);
             AddState(
                 stateMachine,
-                "Combo Attack",
-                comboAttackClip,
+                "Combo First",
+                comboFirstClip,
                 new Vector3(260f, 90f),
+                true);
+            AddState(
+                stateMachine,
+                "Combo Second",
+                comboSecondClip,
+                new Vector3(390f, 90f),
                 true);
             AddState(
                 stateMachine,
@@ -234,9 +365,127 @@ namespace rudIsland.RPG3D.EditorTools
             return state;
         }
 
-        private static void EnsureFloatParameter(
+        private static void AddOrUpdateWalkState(AnimatorController controller, AnimationClip walkClip)
+        {
+            if (controller.layers.Length == 0)
+            {
+                throw new InvalidOperationException("NightShade Animator Controller에 Base Layer가 없습니다.");
+            }
+
+            AnimatorStateMachine stateMachine =
+                controller.layers[0].stateMachine;
+            ChildAnimatorState[] childStates = stateMachine.states;
+            AnimatorState walkState = null;
+            for (int index = 0; index < childStates.Length; index++)
+            {
+                AnimatorState state = childStates[index].state;
+                if (state.name != "Walk")
+                {
+                    continue;
+                }
+
+                if (walkState == null)
+                {
+                    walkState = state;
+                    continue;
+                }
+
+                stateMachine.RemoveState(state);
+            }
+
+            if (walkState == null)
+            {
+                walkState = stateMachine.AddState("Walk", new Vector3(390f, 0f));
+            }
+
+            walkState.motion = walkClip;
+            walkState.writeDefaultValues = true;
+            walkState.speedParameterActive = false;
+            EditorUtility.SetDirty(walkState);
+            EditorUtility.SetDirty(controller);
+        }
+
+        private static void AddOrUpdateSplitComboStates(
             AnimatorController controller,
-            string parameterName)
+            AnimationClip comboFirstClip,
+            AnimationClip comboSecondClip)
+        {
+            if (controller.layers.Length == 0)
+            {
+                throw new InvalidOperationException(
+                    "NightShade Animator Controller에 Base Layer가 없습니다.");
+            }
+
+            EnsureFloatParameter(controller, AttackSpeedParameterName);
+            AnimatorStateMachine stateMachine =
+                controller.layers[0].stateMachine;
+            RemoveStatesByName(stateMachine, "Combo Attack");
+            AddOrUpdateAttackState(
+                stateMachine,
+                "Combo First",
+                comboFirstClip,
+                new Vector3(260f, 90f));
+            AddOrUpdateAttackState(
+                stateMachine,
+                "Combo Second",
+                comboSecondClip,
+                new Vector3(390f, 90f));
+            EditorUtility.SetDirty(controller);
+        }
+
+        private static void AddOrUpdateAttackState(
+            AnimatorStateMachine stateMachine,
+            string stateName,
+            AnimationClip clip,
+            Vector3 position)
+        {
+            ChildAnimatorState[] childStates = stateMachine.states;
+            AnimatorState keptState = null;
+            for (int index = 0; index < childStates.Length; index++)
+            {
+                AnimatorState state = childStates[index].state;
+                if (state.name != stateName)
+                {
+                    continue;
+                }
+
+                if (keptState == null)
+                {
+                    keptState = state;
+                    continue;
+                }
+
+                stateMachine.RemoveState(state);
+            }
+
+            if (keptState == null)
+            {
+                keptState = stateMachine.AddState(stateName, position);
+            }
+
+            keptState.motion = clip;
+            keptState.writeDefaultValues = true;
+            keptState.speedParameterActive = true;
+            keptState.speedParameter = AttackSpeedParameterName;
+            EditorUtility.SetDirty(keptState);
+        }
+
+        private static void RemoveStatesByName(
+            AnimatorStateMachine stateMachine,
+            string stateName)
+        {
+            ChildAnimatorState[] childStates = stateMachine.states;
+            for (int index = 0; index < childStates.Length; index++)
+            {
+                AnimatorState state = childStates[index].state;
+                if (state.name == stateName)
+                {
+                    stateMachine.RemoveState(state);
+                }
+            }
+        }
+
+        private static void EnsureFloatParameter(AnimatorController controller, string parameterName)
         {
             AnimatorControllerParameter[] parameters = controller.parameters;
             for (int index = 0; index < parameters.Length; index++)
@@ -249,16 +498,13 @@ namespace rudIsland.RPG3D.EditorTools
                 if (parameters[index].type !=
                     AnimatorControllerParameterType.Float)
                 {
-                    throw new InvalidOperationException(
-                        $"{parameterName} Animator 파라미터는 Float여야 합니다.");
+                    throw new InvalidOperationException($"{parameterName} Animator 파라미터는 Float여야 합니다.");
                 }
 
                 return;
             }
 
-            controller.AddParameter(
-                parameterName,
-                AnimatorControllerParameterType.Float);
+            controller.AddParameter(parameterName, AnimatorControllerParameterType.Float);
         }
 
         private static AnimationClip LoadClip(string assetPath)
@@ -275,16 +521,13 @@ namespace rudIsland.RPG3D.EditorTools
             for (int index = 0; index < assets.Length; index++)
             {
                 if (assets[index] is AnimationClip clip &&
-                    !clip.name.StartsWith(
-                        "__preview__",
-                        StringComparison.OrdinalIgnoreCase))
+                    !clip.name.StartsWith("__preview__", StringComparison.OrdinalIgnoreCase))
                 {
                     return clip;
                 }
             }
 
-            throw new InvalidOperationException(
-                $"애니메이션 클립을 찾지 못했습니다: {assetPath}");
+            throw new InvalidOperationException($"애니메이션 클립을 찾지 못했습니다: {assetPath}");
         }
 
         private static AnimationClip CopyAnimationClip(
@@ -320,6 +563,242 @@ namespace rudIsland.RPG3D.EditorTools
             return copyClip;
         }
 
+        private static AnimationEvent[] CreateLightAttackEvents()
+        {
+            return new[]
+            {
+                CreateAttackSpeedEvent(0f, 0.5f),
+                CreateAttackSpeedResetEvent(0.2f),
+                CreateAttackEvent(
+                    0.4f,
+                    "StopAttackTurnAnimationEvent",
+                    0),
+                CreateAttackEvent(
+                    0.36666667f,
+                    "PlayAttackSoundAnimationEvent",
+                    0),
+                CreateAttackEvent(
+                    0.53333336f,
+                    "OpenAttackHitAnimationEvent",
+                    0),
+                CreateAttackEvent(
+                    0.7f,
+                    "CloseAttackHitAnimationEvent",
+                    0)
+            };
+        }
+
+        private static AnimationEvent[] CreateComboFirstEvents()
+        {
+            return new[]
+            {
+                CreateAttackSpeedEvent(0.033333335f, 0.6f),
+                CreateAttackSpeedResetEvent(0.23333334f),
+                CreateAttackEvent(
+                    0.36666667f,
+                    "PlayAttackSoundAnimationEvent",
+                    0),
+                CreateAttackEvent(
+                    0.4f,
+                    "StopAttackTurnAnimationEvent",
+                    0),
+                CreateAttackEvent(
+                    0.53333336f,
+                    "OpenAttackHitAnimationEvent",
+                    0),
+                CreateAttackEvent(
+                    0.6666667f,
+                    "CloseAttackHitAnimationEvent",
+                    0)
+            };
+        }
+
+        private static AnimationEvent[] CreateComboSecondEvents()
+        {
+            return new[]
+            {
+                CreateAttackSpeedEvent(0.033333335f, 0.8f),
+                CreateAttackSpeedResetEvent(0.13333334f),
+                CreateAttackEvent(
+                    0.33333334f,
+                    "StopAttackTurnAnimationEvent",
+                    0),
+                CreateAttackEvent(
+                    0.23333334f,
+                    "PlayAttackSoundAnimationEvent",
+                    0),
+                CreateAttackEvent(
+                    0.36666667f,
+                    "OpenAttackHitAnimationEvent",
+                    0),
+                CreateAttackEvent(
+                    0.46666667f,
+                    "CloseAttackHitAnimationEvent",
+                    0),
+            };
+        }
+
+        private static AnimationEvent[] CreateHeavyAttackEvents()
+        {
+            return new[]
+            {
+                CreateAttackSpeedEvent(0f, 0.5f),
+                CreateAttackSpeedResetEvent(0.46666667f),
+                CreateAttackEvent(
+                    0.7f,
+                    "StopAttackTurnAnimationEvent",
+                    0),
+                CreateAttackEvent(
+                    0.6333333f,
+                    "PlayAttackSoundAnimationEvent",
+                    0),
+                CreateAttackEvent(
+                    0.6f,
+                    "OpenAttackHitAnimationEvent",
+                    0),
+                CreateAttackEvent(
+                    0.9666667f,
+                    "CloseAttackHitAnimationEvent",
+                    0)
+            };
+        }
+
+        private static AnimationEvent[] CreateWideSwingAttackEvents()
+        {
+            return new[]
+            {
+                CreateAttackSpeedEvent(0.033333335f, 0.5f),
+                CreateAttackSpeedResetEvent(0.36666667f),
+                CreateAttackEvent(
+                    0.46666667f,
+                    "StopAttackTurnAnimationEvent",
+                    0),
+                CreateAttackEvent(
+                    0.43333334f,
+                    "PlayAttackSoundAnimationEvent",
+                    0),
+                CreateAttackEvent(
+                    0.6f,
+                    "OpenAttackHitAnimationEvent",
+                    0),
+                CreateAttackEvent(
+                    0.7666667f,
+                    "CloseAttackHitAnimationEvent",
+                    0)
+            };
+        }
+
+        private static void ApplyAttackAnimationEvents(AnimationClip clip, AnimationEvent[] nextAttackEvents)
+        {
+            AnimationEvent[] oldEvents =
+                AnimationUtility.GetAnimationEvents(clip);
+            var eventsToKeep = new List<AnimationEvent>(oldEvents.Length + nextAttackEvents.Length);
+            for (int index = 0; index < oldEvents.Length; index++)
+            {
+                if (!IsNightShadeAttackEvent(oldEvents[index].functionName))
+                {
+                    eventsToKeep.Add(oldEvents[index]);
+                }
+            }
+
+            eventsToKeep.AddRange(nextAttackEvents);
+            eventsToKeep.Sort(CompareAnimationEvents);
+            AnimationUtility.SetAnimationEvents(clip, eventsToKeep.ToArray());
+            EditorUtility.SetDirty(clip);
+        }
+
+        private static void ApplyAttackSoundTiming(
+            AnimationClip clip,
+            float soundTime)
+        {
+            AnimationEvent[] oldEvents =
+                AnimationUtility.GetAnimationEvents(clip);
+            var nextEvents =
+                new List<AnimationEvent>(oldEvents.Length);
+            for (int index = 0; index < oldEvents.Length; index++)
+            {
+                AnimationEvent animationEvent = oldEvents[index];
+                if (animationEvent.functionName ==
+                        "PlayAttackSoundAnimationEvent" ||
+                    animationEvent.functionName ==
+                        "SetAttackPlaybackSpeed")
+                {
+                    continue;
+                }
+
+                nextEvents.Add(animationEvent);
+            }
+
+            nextEvents.Add(CreateAttackEvent(
+                soundTime,
+                "PlayAttackSoundAnimationEvent",
+                0));
+            nextEvents.Sort(CompareAnimationEvents);
+            AnimationUtility.SetAnimationEvents(
+                clip,
+                nextEvents.ToArray());
+            EditorUtility.SetDirty(clip);
+        }
+
+        private static bool IsNightShadeAttackEvent(string functionName)
+        {
+            return functionName == "StopAttackTurnAnimationEvent" ||
+                functionName == "PlayAttackSoundAnimationEvent" ||
+                functionName == "OpenAttackHitAnimationEvent" ||
+                functionName == "CloseAttackHitAnimationEvent" ||
+                functionName == "SetAttackSpeed" ||
+                functionName == "ResetAttackSpeed" ||
+                functionName == "ResetAttackPlaybackSpeed";
+        }
+
+        private static int CompareAnimationEvents(AnimationEvent left, AnimationEvent right)
+        {
+            int timeComparison = left.time.CompareTo(right.time);
+            if (timeComparison != 0)
+            {
+                return timeComparison;
+            }
+
+            int nameComparison = string.CompareOrdinal(left.functionName, right.functionName);
+            return nameComparison != 0
+                ? nameComparison
+                : left.intParameter.CompareTo(right.intParameter);
+        }
+
+        private static AnimationEvent CreateAttackEvent(
+            float time,
+            string functionName,
+            int hitIndex)
+        {
+            return new AnimationEvent
+            {
+                time = time,
+                functionName = functionName,
+                intParameter = hitIndex
+            };
+        }
+
+        private static AnimationEvent CreateAttackSpeedEvent(
+            float time,
+            float speed)
+        {
+            return new AnimationEvent
+            {
+                time = time,
+                functionName = "SetAttackSpeed",
+                floatParameter = speed
+            };
+        }
+
+        private static AnimationEvent CreateAttackSpeedResetEvent(float time)
+        {
+            return new AnimationEvent
+            {
+                time = time,
+                functionName = "ResetAttackSpeed"
+            };
+        }
+
         private static void EnsureAssetFolder(string folderPath)
         {
             string[] folderNames = folderPath.Split('/');
@@ -330,17 +809,14 @@ namespace rudIsland.RPG3D.EditorTools
                     $"{currentPath}/{folderNames[index]}";
                 if (!AssetDatabase.IsValidFolder(nextPath))
                 {
-                    AssetDatabase.CreateFolder(
-                        currentPath,
-                        folderNames[index]);
+                    AssetDatabase.CreateFolder(currentPath, folderNames[index]);
                 }
 
                 currentPath = nextPath;
             }
         }
 
-        private static NightShadeSwordController BuildEnemyPrefab(
-            RuntimeAnimatorController animatorController)
+        private static NightShadeSwordController BuildEnemyPrefab(RuntimeAnimatorController animatorController)
         {
             GameObject modelAsset =
                 LoadRequiredAsset<GameObject>(ModelPath);
@@ -354,16 +830,13 @@ namespace rudIsland.RPG3D.EditorTools
                 PrefabUtility.InstantiatePrefab(modelAsset) as GameObject;
             if (enemy == null)
             {
-                throw new InvalidOperationException(
-                    "NightShade 모델을 프리팹 편집용으로 만들지 못했습니다.");
+                throw new InvalidOperationException("NightShade 모델을 프리팹 편집용으로 만들지 못했습니다.");
             }
 
             try
             {
                 enemy.name = "NightShadeSwordElite";
-                enemy.transform.SetPositionAndRotation(
-                    Vector3.zero,
-                    Quaternion.identity);
+                enemy.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
                 enemy.transform.localScale = Vector3.one;
                 SetEnemyLayer(enemy.transform);
                 HideOldLance(enemy.transform);
@@ -372,8 +845,7 @@ namespace rudIsland.RPG3D.EditorTools
                     enemy.GetComponentInChildren<Animator>(true);
                 if (animator == null)
                 {
-                    throw new InvalidOperationException(
-                        "NightShade 모델에서 Animator를 찾지 못했습니다.");
+                    throw new InvalidOperationException("NightShade 모델에서 Animator를 찾지 못했습니다.");
                 }
 
                 animator.runtimeAnimatorController = animatorController;
@@ -401,18 +873,14 @@ namespace rudIsland.RPG3D.EditorTools
 
                 if (rightHand == null)
                 {
-                    throw new InvalidOperationException(
-                        "NightShade 모델에서 RightHand 뼈를 찾지 못했습니다.");
+                    throw new InvalidOperationException("NightShade 모델에서 RightHand 뼈를 찾지 못했습니다.");
                 }
 
                 GameObject sword =
-                    PrefabUtility.InstantiatePrefab(
-                        swordAsset,
-                        rightHand) as GameObject;
+                    PrefabUtility.InstantiatePrefab(swordAsset, rightHand) as GameObject;
                 if (sword == null)
                 {
-                    throw new InvalidOperationException(
-                        "RustySword 프리팹을 오른손에 만들지 못했습니다.");
+                    throw new InvalidOperationException("RustySword 프리팹을 오른손에 만들지 못했습니다.");
                 }
 
                 sword.name = "RustySword";
@@ -444,7 +912,6 @@ namespace rudIsland.RPG3D.EditorTools
                         NightShadeSwordAnimationEventReceiver>();
                 }
 
-                eventReceiver.ConnectForEditor(animationController);
                 if (enemy.GetComponent<CombatHitEffectPlayer>() == null)
                 {
                     enemy.AddComponent<CombatHitEffectPlayer>();
@@ -487,14 +954,12 @@ namespace rudIsland.RPG3D.EditorTools
                     swordStartPoint,
                     swordEndPoint,
                     SwordHitRadius);
+                eventReceiver.ConnectForEditor(animationController, swordController);
 
-                GameObject savedPrefab = PrefabUtility.SaveAsPrefabAsset(
-                    enemy,
-                    EnemyPrefabPath);
+                GameObject savedPrefab = PrefabUtility.SaveAsPrefabAsset(enemy, EnemyPrefabPath);
                 if (savedPrefab == null)
                 {
-                    throw new InvalidOperationException(
-                        "NightShadeSwordElite 프리팹을 저장하지 못했습니다.");
+                    throw new InvalidOperationException("NightShadeSwordElite 프리팹을 저장하지 못했습니다.");
                 }
 
                 return savedPrefab.GetComponent<NightShadeSwordController>();
@@ -505,8 +970,7 @@ namespace rudIsland.RPG3D.EditorTools
             }
         }
 
-        private static void ConnectSpawnSettings(
-            NightShadeSwordController enemyPrefab)
+        private static void ConnectSpawnSettings(NightShadeSwordController enemyPrefab)
         {
             SpawnSettings settings =
                 LoadRequiredAsset<SpawnSettings>(SpawnSettingsPath);
@@ -524,9 +988,7 @@ namespace rudIsland.RPG3D.EditorTools
             MeshFilter meshFilter = sword.GetComponentInChildren<MeshFilter>();
             if (meshFilter == null || meshFilter.sharedMesh == null)
             {
-                sword.SetLocalPositionAndRotation(
-                    Vector3.zero,
-                    Quaternion.identity);
+                sword.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
                 sword.localScale = Vector3.one;
                 return;
             }
@@ -558,11 +1020,7 @@ namespace rudIsland.RPG3D.EditorTools
                 bladeAxis = -bladeAxis;
             }
 
-            sword.SetLocalPositionAndRotation(
-                Vector3.zero,
-                Quaternion.FromToRotation(
-                    bladeAxis,
-                    AuthoredSwordDirection));
+            sword.SetLocalPositionAndRotation(Vector3.zero, Quaternion.FromToRotation(bladeAxis, AuthoredSwordDirection));
             float scale = bladeLength > 0.0001f
                 ? SwordLength / bladeLength
                 : 1f;
@@ -588,9 +1046,7 @@ namespace rudIsland.RPG3D.EditorTools
             {
                 Transform child = children[index];
                 if (child == root ||
-                    child.name.IndexOf(
-                        "lance",
-                        StringComparison.OrdinalIgnoreCase) < 0)
+                    child.name.IndexOf("lance", StringComparison.OrdinalIgnoreCase) < 0)
                 {
                     continue;
                 }
@@ -634,8 +1090,7 @@ namespace rudIsland.RPG3D.EditorTools
             T asset = AssetDatabase.LoadAssetAtPath<T>(assetPath);
             if (asset == null)
             {
-                throw new InvalidOperationException(
-                    $"필수 에셋을 찾지 못했습니다: {assetPath}");
+                throw new InvalidOperationException($"필수 에셋을 찾지 못했습니다: {assetPath}");
             }
 
             return asset;

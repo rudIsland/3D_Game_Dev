@@ -82,9 +82,7 @@ namespace rudIsland.RPG3D.Dev.CharacterTest
         {
             if (!Application.isPlaying)
             {
-                Debug.LogWarning(
-                    "Spawn Missing Enemies는 Play 중에 사용해 주세요.",
-                    this);
+                Debug.LogWarning("Spawn Missing Enemies는 Play 중에 사용해 주세요.", this);
                 return;
             }
 
@@ -124,9 +122,7 @@ namespace rudIsland.RPG3D.Dev.CharacterTest
 
             if (spawnPoint == null || enemySetting == null)
             {
-                Debug.LogError(
-                    $"적 설정 또는 SpawnPoint {index} 연결이 비어 있습니다.",
-                    this);
+                Debug.LogError($"적 설정 또는 SpawnPoint {index} 연결이 비어 있습니다.", this);
                 remainingRespawnTimes[index] = respawnDelay;
                 return;
             }
@@ -137,9 +133,7 @@ namespace rudIsland.RPG3D.Dev.CharacterTest
                     spawnPoint.rotation,
                     out spawnedEnemies[index]))
             {
-                Debug.LogError(
-                    $"{enemySetting.name} 적을 Spawn하지 못했습니다.",
-                    this);
+                Debug.LogError($"{enemySetting.name} 적을 Spawn하지 못했습니다.", this);
                 remainingRespawnTimes[index] = respawnDelay;
                 return;
             }
@@ -151,18 +145,14 @@ namespace rudIsland.RPG3D.Dev.CharacterTest
         {
             if (worldObjectManager == null)
             {
-                Debug.LogError(
-                    "TestSceneEnemySpawner에 WorldObjectManager가 필요합니다.",
-                    this);
+                Debug.LogError("TestSceneEnemySpawner에 WorldObjectManager가 필요합니다.", this);
                 return false;
             }
 
             if (enemySettings.Length == 0 ||
                 enemySettings.Length != spawnPoints.Length)
             {
-                Debug.LogError(
-                    "Enemy Settings와 Spawn Points 개수를 같게 연결해 주세요.",
-                    this);
+                Debug.LogError("Enemy Settings와 Spawn Points 개수를 같게 연결해 주세요.", this);
                 return false;
             }
 

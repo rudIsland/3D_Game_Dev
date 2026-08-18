@@ -28,9 +28,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             PrepareAudioSources();
         }
 
-        internal void Play(
-            NightShadeSwordAttackType attackType,
-            int hitIndex)
+        internal void Play(NightShadeSwordAttackType attackType, int hitIndex)
         {
             PrepareAudioSources();
             if (bodyAudioSource == null || accentAudioSource == null ||
@@ -40,7 +38,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             }
 
             float pitch = GetPitch(attackType);
-            if (attackType == NightShadeSwordAttackType.Combo && hitIndex > 0)
+            if (attackType == NightShadeSwordAttackType.ComboSecond)
             {
                 pitch -= 0.03f;
             }
@@ -58,12 +56,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 0.1f,
                 1f);
 
-            bodyAudioSource.PlayOneShot(
-                swordBodySound,
-                bodyVolume * attackWeight);
-            accentAudioSource.PlayOneShot(
-                swordAccentSound,
-                accentVolume * attackWeight);
+            bodyAudioSource.PlayOneShot(swordBodySound, bodyVolume * attackWeight);
+            accentAudioSource.PlayOneShot(swordAccentSound, accentVolume * attackWeight);
         }
 
         internal void Stop()
@@ -72,8 +66,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             accentAudioSource?.Stop();
         }
 
-        private float GetAttackWeight(
-            NightShadeSwordAttackType attackType)
+        private float GetAttackWeight(NightShadeSwordAttackType attackType)
         {
             return attackType == NightShadeSwordAttackType.Heavy ||
                 attackType == NightShadeSwordAttackType.WideSwing
@@ -85,7 +78,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         {
             switch (attackType)
             {
-                case NightShadeSwordAttackType.Combo:
+                case NightShadeSwordAttackType.ComboFirst:
+                case NightShadeSwordAttackType.ComboSecond:
                     return comboPitch;
                 case NightShadeSwordAttackType.WideSwing:
                     return wideSwingPitch;

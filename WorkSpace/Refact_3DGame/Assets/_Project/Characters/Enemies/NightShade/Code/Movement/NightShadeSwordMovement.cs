@@ -3,7 +3,7 @@ using UnityEngine;
 namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 {
     // NightShade 정예 적의 이동, 회전, 중력만 계산한다.
-    internal sealed class NightShadeSwordMovement
+    internal sealed class NightShadeSwordMovement : INightShadeSwordMovement
     {
         private readonly Transform enemyTransform;
         private readonly CharacterController characterController;
@@ -12,7 +12,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
         private float verticalSpeed;
 
-        internal Vector3 Position => enemyTransform.position;
+        public Vector3 Position => enemyTransform.position;
         internal Vector3 Forward => enemyTransform.forward;
 
         internal NightShadeSwordMovement(
@@ -27,12 +27,12 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             this.groundPull = groundPull;
         }
 
-        internal void Reset()
+        public void Reset()
         {
             verticalSpeed = 0f;
         }
 
-        internal void MoveTo(
+        public void MoveTo(
             Vector3 targetPosition,
             float moveSpeed,
             float turnSpeed,
@@ -53,7 +53,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             characterController.Move(movement);
         }
 
-        internal void TurnTo(
+        public void TurnTo(
             Vector3 targetPosition,
             float turnSpeed,
             float deltaTime)
@@ -68,7 +68,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             StayOnGround(deltaTime);
         }
 
-        internal void MoveForCombat(
+        public void MoveForCombat(
             Vector3 targetPosition,
             NightShadeCombatMoveType moveType,
             float moveSpeed,
@@ -109,16 +109,13 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             characterController.Move(movement);
         }
 
-        internal void StayOnGround(float deltaTime)
+        public void StayOnGround(float deltaTime)
         {
             UpdateVerticalSpeed(deltaTime);
-            characterController.Move(
-                Vector3.up * (verticalSpeed * deltaTime));
+            characterController.Move(Vector3.up * (verticalSpeed * deltaTime));
         }
 
-        internal void ApplyHitMovement(
-            Vector3 horizontalMovement,
-            float deltaTime)
+        public void ApplyHitMovement(Vector3 horizontalMovement, float deltaTime)
         {
             horizontalMovement.y = 0f;
             UpdateVerticalSpeed(deltaTime);
@@ -126,9 +123,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             characterController.Move(horizontalMovement);
         }
 
-        internal bool IsFacing(
-            Vector3 targetPosition,
-            float minimumFacingDot)
+        public bool IsFacing(Vector3 targetPosition, float minimumFacingDot)
         {
             Vector3 direction = targetPosition - enemyTransform.position;
             direction.y = 0f;

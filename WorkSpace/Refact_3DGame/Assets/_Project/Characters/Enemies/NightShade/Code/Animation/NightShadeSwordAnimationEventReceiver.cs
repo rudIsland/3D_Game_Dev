@@ -2,12 +2,14 @@ using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 {
-    // 공격 애니메이션 이벤트를 Animator 속도 변경으로 전달한다.
+    // 공격 Animation Event를 NightShade 전투 경계로 전달한다.
     [DisallowMultipleComponent]
     public sealed class NightShadeSwordAnimationEventReceiver : MonoBehaviour
     {
         [SerializeField]
         private NightShadeSwordAnimationController animationController;
+        [SerializeField]
+        private NightShadeSwordController swordController;
 
         private void Awake()
         {
@@ -16,12 +18,35 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
         public void SetAttackSpeed(float speed)
         {
-            animationController?.SetAttackPlaybackSpeed(speed);
+            if (swordController == null || swordController.IsAttackStateActive)
+            {
+                animationController?.SetAttackPlaybackSpeed(speed);
+            }
         }
 
         public void ResetAttackSpeed()
         {
             animationController?.ResetAttackPlaybackSpeed();
+        }
+
+        public void StopAttackTurnAnimationEvent()
+        {
+            swordController?.StopAttackTurnAnimationEvent();
+        }
+
+        public void PlayAttackSoundAnimationEvent(int hitIndex)
+        {
+            swordController?.PlayAttackSoundAnimationEvent(hitIndex);
+        }
+
+        public void OpenAttackHitAnimationEvent(int hitIndex)
+        {
+            swordController?.OpenAttackHitAnimationEvent(hitIndex);
+        }
+
+        public void CloseAttackHitAnimationEvent()
+        {
+            swordController?.CloseAttackHitAnimationEvent();
         }
 
         private void FindAnimationController()
@@ -32,13 +57,19 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                     GetComponentInParent<
                         NightShadeSwordAnimationController>(true);
             }
+
+            if (swordController == null)
+            {
+                swordController = GetComponentInParent<
+                    NightShadeSwordController>(true);
+            }
         }
 
 #if UNITY_EDITOR
-        public void ConnectForEditor(
-            NightShadeSwordAnimationController controller)
+        public void ConnectForEditor(NightShadeSwordAnimationController controller, NightShadeSwordController owner)
         {
             animationController = controller;
+            swordController = owner;
         }
 
         private void OnValidate()

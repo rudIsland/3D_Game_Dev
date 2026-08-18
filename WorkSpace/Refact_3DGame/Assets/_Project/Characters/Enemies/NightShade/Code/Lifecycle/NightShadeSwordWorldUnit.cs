@@ -15,6 +15,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         public float CurrentStagger => stagger.CurrentStagger;
         public float MaxStagger => stagger.StaggerLimit;
         public bool IsInCombat => stateMachine.IsInCombat;
+        internal bool IsAttackStateActive => stateMachine.IsAttackStateActive;
 
         public event Action<NightShadeSwordWorldUnit> StaggerChanged;
         public event Action<NightShadeSwordWorldUnit> CombatStateChanged;
@@ -63,6 +64,26 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
             stateMachine.ChangeToHitState(in hitRequest);
             return EnemyHitResult.Staggered;
+        }
+
+        internal void StopAttackTurnAnimationEvent()
+        {
+            stateMachine.StopAttackTurnAnimationEvent();
+        }
+
+        internal void PlayAttackSoundAnimationEvent(int hitIndex)
+        {
+            stateMachine.PlayAttackSoundAnimationEvent(hitIndex);
+        }
+
+        internal void OpenAttackHitAnimationEvent(int hitIndex)
+        {
+            stateMachine.OpenAttackHitAnimationEvent(hitIndex);
+        }
+
+        internal void CloseAttackHitAnimationEvent()
+        {
+            stateMachine.CloseAttackHitAnimationEvent();
         }
 
         protected override void OnUnitCreate()

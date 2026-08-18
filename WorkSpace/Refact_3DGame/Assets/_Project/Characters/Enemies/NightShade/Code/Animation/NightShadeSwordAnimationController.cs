@@ -4,7 +4,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 {
     // 상태머신 요청을 NightShade 양손검 Animator 상태로 바꾼다.
     [DisallowMultipleComponent]
-    public sealed class NightShadeSwordAnimationController : MonoBehaviour
+    public sealed class NightShadeSwordAnimationController : MonoBehaviour, INightShadeSwordAnimation
     {
         private const float DefaultBlendTime = 0.12f;
         private const float HitBlendTime = 0.06f;
@@ -13,6 +13,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             Animator.StringToHash("Base Layer.Idle");
         private static readonly int ChaseStateId =
             Animator.StringToHash("Base Layer.Chase");
+        private static readonly int WalkStateId =
+            Animator.StringToHash("Base Layer.Walk");
         private static readonly int CombatBackStateId =
             Animator.StringToHash("Base Layer.Combat Back");
         private static readonly int CombatLeftStateId =
@@ -21,8 +23,10 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             Animator.StringToHash("Base Layer.Combat Right");
         private static readonly int LightAttackStateId =
             Animator.StringToHash("Base Layer.Light Attack");
-        private static readonly int ComboAttackStateId =
-            Animator.StringToHash("Base Layer.Combo Attack");
+        private static readonly int ComboFirstStateId =
+            Animator.StringToHash("Base Layer.Combo First");
+        private static readonly int ComboSecondStateId =
+            Animator.StringToHash("Base Layer.Combo Second");
         private static readonly int HeavyAttackStateId =
             Animator.StringToHash("Base Layer.Heavy Attack");
         private static readonly int WideSwingStateId =
@@ -50,9 +54,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
         internal void PlayIdle() => Play(IdleStateId, DefaultBlendTime);
         internal void PlayChase() => Play(ChaseStateId, DefaultBlendTime);
+        internal void PlayWalk() => Play(WalkStateId, DefaultBlendTime);
 
-        internal void PlayCombatMove(
-            NightShadeCombatMoveType moveType)
+        internal void PlayCombatMove(NightShadeCombatMoveType moveType)
         {
             switch (moveType)
             {
@@ -72,8 +76,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         {
             switch (attackType)
             {
-                case NightShadeSwordAttackType.Combo:
-                    Play(ComboAttackStateId, DefaultBlendTime);
+                case NightShadeSwordAttackType.ComboFirst:
+                    Play(ComboFirstStateId, DefaultBlendTime);
+                    break;
+                case NightShadeSwordAttackType.ComboSecond:
+                    Play(ComboSecondStateId, DefaultBlendTime);
                     break;
                 case NightShadeSwordAttackType.Heavy:
                     Play(HeavyAttackStateId, DefaultBlendTime);
@@ -101,9 +108,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         {
             if (CanReadAnimator())
             {
-                enemyAnimator.SetFloat(
-                    AttackSpeedId,
-                    Mathf.Clamp(speed, 0.1f, 1f));
+                enemyAnimator.SetFloat(AttackSpeedId, Mathf.Clamp(speed, 0.1f, 1f));
             }
         }
 
@@ -158,10 +163,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             }
         }
 
-        private void Play(
-            int stateId,
-            float blendTime,
-            bool restart = false)
+        private void Play(int stateId, float blendTime, bool restart = false)
         {
             requestedStateId = stateId;
             if (!CanReadAnimator())
@@ -169,8 +171,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 return;
             }
 
-            AnimatorStateInfo current =
-                enemyAnimator.GetCurrentAnimatorStateInfo(0);
+            AnimatorStateInfo current = enemyAnimator.GetCurrentAnimatorStateInfo(0);
             if (!restart && current.fullPathHash == stateId)
             {
                 return;
@@ -198,6 +199,17 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 enemyAnimator = GetComponentInChildren<Animator>(true);
             }
         }
+
+        void INightShadeSwordAnimation.PlayIdle() => PlayIdle();
+        void INightShadeSwordAnimation.PlayChase() => PlayChase();
+        void INightShadeSwordAnimation.PlayWalk() => PlayWalk();
+        void INightShadeSwordAnimation.PlayCombatMove(NightShadeCombatMoveType moveType) => PlayCombatMove(moveType);
+        void INightShadeSwordAnimation.PlayAttack(NightShadeSwordAttackType attackType) => PlayAttack(attackType);
+        void INightShadeSwordAnimation.PlayHitFromStart() => PlayHitFromStart();
+        void INightShadeSwordAnimation.PlayDead() => PlayDead();
+        void INightShadeSwordAnimation.ResetAttackPlaybackSpeed() => ResetAttackPlaybackSpeed();
+        bool INightShadeSwordAnimation.TryGetRequestedAnimationTime(out float normalizedTime) => TryGetRequestedAnimationTime(out normalizedTime);
+        bool INightShadeSwordAnimation.IsTransitioning() => IsTransitioning();
 
 #if UNITY_EDITOR
         public void ConnectForEditor(Animator animator)
