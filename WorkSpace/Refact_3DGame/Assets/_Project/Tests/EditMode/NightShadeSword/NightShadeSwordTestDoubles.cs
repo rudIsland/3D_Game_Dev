@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using rudIsland.RPG3D.Characters;
+using rudIsland.RPG3D.Characters.Combat;
 using rudIsland.RPG3D.Characters.Enemies.NightShade;
 using UnityEngine;
 
@@ -31,6 +32,7 @@ namespace rudIsland.RPG3D.Tests
             float runStartRange = 6f,
             int attacksBeforeCombatMove = 2,
             float deadBodyKeepTime = 1f,
+            float knockdownStayDuration = 0.5f,
             float comboFirstExitNormalizedTime = 0.4f,
             float comboSecondDelay = 0.15f)
         {
@@ -54,6 +56,9 @@ namespace rudIsland.RPG3D.Tests
                 0.6f,
                 attacksBeforeCombatMove,
                 0.2f,
+                0.4f,
+                0.6f,
+                knockdownStayDuration,
                 AnimationCurve.Linear(0f, 0f, 1f, 1f),
                 deadBodyKeepTime);
         }
@@ -77,21 +82,20 @@ namespace rudIsland.RPG3D.Tests
 
     internal sealed class FakeNightShadeSwordMovement : INightShadeSwordMovement
     {
-        internal int ResetCount { get; private set; }
+
         internal int MoveToCount { get; private set; }
         internal int TurnToCount { get; private set; }
         internal int StayCount { get; private set; }
-        internal int HitMoveCount { get; private set; }
+
         internal float LastMoveSpeed { get; private set; }
-        internal Vector3 LastHitMovement { get; private set; }
-        internal NightShadeCombatMoveType LastCombatMoveType { get; private set; }
+
+        internal Vector3 TotalHitMovement { get; private set; }
         internal bool IsFacingTarget { get; set; } = true;
 
         public Vector3 Position { get; set; }
 
         public void Reset()
         {
-            ResetCount++;
         }
 
         public void MoveTo(
@@ -119,7 +123,6 @@ namespace rudIsland.RPG3D.Tests
             float turnSpeed,
             float deltaTime)
         {
-            LastCombatMoveType = moveType;
         }
 
         public void StayOnGround(float deltaTime)
@@ -129,8 +132,8 @@ namespace rudIsland.RPG3D.Tests
 
         public void ApplyHitMovement(Vector3 horizontalMovement, float deltaTime)
         {
-            HitMoveCount++;
-            LastHitMovement = horizontalMovement;
+
+            TotalHitMovement += horizontalMovement;
         }
 
         public bool IsFacing(Vector3 targetPosition, float minimumFacingDot)
@@ -144,20 +147,27 @@ namespace rudIsland.RPG3D.Tests
         internal int IdleCount { get; private set; }
         internal int ChaseCount { get; private set; }
         internal int WalkCount { get; private set; }
-        internal int CombatMoveCount { get; private set; }
+
         internal int AttackCount { get; private set; }
         internal int HitCount { get; private set; }
+        internal int SmallHitCount { get; private set; }
+        internal int BigHitCount { get; private set; }
+        internal int KnockbackCount { get; private set; }
+        internal int KnockdownCount { get; private set; }
+        internal int GetUpCount { get; private set; }
         internal int DeadCount { get; private set; }
         internal int ResetSpeedCount { get; private set; }
         internal NightShadeSwordAttackType LastAttackType { get; private set; }
-        internal bool CanReadTime { get; set; } = true;
-        internal bool IsInTransition { get; set; }
+        internal Vector3 LastHitDirection { get; private set; }
+
         internal float NormalizedTime { get; set; }
 
         public void PlayIdle() => IdleCount++;
         public void PlayChase() => ChaseCount++;
         public void PlayWalk() => WalkCount++;
-        public void PlayCombatMove(NightShadeCombatMoveType moveType) => CombatMoveCount++;
+        public void PlayCombatMove(NightShadeCombatMoveType moveType)
+        {
+        }
 
         public void PlayAttack(NightShadeSwordAttackType attackType)
         {
@@ -166,9 +176,37 @@ namespace rudIsland.RPG3D.Tests
             NormalizedTime = 0f;
         }
 
-        public void PlayHitFromStart()
+        public void PlaySmallHitFromStart(Vector3 incomingDirection)
         {
             HitCount++;
+            SmallHitCount++;
+            LastHitDirection = incomingDirection;
+            NormalizedTime = 0f;
+        }
+
+        public void PlayBigHitFromStart(Vector3 incomingDirection)
+        {
+            HitCount++;
+            BigHitCount++;
+            LastHitDirection = incomingDirection;
+            NormalizedTime = 0f;
+        }
+
+        public void PlayKnockbackFromStart()
+        {
+            KnockbackCount++;
+            NormalizedTime = 0f;
+        }
+
+        public void PlayKnockdownFromStart()
+        {
+            KnockdownCount++;
+            NormalizedTime = 0f;
+        }
+
+        public void PlayGetUpFromStart()
+        {
+            GetUpCount++;
             NormalizedTime = 0f;
         }
 
@@ -183,10 +221,10 @@ namespace rudIsland.RPG3D.Tests
         public bool TryGetRequestedAnimationTime(out float normalizedTime)
         {
             normalizedTime = NormalizedTime;
-            return CanReadTime;
+            return true;
         }
 
-        public bool IsTransitioning() => IsInTransition;
+        public bool IsTransitioning() => false;
     }
 
     internal sealed class FakeUnitDeathState : IUnitDeathState

@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using rudIsland.RPG3D.Characters;
+using rudIsland.RPG3D.Characters.Combat;
 using rudIsland.RPG3D.Characters.Enemies.NightShade;
 using UnityEngine;
 
@@ -86,7 +87,9 @@ namespace rudIsland.RPG3D.Tests
                 0f);
 
             FinishComboFirst(machine, scope);
-            machine.ChangeToHitState(in hitRequest);
+            machine.ChangeToHitState(
+                HitReaction.SmallHit,
+                in hitRequest);
             Assert.That(machine.FightMemory.HasPendingComboSecond, Is.False);
 
             machine.Enable();

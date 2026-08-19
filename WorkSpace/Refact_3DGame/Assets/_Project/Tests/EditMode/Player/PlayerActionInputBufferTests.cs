@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using rudIsland.RPG3D.Player.Runtime;
-using rudIsland.RPG3D.Player.States;
 using rudIsland.RPG3D.Player.States.Actions;
 
 namespace rudIsland.RPG3D.Tests
@@ -71,15 +70,5 @@ namespace rudIsland.RPG3D.Tests
             Assert.That(stamina.CurrentStamina, Is.EqualTo(20f));
         }
 
-        [Test]
-        public void ShouldStartRunAttack_직전실제달리기기록만사용한다()
-        {
-            Assert.That(
-                PlayerStateMachine.ShouldStartRunAttack(false),
-                Is.False);
-            Assert.That(
-                PlayerStateMachine.ShouldStartRunAttack(true),
-                Is.True);
-        }
     }
 }

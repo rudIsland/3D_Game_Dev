@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEditor;
+using UnityEditor.Animations;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Tests
@@ -9,6 +10,134 @@ namespace rudIsland.RPG3D.Tests
     {
         private const string ClipFolder =
             "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Clips/TwoHandSword";
+        private const string ControllerPath =
+            "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Controllers/NightShadeTwoHandSwordAnimator.controller";
+        private const string WalkClipPath =
+            "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Clips/TwoHandSword/NightShadeSword_Walk.anim";
+
+        [Test]
+        public void AnimatorController_방향별피격상태에맞는클립이연결되어있다()
+        {
+            AnimatorController controller =
+                AssetDatabase.LoadAssetAtPath<AnimatorController>(ControllerPath);
+            Assert.That(controller, Is.Not.Null, ControllerPath);
+            AnimatorStateMachine stateMachine = controller.layers[0].stateMachine;
+
+            AssertStateClip(
+                stateMachine,
+                "Hit Front",
+                "NightShadeSword_BigHit");
+            AssertStateClip(
+                stateMachine,
+                "Hit Back",
+                "NightShadeSword_BigHit");
+            AssertStateClip(
+                stateMachine,
+                "Hit Left",
+                "NightShadeSword_BigHit");
+            AssertStateClip(
+                stateMachine,
+                "Hit Right",
+                "NightShadeSword_BigHit");
+            AssertStateClip(
+                stateMachine,
+                "Small Hit Front",
+                "NightShadeSword_SmallHitFront",
+                1.25f);
+            AssertStateClip(
+                stateMachine,
+                "Small Hit Back",
+                "NightShadeSword_SmallHitBack",
+                1.25f);
+            AssertStateClip(
+                stateMachine,
+                "Small Hit Left",
+                "NightShadeSword_SmallHitLeft",
+                1f);
+            AssertStateClip(
+                stateMachine,
+                "Small Hit Right",
+                "NightShadeSword_SmallHitRight",
+                1f);
+            AssertNoEvents(
+                $"{ClipFolder}/NightShadeSword_BigHit.anim");
+            AssertNoEvents(
+                $"{ClipFolder}/NightShadeSword_SmallHitFront.anim");
+            AssertNoEvents(
+                $"{ClipFolder}/NightShadeSword_SmallHitBack.anim");
+            AssertNoEvents(
+                $"{ClipFolder}/NightShadeSword_SmallHitLeft.anim");
+            AssertNoEvents(
+                $"{ClipFolder}/NightShadeSword_SmallHitRight.anim");
+        }
+
+        [Test]
+        public void AnimatorController_강제반응상태에정리된클립과속도가연결되어있다()
+        {
+            AnimatorController controller =
+                AssetDatabase.LoadAssetAtPath<AnimatorController>(ControllerPath);
+            Assert.That(controller, Is.Not.Null, ControllerPath);
+            AnimatorStateMachine stateMachine = controller.layers[0].stateMachine;
+
+            AssertStateClip(
+                stateMachine,
+                "Knockback",
+                "NightShadeSword_Knockback",
+                1f);
+            AssertStateClip(
+                stateMachine,
+                "Knockdown",
+                "NightShadeSword_Knockdown",
+                1f);
+            AssertStateClip(
+                stateMachine,
+                "Get Up",
+                "NightShadeSword_GetUp",
+                1.5f);
+            AssertStateClip(
+                stateMachine,
+                "Dead",
+                "NightShadeSword_Dead",
+                0.8f);
+            AssertNoEvents($"{ClipFolder}/NightShadeSword_Knockback.anim");
+            AssertNoEvents($"{ClipFolder}/NightShadeSword_Knockdown.anim");
+            AssertNoEvents($"{ClipFolder}/NightShadeSword_GetUp.anim");
+            AssertNoEvents($"{ClipFolder}/NightShadeSword_Dead.anim");
+        }
+
+        [Test]
+        public void AnimatorController_Walk상태는반복클립하나만사용한다()
+        {
+            AnimationClip walkClip =
+                AssetDatabase.LoadAssetAtPath<AnimationClip>(WalkClipPath);
+            Assert.That(walkClip, Is.Not.Null, WalkClipPath);
+            AnimationClipSettings clipSettings =
+                AnimationUtility.GetAnimationClipSettings(walkClip);
+            Assert.That(clipSettings.loopTime, Is.True);
+
+            AnimatorController controller =
+                AssetDatabase.LoadAssetAtPath<AnimatorController>(ControllerPath);
+            Assert.That(controller, Is.Not.Null, ControllerPath);
+
+            ChildAnimatorState[] states =
+                controller.layers[0].stateMachine.states;
+            int walkStateCount = 0;
+            AnimatorState walkState = null;
+            for (int index = 0; index < states.Length; index++)
+            {
+                if (states[index].state.name != "Walk")
+                {
+                    continue;
+                }
+
+                walkState = states[index].state;
+                walkStateCount++;
+            }
+
+            Assert.That(walkStateCount, Is.EqualTo(1));
+            Assert.That(walkState, Is.Not.Null);
+            Assert.That(walkState.motion, Is.SameAs(walkClip));
+        }
 
         [Test]
         public void AttackClips_검움직임에맞춘사운드와정확한게임이벤트를가진다()
@@ -114,6 +243,42 @@ namespace rudIsland.RPG3D.Tests
                     gameplayEvents[index].intParameter,
                     Is.EqualTo(expectedEvents[index].HitIndex));
             }
+        }
+
+        private static void AssertStateClip(
+            AnimatorStateMachine stateMachine,
+            string stateName,
+            string clipName,
+            float playbackSpeed = 1f)
+        {
+            AnimatorState foundState = null;
+            ChildAnimatorState[] states = stateMachine.states;
+            for (int index = 0; index < states.Length; index++)
+            {
+                if (states[index].state.name == stateName)
+                {
+                    foundState = states[index].state;
+                    break;
+                }
+            }
+
+            Assert.That(foundState, Is.Not.Null, stateName);
+            Assert.That(foundState.motion, Is.Not.Null, stateName);
+            Assert.That(foundState.motion.name, Is.EqualTo(clipName));
+            Assert.That(
+                foundState.speed,
+                Is.EqualTo(playbackSpeed).Within(0.001f));
+        }
+
+        private static void AssertNoEvents(string clipPath)
+        {
+            AnimationClip clip =
+                AssetDatabase.LoadAssetAtPath<AnimationClip>(clipPath);
+            Assert.That(clip, Is.Not.Null, clipPath);
+            Assert.That(
+                AnimationUtility.GetAnimationEvents(clip),
+                Is.Empty,
+                clipPath);
         }
 
         private static ExpectedEvent Expected(

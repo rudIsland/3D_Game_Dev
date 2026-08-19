@@ -88,5 +88,34 @@ namespace rudIsland.RPG3D.Tests
                     true),
                 Is.False);
         }
+
+        [Test]
+        public void HeavyProtection_시작은포함하고종료는포함하지않는다()
+        {
+            Assert.That(
+                PlayerAttackState.IsHeavyProtectionTime(0.1999f),
+                Is.False);
+            Assert.That(
+                PlayerAttackState.IsHeavyProtectionTime(0.20f),
+                Is.True);
+            Assert.That(
+                PlayerAttackState.IsHeavyProtectionTime(0.4199f),
+                Is.True);
+            Assert.That(
+                PlayerAttackState.IsHeavyProtectionTime(0.42f),
+                Is.False);
+            Assert.That(
+                PlayerAttackState.IsHeavyProtectionActive(
+                    4,
+                    true,
+                    0.3f),
+                Is.False);
+            Assert.That(
+                PlayerAttackState.IsHeavyProtectionActive(
+                    5,
+                    true,
+                    0.3f),
+                Is.True);
+        }
     }
 }

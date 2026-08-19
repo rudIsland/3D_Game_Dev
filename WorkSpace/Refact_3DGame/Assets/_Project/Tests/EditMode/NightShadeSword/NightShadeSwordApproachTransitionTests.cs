@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using rudIsland.RPG3D.Characters;
+using rudIsland.RPG3D.Characters.Combat;
 using rudIsland.RPG3D.Characters.Enemies.NightShade;
 using UnityEngine;
 
@@ -58,6 +59,8 @@ namespace rudIsland.RPG3D.Tests
             NightShadeSwordStateMachine machine =
                 scope.CreateStateMachine(settings);
             machine.Enable();
+            machine.FightMemory.RecordAttack(
+                NightShadeSwordAttackType.ComboFirst);
             EnterAttack(machine);
             scope.Animation.NormalizedTime = 1f;
 
@@ -127,7 +130,9 @@ namespace rudIsland.RPG3D.Tests
                 Vector3.back,
                 1f,
                 0f);
-            state.SetHitRequest(in hitRequest);
+            state.SetHitRequest(
+                HitReaction.BigHit,
+                in hitRequest);
             state.Enter();
             scope.Animation.NormalizedTime = 1f;
 
