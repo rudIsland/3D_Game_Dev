@@ -1,3 +1,5 @@
+using rudIsland.RPG3D.Characters;
+using rudIsland.RPG3D.Characters.Combat;
 using rudIsland.RPG3D.Player.Animations;
 using rudIsland.RPG3D.Player.States;
 using rudIsland.RPG3D.Player.Movement;
@@ -9,6 +11,8 @@ namespace rudIsland.RPG3D.Player.States.Attack
     {
         private const int LastComboNumber = 5;
         private const float AttackCompleteNormalizedTime = 1f;
+        internal const float HeavyProtectionStartNormalizedTime = 0.20f;
+        internal const float HeavyProtectionEndNormalizedTime = 0.42f;
 
         private readonly PlayerStateMachine stateMachine;
         private readonly PlayerAnimationController animationController;
@@ -30,6 +34,10 @@ namespace rudIsland.RPG3D.Player.States.Attack
             currentAttackData != null
                 ? currentAttackData.StaggerDamage
                 : 0f;
+        public AttackStrength CurrentAttackStrength =>
+            currentAttackData != null
+                ? currentAttackData.Strength
+                : AttackStrength.Light;
         public float AttackPushDistance =>
             currentAttackData != null
                 ? currentAttackData.PushDistance
@@ -39,6 +47,12 @@ namespace rudIsland.RPG3D.Player.States.Attack
                 ? currentAttackData.HitStopDuration
                 : 0f;
         public PlayerAttackData CurrentAttackData => currentAttackData;
+        internal bool ProtectsSmallHit =>
+            currentAttackData != null &&
+            IsHeavyProtectionActive(
+                currentAttackData.AttackNumber,
+                hasAttackTime,
+                currentNormalizedTime);
         internal bool CanCancelToRoll =>
             currentAttackData != null &&
             hasAttackTime &&
@@ -174,6 +188,24 @@ namespace rudIsland.RPG3D.Player.States.Attack
             return hasAnimationStarted &&
                 eventAttackNumber == currentAttackNumber &&
                 isPlayingCurrentAttack;
+        }
+
+        internal static bool IsHeavyProtectionTime(float normalizedTime)
+        {
+            return normalizedTime >=
+                    HeavyProtectionStartNormalizedTime &&
+                normalizedTime <
+                    HeavyProtectionEndNormalizedTime;
+        }
+
+        internal static bool IsHeavyProtectionActive(
+            int attackNumber,
+            bool hasAttackTime,
+            float normalizedTime)
+        {
+            return attackNumber == LastComboNumber &&
+                hasAttackTime &&
+                IsHeavyProtectionTime(normalizedTime);
         }
 
         internal bool TryStartNextCombo()

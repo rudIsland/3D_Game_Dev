@@ -20,10 +20,7 @@ namespace rudIsland.RPG3D.Player.States.Actions
             this.duration = duration > 0f ? duration : 0f;
         }
 
-        internal void Update(
-            float deltaTime,
-            bool rollPressed,
-            bool attackPressed)
+        internal void Update( float deltaTime,bool rollPressed, bool attackPressed)
         {
             if (CurrentAction != PlayerBufferedAction.None)
             {

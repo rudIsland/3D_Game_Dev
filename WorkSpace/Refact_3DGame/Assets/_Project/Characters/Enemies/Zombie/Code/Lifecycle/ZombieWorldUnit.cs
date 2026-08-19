@@ -9,12 +9,12 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
     {
         private readonly ZombieStateMachine stateMachine; // 현재 행동 상태
         private readonly ZombieAttackRangeDetector attackRangeDetector;
-        private readonly ZombieStagger stagger;
+        private readonly StopPoint stopPoint;
         private readonly CombatHitStop hitStop;
 
         public float CurrentHealth => Health.CurrentHealth; // 현재 체력
-        public float CurrentStagger => stagger.CurrentStagger;
-        public float MaxStagger => stagger.StaggerLimit;
+        public float CurrentStagger => stopPoint.CurrentPoint;
+        public float MaxStagger => stopPoint.MaxPoint;
         public bool IsInCombat => stateMachine.IsInCombat;
 
         public event Action<ZombieWorldUnit> StaggerChanged;
@@ -24,50 +24,57 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             float maxHealth,
             ZombieStateMachine stateMachine,
             ZombieAttackRangeDetector attackRangeDetector,
-            ZombieStagger stagger,
+            StopPoint stopPoint,
             CombatHitStop hitStop)
             : base(maxHealth)
         {
             this.stateMachine = stateMachine;
             this.attackRangeDetector = attackRangeDetector;
-            this.stagger = stagger;
+            this.stopPoint = stopPoint;
             this.hitStop = hitStop;
         }
 
         public EnemyHitResult TakeHit(in EnemyHitRequest hitRequest)
         {
-            float healthBeforeDamage = Health.CurrentHealth;
-
-            Health.TakeDamage(hitRequest.Damage);
-
-            if (Health.CurrentHealth >= healthBeforeDamage)
+            HitDamageResult damageResult =
+                HitDamageCalculator.Apply(Health, hitRequest.Damage);
+            if (damageResult == HitDamageResult.Ignored)
             {
                 return EnemyHitResult.Ignored;
             }
 
-            if (IsDead)
+            hitStop.Request(hitRequest.HitStopDuration);
+            if (damageResult == HitDamageResult.Killed)
             {
-                hitStop.Request(hitRequest.HitStopDuration);
-                return EnemyHitResult.Damaged;
+                return EnemyHitResult.Killed;
             }
 
+            bool reachedStopLimit =
+                stopPoint.TryAccumulate(hitRequest.StaggerDamage);
+            HitReaction reaction = HitReactionSelector.Select(
+                hitRequest.Strength,
+                reachedStopLimit,
+                false,
+                false,
+                false);
+            var hitResult = new EnemyHitResult(
+                HitDamageResult.Damaged,
+                reaction);
+
             stateMachine.NotifyDamaged();
-            bool shouldEnterHitState =
-                stagger.TryAccumulate(hitRequest.StaggerDamage);
             if (hitRequest.StaggerDamage > 0f)
             {
                 StaggerChanged?.Invoke(this);
             }
 
-            if (shouldEnterHitState)
+            if (reaction != HitReaction.None)
             {
-                hitStop.Request(hitRequest.HitStopDuration);
-                stateMachine.ChangeToHitState(in hitRequest);
-                return EnemyHitResult.Staggered;
+                stateMachine.ChangeToHitState(
+                    reaction,
+                    in hitRequest);
             }
 
-            hitStop.Request(hitRequest.HitStopDuration);
-            return EnemyHitResult.Damaged;
+            return hitResult;
         }
 
         internal void NotifyAttackAnimationEnded()
@@ -101,7 +108,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         {
             hitStop.Reset();
             attackRangeDetector.Close();
-            stagger.Reset();
+            stopPoint.Reset();
             stateMachine.Enable();
         }
 
@@ -112,7 +119,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 return;
             }
 
-            if (stagger.UpdateRecovery(deltaTime))
+            if (stopPoint.UpdateRecovery(deltaTime))
             {
                 StaggerChanged?.Invoke(this);
             }

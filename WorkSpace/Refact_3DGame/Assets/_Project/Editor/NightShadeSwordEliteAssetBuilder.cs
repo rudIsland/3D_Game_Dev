@@ -27,51 +27,101 @@ namespace rudIsland.RPG3D.EditorTools
             "Assets/_Project/Scenes/Dev/CharacterTest/Prefabs/NightShadeSwordElite.prefab";
         private const string SpawnSettingsPath =
             "Assets/_Project/Scenes/Dev/CharacterTest/Settings/NightShadeTestSpawnSettings.asset";
-        private const string AnimationCopyFolder =
-            "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Clips/TwoHandSword";
+        private const string AnimationClipsFolder =
+            "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Clips";
+        private const string AnimationSourcesFolder =
+            "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Sources";
+        private const string IdleClipPath =
+            AnimationClipsFolder + "/Idle/NightShadeSword_Idle.anim";
+        private const string ChaseClipPath =
+            AnimationClipsFolder + "/Run/NightShadeSword_Chase.anim";
         private const string WalkClipPath =
-            "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Clips/TwoHandSword/NightShadeSword_Walk.anim";
+            AnimationClipsFolder + "/Walk/NightShadeSword_Walk.anim";
+        private const string CombatBackClipPath =
+            AnimationClipsFolder + "/Walk/NightShadeSword_CombatBack.anim";
+        private const string CombatLeftClipPath =
+            AnimationClipsFolder + "/Walk/NightShadeSword_CombatLeft.anim";
+        private const string CombatRightClipPath =
+            AnimationClipsFolder + "/Walk/NightShadeSword_CombatRight.anim";
         private const string LightAttackClipPath =
-            "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Clips/TwoHandSword/NightShadeSword_LightAttack.anim";
+            AnimationClipsFolder + "/Attack/NightShadeSword_LightAttack.anim";
         private const string ComboFirstClipPath =
-            "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Clips/TwoHandSword/NightShadeSword_ComboFirst.anim";
+            AnimationClipsFolder + "/Attack/NightShadeSword_ComboFirst.anim";
         private const string ComboSecondClipPath =
-            "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Clips/TwoHandSword/NightShadeSword_ComboSecond.anim";
+            AnimationClipsFolder + "/Attack/NightShadeSword_ComboSecond.anim";
         private const string HeavyAttackClipPath =
-            "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Clips/TwoHandSword/NightShadeSword_HeavyAttack.anim";
+            AnimationClipsFolder + "/Attack/NightShadeSword_HeavyAttack.anim";
         private const string WideSwingClipPath =
-            "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Clips/TwoHandSword/NightShadeSword_WideSwing.anim";
+            AnimationClipsFolder + "/Attack/NightShadeSword_WideSwing.anim";
+        private const string DeadClipPath =
+            AnimationClipsFolder + "/Death/NightShadeSword_Dead.anim";
+        private const string BigHitClipPath =
+            AnimationClipsFolder + "/Hit/NightShadeSword_BigHit.anim";
+        private const string KnockbackClipPath =
+            AnimationClipsFolder + "/Hit/NightShadeSword_Knockback.anim";
+        private const string KnockdownClipPath =
+            AnimationClipsFolder + "/Hit/NightShadeSword_Knockdown.anim";
+        private const string GetUpClipPath =
+            AnimationClipsFolder + "/Hit/NightShadeSword_GetUp.anim";
+        private const string SmallHitFrontClipPath =
+            AnimationClipsFolder + "/Hit/NightShadeSword_SmallHitFront.anim";
+        private const string SmallHitBackClipPath =
+            AnimationClipsFolder + "/Hit/NightShadeSword_SmallHitBack.anim";
+        private const string SmallHitLeftClipPath =
+            AnimationClipsFolder + "/Hit/NightShadeSword_SmallHitLeft.anim";
+        private const string SmallHitRightClipPath =
+            AnimationClipsFolder + "/Hit/NightShadeSword_SmallHitRight.anim";
         private const string AttackSpeedParameterName = "AttackSpeed";
 
         private const string IdleSourcePath =
-            "Assets/_ThirdParty/AnimationBundle/FBX_Animations/Two Hand Up/Movement/Idle/Idle/2Hand_Up_Idle_A_1.fbx";
+            AnimationSourcesFolder + "/2Hand_Up_Idle_A_1.fbx";
         private const string ChaseSourcePath =
-            "Assets/_ThirdParty/AnimationBundle/FBX_Animations/Two Hand Up/Movement/Run/Type A/Base/InPlace/2Hand_Up_Run_A_F_InPlace.fbx";
+            AnimationSourcesFolder + "/2Hand_Up_Run_A_F_InPlace.fbx";
         private const string WalkSourcePath =
-            "Assets/_ThirdParty/AnimationBundle/FBX_Animations/Two Hand Up/Movement/Walk/Type A/Base/InPlace/2Hand_Up_Walk_A_F_InPlace.fbx";
+            AnimationSourcesFolder + "/2Hand_Up_Walk_A_F_InPlace.fbx";
         private const string CombatBackSourcePath =
-            "Assets/_ThirdParty/AnimationBundle/FBX_Animations/Two Hand Up/Movement/Walk Slow/Type B/InPlace/2Hand_Up_Walk_Slow_B_B_InPlace.fbx";
+            AnimationSourcesFolder + "/2Hand_Up_Walk_Slow_B_B_InPlace.fbx";
         private const string CombatLeftSourcePath =
-            "Assets/_ThirdParty/AnimationBundle/FBX_Animations/Two Hand Up/Movement/Block A Walk Slow/InPlace/2Hand_Up_Block_Walk_Slow_F_L90_A_InPlace.fbx";
+            AnimationSourcesFolder + "/2Hand_Up_Block_Walk_Slow_F_L90_A_InPlace.fbx";
         private const string CombatRightSourcePath =
-            "Assets/_ThirdParty/AnimationBundle/FBX_Animations/Two Hand Up/Movement/Block A Walk Slow/InPlace/2Hand_Up_Block_Walk_Slow_F_R90_A_InPlace.fbx";
+            AnimationSourcesFolder + "/2Hand_Up_Block_Walk_Slow_F_R90_A_InPlace.fbx";
         private const string LightAttackSourcePath =
-            "Assets/_ThirdParty/AnimationBundle/FBX_Animations/Two Hand Up/Attack_A/2Hand_Up_Attack_A_1.fbx";
+            AnimationSourcesFolder + "/2Hand_Up_Attack_A_1.fbx";
         private const string ComboFirstSourcePath =
-            "Assets/_ThirdParty/AnimationBundle/FBX_Animations/Two Hand Up/Attack_A/2Hand_Up_Attack_A_1.fbx";
+            AnimationSourcesFolder + "/2Hand_Up_Attack_A_1.fbx";
         private const string ComboSecondSourcePath =
-            "Assets/_ThirdParty/AnimationBundle/FBX_Animations/Two Hand Up/Attack_A/2Hand_Up_Attack_A_2_Combo.fbx";
+            AnimationSourcesFolder + "/2Hand_Up_Attack_A_2_Combo.fbx";
         private const string HeavyAttackSourcePath =
-            "Assets/_ThirdParty/AnimationBundle/FBX_Animations/Two Hand Up/Attack_B/2Hand_Up_Attack_B_1.fbx";
+            AnimationSourcesFolder + "/2Hand_Up_Attack_B_1.fbx";
         private const string WideSwingSourcePath =
-            "Assets/_ThirdParty/AnimationBundle/FBX_Animations/Two Hand Up/Attack_A/2Hand_Up_Attack_A_3.fbx";
-        private const string HitClipPath =
-            "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Clips/FromSources/A_SpearCombatAnimationV2_Hit_Fw_RM.anim";
-        private const string DeadClipPath =
-            "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Clips/FromSources/A_SpearCombatAnimationV2_HitDeath_Fw_RM.anim";
-
+            AnimationSourcesFolder + "/2Hand_Up_Attack_A_3.fbx";
+        private const string DeadSourcePath =
+            AnimationSourcesFolder + "/@anim_Sword_death.FBX";
+        private const string BigHitSourcePath =
+            AnimationSourcesFolder + "/RPG-Character@2Hand-Sword-GetHit-F2.FBX";
+        private const string KnockbackSourcePath =
+            AnimationSourcesFolder + "/RPG-Character@2Hand-Sword-Knockback-Back2.FBX";
+        private const string KnockdownSourcePath =
+            AnimationSourcesFolder + "/RPG-Character@2Hand-Sword-Knockdown1.FBX";
+        private const string GetUpSourcePath =
+            AnimationSourcesFolder + "/RPG-Character@2Hand-Sword-Getup1.FBX";
+        private const string SmallHitFrontSourcePath =
+            AnimationSourcesFolder + "/RPG-Character@2Hand-Sword-GetHit-F1.FBX";
+        private const string SmallHitBackSourcePath =
+            AnimationSourcesFolder + "/RPG-Character@2Hand-Sword-GetHit-B1.FBX";
+        private const string SmallHitLeftSourcePath =
+            AnimationSourcesFolder + "/RPG-Character@2Hand-Sword-GetHit-L1.FBX";
+        private const string SmallHitRightSourcePath =
+            AnimationSourcesFolder + "/RPG-Character@2Hand-Sword-GetHit-R1.FBX";
         private const float SwordLength = 1.5f;
         private const float SwordHitRadius = 0.13f;
+        private const float KnockbackPlaybackSpeed = 1f;
+        private const float KnockdownPlaybackSpeed = 1f;
+        private const float GetUpPlaybackSpeed = 1.5f;
+        private const float SmallHitFrontBackPlaybackSpeed = 1.25f;
+        private const float SmallHitLeftRightPlaybackSpeed = 1f;
+        private const float BigHitPlaybackSpeed = 1f;
+        private const float DeadPlaybackSpeed = 0.8f;
         private static readonly Vector3 AuthoredSwordDirection =
             new Vector3(-0.76f, -0.35f, -0.54f).normalized;
 
@@ -126,7 +176,7 @@ namespace rudIsland.RPG3D.EditorTools
         [MenuItem("Tools/rudIsland/Apply NightShade Sword Split Combo")]
         public static void ApplySplitCombo()
         {
-            EnsureAssetFolder(AnimationCopyFolder);
+            EnsureAssetFolder(AnimationClipsFolder);
             AnimationClip comboFirstClip = CopyAnimationClip(
                 ComboFirstSourcePath,
                 ComboFirstClipPath,
@@ -163,7 +213,7 @@ namespace rudIsland.RPG3D.EditorTools
         [MenuItem("Tools/rudIsland/Apply NightShade Sword Walk")]
         public static void ApplyWalkAnimation()
         {
-            EnsureAssetFolder(AnimationCopyFolder);
+            EnsureAssetFolder(AnimationClipsFolder);
             AnimationClip walkClip = CopyAnimationClip(
                 WalkSourcePath,
                 WalkClipPath,
@@ -181,6 +231,133 @@ namespace rudIsland.RPG3D.EditorTools
             Debug.Log("NightShade 양손검 Walk 클립과 상태만 적용했습니다.");
         }
 
+        [MenuItem("Tools/rudIsland/Apply NightShade Hit Reactions")]
+        public static void ApplyHitReactionAnimations()
+        {
+            EnsureAssetFolder(AnimationClipsFolder);
+            AnimationClip smallHitFrontClip =
+                CopyReactionAnimationClip(
+                    SmallHitFrontSourcePath,
+                    SmallHitFrontClipPath);
+            AnimationClip smallHitBackClip =
+                CopyReactionAnimationClip(
+                    SmallHitBackSourcePath,
+                    SmallHitBackClipPath);
+            AnimationClip smallHitLeftClip =
+                CopyReactionAnimationClip(
+                    SmallHitLeftSourcePath,
+                    SmallHitLeftClipPath);
+            AnimationClip smallHitRightClip =
+                CopyReactionAnimationClip(
+                    SmallHitRightSourcePath,
+                    SmallHitRightClipPath);
+            AnimationClip knockbackClip = CopyReactionAnimationClip(
+                KnockbackSourcePath,
+                KnockbackClipPath);
+            AnimationClip knockdownClip = CopyReactionAnimationClip(
+                KnockdownSourcePath,
+                KnockdownClipPath);
+            AnimationClip getUpClip = CopyReactionAnimationClip(
+                GetUpSourcePath,
+                GetUpClipPath);
+            AnimationClip bigHitClip = CopyReactionAnimationClip(
+                BigHitSourcePath,
+                BigHitClipPath);
+            AnimationClip deadClip = CopyReactionAnimationClip(
+                DeadSourcePath,
+                DeadClipPath);
+            AnimatorController controller =
+                AssetDatabase.LoadAssetAtPath<AnimatorController>(
+                    AnimatorControllerPath);
+            if (controller == null)
+            {
+                throw new InvalidOperationException(
+                    $"NightShade Animator Controller를 찾지 못했습니다: {AnimatorControllerPath}");
+            }
+
+            AnimatorStateMachine stateMachine =
+                controller.layers[0].stateMachine;
+            AddOrUpdateReactionState(
+                stateMachine,
+                "Small Hit Front",
+                smallHitFrontClip,
+                new Vector3(0f, 270f),
+                SmallHitFrontBackPlaybackSpeed);
+            AddOrUpdateReactionState(
+                stateMachine,
+                "Small Hit Back",
+                smallHitBackClip,
+                new Vector3(130f, 270f),
+                SmallHitFrontBackPlaybackSpeed);
+            AddOrUpdateReactionState(
+                stateMachine,
+                "Small Hit Left",
+                smallHitLeftClip,
+                new Vector3(260f, 270f),
+                SmallHitLeftRightPlaybackSpeed);
+            AddOrUpdateReactionState(
+                stateMachine,
+                "Small Hit Right",
+                smallHitRightClip,
+                new Vector3(390f, 270f),
+                SmallHitLeftRightPlaybackSpeed);
+            AddOrUpdateReactionState(
+                stateMachine,
+                "Knockback",
+                knockbackClip,
+                new Vector3(520f, 180f),
+                KnockbackPlaybackSpeed);
+            AddOrUpdateReactionState(
+                stateMachine,
+                "Knockdown",
+                knockdownClip,
+                new Vector3(650f, 180f),
+                KnockdownPlaybackSpeed);
+            AddOrUpdateReactionState(
+                stateMachine,
+                "Get Up",
+                getUpClip,
+                new Vector3(780f, 180f),
+                GetUpPlaybackSpeed);
+            AddOrUpdateReactionState(
+                stateMachine,
+                "Hit Front",
+                bigHitClip,
+                new Vector3(0f, 180f),
+                BigHitPlaybackSpeed);
+            AddOrUpdateReactionState(
+                stateMachine,
+                "Hit Back",
+                bigHitClip,
+                new Vector3(130f, 180f),
+                BigHitPlaybackSpeed);
+            AddOrUpdateReactionState(
+                stateMachine,
+                "Hit Left",
+                bigHitClip,
+                new Vector3(260f, 180f),
+                BigHitPlaybackSpeed);
+            AddOrUpdateReactionState(
+                stateMachine,
+                "Hit Right",
+                bigHitClip,
+                new Vector3(390f, 180f),
+                BigHitPlaybackSpeed);
+            AddOrUpdateReactionState(
+                stateMachine,
+                "Dead",
+                deadClip,
+                new Vector3(910f, 180f),
+                DeadPlaybackSpeed);
+            ApplyAttackAnimationEvents(
+                LoadClip(HeavyAttackClipPath),
+                CreateHeavyAttackEvents());
+            EditorUtility.SetDirty(controller);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            Debug.Log("NightShade 피격, 넉백, 다운과 사망 애니메이션을 적용했습니다.");
+        }
+
         public static void BuildFromCommandLine()
         {
             try
@@ -196,14 +373,14 @@ namespace rudIsland.RPG3D.EditorTools
 
         private static AnimatorController BuildAnimatorController()
         {
-            EnsureAssetFolder(AnimationCopyFolder);
+            EnsureAssetFolder(AnimationClipsFolder);
             AnimationClip idleClip = CopyAnimationClip(
                 IdleSourcePath,
-                $"{AnimationCopyFolder}/NightShadeSword_Idle.anim",
+                IdleClipPath,
                 true);
             AnimationClip chaseClip = CopyAnimationClip(
                 ChaseSourcePath,
-                $"{AnimationCopyFolder}/NightShadeSword_Chase.anim",
+                ChaseClipPath,
                 true);
             AnimationClip walkClip = CopyAnimationClip(
                 WalkSourcePath,
@@ -211,19 +388,19 @@ namespace rudIsland.RPG3D.EditorTools
                 true);
             AnimationClip combatBackClip = CopyAnimationClip(
                 CombatBackSourcePath,
-                $"{AnimationCopyFolder}/NightShadeSword_CombatBack.anim",
+                CombatBackClipPath,
                 true);
             AnimationClip combatLeftClip = CopyAnimationClip(
                 CombatLeftSourcePath,
-                $"{AnimationCopyFolder}/NightShadeSword_CombatLeft.anim",
+                CombatLeftClipPath,
                 true);
             AnimationClip combatRightClip = CopyAnimationClip(
                 CombatRightSourcePath,
-                $"{AnimationCopyFolder}/NightShadeSword_CombatRight.anim",
+                CombatRightClipPath,
                 true);
             AnimationClip lightAttackClip = CopyAnimationClip(
                 LightAttackSourcePath,
-                $"{AnimationCopyFolder}/NightShadeSword_LightAttack.anim",
+                LightAttackClipPath,
                 false);
             AnimationClip comboFirstClip = CopyAnimationClip(
                 ComboFirstSourcePath,
@@ -235,12 +412,43 @@ namespace rudIsland.RPG3D.EditorTools
                 false);
             AnimationClip heavyAttackClip = CopyAnimationClip(
                 HeavyAttackSourcePath,
-                $"{AnimationCopyFolder}/NightShadeSword_HeavyAttack.anim",
+                HeavyAttackClipPath,
                 false);
             AnimationClip wideSwingClip = CopyAnimationClip(
                 WideSwingSourcePath,
-                $"{AnimationCopyFolder}/NightShadeSword_WideSwing.anim",
+                WideSwingClipPath,
                 false);
+            AnimationClip deadClip = CopyReactionAnimationClip(
+                DeadSourcePath,
+                DeadClipPath);
+            AnimationClip bigHitClip = CopyReactionAnimationClip(
+                BigHitSourcePath,
+                BigHitClipPath);
+            AnimationClip knockbackClip = CopyReactionAnimationClip(
+                KnockbackSourcePath,
+                KnockbackClipPath);
+            AnimationClip knockdownClip = CopyReactionAnimationClip(
+                KnockdownSourcePath,
+                KnockdownClipPath);
+            AnimationClip getUpClip = CopyReactionAnimationClip(
+                GetUpSourcePath,
+                GetUpClipPath);
+            AnimationClip smallHitFrontClip =
+                CopyReactionAnimationClip(
+                    SmallHitFrontSourcePath,
+                    SmallHitFrontClipPath);
+            AnimationClip smallHitBackClip =
+                CopyReactionAnimationClip(
+                    SmallHitBackSourcePath,
+                    SmallHitBackClipPath);
+            AnimationClip smallHitLeftClip =
+                CopyReactionAnimationClip(
+                    SmallHitLeftSourcePath,
+                    SmallHitLeftClipPath);
+            AnimationClip smallHitRightClip =
+                CopyReactionAnimationClip(
+                    SmallHitRightSourcePath,
+                    SmallHitRightClipPath);
 
             ApplyAttackAnimationEvents(lightAttackClip, CreateLightAttackEvents());
             ApplyAttackAnimationEvents(comboFirstClip, CreateComboFirstEvents());
@@ -333,14 +541,80 @@ namespace rudIsland.RPG3D.EditorTools
                 true);
             AddState(
                 stateMachine,
-                "Hit",
-                LoadClip(HitClipPath),
-                new Vector3(130f, 180f));
+                "Small Hit Front",
+                smallHitFrontClip,
+                new Vector3(0f, 270f),
+                playbackSpeed:
+                    SmallHitFrontBackPlaybackSpeed);
+            AddState(
+                stateMachine,
+                "Small Hit Back",
+                smallHitBackClip,
+                new Vector3(130f, 270f),
+                playbackSpeed:
+                    SmallHitFrontBackPlaybackSpeed);
+            AddState(
+                stateMachine,
+                "Small Hit Left",
+                smallHitLeftClip,
+                new Vector3(260f, 270f),
+                playbackSpeed:
+                    SmallHitLeftRightPlaybackSpeed);
+            AddState(
+                stateMachine,
+                "Small Hit Right",
+                smallHitRightClip,
+                new Vector3(390f, 270f),
+                playbackSpeed:
+                    SmallHitLeftRightPlaybackSpeed);
+            AddState(
+                stateMachine,
+                "Hit Front",
+                bigHitClip,
+                new Vector3(0f, 180f),
+                playbackSpeed: BigHitPlaybackSpeed);
+            AddState(
+                stateMachine,
+                "Hit Back",
+                bigHitClip,
+                new Vector3(130f, 180f),
+                playbackSpeed: BigHitPlaybackSpeed);
+            AddState(
+                stateMachine,
+                "Hit Left",
+                bigHitClip,
+                new Vector3(260f, 180f),
+                playbackSpeed: BigHitPlaybackSpeed);
+            AddState(
+                stateMachine,
+                "Hit Right",
+                bigHitClip,
+                new Vector3(390f, 180f),
+                playbackSpeed: BigHitPlaybackSpeed);
+            AddState(
+                stateMachine,
+                "Knockback",
+                knockbackClip,
+                new Vector3(520f, 180f),
+                playbackSpeed: KnockbackPlaybackSpeed);
+            AddState(
+                stateMachine,
+                "Knockdown",
+                knockdownClip,
+                new Vector3(650f, 180f),
+                playbackSpeed: KnockdownPlaybackSpeed);
+            AddState(
+                stateMachine,
+                "Get Up",
+                getUpClip,
+                new Vector3(780f, 180f),
+                playbackSpeed: GetUpPlaybackSpeed);
             AddState(
                 stateMachine,
                 "Dead",
-                LoadClip(DeadClipPath),
-                new Vector3(390f, 180f));
+                deadClip,
+                new Vector3(910f, 180f),
+                playbackSpeed: DeadPlaybackSpeed);
             stateMachine.defaultState = idle;
             EditorUtility.SetDirty(controller);
             return controller;
@@ -351,10 +625,12 @@ namespace rudIsland.RPG3D.EditorTools
             string stateName,
             AnimationClip clip,
             Vector3 position,
-            bool usesAttackSpeed = false)
+            bool usesAttackSpeed = false,
+            float playbackSpeed = 1f)
         {
             AnimatorState state = stateMachine.AddState(stateName, position);
             state.motion = clip;
+            state.speed = Mathf.Max(0.01f, playbackSpeed);
             state.writeDefaultValues = true;
             if (usesAttackSpeed)
             {
@@ -470,6 +746,44 @@ namespace rudIsland.RPG3D.EditorTools
             EditorUtility.SetDirty(keptState);
         }
 
+        private static void AddOrUpdateReactionState(
+            AnimatorStateMachine stateMachine,
+            string stateName,
+            AnimationClip clip,
+            Vector3 position,
+            float playbackSpeed)
+        {
+            ChildAnimatorState[] childStates = stateMachine.states;
+            AnimatorState keptState = null;
+            for (int index = 0; index < childStates.Length; index++)
+            {
+                AnimatorState state = childStates[index].state;
+                if (state.name != stateName)
+                {
+                    continue;
+                }
+
+                if (keptState == null)
+                {
+                    keptState = state;
+                    continue;
+                }
+
+                stateMachine.RemoveState(state);
+            }
+
+            if (keptState == null)
+            {
+                keptState = stateMachine.AddState(stateName, position);
+            }
+
+            keptState.motion = clip;
+            keptState.speed = Mathf.Max(0.01f, playbackSpeed);
+            keptState.writeDefaultValues = true;
+            keptState.speedParameterActive = false;
+            EditorUtility.SetDirty(keptState);
+        }
+
         private static void RemoveStatesByName(
             AnimatorStateMachine stateMachine,
             string stateName)
@@ -561,6 +875,21 @@ namespace rudIsland.RPG3D.EditorTools
             AnimationUtility.SetAnimationClipSettings(copyClip, settings);
             EditorUtility.SetDirty(copyClip);
             return copyClip;
+        }
+
+        private static AnimationClip CopyReactionAnimationClip(
+            string sourcePath,
+            string copyPath)
+        {
+            AnimationClip clip = CopyAnimationClip(
+                sourcePath,
+                copyPath,
+                false);
+            AnimationUtility.SetAnimationEvents(
+                clip,
+                Array.Empty<AnimationEvent>());
+            EditorUtility.SetDirty(clip);
+            return clip;
         }
 
         private static AnimationEvent[] CreateLightAttackEvents()
@@ -749,7 +1078,9 @@ namespace rudIsland.RPG3D.EditorTools
                 functionName == "SetAttackSpeed" ||
                 functionName == "ResetAttackSpeed" ||
                 functionName == "SetAttackPlaybackSpeed" ||
-                functionName == "ResetAttackPlaybackSpeed";
+                functionName == "ResetAttackPlaybackSpeed" ||
+                functionName == "BeginSuperArmorAnimationEvent" ||
+                functionName == "EndSuperArmorAnimationEvent";
         }
 
         private static int CompareAnimationEvents(AnimationEvent left, AnimationEvent right)

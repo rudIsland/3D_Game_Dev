@@ -8,10 +8,17 @@ namespace rudIsland.RPG3D.Characters.Combat
     public sealed class CombatHitEffectPlayer : MonoBehaviour
     {
         private const float DirectionThreshold = 0.000001f;
+        private const int DefaultFloorLayerMask = 1 << 0;
 
         [Header("타격 효과")]
         [SerializeField] private GameObject bodyHitEffectPrefab;
         [SerializeField] private GameObject guardHitEffectPrefab;
+
+        [Header("바닥 혈흔")]
+        [SerializeField] private LayerMask floorLayerMask = DefaultFloorLayerMask;
+        [SerializeField, Min(0f)] private float floorRayStartHeight = 0.25f;
+        [SerializeField, Min(0.1f)] private float floorRayDistance = 4f;
+        [SerializeField, Min(0f)] private float floorSurfaceOffset = 0.015f;
 
         [Header("효과 풀")]
         [SerializeField, Min(1)] private int bodyHitPoolSize = 4;
@@ -30,7 +37,26 @@ namespace rudIsland.RPG3D.Characters.Combat
         public void PlayBodyHit(Vector3 hitPosition, Vector3 incomingDirection)
         {
             Create();
-            bodyHitPool?.Play(hitPosition, GetEffectRotation(incomingDirection));
+            if (bodyHitPool == null)
+            {
+                return;
+            }
+
+            if (TryFindBloodFloor(hitPosition, out RaycastHit floorHit))
+            {
+                Vector3 floorPosition =
+                    floorHit.point + floorHit.normal * floorSurfaceOffset;
+                Quaternion floorRotation =
+                    GetFloorEffectRotation(
+                        floorHit.normal,
+                        incomingDirection);
+                bodyHitPool.Play(floorPosition, floorRotation);
+                return;
+            }
+
+            bodyHitPool.Play(
+                hitPosition,
+                GetEffectRotation(incomingDirection));
         }
 
         public void PlayGuardHit(Vector3 hitPosition, Vector3 incomingDirection)
@@ -94,11 +120,57 @@ namespace rudIsland.RPG3D.Characters.Combat
             return Quaternion.LookRotation(-incomingDirection.normalized, Vector3.up);
         }
 
+        private bool TryFindBloodFloor(
+            Vector3 hitPosition,
+            out RaycastHit floorHit)
+        {
+            Vector3 rayStart =
+                hitPosition + Vector3.up * floorRayStartHeight;
+            float rayDistance =
+                floorRayStartHeight + floorRayDistance;
+
+            return Physics.Raycast(
+                rayStart,
+                Vector3.down,
+                out floorHit,
+                rayDistance,
+                floorLayerMask,
+                QueryTriggerInteraction.Ignore);
+        }
+
+        private static Quaternion GetFloorEffectRotation(
+            Vector3 floorNormal,
+            Vector3 incomingDirection)
+        {
+            if (floorNormal.sqrMagnitude <= DirectionThreshold)
+            {
+                return Quaternion.identity;
+            }
+
+            Vector3 normalizedFloorNormal = floorNormal.normalized;
+            Vector3 bloodDirection = Vector3.ProjectOnPlane(
+                -incomingDirection,
+                normalizedFloorNormal);
+            if (bloodDirection.sqrMagnitude <= DirectionThreshold)
+            {
+                return Quaternion.FromToRotation(
+                    Vector3.forward,
+                    normalizedFloorNormal);
+            }
+
+            return Quaternion.LookRotation(
+                normalizedFloorNormal,
+                bloodDirection.normalized);
+        }
+
 #if UNITY_EDITOR
         private void OnValidate()
         {
             bodyHitPoolSize = Mathf.Max(1, bodyHitPoolSize);
             guardHitPoolSize = Mathf.Max(1, guardHitPoolSize);
+            floorRayStartHeight = Mathf.Max(0f, floorRayStartHeight);
+            floorRayDistance = Mathf.Max(0.1f, floorRayDistance);
+            floorSurfaceOffset = Mathf.Max(0f, floorSurfaceOffset);
         }
 #endif
 
@@ -200,7 +272,10 @@ namespace rudIsland.RPG3D.Characters.Combat
                          index < particleSystems.Length;
                          index++)
                     {
-                        if (particleSystems[index].IsAlive(false))
+                        ParticleSystem particleSystem =
+                            particleSystems[index];
+                        if (particleSystem != null &&
+                            particleSystem.IsAlive(false))
                         {
                             return true;
                         }
@@ -220,6 +295,11 @@ namespace rudIsland.RPG3D.Characters.Combat
                      index++)
                 {
                     ParticleSystem particleSystem = particleSystems[index];
+                    if (particleSystem == null)
+                    {
+                        continue;
+                    }
+
                     particleSystem.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
                     particleSystem.Play(false);
                 }
@@ -231,7 +311,16 @@ namespace rudIsland.RPG3D.Characters.Combat
                      index < particleSystems.Length;
                      index++)
                 {
-                    particleSystems[index].Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+                    ParticleSystem particleSystem =
+                        particleSystems[index];
+                    if (particleSystem == null)
+                    {
+                        continue;
+                    }
+
+                    particleSystem.Stop(
+                        false,
+                        ParticleSystemStopBehavior.StopEmittingAndClear);
                 }
             }
 

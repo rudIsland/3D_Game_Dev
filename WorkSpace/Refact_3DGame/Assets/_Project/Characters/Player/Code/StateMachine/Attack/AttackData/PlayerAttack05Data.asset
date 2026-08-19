@@ -15,7 +15,8 @@ MonoBehaviour:
   attackNumber: 5
   damage: 25
   staggerDamage: 30
-  pushDistance: 0.25
+  attackStrength: 1
+  pushDistance: 0.55
   hitStopDuration: 0.06
   staminaCost: 30
   swingSound: {fileID: 8300000, guid: bc0d800b2a79c004e8b1a9e9b16df148, type: 3}

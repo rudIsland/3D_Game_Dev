@@ -559,7 +559,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 276505471}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.022221591, y: 0.027744284, z: -0.0006169125, w: 0.99936783}
+  m_LocalRotation: {x: 0.02222162, y: 0.027694872, z: -0.0006158133, w: 0.9993692}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1193,7 +1193,7 @@ MonoBehaviour:
   m_VolumeLayerMask:
     serializedVersion: 2
     m_Bits: 1
-  m_VolumeTrigger: {fileID: 0}
+  m_VolumeTrigger: {fileID: 519073573}
   m_VolumeFrameworkUpdateModeOption: 2
   m_RenderPostProcessing: 0
   m_Antialiasing: 0
@@ -3409,7 +3409,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1302424112}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.048199624, y: 0.027718864, z: -0.0013381102, w: 0.9984521}
+  m_LocalRotation: {x: 0.04819967, y: 0.027669497, z: -0.0013357262, w: 0.9984535}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -4550,6 +4550,9 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  stopPointLimit: 30
+  stopPointRecoverDelay: 1.5
+  stopPointRecoverSpeed: 15
 --- !u!114 &1699705003
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4562,8 +4565,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8a4c0717de6458095c2b2f7c52919cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Characters.Combat.CombatHitEffectPlayer
-  bodyHitEffectPrefab: {fileID: 0}
+  bodyHitEffectPrefab: {fileID: 2508344019071891113, guid: 3179f3613d3ad0e4085a8e230b039b81,
+    type: 3}
   guardHitEffectPrefab: {fileID: 0}
+  floorLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  floorRayStartHeight: 0.25
+  floorRayDistance: 4
+  floorSurfaceOffset: 0.015
   bodyHitPoolSize: 4
   guardHitPoolSize: 2
 --- !u!114 &1699705004
@@ -4580,7 +4590,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Player.Runtime.Attack.PlayerAttackEffectPlayer
   confirmedHitSound: {fileID: 8300000, guid: a848f901dd0ca264a8ae871d3e2bc7d5, type: 3}
   confirmedHitSoundVolume: 0.8
+  smallHitSoundVolume: 0.9
+  strongHitSoundVolume: 1
   confirmedHitImpulseForce: 0.12
+  smallHitImpulseForce: 0.16
+  strongHitImpulseForce: 0.22
 --- !u!82 &1699705005
 AudioSource:
   m_ObjectHideFlags: 0
@@ -4928,7 +4942,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1835938357}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.0036315476, y: 0.027750963, z: 0.000100818375, w: 0.9996083}
+  m_LocalRotation: {x: -0.0036315531, y: 0.027701532, z: 0.00010063885, w: 0.99960965}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0

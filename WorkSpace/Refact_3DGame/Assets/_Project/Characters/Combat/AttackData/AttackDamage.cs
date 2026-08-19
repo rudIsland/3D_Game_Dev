@@ -15,8 +15,8 @@ namespace rudIsland.RPG3D.Characters.Combat.AttackData
     {
         [SerializeField, Min(0f)]
         private float healthDamage = 15f;
-        [SerializeField, Min(0)]
-        private int strength;
+        [SerializeField]
+        private AttackStrength strength;
         [SerializeField, Min(0f)]
         private float staggerDamage;
         [SerializeField, Min(0f)]
@@ -38,7 +38,7 @@ namespace rudIsland.RPG3D.Characters.Combat.AttackData
 
         public AttackDamage(
             float healthDamage,
-            int strength,
+            AttackStrength strength,
             float staggerDamage,
             float pushDistance,
             float guardStaminaDamage,
@@ -49,7 +49,7 @@ namespace rudIsland.RPG3D.Characters.Combat.AttackData
                 DamageSoundType.BodyImpact)
         {
             this.healthDamage = Mathf.Max(0f, healthDamage);
-            this.strength = Mathf.Max(0, strength);
+            this.strength = strength;
             this.staggerDamage = Mathf.Max(0f, staggerDamage);
             this.pushDistance = Mathf.Max(0f, pushDistance);
             this.hitStopDuration = Mathf.Max(0f, hitStopDuration);
@@ -59,7 +59,7 @@ namespace rudIsland.RPG3D.Characters.Combat.AttackData
         }
 
         public float HealthDamage => healthDamage;
-        public int Strength => strength;
+        public AttackStrength Strength => strength;
         public float StaggerDamage => staggerDamage;
         public float PushDistance => pushDistance;
         public float HitStopDuration => hitStopDuration;

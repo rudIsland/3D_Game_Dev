@@ -15,6 +15,7 @@ MonoBehaviour:
   attackNumber: 2
   damage: 12
   staggerDamage: 12
+  attackStrength: 0
   pushDistance: 0.25
   hitStopDuration: 0.04
   staminaCost: 15

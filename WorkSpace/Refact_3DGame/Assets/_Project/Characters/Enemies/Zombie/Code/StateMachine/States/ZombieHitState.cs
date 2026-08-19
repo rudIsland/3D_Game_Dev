@@ -1,3 +1,4 @@
+using rudIsland.RPG3D.Characters.Combat;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.Zombie
@@ -8,8 +9,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         private readonly ZombieStateMachine stateMachine;
 
         private EnemyHitRequest hitRequest;
+        private HitReaction reaction;
         private float elapsedPushTime;
         private float previousPushProgress;
+        private float elapsedReactionTime;
+        private float pushDistance;
 
         public ZombieHitState(ZombieStateMachine stateMachine)
         {
@@ -23,6 +27,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         public void Update(float deltaTime)
         {
+            elapsedReactionTime += Mathf.Max(0f, deltaTime);
             ApplyHitMovement(deltaTime);
 
             if (stateMachine.TryGetCurrentAnimationTime(out float normalizedTime)
@@ -42,27 +47,46 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         public void Restart()
         {
             elapsedPushTime = 0f;
-            previousPushProgress =
-                stateMachine.EvaluateHitPushProgress(0f);
-            stateMachine.PlayHitFromStart();
+            previousPushProgress = stateMachine.EvaluateHitPushProgress(0f);
+            elapsedReactionTime = 0f;
+            stateMachine.PlayHitFromStart(reaction);
         }
 
-        internal void SetHitRequest( in EnemyHitRequest nextHitRequest)
+        internal bool TryRestart(
+            HitReaction nextReaction,
+            in EnemyHitRequest nextHitRequest)
         {
+            if (!HitReactionPlayback.CanStart(
+                    reaction,
+                    nextReaction,
+                    elapsedReactionTime))
+            {
+                return false;
+            }
+
+            SetHitRequest(nextReaction, in nextHitRequest);
+            Restart();
+            return true;
+        }
+
+        internal void SetHitRequest(HitReaction nextReaction, in EnemyHitRequest nextHitRequest)
+        {
+            reaction = nextReaction;
             hitRequest = nextHitRequest;
+            pushDistance = HitPushDistance.GetDistance(
+                hitRequest.PushDistance,
+                reaction);
         }
 
         private void ApplyHitMovement(float deltaTime)
         {
-            elapsedPushTime = Mathf.Min(elapsedPushTime + Mathf.Max(0f, deltaTime), stateMachine.HitPushDuration);
-            float normalizedTime =
-                elapsedPushTime / stateMachine.HitPushDuration;
+            float pushDuration = stateMachine.GetHitPushDuration(reaction);
+            elapsedPushTime = Mathf.Min(elapsedPushTime + Mathf.Max(0f, deltaTime), pushDuration);
+            float normalizedTime = elapsedPushTime / pushDuration;
             float pushProgress = Mathf.Max(previousPushProgress, stateMachine.EvaluateHitPushProgress(normalizedTime));
-            float deltaProgress =
-                pushProgress - previousPushProgress;
-            Vector3 horizontalMovement =
-                hitRequest.PushDirection *
-                (hitRequest.PushDistance * deltaProgress);
+            float deltaProgress = pushProgress - previousPushProgress;
+            Vector3 horizontalMovement = hitRequest.PushDirection *
+                (pushDistance * deltaProgress);
 
             previousPushProgress = pushProgress;
             stateMachine.ApplyHitMovement(horizontalMovement, deltaTime);

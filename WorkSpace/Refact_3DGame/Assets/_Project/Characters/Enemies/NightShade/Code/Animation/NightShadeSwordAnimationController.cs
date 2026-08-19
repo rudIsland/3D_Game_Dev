@@ -1,3 +1,4 @@
+using rudIsland.RPG3D.Characters.Combat;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.NightShade
@@ -33,6 +34,28 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             Animator.StringToHash("Base Layer.Wide Swing");
         private static readonly int HitStateId =
             Animator.StringToHash("Base Layer.Hit");
+        private static readonly int SmallHitFrontStateId =
+            Animator.StringToHash("Base Layer.Small Hit Front");
+        private static readonly int SmallHitBackStateId =
+            Animator.StringToHash("Base Layer.Small Hit Back");
+        private static readonly int SmallHitLeftStateId =
+            Animator.StringToHash("Base Layer.Small Hit Left");
+        private static readonly int SmallHitRightStateId =
+            Animator.StringToHash("Base Layer.Small Hit Right");
+        private static readonly int HitFrontStateId =
+            Animator.StringToHash("Base Layer.Hit Front");
+        private static readonly int HitBackStateId =
+            Animator.StringToHash("Base Layer.Hit Back");
+        private static readonly int HitLeftStateId =
+            Animator.StringToHash("Base Layer.Hit Left");
+        private static readonly int HitRightStateId =
+            Animator.StringToHash("Base Layer.Hit Right");
+        private static readonly int KnockbackStateId =
+            Animator.StringToHash("Base Layer.Knockback");
+        private static readonly int KnockdownStateId =
+            Animator.StringToHash("Base Layer.Knockdown");
+        private static readonly int GetUpStateId =
+            Animator.StringToHash("Base Layer.Get Up");
         private static readonly int DeadStateId =
             Animator.StringToHash("Base Layer.Dead");
         private static readonly int AttackSpeedId =
@@ -94,9 +117,51 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             }
         }
 
-        internal void PlayHitFromStart()
+        internal void PlaySmallHitFromStart(
+            Vector3 incomingDirection)
         {
-            Play(HitStateId, HitBlendTime, true);
+            int stateId = GetHitStateId(
+                incomingDirection,
+                HitReaction.SmallHit);
+            if (CanReadAnimator() &&
+                !enemyAnimator.HasState(0, stateId))
+            {
+                stateId = GetHitStateId(
+                    incomingDirection,
+                    HitReaction.BigHit);
+            }
+
+            Play(stateId, HitBlendTime, true);
+        }
+
+        internal void PlayBigHitFromStart(
+            Vector3 incomingDirection)
+        {
+            int stateId = GetHitStateId(
+                incomingDirection,
+                HitReaction.BigHit);
+            if (CanReadAnimator() &&
+                !enemyAnimator.HasState(0, stateId))
+            {
+                stateId = HitStateId;
+            }
+
+            Play(stateId, HitBlendTime, true);
+        }
+
+        internal void PlayKnockbackFromStart()
+        {
+            Play(KnockbackStateId, HitBlendTime, true);
+        }
+
+        internal void PlayKnockdownFromStart()
+        {
+            Play(KnockdownStateId, HitBlendTime, true);
+        }
+
+        internal void PlayGetUpFromStart()
+        {
+            Play(GetUpStateId, DefaultBlendTime, true);
         }
 
         internal void PlayDead()
@@ -200,12 +265,53 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             }
         }
 
+        private int GetHitStateId(
+            Vector3 incomingDirection,
+            HitReaction reaction)
+        {
+            bool usesSmallHit =
+                reaction == HitReaction.SmallHit;
+            switch (NightShadeHitDirection.GetSide(
+                        transform.forward,
+                        transform.right,
+                        incomingDirection))
+            {
+                case NightShadeHitSide.Back:
+                    return usesSmallHit
+                        ? SmallHitBackStateId
+                        : HitBackStateId;
+                case NightShadeHitSide.Left:
+                    return usesSmallHit
+                        ? SmallHitLeftStateId
+                        : HitLeftStateId;
+                case NightShadeHitSide.Right:
+                    return usesSmallHit
+                        ? SmallHitRightStateId
+                        : HitRightStateId;
+                default:
+                    return usesSmallHit
+                        ? SmallHitFrontStateId
+                        : HitFrontStateId;
+            }
+        }
+
         void INightShadeSwordAnimation.PlayIdle() => PlayIdle();
         void INightShadeSwordAnimation.PlayChase() => PlayChase();
         void INightShadeSwordAnimation.PlayWalk() => PlayWalk();
         void INightShadeSwordAnimation.PlayCombatMove(NightShadeCombatMoveType moveType) => PlayCombatMove(moveType);
         void INightShadeSwordAnimation.PlayAttack(NightShadeSwordAttackType attackType) => PlayAttack(attackType);
-        void INightShadeSwordAnimation.PlayHitFromStart() => PlayHitFromStart();
+        void INightShadeSwordAnimation.PlaySmallHitFromStart(
+            Vector3 incomingDirection) =>
+            PlaySmallHitFromStart(incomingDirection);
+        void INightShadeSwordAnimation.PlayBigHitFromStart(
+            Vector3 incomingDirection) =>
+            PlayBigHitFromStart(incomingDirection);
+        void INightShadeSwordAnimation.PlayKnockbackFromStart() =>
+            PlayKnockbackFromStart();
+        void INightShadeSwordAnimation.PlayKnockdownFromStart() =>
+            PlayKnockdownFromStart();
+        void INightShadeSwordAnimation.PlayGetUpFromStart() =>
+            PlayGetUpFromStart();
         void INightShadeSwordAnimation.PlayDead() => PlayDead();
         void INightShadeSwordAnimation.ResetAttackPlaybackSpeed() => ResetAttackPlaybackSpeed();
         bool INightShadeSwordAnimation.TryGetRequestedAnimationTime(out float normalizedTime) => TryGetRequestedAnimationTime(out normalizedTime);

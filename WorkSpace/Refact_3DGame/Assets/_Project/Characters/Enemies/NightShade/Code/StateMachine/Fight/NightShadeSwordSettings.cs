@@ -1,3 +1,4 @@
+using rudIsland.RPG3D.Characters.Combat;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.NightShade
@@ -18,6 +19,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         internal float CombatMoveDuration { get; }
         internal int AttacksBeforeCombatMove { get; }
         internal float HitPushDuration { get; }
+        internal float KnockbackPushDuration { get; }
+        internal float KnockdownPushDuration { get; }
+        internal float KnockdownStayDuration { get; }
         internal AnimationCurve HitPushCurve { get; }
         internal float DeadBodyKeepTime { get; }
         internal float ComboFirstExitNormalizedTime { get; }
@@ -48,6 +52,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             float combatMoveDuration,
             int attacksBeforeCombatMove,
             float hitPushDuration,
+            float knockbackPushDuration,
+            float knockdownPushDuration,
+            float knockdownStayDuration,
             AnimationCurve hitPushCurve,
             float deadBodyKeepTime)
         {
@@ -89,6 +96,12 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             AttacksBeforeCombatMove =
                 Mathf.Max(1, attacksBeforeCombatMove);
             HitPushDuration = Mathf.Max(0.01f, hitPushDuration);
+            KnockbackPushDuration =
+                Mathf.Max(HitPushDuration, knockbackPushDuration);
+            KnockdownPushDuration =
+                Mathf.Max(KnockbackPushDuration, knockdownPushDuration);
+            KnockdownStayDuration =
+                Mathf.Max(0f, knockdownStayDuration);
             HitPushCurve = hitPushCurve;
             DeadBodyKeepTime = Mathf.Max(0f, deadBodyKeepTime);
         }
@@ -127,6 +140,19 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             return Mathf.Clamp01(HitPushCurve != null && HitPushCurve.length > 0
                 ? HitPushCurve.Evaluate(clampedTime)
                 : clampedTime);
+        }
+
+        internal float GetHitPushDuration(HitReaction reaction)
+        {
+            switch (reaction)
+            {
+                case HitReaction.Knockdown:
+                    return KnockdownPushDuration;
+                case HitReaction.Knockback:
+                    return KnockbackPushDuration;
+                default:
+                    return HitPushDuration;
+            }
         }
     }
 }

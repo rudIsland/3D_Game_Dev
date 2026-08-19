@@ -27,7 +27,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         [SerializeField, Min(1f)] private float staggerLimit = 100f;
         [SerializeField, Min(0f)] private float staggerRecoverDelay = 2.5f;
         [SerializeField, Min(0f)] private float staggerRecoverSpeed = 8f;
-
         [Header("사망 후 정리")]
         [SerializeField, Min(0f)] private float deadBodyKeepTime = 3f;
 
@@ -43,15 +42,15 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         [SerializeField] private LayerMask targetLayers = 1 << 17;
         [SerializeField] private NightShadeSwordHitShape swordHitShape;
         [SerializeField] private AttackDamage lightAttackDamage =
-            new AttackDamage(18f, 1, 18f, 0.4f, 30f, true, 0.06f, DamageSoundType.SwordCut);
+            new AttackDamage(18f, AttackStrength.Heavy, 18f, 0.4f, 30f, true, 0.06f, DamageSoundType.SwordCut);
         [SerializeField] private AttackDamage comboFirstAttackDamage =
-            new AttackDamage(12f, 1, 12f, 0.25f, 20f, true, 0.045f, DamageSoundType.SwordCut);
+            new AttackDamage(12f, AttackStrength.Heavy, 12f, 0.25f, 20f, true, 0.045f, DamageSoundType.SwordCut);
         [SerializeField] private AttackDamage comboSecondAttackDamage =
-            new AttackDamage(16f, 1, 18f, 0.4f, 25f, true, 0.06f, DamageSoundType.SwordCut);
+            new AttackDamage(16f, AttackStrength.Heavy, 18f, 0.4f, 25f, true, 0.06f, DamageSoundType.SwordCut);
         [SerializeField] private AttackDamage heavyAttackDamage =
-            new AttackDamage(28f, 2, 35f, 0.75f, 45f, true, 0.08f, DamageSoundType.SwordCut);
+            new AttackDamage(28f, AttackStrength.Knockdown, 35f, 0.75f, 45f, true, 0.08f, DamageSoundType.SwordCut);
         [SerializeField] private AttackDamage wideSwingAttackDamage =
-            new AttackDamage(22f, 1, 24f, 0.55f, 35f, true, 0.07f, DamageSoundType.SwordCut);
+            new AttackDamage(22f, AttackStrength.Heavy, 24f, 0.55f, 35f, true, 0.07f, DamageSoundType.SwordCut);
 
         [Header("이동")]
         [SerializeField, Min(0.1f)] private float walkSpeed = 1.8f;
@@ -79,6 +78,12 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
         [Header("피격 이동")]
         [SerializeField, Min(0.01f)] private float hitPushDuration = 0.18f;
+        [SerializeField, Min(0.01f)]
+        private float knockbackPushDuration = 0.28f;
+        [SerializeField, Min(0.01f)]
+        private float knockdownPushDuration = 0.38f;
+        [SerializeField, Min(0f)]
+        private float knockdownStayDuration = 0.75f;
         [SerializeField] private AnimationCurve hitPushCurve = CreateDefaultHitPushCurve();
 
         private CharacterController characterController;
@@ -143,6 +148,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 combatMoveDuration,
                 attacksBeforeCombatMove,
                 hitPushDuration,
+                knockbackPushDuration,
+                knockdownPushDuration,
+                knockdownStayDuration,
                 hitPushCurve,
                 deadBodyKeepTime);
             var actions = new NightShadeSwordActions(
@@ -157,7 +165,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 swordAnimation,
                 settings,
                 actions);
-            var stagger = new NightShadeSwordStagger(
+            var stopPoint = new StopPoint(
                 staggerLimit,
                 staggerRecoverDelay,
                 staggerRecoverSpeed);
@@ -166,7 +174,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 maxHealth,
                 stateMachine,
                 attackRangeDetector,
-                stagger,
+                stopPoint,
                 hitStop);
             return swordWorldUnit;
         }
@@ -318,6 +326,12 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             attacksBeforeCombatMove =
                 Mathf.Max(1, attacksBeforeCombatMove);
             hitPushDuration = Mathf.Max(0.01f, hitPushDuration);
+            knockbackPushDuration =
+                Mathf.Max(hitPushDuration, knockbackPushDuration);
+            knockdownPushDuration =
+                Mathf.Max(knockbackPushDuration, knockdownPushDuration);
+            knockdownStayDuration =
+                Mathf.Max(0f, knockdownStayDuration);
             if (hitPushCurve == null || hitPushCurve.length < 2)
             {
                 hitPushCurve = CreateDefaultHitPushCurve();

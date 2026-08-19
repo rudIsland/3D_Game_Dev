@@ -1,6 +1,9 @@
 using Cinemachine;
+using rudIsland.RPG3D.Characters;
+using rudIsland.RPG3D.Characters.Combat;
 using rudIsland.RPG3D.Player.States.Attack;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace rudIsland.RPG3D.Player.Runtime.Attack
 {
@@ -18,7 +21,15 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
         [SerializeField] private AudioClip confirmedHitSound;
         [SerializeField, Range(0f, 1f)]
         private float confirmedHitSoundVolume = 0.8f;
+        [SerializeField, Range(0f, 1f)]
+        [FormerlySerializedAs("staggerHitSoundVolume")]
+        private float smallHitSoundVolume = 0.9f;
+        [SerializeField, Range(0f, 1f)]
+        private float strongHitSoundVolume = 1f;
         [SerializeField, Min(0f)] private float confirmedHitImpulseForce = 0.12f;
+        [FormerlySerializedAs("staggerHitImpulseForce")]
+        [SerializeField, Min(0f)] private float smallHitImpulseForce = 0.16f;
+        [SerializeField, Min(0f)] private float strongHitImpulseForce = 0.22f;
 
         private void Awake()
         {
@@ -66,16 +77,53 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
             bladeTrailRenderer?.BeginTrail();
         }
 
-        public void PlayConfirmedHit()
+        public void PlayConfirmedHit(in EnemyHitResult hitResult)
         {
+            if (!hitResult.HasDamageFeedback)
+            {
+                return;
+            }
+
+            float soundVolume = GetHitSoundVolume(in hitResult);
             if (attackAudioSource != null && confirmedHitSound != null)
             {
                 attackAudioSource.PlayOneShot(
                     confirmedHitSound,
-                    confirmedHitSoundVolume);
+                    soundVolume);
             }
 
-            hitImpulseSource?.GenerateImpulse(confirmedHitImpulseForce);
+            hitImpulseSource?.GenerateImpulse(
+                GetHitImpulseForce(in hitResult));
+        }
+
+        private float GetHitSoundVolume(in EnemyHitResult hitResult)
+        {
+            if (hitResult.DamageResult == HitDamageResult.Killed ||
+                hitResult.Reaction == HitReaction.BigHit ||
+                hitResult.Reaction == HitReaction.Knockback ||
+                hitResult.Reaction == HitReaction.Knockdown)
+            {
+                return strongHitSoundVolume;
+            }
+
+            return hitResult.Reaction == HitReaction.SmallHit
+                ? smallHitSoundVolume
+                : confirmedHitSoundVolume;
+        }
+
+        private float GetHitImpulseForce(in EnemyHitResult hitResult)
+        {
+            if (hitResult.DamageResult == HitDamageResult.Killed ||
+                hitResult.Reaction == HitReaction.BigHit ||
+                hitResult.Reaction == HitReaction.Knockback ||
+                hitResult.Reaction == HitReaction.Knockdown)
+            {
+                return strongHitImpulseForce;
+            }
+
+            return hitResult.Reaction == HitReaction.SmallHit
+                ? smallHitImpulseForce
+                : confirmedHitImpulseForce;
         }
 
         public void Stop()
@@ -94,7 +142,11 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
         private void OnValidate()
         {
             confirmedHitSoundVolume = Mathf.Clamp01(confirmedHitSoundVolume);
+            smallHitSoundVolume = Mathf.Clamp01(smallHitSoundVolume);
+            strongHitSoundVolume = Mathf.Clamp01(strongHitSoundVolume);
             confirmedHitImpulseForce = Mathf.Max(0f, confirmedHitImpulseForce);
+            smallHitImpulseForce = Mathf.Max(0f, smallHitImpulseForce);
+            strongHitImpulseForce = Mathf.Max(0f, strongHitImpulseForce);
         }
 #endif
     }

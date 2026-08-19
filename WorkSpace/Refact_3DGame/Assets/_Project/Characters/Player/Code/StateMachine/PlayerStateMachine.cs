@@ -56,6 +56,8 @@ namespace rudIsland.RPG3D.Player.States
         public bool IsTargeting => ReferenceEquals(currentState, targetLookState);
         public bool IsDead => ReferenceEquals(currentState, deadState);
         public bool IsHit => ReferenceEquals(currentState, hitState);
+        internal bool ProtectsSmallHit =>
+            IsAttacking && attackState.ProtectsSmallHit;
         public float StaminaRecoveryRate
         {
             get
@@ -391,30 +393,49 @@ namespace rudIsland.RPG3D.Player.States
             ChangeState(deadState);
         }
 
-        internal void ChangeToHitState(in PlayerHitRequest hitRequest)
+        internal void ChangeToHitState(
+            HitReaction reaction,
+            in PlayerHitRequest hitRequest)
         {
-            ChangeToHitState(in hitRequest, false);
+            ChangeToHitState(
+                reaction,
+                in hitRequest,
+                false);
         }
 
-        internal void ChangeToGuardBreakState(in PlayerHitRequest hitRequest)
+        internal void ChangeToGuardBreakState(
+            HitReaction reaction,
+            in PlayerHitRequest hitRequest)
         {
-            ChangeToHitState(in hitRequest, true);
+            ChangeToHitState(
+                reaction,
+                in hitRequest,
+                true);
         }
 
-        private void ChangeToHitState(in PlayerHitRequest hitRequest, bool isGuardBreak)
+        private void ChangeToHitState(
+            HitReaction reaction,
+            in PlayerHitRequest hitRequest,
+            bool isGuardBreak)
         {
             if (!isEnabled || ReferenceEquals(currentState, deadState))
             {
                 return;
             }
 
-            hitState.SetHitRequest(in hitRequest, isGuardBreak);
             if (ReferenceEquals(currentState, hitState))
             {
-                hitState.Restart();
+                hitState.TryRestart(
+                    reaction,
+                    in hitRequest,
+                    isGuardBreak);
                 return;
             }
 
+            hitState.SetHitRequest(
+                reaction,
+                in hitRequest,
+                isGuardBreak);
             actionStateMachine.Disable();
             isSprintingThisFrame = false;
             wasSprintingLastFrame = false;
@@ -442,6 +463,7 @@ namespace rudIsland.RPG3D.Player.States
             attackRangeDetector.Open(
                 attackState.AttackDamage,
                 attackState.AttackStaggerDamage,
+                attackState.CurrentAttackStrength,
                 attackState.AttackPushDistance,
                 attackState.AttackHitStopDuration);
             attackEffectPlayer?.BeginTrail();

@@ -8,12 +8,12 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
     {
         private readonly NightShadeSwordStateMachine stateMachine;
         private readonly NightShadeSwordAttackRangeDetector attackRangeDetector;
-        private readonly NightShadeSwordStagger stagger;
+        private readonly StopPoint stopPoint;
         private readonly CombatHitStop hitStop;
 
         public float CurrentHealth => Health.CurrentHealth;
-        public float CurrentStagger => stagger.CurrentStagger;
-        public float MaxStagger => stagger.StaggerLimit;
+        public float CurrentStagger => stopPoint.CurrentPoint;
+        public float MaxStagger => stopPoint.MaxPoint;
         public bool IsInCombat => stateMachine.IsInCombat;
         internal bool IsAttackStateActive => stateMachine.IsAttackStateActive;
 
@@ -24,46 +24,60 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             float maxHealth,
             NightShadeSwordStateMachine stateMachine,
             NightShadeSwordAttackRangeDetector attackRangeDetector,
-            NightShadeSwordStagger stagger,
+            StopPoint stopPoint,
             CombatHitStop hitStop)
             : base(maxHealth)
         {
             this.stateMachine = stateMachine;
             this.attackRangeDetector = attackRangeDetector;
-            this.stagger = stagger;
+            this.stopPoint = stopPoint;
             this.hitStop = hitStop;
         }
 
         public EnemyHitResult TakeHit(in EnemyHitRequest hitRequest)
         {
-            float healthBeforeDamage = Health.CurrentHealth;
-            Health.TakeDamage(hitRequest.Damage);
-            if (Health.CurrentHealth >= healthBeforeDamage)
+            HitDamageResult damageResult =
+                HitDamageCalculator.Apply(Health, hitRequest.Damage);
+            if (damageResult == HitDamageResult.Ignored)
             {
                 return EnemyHitResult.Ignored;
             }
 
             hitStop.Request(hitRequest.HitStopDuration);
-            if (IsDead)
+            if (damageResult == HitDamageResult.Killed)
             {
-                return EnemyHitResult.Damaged;
+                return EnemyHitResult.Killed;
             }
 
+            float appliedStopDamage =
+                hitRequest.StaggerDamage *
+                stateMachine.StopDamageScale;
+            bool reachedStopLimit =
+                stopPoint.TryAccumulate(appliedStopDamage);
+            HitReaction reaction = HitReactionSelector.Select(
+                hitRequest.Strength,
+                reachedStopLimit,
+                stateMachine.ProtectsSmallHit,
+                true,
+                true);
+            var hitResult = new EnemyHitResult(
+                HitDamageResult.Damaged,
+                reaction);
+
             stateMachine.NotifyDamaged();
-            bool shouldEnterHitState =
-                stagger.TryAccumulate(hitRequest.StaggerDamage);
-            if (hitRequest.StaggerDamage > 0f)
+            if (appliedStopDamage > 0f)
             {
                 StaggerChanged?.Invoke(this);
             }
 
-            if (!shouldEnterHitState)
+            if (reaction != HitReaction.None)
             {
-                return EnemyHitResult.Damaged;
+                stateMachine.ChangeToHitState(
+                    reaction,
+                    in hitRequest);
             }
 
-            stateMachine.ChangeToHitState(in hitRequest);
-            return EnemyHitResult.Staggered;
+            return hitResult;
         }
 
         internal void StopAttackTurnAnimationEvent()
@@ -96,7 +110,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         {
             hitStop.Reset();
             attackRangeDetector.Close();
-            stagger.Reset();
+            stopPoint.Reset();
             stateMachine.Enable();
         }
 
@@ -107,7 +121,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 return;
             }
 
-            if (stagger.UpdateRecovery(deltaTime))
+            if (stopPoint.UpdateRecovery(deltaTime))
             {
                 StaggerChanged?.Invoke(this);
             }

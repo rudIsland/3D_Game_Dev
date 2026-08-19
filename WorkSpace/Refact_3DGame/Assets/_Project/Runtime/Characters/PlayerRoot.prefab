@@ -377,6 +377,9 @@ MonoBehaviour:
   guardBreakControlLockDuration: 1
   guardHitBox: {fileID: 0}
   hitPushDuration: 0.15
+  stopPointLimit: 30
+  stopPointRecoverDelay: 1.5
+  stopPointRecoverSpeed: 15
   hitPushCurve:
     serializedVersion: 2
     m_Curve:
@@ -413,7 +416,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8a4c0717de6458095c2b2f7c52919cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Characters.Combat.CombatHitEffectPlayer
-  bodyHitEffectPrefab: {fileID: 0}
+  bodyHitEffectPrefab: {fileID: 2508344019071891113, guid: 3179f3613d3ad0e4085a8e230b039b81,
+    type: 3}
   guardHitEffectPrefab: {fileID: 0}
   bodyHitPoolSize: 4
   guardHitPoolSize: 2
@@ -528,7 +532,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Player.Runtime.Attack.PlayerAttackEffectPlayer
   confirmedHitSound: {fileID: 8300000, guid: a848f901dd0ca264a8ae871d3e2bc7d5, type: 3}
   confirmedHitSoundVolume: 0.8
+  staggerHitSoundVolume: 0.9
+  strongHitSoundVolume: 1
   confirmedHitImpulseForce: 0.12
+  staggerHitImpulseForce: 0.16
+  strongHitImpulseForce: 0.22
 --- !u!1 &7112299585502653175
 GameObject:
   m_ObjectHideFlags: 0

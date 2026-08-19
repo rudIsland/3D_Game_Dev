@@ -1,3 +1,4 @@
+using rudIsland.RPG3D.Characters.Combat;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.Zombie
@@ -7,6 +8,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
     public sealed class ZombieAnimationController : MonoBehaviour
     {
         private const float HitRestartBlendTime = 0.15f; // 피격 또는 피해 관련 값
+        private const float SmallHitPlaybackSpeed = 3.3f;
+        private const float BigHitPlaybackSpeed = 1.7f;
 
         private static readonly int StateId = Animator.StringToHash("State"); // 현재 행동 상태
         private static readonly int AttackTypeId = Animator.StringToHash("AttackType"); // 공격 관련 설정 또는 상태
@@ -17,6 +20,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         private static readonly int UpDownAttackStateId =Animator.StringToHash("Up Down Attack"); // 공격 관련 설정 또는 상태
         private static readonly int HitStateId = Animator.StringToHash("Hit"); // 피격 또는 피해 관련 값
         private static readonly int HitFullPathId = Animator.StringToHash("Base Layer.Hit"); // 피격 또는 피해 관련 값
+        private static readonly int HitSpeedId = Animator.StringToHash("HitSpeed");
         private static readonly int DeadStateId = Animator.StringToHash("Dead"); // 현재 행동 상태
         private enum AnimationState
         {
@@ -65,8 +69,17 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             zombieAnimator.SetInteger(StateId, (int)AnimationState.Attack);
         }
 
-        public void PlayHitFromStart()
+        public void PlayHitFromStart(HitReaction reaction)
         {
+            if (CanControlAnimator())
+            {
+                zombieAnimator.SetFloat(
+                    HitSpeedId,
+                    reaction == HitReaction.SmallHit
+                        ? SmallHitPlaybackSpeed
+                        : BigHitPlaybackSpeed);
+            }
+
             RequestAnimation(AnimationState.Hit);
 
             if (!CanControlAnimator())
@@ -150,6 +163,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             zombieAnimator.Rebind();
             zombieAnimator.SetInteger(StateId, (int)AnimationState.Idle);
             zombieAnimator.SetInteger(AttackTypeId, 0);
+            zombieAnimator.SetFloat(HitSpeedId, 1f);
             if (zombieAnimator.isActiveAndEnabled)
             {
                 zombieAnimator.Update(0f);

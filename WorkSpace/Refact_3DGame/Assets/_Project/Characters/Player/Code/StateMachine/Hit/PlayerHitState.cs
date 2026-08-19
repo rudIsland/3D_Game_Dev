@@ -1,3 +1,4 @@
+using rudIsland.RPG3D.Characters.Combat;
 using rudIsland.RPG3D.Player.Animations;
 using rudIsland.RPG3D.Player.Movement;
 using rudIsland.RPG3D.Player.Runtime.Hit;
@@ -18,8 +19,11 @@ namespace rudIsland.RPG3D.Player.States.Hit
         private readonly float guardBreakControlLockDuration;
 
         private PlayerHitRequest hitRequest;
+        private HitReaction reaction;
         private float elapsedPushTime;
         private float elapsedStateTime;
+        private float elapsedReactionTime;
+        private float pushDistance;
         private bool isGuardBreak;
         private bool hasHitAnimationStarted;
         private bool canReturnControl;
@@ -49,6 +53,7 @@ namespace rudIsland.RPG3D.Player.States.Hit
             animationController.StopMove();
             ApplyHitMovement(deltaTime);
             elapsedStateTime += Mathf.Max(0f, deltaTime);
+            elapsedReactionTime += Mathf.Max(0f, deltaTime);
             UpdateControlReturnState();
 
             if (canReturnControl &&
@@ -63,6 +68,7 @@ namespace rudIsland.RPG3D.Player.States.Hit
         {
             elapsedPushTime = 0f;
             elapsedStateTime = 0f;
+            elapsedReactionTime = 0f;
             isGuardBreak = false;
             hasHitAnimationStarted = false;
             canReturnControl = false;
@@ -74,16 +80,45 @@ namespace rudIsland.RPG3D.Player.States.Hit
             stateMachine.EndAttackHit();
             elapsedPushTime = 0f;
             elapsedStateTime = 0f;
+            elapsedReactionTime = 0f;
             hasHitAnimationStarted = false;
             canReturnControl = false;
-            pushMovement.Begin(hitRequest.PushDistance, pushCurve);
-            animationController.PlayHitFromStart();
+            pushMovement.Begin(pushDistance, pushCurve);
+            animationController.PlayHitFromStart(reaction);
         }
 
-        internal void SetHitRequest(in PlayerHitRequest nextHitRequest, bool nextIsGuardBreak)
+        internal bool TryRestart(
+            HitReaction nextReaction,
+            in PlayerHitRequest nextHitRequest,
+            bool nextIsGuardBreak)
         {
+            if (!HitReactionPlayback.CanStart(
+                    reaction,
+                    nextReaction,
+                    elapsedReactionTime))
+            {
+                return false;
+            }
+
+            SetHitRequest(
+                nextReaction,
+                in nextHitRequest,
+                nextIsGuardBreak);
+            Restart();
+            return true;
+        }
+
+        internal void SetHitRequest(
+            HitReaction nextReaction,
+            in PlayerHitRequest nextHitRequest,
+            bool nextIsGuardBreak)
+        {
+            reaction = nextReaction;
             hitRequest = nextHitRequest;
             isGuardBreak = nextIsGuardBreak;
+            pushDistance = HitPushDistance.GetDistance(
+                hitRequest.PushDistance,
+                reaction);
         }
 
         private void UpdateControlReturnState()

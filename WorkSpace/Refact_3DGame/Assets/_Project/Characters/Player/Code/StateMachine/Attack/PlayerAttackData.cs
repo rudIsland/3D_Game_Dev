@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Serialization;
+using rudIsland.RPG3D.Characters;
 using rudIsland.RPG3D.Characters.Combat;
 
 namespace rudIsland.RPG3D.Player.States.Attack
@@ -14,6 +15,7 @@ namespace rudIsland.RPG3D.Player.States.Attack
         [Header("피해")]
         [SerializeField, Min(0f)] private float damage = 10f;
         [SerializeField, Min(0f)] private float staggerDamage = 10f;
+        [SerializeField] private AttackStrength attackStrength = AttackStrength.Light;
         [SerializeField, Min(0f)] private float pushDistance = 0.25f;
         [SerializeField, Min(0f)] private float hitStopDuration = CombatHitStop.DefaultDamageDuration;
 
@@ -46,6 +48,7 @@ namespace rudIsland.RPG3D.Player.States.Attack
         public int AttackNumber => attackNumber;
         public float Damage => damage;
         public float StaggerDamage => staggerDamage;
+        public AttackStrength Strength => attackStrength;
         public float PushDistance => pushDistance;
         public float HitStopDuration => hitStopDuration;
         public float StaminaCost => staminaCost;
@@ -82,6 +85,10 @@ namespace rudIsland.RPG3D.Player.States.Attack
             attackNumber = Mathf.Clamp(attackNumber, 1, 6);
             damage = Mathf.Max(0f, damage);
             staggerDamage = Mathf.Max(0f, staggerDamage);
+            attackStrength = (AttackStrength)Mathf.Clamp(
+                (int)attackStrength,
+                (int)AttackStrength.Light,
+                (int)AttackStrength.Knockdown);
             pushDistance = Mathf.Max(0f, pushDistance);
             hitStopDuration = Mathf.Max(0f, hitStopDuration);
             staminaCost = Mathf.Max(0f, staminaCost);

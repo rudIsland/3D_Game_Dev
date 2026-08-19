@@ -1,3 +1,4 @@
+using rudIsland.RPG3D.Characters.Combat;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Player.Animations
@@ -6,6 +7,8 @@ namespace rudIsland.RPG3D.Player.Animations
     public sealed class PlayerAnimationController
     {
         private const int BaseLayerIndex = 0;
+        private const float SmallHitPlaybackSpeed = 1.8f;
+        private const float BigHitPlaybackSpeed = 1f;
 
         private static readonly int MoveAmountId = Animator.StringToHash("MoveAmount"); // 이동 정보
         private static readonly int InputDirXId = Animator.StringToHash("InputDirX"); // 이동 정보
@@ -19,6 +22,7 @@ namespace rudIsland.RPG3D.Player.Animations
         private static readonly int AttackId = Animator.StringToHash("Attack"); // 공격 관련 설정 또는 상태
         private static readonly int AttackIndexId = Animator.StringToHash("AttackIndex"); // 공격 관련 설정 또는 상태
         private static readonly int HitId = Animator.StringToHash("Hit"); // 피격 또는 피해 관련 값
+        private static readonly int HitSpeedId = Animator.StringToHash("HitSpeed");
         private static readonly int DeathId = Animator.StringToHash("Death"); // 내부에서 사용하는 값
         private static readonly int PlayerHitShortNameId = Animator.StringToHash("PlayerHit");
         private static readonly int PlayerHitFullPathId = Animator.StringToHash("Base Layer.PlayerHit");
@@ -60,6 +64,7 @@ namespace rudIsland.RPG3D.Player.Animations
             playerAnimator.ResetTrigger(HitId);
             playerAnimator.ResetTrigger(DeathId);
             playerAnimator.SetInteger(AttackIndexId, 0);
+            playerAnimator.SetFloat(HitSpeedId, 1f);
         }
 
         public void UpdateMove(Vector2 moveInput, bool isSprinting, float deltaTime)
@@ -220,7 +225,7 @@ namespace rudIsland.RPG3D.Player.Animations
             return TryGetCurrentStateTime(PlayerRollStateId, out normalizedTime);
         }
 
-        public void PlayHitFromStart()
+        public void PlayHitFromStart(HitReaction reaction)
         {
             if (playerAnimator == null)
             {
@@ -232,6 +237,11 @@ namespace rudIsland.RPG3D.Player.Animations
             playerAnimator.ResetTrigger(RollId);
             playerAnimator.ResetTrigger(AttackId);
             playerAnimator.SetInteger(AttackIndexId, 0);
+            playerAnimator.SetFloat(
+                HitSpeedId,
+                reaction == HitReaction.SmallHit
+                    ? SmallHitPlaybackSpeed
+                    : BigHitPlaybackSpeed);
 
             bool isPlayingHit = IsCurrentState(PlayerHitShortNameId);
             bool isChangingToHit = IsChangingTo(PlayerHitShortNameId);

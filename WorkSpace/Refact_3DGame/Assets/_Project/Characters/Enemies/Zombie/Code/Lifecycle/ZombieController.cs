@@ -55,11 +55,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         [SerializeField] private ZombieAttackHitShape kickHitShape;
         [SerializeField] private ZombieAttackHitShape upDownHitShape;
         [SerializeField] private AttackDamage swingAttackDamage =
-            new AttackDamage(10f, 0, 10f, 0.3f, 25f, true, 0.04f);
+            new AttackDamage(10f, AttackStrength.Light, 10f, 0.3f, 25f, true, 0.04f);
         [SerializeField] private AttackDamage kickAttackDamage =
-            new AttackDamage(10f, 1, 10f, 0.3f, 25f, true, 0.05f);
+            new AttackDamage(10f, AttackStrength.Heavy, 10f, 0.3f, 25f, true, 0.05f);
         [SerializeField] private AttackDamage upDownAttackDamage =
-            new AttackDamage(10f, 1, 10f, 0.3f, 25f, true, 0.06f);
+            new AttackDamage(10f, AttackStrength.Heavy, 10f, 0.3f, 25f, true, 0.06f);
 
 
         [Header("이동")]
@@ -71,6 +71,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         [Header("피격 이동")]
         [SerializeField, Min(0.01f)]
         private float hitPushDuration = 0.15f;
+        [SerializeField, Min(0.01f)]
+        private float knockbackPushDuration = 0.25f;
         [SerializeField]
         private AnimationCurve hitPushCurve = CreateDefaultHitPushCurve();
 
@@ -128,11 +130,12 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 chaseSpeed,
                 turnSpeed,
                 hitPushDuration,
+                knockbackPushDuration,
                 hitPushCurve,
                 deadBodyKeepTime,
                 RequestDeadZombieRelease,
                 EndAttackHit);
-            var stagger = new ZombieStagger(
+            var stopPoint = new StopPoint(
                 staggerLimit,
                 staggerRecoverDelay,
                 staggerRecoverSpeed);
@@ -141,7 +144,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 maxHealth,
                 stateMachine,
                 attackRangeDetector,
-                stagger,
+                stopPoint,
                 hitStop);
             return zombieWorldUnit;
         }
@@ -297,6 +300,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             kickHitShape?.Validate();
             upDownHitShape?.Validate();
             hitPushDuration = Mathf.Max(0.01f, hitPushDuration);
+            knockbackPushDuration =
+                Mathf.Max(hitPushDuration, knockbackPushDuration);
             if (hitPushCurve == null || hitPushCurve.length < 2)
             {
                 hitPushCurve = CreateDefaultHitPushCurve();

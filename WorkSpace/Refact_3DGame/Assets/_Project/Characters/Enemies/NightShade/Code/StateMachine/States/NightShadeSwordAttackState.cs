@@ -4,6 +4,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
     internal sealed class NightShadeSwordAttackState : INightShadeSwordState
     {
         private const int EventQueueCapacity = 8;
+        internal const float HeavyProtectionStartNormalizedTime = 0.16f;
+        internal const float HeavyProtectionEndNormalizedTime = 0.39f;
 
         private enum AttackEventType : byte
         {
@@ -45,6 +47,22 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
         internal NightShadeSwordAttackType AttackType => attackType;
         internal int QueuedEventCount => queuedEventCount;
+        internal bool ProtectsSmallHit
+        {
+            get
+            {
+                if (!isActive ||
+                    attackType != NightShadeSwordAttackType.Heavy ||
+                    animation.IsTransitioning() ||
+                    !animation.TryGetRequestedAnimationTime(
+                        out float normalizedTime))
+                {
+                    return false;
+                }
+
+                return IsHeavyProtectionTime(normalizedTime);
+            }
+        }
 
         internal NightShadeSwordAttackState(
             NightShadeSwordTargetReader targetReader,
@@ -230,6 +248,14 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         private int GetAttackHitCount()
         {
             return 1;
+        }
+
+        internal static bool IsHeavyProtectionTime(float normalizedTime)
+        {
+            return normalizedTime >=
+                    HeavyProtectionStartNormalizedTime &&
+                normalizedTime <
+                    HeavyProtectionEndNormalizedTime;
         }
 
         private NightShadeSwordStateId FinishAttack()

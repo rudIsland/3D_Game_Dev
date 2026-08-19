@@ -132,6 +132,11 @@ namespace rudIsland.RPG3D.Player
         [SerializeField]
         private AnimationCurve hitPushCurve = CreateDefaultHitPushCurve();
 
+        [Header("행동 중단")]
+        [SerializeField, Min(1f)] private float stopPointLimit = 30f;
+        [SerializeField, Min(0f)] private float stopPointRecoverDelay = 1.5f;
+        [SerializeField, Min(0f)] private float stopPointRecoverSpeed = 15f;
+
         private CharacterController characterController; // 씬 또는 시스템 참조
         private PlayerInputReader playerInput; // 입력 또는 행동 여부
         private PlayerStateMachine playerStateMachine; // 현재 행동 상태
@@ -266,6 +271,10 @@ namespace rudIsland.RPG3D.Player
                 staminaRecoverDelay,
                 staminaRecoverSpeed);
             var hitStop = new CombatHitStop(playerAnimator);
+            var stopPoint = new StopPoint(
+                stopPointLimit,
+                stopPointRecoverDelay,
+                stopPointRecoverSpeed);
             playerStateMachine = new PlayerStateMachine(
                 playerInput,
                 playerMovement,
@@ -304,6 +313,7 @@ namespace rudIsland.RPG3D.Player
             playerWorldUnit = new PlayerWorldUnit(
                 maxHealth,
                 playerStamina,
+                stopPoint,
                 playerInput,
                 playerStateMachine,
                 hitStop);
@@ -460,7 +470,7 @@ namespace rudIsland.RPG3D.Player
             float healthBeforeDamage = playerWorldUnit.CurrentHealth;
             var damage = new AttackDamage(
                 testDamage,
-                0,
+                AttackStrength.Light,
                 0f,
                 0f,
                 0f,
@@ -501,6 +511,11 @@ namespace rudIsland.RPG3D.Player
             guardRaiseDuration = Mathf.Max(0f, guardRaiseDuration);
             guardBreakControlLockDuration = Mathf.Max(0f, guardBreakControlLockDuration);
             hitPushDuration = Mathf.Max(0.01f, hitPushDuration);
+            stopPointLimit = Mathf.Max(1f, stopPointLimit);
+            stopPointRecoverDelay =
+                Mathf.Max(0f, stopPointRecoverDelay);
+            stopPointRecoverSpeed =
+                Mathf.Max(0f, stopPointRecoverSpeed);
             if (hitPushCurve == null || hitPushCurve.length < 2)
             {
                 hitPushCurve = CreateDefaultHitPushCurve();

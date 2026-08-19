@@ -1,4 +1,5 @@
 using System;
+using rudIsland.RPG3D.Characters.Combat;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.NightShade
@@ -47,8 +48,12 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         private bool hasCurrentState;
         private bool isEnabled;
         private bool isInCombat;
-
         internal bool IsInCombat => isInCombat;
+        internal bool ProtectsSmallHit =>
+            IsAttackStateActive &&
+            attackState.ProtectsSmallHit;
+        internal float StopDamageScale =>
+            ProtectsSmallHit ? 0.5f : 1f;
         internal bool IsAttackStateActive =>
             isEnabled && hasCurrentState &&
             currentStateId == NightShadeSwordStateId.Attack;
@@ -168,7 +173,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             }
         }
 
-        internal void ChangeToHitState(in EnemyHitRequest hitRequest)
+        internal void ChangeToHitState(
+            HitReaction reaction,
+            in EnemyHitRequest hitRequest)
         {
             if (hasCurrentState &&
                 currentStateId == NightShadeSwordStateId.Dead)
@@ -176,8 +183,15 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 return;
             }
 
-            hitState.SetHitRequest(in hitRequest);
-            ChangeState(NightShadeSwordStateId.Hit, true);
+            if (hasCurrentState &&
+                currentStateId == NightShadeSwordStateId.Hit)
+            {
+                hitState.TryRestart(reaction, in hitRequest);
+                return;
+            }
+
+            hitState.SetHitRequest(reaction, in hitRequest);
+            ChangeState(NightShadeSwordStateId.Hit);
         }
 
         internal void ChangeToDeadState()

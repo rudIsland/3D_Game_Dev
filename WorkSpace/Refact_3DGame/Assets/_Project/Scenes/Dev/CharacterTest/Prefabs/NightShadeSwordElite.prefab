@@ -596,8 +596,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8a4c0717de6458095c2b2f7c52919cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Characters.Combat.CombatHitEffectPlayer
-  bodyHitEffectPrefab: {fileID: 0}
+  bodyHitEffectPrefab: {fileID: 2508344019071891113, guid: 3179f3613d3ad0e4085a8e230b039b81,
+    type: 3}
   guardHitEffectPrefab: {fileID: 0}
+  floorLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  floorRayStartHeight: 0.25
+  floorRayDistance: 4
+  floorSurfaceOffset: 0.015
   bodyHitPoolSize: 4
   guardHitPoolSize: 2
 --- !u!82 &177102377851069258
@@ -910,6 +917,9 @@ MonoBehaviour:
   combatMoveDuration: 0.6
   attacksBeforeCombatMove: 2
   hitPushDuration: 0.18
+  knockbackPushDuration: 0.28
+  knockdownPushDuration: 0.38
+  knockdownStayDuration: 0.75
   hitPushCurve:
     serializedVersion: 2
     m_Curve:

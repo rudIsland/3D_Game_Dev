@@ -27,6 +27,7 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
         private bool hasPreviousWeaponPositions;
         private float attackDamage;
         private float attackStaggerDamage;
+        private AttackStrength attackStrength;
         private float attackPushDistance;
         private float attackHitStopDuration;
         private Vector3 previousStartPosition;
@@ -56,12 +57,14 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
         public void Open(
             float damage,
             float staggerDamage,
+            AttackStrength strength,
             float pushDistance,
             float hitStopDuration)
         {
             isWindowOpen = true;
             attackDamage = Mathf.Max(0f, damage);
             attackStaggerDamage = Mathf.Max(0f, staggerDamage);
+            attackStrength = strength;
             attackPushDistance = Mathf.Max(0f, pushDistance);
             attackHitStopDuration = Mathf.Max(0f, hitStopDuration);
             hitTargets.Clear();
@@ -100,6 +103,7 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
             hasPreviousWeaponPositions = false;
             attackDamage = 0f;
             attackStaggerDamage = 0f;
+            attackStrength = AttackStrength.Light;
             attackPushDistance = 0f;
             attackHitStopDuration = 0f;
             hitTargets.Clear();
@@ -194,7 +198,18 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
                 return;
             }
 
-            Vector3 pushDirection = hitPosition - attackerRoot.position;
+            Vector3 hitDirection = hitPosition - attackerRoot.position;
+            hitDirection.y = 0f;
+            if (hitDirection.sqrMagnitude <= 0.000001f)
+            {
+                hitDirection = attackerRoot.forward;
+            }
+
+            Component targetComponent = target as Component;
+            Vector3 targetPosition = targetComponent != null
+                ? targetComponent.transform.position
+                : detectedCollider.transform.position;
+            Vector3 pushDirection = targetPosition - attackerRoot.position;
             pushDirection.y = 0f;
             if (pushDirection.sqrMagnitude <= 0.000001f)
             {
@@ -204,16 +219,20 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
             var hitRequest = new EnemyHitRequest(
                 attackDamage,
                 attackStaggerDamage,
+                attackStrength,
                 hitPosition,
+                hitDirection,
                 pushDirection,
                 attackPushDistance,
                 attackHitStopDuration);
             EnemyHitResult hitResult = target.TakeHit(in hitRequest);
-            if (hitResult == EnemyHitResult.Staggered || hitResult == EnemyHitResult.Damaged)
+            if (hitResult.HasDamageFeedback)
             {
                 attackerHitStop?.Request(hitRequest.HitStopDuration);
-                hitEffectPlayer?.PlayBodyHit(hitRequest.HitPosition, hitRequest.PushDirection);
-                attackEffectPlayer?.PlayConfirmedHit();
+                hitEffectPlayer?.PlayBodyHit(
+                    hitRequest.HitPosition,
+                    hitRequest.HitDirection);
+                attackEffectPlayer?.PlayConfirmedHit(in hitResult);
             }
         }
 

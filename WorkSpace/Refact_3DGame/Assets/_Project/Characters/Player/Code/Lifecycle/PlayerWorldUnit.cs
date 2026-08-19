@@ -13,6 +13,7 @@ namespace rudIsland.RPG3D.Player
         private readonly PlayerInputReader playerInput; // 입력 또는 행동 여부
         private readonly PlayerStateMachine playerStateMachine; // 현재 행동 상태
         private readonly PlayerStamina playerStamina;
+        private readonly StopPoint stopPoint;
         private readonly CombatHitStop hitStop;
 
         public float CurrentHealth => Health.CurrentHealth; // 현재 체력
@@ -20,9 +21,10 @@ namespace rudIsland.RPG3D.Player
         public float MaxStamina => playerStamina.MaxStamina;
         public PlayerStamina Stamina => playerStamina;
 
-        public PlayerWorldUnit(
+        internal PlayerWorldUnit(
             float maxHealth,
             PlayerStamina playerStamina,
+            StopPoint stopPoint,
             PlayerInputReader playerInput,
             PlayerStateMachine playerStateMachine,
             CombatHitStop hitStop)
@@ -31,57 +33,110 @@ namespace rudIsland.RPG3D.Player
             this.playerInput = playerInput;
             this.playerStateMachine = playerStateMachine;
             this.playerStamina = playerStamina;
+            this.stopPoint = stopPoint;
             this.hitStop = hitStop;
         }
 
         public PlayerHitResult TryTakeHit(in PlayerHitRequest hitRequest)
         {
-            if (hitRequest.Damage == null || IsDead)
-            {
-                return PlayerHitResult.Ignored;
-            }
+            bool canBlockHit =
+                hitRequest.Damage != null &&
+                !IsDead &&
+                !playerStateMachine.IsRollInvulnerable &&
+                hitRequest.Damage.CanBlock &&
+                playerStateMachine.CanBlockHit(hitRequest.PushDirection);
+            PlayerHitResult resultBeforeHealthDamage =
+                GetHitResultBeforeHealthDamage(
+                    hitRequest.Damage != null,
+                    IsDead,
+                    playerStateMachine.IsRollInvulnerable,
+                    canBlockHit,
+                    playerStamina.CurrentStamina,
+                    hitRequest.Damage != null
+                        ? hitRequest.Damage.GuardStaminaDamage
+                        : 0f);
 
-            if (playerStateMachine.IsRollInvulnerable)
+            switch (resultBeforeHealthDamage)
             {
-                return PlayerHitResult.Avoided;
-            }
-
-            if (hitRequest.Damage.CanBlock && playerStateMachine.CanBlockHit(hitRequest.PushDirection))
-            {
-                if (playerStamina.TryConsumeGuard(hitRequest.Damage.GuardStaminaDamage))
-                {
+                case PlayerHitResult.Ignored:
+                case PlayerHitResult.Avoided:
+                    return resultBeforeHealthDamage;
+                case PlayerHitResult.Blocked:
+                    playerStamina.TryConsumeGuard(
+                        hitRequest.Damage.GuardStaminaDamage);
                     hitStop.Request(CombatHitStop.GuardDuration);
                     playerStateMachine.NotifyAttackBlocked();
                     return PlayerHitResult.Blocked;
-                }
-
-                hitStop.Request(hitRequest.Damage.HitStopDuration);
-                playerStateMachine.ChangeToGuardBreakState(in hitRequest);
-                return PlayerHitResult.GuardBroken;
+                case PlayerHitResult.GuardBroken:
+                    playerStamina.TryConsumeGuard(
+                        hitRequest.Damage.GuardStaminaDamage);
+                    hitStop.Request(hitRequest.Damage.HitStopDuration);
+                    playerStateMachine.ChangeToGuardBreakState(
+                        HitReaction.BigHit,
+                        in hitRequest);
+                    return PlayerHitResult.GuardBroken;
             }
 
-            if (!TryApplyDamage(hitRequest.Damage.HealthDamage))
+            HitDamageResult damageResult = HitDamageCalculator.Apply(
+                Health,
+                hitRequest.Damage.HealthDamage);
+            if (damageResult == HitDamageResult.Ignored)
             {
                 return PlayerHitResult.Ignored;
             }
 
             hitStop.Request(hitRequest.Damage.HitStopDuration);
-            if (!IsDead)
+            if (damageResult != HitDamageResult.Killed)
             {
-                playerStateMachine.ChangeToHitState(in hitRequest);
+                bool reachedStopLimit = stopPoint.TryAccumulate(
+                    hitRequest.Damage.StaggerDamage);
+                HitReaction reaction = HitReactionSelector.Select(
+                    hitRequest.Damage.Strength,
+                    reachedStopLimit,
+                    playerStateMachine.ProtectsSmallHit,
+                    false,
+                    false);
+                if (reaction != HitReaction.None)
+                {
+                    playerStateMachine.ChangeToHitState(
+                        reaction,
+                        in hitRequest);
+                }
             }
 
             return PlayerHitResult.Damaged;
         }
 
-        private bool TryApplyDamage(float damage)
+
+
+        internal static PlayerHitResult GetHitResultBeforeHealthDamage(
+            bool hasDamage,
+            bool isDead,
+            bool isRollInvulnerable,
+            bool canBlockHit,
+            float currentStamina,
+            float guardStaminaDamage)
         {
-            float healthBeforeDamage = Health.CurrentHealth;
-            Health.TakeDamage(damage);
-            return Health.CurrentHealth < healthBeforeDamage;
+            if (!hasDamage || isDead)
+            {
+                return PlayerHitResult.Ignored;
+            }
+
+            if (isRollInvulnerable)
+            {
+                return PlayerHitResult.Avoided;
+            }
+
+            if (!canBlockHit)
+            {
+                return PlayerHitResult.Damaged;
+            }
+
+            return guardStaminaDamage <= 0f ||
+                currentStamina > guardStaminaDamage
+                    ? PlayerHitResult.Blocked
+                    : PlayerHitResult.GuardBroken;
         }
-
-
 
         protected override void OnUnitCreate()
         {
@@ -92,6 +147,7 @@ namespace rudIsland.RPG3D.Player
         protected override void OnUnitEnable()
         {
             hitStop.Reset();
+            stopPoint.Reset();
             if (IsDead)
             {
                 playerStateMachine.Enable();
@@ -109,6 +165,8 @@ namespace rudIsland.RPG3D.Player
             {
                 return;
             }
+
+            stopPoint.UpdateRecovery(deltaTime);
 
             if (IsDead)
             {

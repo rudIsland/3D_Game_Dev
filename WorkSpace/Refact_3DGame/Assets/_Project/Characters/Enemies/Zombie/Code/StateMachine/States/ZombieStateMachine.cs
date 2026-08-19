@@ -1,5 +1,6 @@
 using System;
 using rudIsland.RPG3D.Characters;
+using rudIsland.RPG3D.Characters.Combat;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.Zombie
@@ -34,6 +35,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         internal float ChaseSpeed { get; } // 이동 속도
         internal float TurnSpeed { get; } // 이동 속도
         internal float HitPushDuration { get; }
+        internal float KnockbackPushDuration { get; }
         internal float DeadBodyKeepTime { get; } // 시간 설정
         internal bool IsInCombat { get; private set; }
 
@@ -49,6 +51,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             float chaseSpeed,
             float turnSpeed,
             float hitPushDuration,
+            float knockbackPushDuration,
             AnimationCurve hitPushCurve,
             float deadBodyKeepTime,
             Action requestRelease,
@@ -66,6 +69,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             ChaseSpeed = chaseSpeed;
             TurnSpeed = turnSpeed;
             HitPushDuration = Mathf.Max(0.01f, hitPushDuration);
+            KnockbackPushDuration =
+                Mathf.Max(HitPushDuration, knockbackPushDuration);
             this.hitPushCurve = hitPushCurve ??
                 AnimationCurve.Linear(0f, 0f, 1f, 1f);
             hitPushCurveStart = this.hitPushCurve.Evaluate(0f);
@@ -197,7 +202,16 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             return Mathf.Clamp01((hitPushCurve.Evaluate(normalizedTime) - hitPushCurveStart) / hitPushCurveRange);
         }
 
-        internal void ChangeToHitState(in EnemyHitRequest hitRequest)
+        internal float GetHitPushDuration(HitReaction reaction)
+        {
+            return reaction == HitReaction.Knockback
+                ? KnockbackPushDuration
+                : HitPushDuration;
+        }
+
+        internal void ChangeToHitState(
+            HitReaction reaction,
+            in EnemyHitRequest hitRequest)
         {
             if (!isEnabled || ReferenceEquals(currentState, deadState))
             {
@@ -205,13 +219,13 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             }
 
             EndAttackHit();
-            hitState.SetHitRequest(in hitRequest);
             if (ReferenceEquals(currentState, hitState))
             {
-                hitState.Restart();
+                hitState.TryRestart(reaction, in hitRequest);
                 return;
             }
 
+            hitState.SetHitRequest(reaction, in hitRequest);
             ChangeState(hitState);
         }
 
@@ -292,9 +306,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             animation.PlayAttack(attackType);
         }
 
-        internal void PlayHitFromStart()
+        internal void PlayHitFromStart(HitReaction reaction)
         {
-            animation.PlayHitFromStart();
+            animation.PlayHitFromStart(reaction);
         }
 
         internal void PlayDead()

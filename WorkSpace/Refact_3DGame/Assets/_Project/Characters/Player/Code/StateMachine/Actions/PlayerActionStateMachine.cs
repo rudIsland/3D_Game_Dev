@@ -59,10 +59,7 @@ namespace rudIsland.RPG3D.Player.States.Actions
                 return;
             }
 
-            inputBuffer.Update(
-                deltaTime,
-                input.RollPressed,
-                input.AttackPressed);
+            inputBuffer.Update(deltaTime, input.RollPressed, input.AttackPressed);
 
             if (ReferenceEquals(currentState, rollState))
             {

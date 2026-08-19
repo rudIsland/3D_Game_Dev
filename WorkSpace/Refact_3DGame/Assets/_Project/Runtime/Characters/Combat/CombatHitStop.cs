@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Combat
 {
+    //연출을 위해 피격과 가드시 속성의 시간만큼 연출을 멈춤.
     // 공격 데이터가 요청한 시간만큼 한 유닛의 애니메이션과 상태 갱신을 정지시킨다.
     public sealed class CombatHitStop
     {
@@ -22,9 +23,7 @@ namespace rudIsland.RPG3D.Characters.Combat
         public void Request(float duration)
         {
             duration = Mathf.Max(0f, duration);
-            if (duration <= 0f ||
-                animator == null ||
-                !animator.isActiveAndEnabled)
+            if (duration <= 0f || animator == null || !animator.isActiveAndEnabled)
             {
                 return;
             }

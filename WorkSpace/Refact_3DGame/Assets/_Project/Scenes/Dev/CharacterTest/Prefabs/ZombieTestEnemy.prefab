@@ -972,6 +972,7 @@ MonoBehaviour:
     hitStopDuration: 0.04
     guardStaminaDamage: 25
     canBlock: 1
+    damageSoundType: 0
   kickAttackDamage:
     healthDamage: 10
     strength: 1
@@ -980,6 +981,7 @@ MonoBehaviour:
     hitStopDuration: 0.05
     guardStaminaDamage: 25
     canBlock: 1
+    damageSoundType: 0
   upDownAttackDamage:
     healthDamage: 10
     strength: 1
@@ -988,12 +990,13 @@ MonoBehaviour:
     hitStopDuration: 0.06
     guardStaminaDamage: 25
     canBlock: 1
-
+    damageSoundType: 0
   chaseSpeed: 3.5
   turnSpeed: 360
   gravity: -22
   groundPull: -2
   hitPushDuration: 0.15
+  knockbackPushDuration: 0.25
   hitPushCurve:
     serializedVersion: 2
     m_Curve:
@@ -1004,8 +1007,8 @@ MonoBehaviour:
       outSlope: 2
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
+      inWeight: 0
+      outWeight: 0
     - serializedVersion: 3
       time: 1
       value: 1
@@ -1013,8 +1016,8 @@ MonoBehaviour:
       outSlope: 0
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
+      inWeight: 0
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
@@ -1030,7 +1033,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8a4c0717de6458095c2b2f7c52919cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Characters.Combat.CombatHitEffectPlayer
-  bodyHitEffectPrefab: {fileID: 0}
+  bodyHitEffectPrefab: {fileID: 2508344019071891113, guid: 3179f3613d3ad0e4085a8e230b039b81,
+    type: 3}
   guardHitEffectPrefab: {fileID: 0}
   bodyHitPoolSize: 4
   guardHitPoolSize: 2
