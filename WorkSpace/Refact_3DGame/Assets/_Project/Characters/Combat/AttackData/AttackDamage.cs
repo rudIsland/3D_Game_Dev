@@ -32,9 +32,7 @@ namespace rudIsland.RPG3D.Characters.Combat.AttackData
         private DamageSoundType damageSoundType =
             DamageSoundType.BodyImpact;
 
-        public AttackDamage()
-        {
-        }
+        public AttackDamage(){ }
 
         public AttackDamage(
             float healthDamage,
