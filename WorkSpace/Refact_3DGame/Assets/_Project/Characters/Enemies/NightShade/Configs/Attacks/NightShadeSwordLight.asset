@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08ed6997ce7943fe890ccad863c2acec, type: 3}
+  m_Name: NightShadeSwordLight
+  m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Characters.Enemies.NightShade.NightShadeSwordSingleAttackData
+  hitDamages:
+  - healthDamage: 18
+    strength: 1
+    staggerDamage: 18
+    pushDistance: 0.4
+    hitStopDuration: 0.06
+    guardStaminaDamage: 30
+    canBlock: 1
+    damageSoundType: 1
+  postAttackDelay: 2
+  utility:
+    baseScore: 0.35
+    preferredDistance: 0.55
+    distanceTolerance: 0.55
+  actionId: 4

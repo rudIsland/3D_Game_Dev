@@ -13,7 +13,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         private float verticalSpeed;
 
         public Vector3 Position => enemyTransform.position;
-        internal Vector3 Forward => enemyTransform.forward;
+        public Vector3 Forward => enemyTransform.forward;
 
         internal NightShadeSwordMovement(
             Transform enemyTransform,

@@ -9,6 +9,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
     {
         private const float DefaultBlendTime = 0.12f;
         private const float HitBlendTime = 0.06f;
+        private const float StaggerEnterToStartBlendTime = 0.18f;
+        private const float StaggerStartToIdleBlendTime = 0.06f;
+        private const float StaggerIdleToEndBlendTime = 0.22f;
 
         private static readonly int IdleStateId =
             Animator.StringToHash("Base Layer.Idle");
@@ -56,6 +59,14 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             Animator.StringToHash("Base Layer.Knockdown");
         private static readonly int GetUpStateId =
             Animator.StringToHash("Base Layer.Get Up");
+        private static readonly int StaggerEnterStateId =
+            Animator.StringToHash("Base Layer.Stagger Enter");
+        private static readonly int StaggerStartStateId =
+            Animator.StringToHash("Base Layer.Stagger Start");
+        private static readonly int StaggerIdleStateId =
+            Animator.StringToHash("Base Layer.Stagger Idle");
+        private static readonly int StaggerEndStateId =
+            Animator.StringToHash("Base Layer.Stagger End");
         private static readonly int DeadStateId =
             Animator.StringToHash("Base Layer.Dead");
         private static readonly int AttackSpeedId =
@@ -162,6 +173,26 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         internal void PlayGetUpFromStart()
         {
             Play(GetUpStateId, DefaultBlendTime, true);
+        }
+
+        internal void PlayStaggerEnterFromStart()
+        {
+            Play(StaggerEnterStateId, HitBlendTime, true);
+        }
+
+        internal void PlayStaggerStartFromStart()
+        {
+            Play(StaggerStartStateId, StaggerEnterToStartBlendTime, true);
+        }
+
+        internal void PlayStaggerIdleFromStart()
+        {
+            Play(StaggerIdleStateId, StaggerStartToIdleBlendTime, true);
+        }
+
+        internal void PlayStaggerEndFromStart()
+        {
+            Play(StaggerEndStateId, StaggerIdleToEndBlendTime, true);
         }
 
         internal void PlayDead()
@@ -312,6 +343,14 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             PlayKnockdownFromStart();
         void INightShadeSwordAnimation.PlayGetUpFromStart() =>
             PlayGetUpFromStart();
+        void INightShadeSwordAnimation.PlayStaggerEnterFromStart() =>
+            PlayStaggerEnterFromStart();
+        void INightShadeSwordAnimation.PlayStaggerStartFromStart() =>
+            PlayStaggerStartFromStart();
+        void INightShadeSwordAnimation.PlayStaggerIdleFromStart() =>
+            PlayStaggerIdleFromStart();
+        void INightShadeSwordAnimation.PlayStaggerEndFromStart() =>
+            PlayStaggerEndFromStart();
         void INightShadeSwordAnimation.PlayDead() => PlayDead();
         void INightShadeSwordAnimation.ResetAttackPlaybackSpeed() => ResetAttackPlaybackSpeed();
         bool INightShadeSwordAnimation.TryGetRequestedAnimationTime(out float normalizedTime) => TryGetRequestedAnimationTime(out normalizedTime);

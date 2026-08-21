@@ -7,96 +7,84 @@ namespace rudIsland.RPG3D.Tests
     public sealed class NightShadeSwordStateMachineTests
     {
         [Test]
-        public void Update_가까운대상을찾고방향이맞으면Idle_Walk_Attack순서로전환한다()
+        public void Update_Idle에서Combat단계를순서대로진행한다()
         {
             using var scope = new NightShadeSwordTestScope(
-                new Vector3(0f, 0f, 3f));
-            NightShadeSwordStateMachine machine =
-                scope.CreateStateMachine(scope.CreateSettings());
+                new Vector3(0f, 0f, 2.2f));
+            NightShadeSwordStateMachine machine = scope.CreateStateMachine(
+                scope.CreateSettings(),
+                new FixedNightShadeSwordRandomProvider());
 
             machine.Enable();
-            Assert.That(
-                machine.CurrentStateId,
-                Is.EqualTo(NightShadeSwordStateId.Idle));
+            Assert.That(machine.CurrentStateId, Is.EqualTo(NightShadeSwordStateId.Idle));
 
             machine.Update(0.1f);
-            Assert.That(
-                machine.CurrentStateId,
-                Is.EqualTo(NightShadeSwordStateId.Walk));
+            Assert.That(machine.CurrentStateId, Is.EqualTo(NightShadeSwordStateId.Combat));
+            Assert.That(machine.CurrentCombatPhase, Is.EqualTo(NightShadeSwordCombatPhase.Positioning));
+            Assert.That(machine.CurrentActionId, Is.EqualTo(NightShadeSwordActionId.WatchTarget));
 
             machine.Update(0.1f);
-            Assert.That(
-                machine.CurrentStateId,
-                Is.EqualTo(NightShadeSwordStateId.Attack));
-            Assert.That(machine.IsAttackStateActive, Is.True);
-            Assert.That(scope.Animation.AttackCount, Is.EqualTo(1));
+            Assert.That(machine.Debug.LastEvaluatedPhase, Is.EqualTo(NightShadeSwordCombatPhase.Attack));
+            Assert.That(machine.CurrentCombatPhase, Is.EqualTo(NightShadeSwordCombatPhase.Attack));
+
+            scope.Animation.NormalizedTime = 1f;
+            machine.Update(0.1f);
+            Assert.That(machine.CurrentCombatPhase, Is.EqualTo(NightShadeSwordCombatPhase.Recovery));
+            Assert.That(machine.CurrentActionId, Is.EqualTo(NightShadeSwordActionId.LeftRecovery));
+
+            machine.Update(0.6f);
+            Assert.That(machine.CurrentCombatPhase, Is.EqualTo(NightShadeSwordCombatPhase.Positioning));
+            Assert.That(machine.CurrentActionId, Is.EqualTo(NightShadeSwordActionId.WatchTarget));
         }
 
         [Test]
-        public void Update_공격거리안에서방향이맞지않으면회전만한다()
+        public void Recovery_0점6초가끝나도공격쿨다운이남으면공격하지않는다()
         {
             using var scope = new NightShadeSwordTestScope(
-                new Vector3(0f, 0f, 3f));
-            scope.Movement.IsFacingTarget = false;
-            NightShadeSwordStateMachine machine =
-                scope.CreateStateMachine(scope.CreateSettings());
-
+                new Vector3(0f, 0f, 2.2f));
+            NightShadeSwordStateMachine machine = scope.CreateStateMachine(
+                scope.CreateSettings(),
+                new FixedNightShadeSwordRandomProvider());
             machine.Enable();
             machine.Update(0.1f);
             machine.Update(0.1f);
+            scope.Animation.NormalizedTime = 1f;
+            machine.Update(0.1f);
+            int attackCount = scope.Animation.AttackCount;
 
-            Assert.That(
-                machine.CurrentStateId,
-                Is.EqualTo(NightShadeSwordStateId.Walk));
-            Assert.That(scope.Movement.TurnToCount, Is.EqualTo(1));
-            Assert.That(scope.Movement.MoveToCount, Is.Zero);
+            machine.Update(0.6f);
+            machine.Update(1.3f);
+
+            Assert.That(machine.CurrentCombatPhase, Is.EqualTo(NightShadeSwordCombatPhase.Positioning));
+            Assert.That(machine.CurrentActionId, Is.EqualTo(NightShadeSwordActionId.WatchTarget));
+            Assert.That(scope.Animation.AttackCount, Is.EqualTo(attackCount));
+
+            machine.Update(0.2f);
+            Assert.That(machine.CurrentCombatPhase, Is.EqualTo(NightShadeSwordCombatPhase.Attack));
+            Assert.That(scope.Animation.AttackCount, Is.EqualTo(attackCount + 1));
         }
 
         [Test]
-        public void Update_공격회복중에는새공격을시작하지않는다()
+        public void Disable_Enable_상태와전투기억을초기화한다()
         {
             using var scope = new NightShadeSwordTestScope(
-                new Vector3(0f, 0f, 3f));
-            NightShadeSwordStateMachine machine =
-                scope.CreateStateMachine(scope.CreateSettings());
-            machine.Enable();
-            machine.FightMemory.CompleteAttack(1f);
-
-            machine.Update(0.1f);
-            machine.Update(0.1f);
-
-            Assert.That(
-                machine.CurrentStateId,
-                Is.EqualTo(NightShadeSwordStateId.Walk));
-            Assert.That(scope.Animation.AttackCount, Is.Zero);
-        }
-
-        [Test]
-        public void Disable_Enable_전투상태와공격기억을초기화한다()
-        {
-            using var scope = new NightShadeSwordTestScope(
-                new Vector3(0f, 0f, 3f));
-            NightShadeSwordStateMachine machine =
-                scope.CreateStateMachine(scope.CreateSettings());
+                new Vector3(0f, 0f, 2.2f));
+            NightShadeSwordStateMachine machine = scope.CreateStateMachine(
+                scope.CreateSettings(),
+                new FixedNightShadeSwordRandomProvider());
             machine.Enable();
             machine.Update(0.1f);
-            machine.FightMemory.RecordAttack(
-                NightShadeSwordAttackType.Heavy);
-            machine.FightMemory.CompleteAttack(2f);
+            machine.FightMemory.RecordAttack(NightShadeSwordActionId.Heavy);
+            machine.FightMemory.StartPostAttackDelay(2f);
 
             machine.Disable();
-            Assert.That(machine.IsAttackStateActive, Is.False);
             machine.Enable();
 
             Assert.That(machine.IsInCombat, Is.False);
-            Assert.That(
-                machine.CurrentStateId,
-                Is.EqualTo(NightShadeSwordStateId.Idle));
+            Assert.That(machine.CurrentStateId, Is.EqualTo(NightShadeSwordStateId.Idle));
+            Assert.That(machine.CurrentActionId, Is.EqualTo(NightShadeSwordActionId.None));
             Assert.That(machine.FightMemory.HasPreviousAttack, Is.False);
-            Assert.That(
-                machine.FightMemory.RemainingAttackCooldown,
-                Is.Zero);
-            Assert.That(machine.FightMemory.CompletedAttackCount, Is.Zero);
+            Assert.That(machine.FightMemory.RemainingPostAttackDelay, Is.Zero);
         }
     }
 }

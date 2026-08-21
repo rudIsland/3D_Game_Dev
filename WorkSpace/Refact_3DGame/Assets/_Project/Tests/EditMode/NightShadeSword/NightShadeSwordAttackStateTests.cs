@@ -1,4 +1,6 @@
 using NUnit.Framework;
+using rudIsland.RPG3D.Characters;
+using rudIsland.RPG3D.Characters.Combat;
 using rudIsland.RPG3D.Characters.Enemies.NightShade;
 using UnityEngine;
 
@@ -7,115 +9,73 @@ namespace rudIsland.RPG3D.Tests
     public sealed class NightShadeSwordAttackStateTests
     {
         [Test]
-        public void AnimationEvent_ComboFirst는HitIndex0만한번처리한다()
+        public void AnimationEvent_현재공격Action만순서대로한번처리한다()
         {
             using var scope = new NightShadeSwordTestScope(
-                new Vector3(0f, 0f, 1f));
-            NightShadeSwordAttackState state = CreateComboState(scope);
-            state.Enter();
+                new Vector3(0f, 0f, 2.2f));
+            NightShadeSwordStateMachine machine = EnterAttack(scope);
 
-            state.QueuePlaySound(0);
-            state.QueueOpenHit(0);
-            state.QueueCloseHit();
-            state.QueuePlaySound(1);
-            state.QueueOpenHit(1);
-            state.QueueCloseHit();
-
-            Assert.That(scope.Actions.Calls, Is.Empty);
-            state.Update(0.1f);
-
-            Assert.That(
-                scope.Actions.Calls,
-                Is.EqualTo(new[]
-                {
-                    "Sound:0",
-                    "Open:0",
-                    "Close"
-                }));
-        }
-
-        [Test]
-        public void AnimationEvent_중복되거나순서가늦은이벤트는무시한다()
-        {
-            using var scope = new NightShadeSwordTestScope(
-                new Vector3(0f, 0f, 1f));
-            NightShadeSwordAttackState state = CreateComboState(scope);
-            state.Enter();
-
-            state.QueuePlaySound(0);
-            state.QueuePlaySound(0);
-            state.QueueOpenHit(0);
-            state.QueueCloseHit();
-            state.QueueOpenHit(0);
-            state.Update(0.1f);
+            machine.PlayAttackSoundAnimationEvent(0);
+            machine.PlayAttackSoundAnimationEvent(0);
+            machine.OpenAttackHitAnimationEvent(0);
+            machine.CloseAttackHitAnimationEvent();
+            machine.OpenAttackHitAnimationEvent(0);
+            machine.Update(0.1f);
 
             Assert.That(
                 scope.Actions.Calls,
                 Is.EqualTo(new[] { "Sound:0", "Open:0", "Close" }));
-
-            state.Exit();
-            int oldCallCount = scope.Actions.Calls.Count;
-            state.QueuePlaySound(1);
-            Assert.That(state.QueuedEventCount, Is.Zero);
-            Assert.That(scope.Actions.Calls.Count, Is.EqualTo(oldCallCount));
         }
 
         [Test]
-        public void StopTurnEvent_다음Update부터공격회전을멈춘다()
+        public void 피격중단_열린판정대기이벤트와공격속도를정리한다()
         {
             using var scope = new NightShadeSwordTestScope(
-                new Vector3(0f, 0f, 1f));
-            NightShadeSwordAttackState state = CreateComboState(scope);
-            state.Enter();
-            state.QueueStopTurn();
+                new Vector3(0f, 0f, 2.2f));
+            NightShadeSwordStateMachine machine = EnterAttack(scope);
+            machine.OpenAttackHitAnimationEvent(0);
+            machine.Update(0.1f);
+            int resetCount = scope.Animation.ResetSpeedCount;
+            var hitRequest = new EnemyHitRequest(
+                1f,
+                1f,
+                Vector3.zero,
+                Vector3.back,
+                0f,
+                0f);
 
-            state.Update(0.1f);
+            machine.ChangeToHitState(HitReaction.SmallHit, in hitRequest);
+            Assert.That(machine.CurrentStateId, Is.EqualTo(NightShadeSwordStateId.Combat));
+            machine.Update(0f);
 
-            Assert.That(scope.Movement.TurnToCount, Is.Zero);
-            Assert.That(scope.Movement.StayCount, Is.EqualTo(1));
-        }
-
-        [Test]
-        public void Exit_열린판정을닫고이벤트와공격속도를초기화한다()
-        {
-            using var scope = new NightShadeSwordTestScope(
-                new Vector3(0f, 0f, 1f));
-            NightShadeSwordAttackState state = CreateComboState(scope);
-            state.Enter();
-            state.QueueOpenHit(0);
-            state.Update(0.1f);
-            int resetCountBeforeExit = scope.Animation.ResetSpeedCount;
-
-            state.Exit();
-
-            Assert.That(scope.Actions.CloseCount, Is.EqualTo(1));
-            Assert.That(state.QueuedEventCount, Is.Zero);
+            Assert.That(machine.CurrentStateId, Is.EqualTo(NightShadeSwordStateId.Hit));
+            Assert.That(scope.Actions.CloseCount, Is.GreaterThanOrEqualTo(1));
+            Assert.That(scope.Animation.ResetSpeedCount, Is.GreaterThan(resetCount));
             Assert.That(
-                scope.Animation.ResetSpeedCount,
-                Is.EqualTo(resetCountBeforeExit + 1));
+                machine.Debug.PreviousActionStopReason,
+                Is.EqualTo(NightShadeSwordActionStopReason.Interrupted));
         }
 
-        private static NightShadeSwordAttackState CreateComboState(NightShadeSwordTestScope scope)
+        [Test]
+        public void HeavyProtection_시작은포함하고종료는포함하지않는다()
         {
-            NightShadeSwordSettings settings = scope.CreateSettings();
-            var targetReader = new NightShadeSwordTargetReader(
-                scope.TargetObject.transform,
-                scope.TargetDeathState,
-                scope.Movement);
-            targetReader.Refresh();
-            var fightMemory = new NightShadeSwordFightMemory();
-            fightMemory.Reset();
-            fightMemory.RecordAttack(NightShadeSwordAttackType.Light);
+            Assert.That(NightShadeSwordAttackTiming.IsHeavyProtectionTime(0.1599f), Is.False);
+            Assert.That(NightShadeSwordAttackTiming.IsHeavyProtectionTime(0.16f), Is.True);
+            Assert.That(NightShadeSwordAttackTiming.IsHeavyProtectionTime(0.3899f), Is.True);
+            Assert.That(NightShadeSwordAttackTiming.IsHeavyProtectionTime(0.39f), Is.False);
+        }
 
-            return new NightShadeSwordAttackState(
-                targetReader,
-                scope.Movement,
-                scope.Animation,
-                settings,
-                fightMemory,
-                new NightShadeSwordAttackSelector(
-                    settings.AttackRangeSquared),
-                scope.Actions.Value);
+        private static NightShadeSwordStateMachine EnterAttack(
+            NightShadeSwordTestScope scope)
+        {
+            NightShadeSwordStateMachine machine = scope.CreateStateMachine(
+                scope.CreateSettings(),
+                new FixedNightShadeSwordRandomProvider());
+            machine.Enable();
+            machine.Update(0.1f);
+            machine.Update(0.1f);
+            Assert.That(machine.IsAttackStateActive, Is.True);
+            return machine;
         }
     }
 }

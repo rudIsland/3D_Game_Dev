@@ -8,12 +8,17 @@ namespace rudIsland.RPG3D.Tests
 {
     public sealed class NightShadeSwordAnimationEventAssetTests
     {
-        private const string ClipFolder =
-            "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Clips/TwoHandSword";
+        private const string ClipRoot =
+            "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Clips";
+        private const string AttackClipFolder = ClipRoot + "/Attack";
+        private const string HitClipFolder = ClipRoot + "/Hit";
+        private const string DeathClipFolder = ClipRoot + "/Death";
         private const string ControllerPath =
             "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Controllers/NightShadeTwoHandSwordAnimator.controller";
         private const string WalkClipPath =
-            "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Clips/TwoHandSword/NightShadeSword_Walk.anim";
+            ClipRoot + "/Walk/NightShadeSword_Walk.anim";
+        private const string StaggerEnterClipPath =
+            "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Sources/Stagger Enter.anim";
 
         [Test]
         public void AnimatorController_방향별피격상태에맞는클립이연결되어있다()
@@ -25,30 +30,39 @@ namespace rudIsland.RPG3D.Tests
 
             AssertStateClip(
                 stateMachine,
+                "Hit",
+                "NightShadeSword_BigHitFront",
+                0.70f);
+            AssertStateClip(
+                stateMachine,
                 "Hit Front",
-                "NightShadeSword_BigHit");
+                "NightShadeSword_BigHitFront",
+                0.70f);
             AssertStateClip(
                 stateMachine,
                 "Hit Back",
-                "NightShadeSword_BigHit");
+                "NightShadeSword_BigHitBack",
+                0.70f);
             AssertStateClip(
                 stateMachine,
                 "Hit Left",
-                "NightShadeSword_BigHit");
+                "NightShadeSword_BigHitLeft",
+                0.50f);
             AssertStateClip(
                 stateMachine,
                 "Hit Right",
-                "NightShadeSword_BigHit");
+                "NightShadeSword_BigHitRight",
+                0.50f);
             AssertStateClip(
                 stateMachine,
                 "Small Hit Front",
                 "NightShadeSword_SmallHitFront",
-                1.25f);
+                1f);
             AssertStateClip(
                 stateMachine,
                 "Small Hit Back",
                 "NightShadeSword_SmallHitBack",
-                1.25f);
+                1f);
             AssertStateClip(
                 stateMachine,
                 "Small Hit Left",
@@ -60,15 +74,157 @@ namespace rudIsland.RPG3D.Tests
                 "NightShadeSword_SmallHitRight",
                 1f);
             AssertNoEvents(
-                $"{ClipFolder}/NightShadeSword_BigHit.anim");
+                $"{HitClipFolder}/NightShadeSword_BigHitFront.anim");
             AssertNoEvents(
-                $"{ClipFolder}/NightShadeSword_SmallHitFront.anim");
+                $"{HitClipFolder}/NightShadeSword_BigHitBack.anim");
             AssertNoEvents(
-                $"{ClipFolder}/NightShadeSword_SmallHitBack.anim");
+                $"{HitClipFolder}/NightShadeSword_BigHitLeft.anim");
             AssertNoEvents(
-                $"{ClipFolder}/NightShadeSword_SmallHitLeft.anim");
+                $"{HitClipFolder}/NightShadeSword_BigHitRight.anim");
             AssertNoEvents(
-                $"{ClipFolder}/NightShadeSword_SmallHitRight.anim");
+                $"{HitClipFolder}/NightShadeSword_SmallHitFront.anim");
+            AssertNoEvents(
+                $"{HitClipFolder}/NightShadeSword_SmallHitBack.anim");
+            AssertNoEvents(
+                $"{HitClipFolder}/NightShadeSword_SmallHitLeft.anim");
+            AssertNoEvents(
+                $"{HitClipFolder}/NightShadeSword_SmallHitRight.anim");
+            AssertStateClip(
+                stateMachine,
+                "Stagger Enter",
+                "Stagger Enter");
+            AssertStateClip(
+                stateMachine,
+                "Stagger Start",
+                "NightShadeSword_StaggerStart");
+            AssertStateClip(
+                stateMachine,
+                "Stagger Idle",
+                "NightShadeSword_StaggerIdle");
+            AssertStateClip(
+                stateMachine,
+                "Stagger End",
+                "NightShadeSword_StaggerEnd");
+            AssertNoEvents(
+                $"{HitClipFolder}/NightShadeSword_StaggerStart.anim");
+            AssertNoEvents(
+                $"{HitClipFolder}/NightShadeSword_StaggerIdle.anim");
+            AssertNoEvents(
+                $"{HitClipFolder}/NightShadeSword_StaggerEnd.anim");
+            AssertNoEvents(StaggerEnterClipPath);
+            AssertLoopTime(StaggerEnterClipPath, false);
+            AssertLoopTime(
+                $"{HitClipFolder}/NightShadeSword_StaggerStart.anim",
+                false);
+            AssertLoopTime(
+                $"{HitClipFolder}/NightShadeSword_StaggerIdle.anim",
+                true);
+            AssertLoopTime(
+                $"{HitClipFolder}/NightShadeSword_StaggerEnd.anim",
+                false);
+        }
+
+        [Test]
+        public void AnimatorController_상태를기능별가로행으로배치한다()
+        {
+            AnimatorController controller =
+                AssetDatabase.LoadAssetAtPath<AnimatorController>(ControllerPath);
+            Assert.That(controller, Is.Not.Null, ControllerPath);
+            AnimatorStateMachine stateMachine = controller.layers[0].stateMachine;
+
+            AssertStateRow(
+                stateMachine,
+                0f,
+                "Idle",
+                "Chase",
+                "Walk",
+                "Combat Back",
+                "Combat Left",
+                "Combat Right");
+            AssertStateRow(
+                stateMachine,
+                150f,
+                "Light Attack",
+                "Combo First",
+                "Combo Second",
+                "Heavy Attack",
+                "Wide Swing");
+            AssertStateRow(
+                stateMachine,
+                300f,
+                "Hit",
+                "Knockback",
+                "Knockdown",
+                "Get Up",
+                "Dead");
+            AssertStateRow(
+                stateMachine,
+                450f,
+                "Small Hit Front",
+                "Small Hit Back",
+                "Small Hit Left",
+                "Small Hit Right");
+            AssertStateRow(
+                stateMachine,
+                600f,
+                "Hit Front",
+                "Hit Back",
+                "Hit Left",
+                "Hit Right");
+            AssertStateRow(
+                stateMachine,
+                750f,
+                "Stagger Enter",
+                "Stagger Start",
+                "Stagger Idle",
+                "Stagger End");
+        }
+
+        [Test]
+        public void StaggerEnter클립_수평위치곡선은제자리다()
+        {
+            AnimationClip clip =
+                AssetDatabase.LoadAssetAtPath<AnimationClip>(
+                    StaggerEnterClipPath);
+            Assert.That(clip, Is.Not.Null, StaggerEnterClipPath);
+
+            bool foundPositionX = false;
+            bool foundPositionZ = false;
+            EditorCurveBinding[] bindings =
+                AnimationUtility.GetCurveBindings(clip);
+            for (int bindingIndex = 0;
+                bindingIndex < bindings.Length;
+                bindingIndex++)
+            {
+                EditorCurveBinding binding = bindings[bindingIndex];
+                if (binding.type != typeof(Transform) ||
+                    binding.path != "mixamorig:Hips" ||
+                    (binding.propertyName != "m_LocalPosition.x" &&
+                        binding.propertyName != "m_LocalPosition.z"))
+                {
+                    continue;
+                }
+
+                foundPositionX |=
+                    binding.propertyName == "m_LocalPosition.x";
+                foundPositionZ |=
+                    binding.propertyName == "m_LocalPosition.z";
+                AnimationCurve curve =
+                    AnimationUtility.GetEditorCurve(clip, binding);
+                Assert.That(curve, Is.Not.Null, binding.propertyName);
+                Keyframe[] keys = curve.keys;
+                for (int keyIndex = 0;
+                    keyIndex < keys.Length;
+                    keyIndex++)
+                {
+                    Assert.That(keys[keyIndex].value, Is.Zero);
+                    Assert.That(keys[keyIndex].inTangent, Is.Zero);
+                    Assert.That(keys[keyIndex].outTangent, Is.Zero);
+                }
+            }
+
+            Assert.That(foundPositionX, Is.True);
+            Assert.That(foundPositionZ, Is.True);
         }
 
         [Test]
@@ -99,10 +255,10 @@ namespace rudIsland.RPG3D.Tests
                 "Dead",
                 "NightShadeSword_Dead",
                 0.8f);
-            AssertNoEvents($"{ClipFolder}/NightShadeSword_Knockback.anim");
-            AssertNoEvents($"{ClipFolder}/NightShadeSword_Knockdown.anim");
-            AssertNoEvents($"{ClipFolder}/NightShadeSword_GetUp.anim");
-            AssertNoEvents($"{ClipFolder}/NightShadeSword_Dead.anim");
+            AssertNoEvents($"{HitClipFolder}/NightShadeSword_Knockback.anim");
+            AssertNoEvents($"{HitClipFolder}/NightShadeSword_Knockdown.anim");
+            AssertNoEvents($"{HitClipFolder}/NightShadeSword_GetUp.anim");
+            AssertNoEvents($"{DeathClipFolder}/NightShadeSword_Dead.anim");
         }
 
         [Test]
@@ -143,7 +299,7 @@ namespace rudIsland.RPG3D.Tests
         public void AttackClips_검움직임에맞춘사운드와정확한게임이벤트를가진다()
         {
             AssertClip(
-                $"{ClipFolder}/NightShadeSword_LightAttack.anim",
+                $"{AttackClipFolder}/NightShadeSword_LightAttack.anim",
                 2,
                 new[]
                 {
@@ -153,7 +309,7 @@ namespace rudIsland.RPG3D.Tests
                     Expected(0.7f, "CloseAttackHitAnimationEvent", 0)
                 });
             AssertClip(
-                $"{ClipFolder}/NightShadeSword_ComboFirst.anim",
+                $"{AttackClipFolder}/NightShadeSword_ComboFirst.anim",
                 2,
                 new[]
                 {
@@ -163,7 +319,7 @@ namespace rudIsland.RPG3D.Tests
                     Expected(0.6666667f, "CloseAttackHitAnimationEvent", 0)
                 });
             AssertClip(
-                $"{ClipFolder}/NightShadeSword_ComboSecond.anim",
+                $"{AttackClipFolder}/NightShadeSword_ComboSecond.anim",
                 2,
                 new[]
                 {
@@ -173,7 +329,7 @@ namespace rudIsland.RPG3D.Tests
                     Expected(0.46666667f, "CloseAttackHitAnimationEvent", 0)
                 });
             AssertClip(
-                $"{ClipFolder}/NightShadeSword_HeavyAttack.anim",
+                $"{AttackClipFolder}/NightShadeSword_HeavyAttack.anim",
                 2,
                 new[]
                 {
@@ -183,7 +339,7 @@ namespace rudIsland.RPG3D.Tests
                     Expected(0.9666667f, "CloseAttackHitAnimationEvent", 0)
                 });
             AssertClip(
-                $"{ClipFolder}/NightShadeSword_WideSwing.anim",
+                $"{AttackClipFolder}/NightShadeSword_WideSwing.anim",
                 2,
                 new[]
                 {
@@ -249,7 +405,8 @@ namespace rudIsland.RPG3D.Tests
             AnimatorStateMachine stateMachine,
             string stateName,
             string clipName,
-            float playbackSpeed = 1f)
+            float playbackSpeed = 1f,
+            bool mirrorsClip = false)
         {
             AnimatorState foundState = null;
             ChildAnimatorState[] states = stateMachine.states;
@@ -268,6 +425,39 @@ namespace rudIsland.RPG3D.Tests
             Assert.That(
                 foundState.speed,
                 Is.EqualTo(playbackSpeed).Within(0.001f));
+            Assert.That(foundState.mirror, Is.EqualTo(mirrorsClip));
+        }
+
+        private static void AssertStateRow(
+            AnimatorStateMachine stateMachine,
+            float rowY,
+            params string[] stateNames)
+        {
+            float previousX = float.NegativeInfinity;
+            for (int nameIndex = 0; nameIndex < stateNames.Length; nameIndex++)
+            {
+                bool found = false;
+                ChildAnimatorState[] states = stateMachine.states;
+                for (int stateIndex = 0; stateIndex < states.Length; stateIndex++)
+                {
+                    if (states[stateIndex].state.name != stateNames[nameIndex])
+                    {
+                        continue;
+                    }
+
+                    Vector3 position = states[stateIndex].position;
+                    Assert.That(position.y, Is.EqualTo(rowY).Within(0.001f));
+                    Assert.That(position.x, Is.GreaterThan(previousX));
+                    Assert.That(
+                        states[stateIndex].state.motion,
+                        Is.TypeOf<AnimationClip>());
+                    previousX = position.x;
+                    found = true;
+                    break;
+                }
+
+                Assert.That(found, Is.True, stateNames[nameIndex]);
+            }
         }
 
         private static void AssertNoEvents(string clipPath)
@@ -279,6 +469,18 @@ namespace rudIsland.RPG3D.Tests
                 AnimationUtility.GetAnimationEvents(clip),
                 Is.Empty,
                 clipPath);
+        }
+
+        private static void AssertLoopTime(
+            string clipPath,
+            bool expectedLoopTime)
+        {
+            AnimationClip clip =
+                AssetDatabase.LoadAssetAtPath<AnimationClip>(clipPath);
+            Assert.That(clip, Is.Not.Null, clipPath);
+            AnimationClipSettings settings =
+                AnimationUtility.GetAnimationClipSettings(clip);
+            Assert.That(settings.loopTime, Is.EqualTo(expectedLoopTime));
         }
 
         private static ExpectedEvent Expected(

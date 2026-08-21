@@ -19,72 +19,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         [Header("필수 연결")]
         [SerializeField] private Transform target;
         [SerializeField] private Animator enemyAnimator;
-
-        [Header("생명")]
-        [SerializeField, Min(1f)] private float maxHealth = 250f;
-
-        [Header("경직")]
-        [SerializeField, Min(1f)] private float staggerLimit = 100f;
-        [SerializeField, Min(0f)] private float staggerRecoverDelay = 2.5f;
-        [SerializeField, Min(0f)] private float staggerRecoverSpeed = 8f;
-        [Header("사망 후 정리")]
-        [SerializeField, Min(0f)] private float deadBodyKeepTime = 3f;
-
-        [Header("찾기와 공격 거리")]
-        [SerializeField, Min(0.1f)] private float findRange = 24f;
-        [SerializeField, Min(0.1f)] private float attackRange = 2.4f;
-        [SerializeField, Min(0.1f)] private float walkStartRange = 5f;
-        [SerializeField, Min(0.1f)] private float runStartRange = 6f;
-        [SerializeField, Range(0f, 180f)]
-        private float attackFacingAngle = 14f;
-
-        [Header("RustySword 공격 판정")]
-        [SerializeField] private LayerMask targetLayers = 1 << 17;
         [SerializeField] private NightShadeSwordHitShape swordHitShape;
-        [SerializeField] private AttackDamage lightAttackDamage =
-            new AttackDamage(18f, AttackStrength.Heavy, 18f, 0.4f, 30f, true, 0.06f, DamageSoundType.SwordCut);
-        [SerializeField] private AttackDamage comboFirstAttackDamage =
-            new AttackDamage(12f, AttackStrength.Heavy, 12f, 0.25f, 20f, true, 0.045f, DamageSoundType.SwordCut);
-        [SerializeField] private AttackDamage comboSecondAttackDamage =
-            new AttackDamage(16f, AttackStrength.Heavy, 18f, 0.4f, 25f, true, 0.06f, DamageSoundType.SwordCut);
-        [SerializeField] private AttackDamage heavyAttackDamage =
-            new AttackDamage(28f, AttackStrength.Knockdown, 35f, 0.75f, 45f, true, 0.08f, DamageSoundType.SwordCut);
-        [SerializeField] private AttackDamage wideSwingAttackDamage =
-            new AttackDamage(22f, AttackStrength.Heavy, 24f, 0.55f, 35f, true, 0.07f, DamageSoundType.SwordCut);
-
-        [Header("이동")]
-        [SerializeField, Min(0.1f)] private float walkSpeed = 1.8f;
-        [SerializeField, Min(0.1f)] private float chaseSpeed = 3.8f;
-        [SerializeField, Min(1f)] private float turnSpeed = 420f;
-        [SerializeField, Min(1f)] private float attackTurnSpeed = 180f;
-        [SerializeField] private float gravity = -22f;
-        [SerializeField] private float groundPull = -2f;
-
-        [Header("공격 후 쉬는 시간")]
-        [SerializeField, Min(0f)] private float lightAttackRecovery = 2f;
-        [SerializeField, Min(0f)] private float comboAttackRecovery = 2.5f;
-        [SerializeField, Min(0f)] private float wideSwingAttackRecovery = 2.5f;
-        [SerializeField, Min(0f)] private float heavyAttackRecovery = 3f;
-
-        [Header("콤보 연결")]
-        [SerializeField, Range(0.35f, 1f)]
-        private float comboFirstExitNormalizedTime = 0.4f;
-        [SerializeField, Min(0f)] private float comboSecondDelay = 0.15f;
-
-        [Header("전투 거리 조절")]
-        [SerializeField, Min(0.1f)] private float combatMoveSpeed = 2f;
-        [SerializeField, Min(0.1f)] private float combatMoveDuration = 0.6f;
-        [SerializeField, Min(1)] private int attacksBeforeCombatMove = 2;
-
-        [Header("피격 이동")]
-        [SerializeField, Min(0.01f)] private float hitPushDuration = 0.18f;
-        [SerializeField, Min(0.01f)]
-        private float knockbackPushDuration = 0.28f;
-        [SerializeField, Min(0.01f)]
-        private float knockdownPushDuration = 0.38f;
-        [SerializeField, Min(0f)]
-        private float knockdownStayDuration = 0.75f;
-        [SerializeField] private AnimationCurve hitPushCurve = CreateDefaultHitPushCurve();
+        [SerializeField] private NightShadeSwordConfig config;
 
         private CharacterController characterController;
         private NightShadeSwordAnimationController swordAnimation;
@@ -92,10 +28,20 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         private NightShadeSwordWorldUnit swordWorldUnit;
         private CombatHitEffectPlayer hitEffectPlayer;
         private NightShadeSwordAttackAudio attackAudio;
+        private NightShadeSwordSettings runtimeSettings;
 
         public bool IsDead => swordWorldUnit != null && swordWorldUnit.IsDead;
         internal bool IsAttackStateActive =>
             swordWorldUnit != null && swordWorldUnit.IsAttackStateActive;
+
+        public string DebugTopStateName => GetCombatDebug()?.TopState.ToString() ?? "없음";
+        public string DebugCombatPhaseName => GetCombatDebug()?.CombatPhase.ToString() ?? "없음";
+        public string DebugCurrentActionName => GetCombatDebug()?.CurrentAction.ToString() ?? "없음";
+        public string DebugCurrentStopReasonName => GetCombatDebug()?.CurrentActionStopReason.ToString() ?? "없음";
+        public string DebugLastEvaluatedPhaseName => GetCombatDebug()?.LastEvaluatedPhase.ToString() ?? "없음";
+        public string DebugSelectedActionName => GetCombatDebug()?.SelectedAction.ToString() ?? "없음";
+        public string DebugPreviousStopReasonName => GetCombatDebug()?.PreviousActionStopReason.ToString() ?? "없음";
+        public int DebugCandidateCount => GetCombatDebug()?.CandidateCount ?? 0;
 
         protected override IWorldObject CreateRuntimeObject()
         {
@@ -105,54 +51,31 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             if (target == null ||
                 enemyAnimator == null ||
                 swordHitShape == null ||
-                !swordHitShape.IsReady)
+                !swordHitShape.IsReady ||
+                config == null)
             {
                 throw new InvalidOperationException(
-                    "NightShadeSwordController에 Target, Animator와 RustySword 검날 판정점이 필요합니다.");
+                    "NightShadeSwordController에 Target, Animator, RustySword 검날 판정점과 Config가 필요합니다.");
             }
 
             enemyAnimator.applyRootMotion = false;
             swordAnimation.ConnectAnimator(enemyAnimator);
+            runtimeSettings = config.CreateRuntimeSettings();
 
             var movement = new NightShadeSwordMovement(
                 transform,
                 characterController,
-                gravity,
-                groundPull);
+                runtimeSettings.Gravity,
+                runtimeSettings.GroundPull);
             var hitStop = new CombatHitStop(enemyAnimator);
             attackRangeDetector = new NightShadeSwordAttackRangeDetector(
                 transform,
-                targetLayers,
+                runtimeSettings.TargetLayers,
                 swordHitShape,
                 hitStop,
                 hitEffectPlayer);
             IUnitDeathState targetDeathState =
                 target.GetComponentInParent<IUnitDeathState>();
-            var settings = new NightShadeSwordSettings(
-                findRange,
-                attackRange,
-                walkStartRange,
-                runStartRange,
-                attackFacingAngle,
-                walkSpeed,
-                chaseSpeed,
-                turnSpeed,
-                attackTurnSpeed,
-                lightAttackRecovery,
-                comboAttackRecovery,
-                comboFirstExitNormalizedTime,
-                comboSecondDelay,
-                wideSwingAttackRecovery,
-                heavyAttackRecovery,
-                combatMoveSpeed,
-                combatMoveDuration,
-                attacksBeforeCombatMove,
-                hitPushDuration,
-                knockbackPushDuration,
-                knockdownPushDuration,
-                knockdownStayDuration,
-                hitPushCurve,
-                deadBodyKeepTime);
             var actions = new NightShadeSwordActions(
                 PlayAttackSound,
                 OpenAttackHit,
@@ -163,15 +86,15 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 targetDeathState,
                 movement,
                 swordAnimation,
-                settings,
+                runtimeSettings,
                 actions);
             var stopPoint = new StopPoint(
-                staggerLimit,
-                staggerRecoverDelay,
-                staggerRecoverSpeed);
+                runtimeSettings.StaggerLimit,
+                runtimeSettings.StaggerRecoverDelay,
+                runtimeSettings.StaggerRecoverSpeed);
 
             swordWorldUnit = new NightShadeSwordWorldUnit(
-                maxHealth,
+                runtimeSettings.MaxHealth,
                 stateMachine,
                 attackRangeDetector,
                 stopPoint,
@@ -230,19 +153,79 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
         private AttackDamage GetAttackDamage(NightShadeSwordAttackType attackType, int hitIndex)
         {
-            switch (attackType)
+            return runtimeSettings.GetAttackDamage(attackType);
+        }
+
+        public string GetDebugCandidateActionName(int index)
+        {
+            return TryGetDebugCandidate(index, out NightShadeSwordActionDebugEntry entry)
+                ? entry.ActionId.ToString()
+                : "없음";
+        }
+
+        public bool GetDebugCandidateCanStart(int index)
+        {
+            return TryGetDebugCandidate(index, out NightShadeSwordActionDebugEntry entry) &&
+                entry.CanStart;
+        }
+
+        public string GetDebugCandidateRejectReasonName(int index)
+        {
+            return TryGetDebugCandidate(index, out NightShadeSwordActionDebugEntry entry)
+                ? entry.RejectReason.ToString()
+                : "없음";
+        }
+
+        public float GetDebugCandidateBaseScore(int index) =>
+            TryGetDebugCandidate(index, out NightShadeSwordActionDebugEntry entry)
+                ? entry.Score.BaseScore
+                : 0f;
+
+        public float GetDebugCandidateDistanceScore(int index) =>
+            TryGetDebugCandidate(index, out NightShadeSwordActionDebugEntry entry)
+                ? entry.Score.DistanceScore
+                : 0f;
+
+        public float GetDebugCandidateRepeatPenalty(int index) =>
+            TryGetDebugCandidate(index, out NightShadeSwordActionDebugEntry entry)
+                ? entry.Score.RepeatPenalty
+                : 0f;
+
+        public float GetDebugCandidateRandomBonus(int index) =>
+            TryGetDebugCandidate(index, out NightShadeSwordActionDebugEntry entry)
+                ? entry.Score.RandomBonus
+                : 0f;
+
+        public float GetDebugCandidateFinalScore(int index) =>
+            TryGetDebugCandidate(index, out NightShadeSwordActionDebugEntry entry)
+                ? entry.Score.FinalScore
+                : 0f;
+
+        public bool GetDebugCandidateIsSelected(int index)
+        {
+            return TryGetDebugCandidate(index, out NightShadeSwordActionDebugEntry entry) &&
+                entry.IsSelected;
+        }
+
+        private NightShadeSwordCombatDebug GetCombatDebug()
+        {
+            return swordWorldUnit?.CombatDebug;
+        }
+
+        private bool TryGetDebugCandidate(
+            int index,
+            out NightShadeSwordActionDebugEntry entry)
+        {
+            NightShadeSwordCombatDebug combatDebug = GetCombatDebug();
+            if (combatDebug == null ||
+                (uint)index >= (uint)combatDebug.CandidateCount)
             {
-                case NightShadeSwordAttackType.ComboFirst:
-                    return comboFirstAttackDamage;
-                case NightShadeSwordAttackType.ComboSecond:
-                    return comboSecondAttackDamage;
-                case NightShadeSwordAttackType.Heavy:
-                    return heavyAttackDamage;
-                case NightShadeSwordAttackType.WideSwing:
-                    return wideSwingAttackDamage;
-                default:
-                    return lightAttackDamage;
+                entry = default;
+                return false;
             }
+
+            entry = combatDebug.Candidates[index];
+            return true;
         }
 
         private void FindSceneReferences()
@@ -268,19 +251,16 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             }
         }
 
-        private static AnimationCurve CreateDefaultHitPushCurve()
-        {
-            return new AnimationCurve(new Keyframe(0f, 0f, 2f, 2f), new Keyframe(1f, 1f, 0f, 0f));
-        }
-
 #if UNITY_EDITOR
         public void ConnectForEditor(
             Animator animator,
             Transform swordStartPoint,
             Transform swordEndPoint,
-            float swordRadius)
+            float swordRadius,
+            NightShadeSwordConfig runtimeConfig)
         {
             enemyAnimator = animator;
+            config = runtimeConfig;
             swordHitShape ??= new NightShadeSwordHitShape();
             swordHitShape.ConnectForEditor(
                 swordStartPoint,
@@ -291,61 +271,26 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         private void OnValidate()
         {
             FindUnityComponents();
-            maxHealth = Mathf.Max(1f, maxHealth);
-            staggerLimit = Mathf.Max(1f, staggerLimit);
-            staggerRecoverDelay = Mathf.Max(0f, staggerRecoverDelay);
-            staggerRecoverSpeed = Mathf.Max(0f, staggerRecoverSpeed);
-            deadBodyKeepTime = Mathf.Max(0f, deadBodyKeepTime);
-            findRange = Mathf.Max(0.1f, findRange);
-            attackRange = Mathf.Clamp(attackRange, 0.1f, findRange);
-            walkStartRange = Mathf.Clamp(
-                walkStartRange,
-                attackRange,
-                findRange);
-            runStartRange = Mathf.Clamp(
-                runStartRange,
-                walkStartRange,
-                findRange);
-            attackFacingAngle = Mathf.Clamp(attackFacingAngle, 0f, 180f);
-            walkSpeed = Mathf.Max(0.1f, walkSpeed);
-            chaseSpeed = Mathf.Max(0.1f, chaseSpeed);
-            turnSpeed = Mathf.Max(1f, turnSpeed);
-            attackTurnSpeed = Mathf.Max(1f, attackTurnSpeed);
-            lightAttackRecovery = Mathf.Max(0f, lightAttackRecovery);
-            comboAttackRecovery = Mathf.Max(0f, comboAttackRecovery);
-            comboFirstExitNormalizedTime = Mathf.Clamp(
-                comboFirstExitNormalizedTime,
-                0.35f,
-                1f);
-            comboSecondDelay = Mathf.Max(0f, comboSecondDelay);
-            wideSwingAttackRecovery =
-                Mathf.Max(0f, wideSwingAttackRecovery);
-            heavyAttackRecovery = Mathf.Max(0f, heavyAttackRecovery);
-            combatMoveSpeed = Mathf.Max(0.1f, combatMoveSpeed);
-            combatMoveDuration = Mathf.Max(0.1f, combatMoveDuration);
-            attacksBeforeCombatMove =
-                Mathf.Max(1, attacksBeforeCombatMove);
-            hitPushDuration = Mathf.Max(0.01f, hitPushDuration);
-            knockbackPushDuration =
-                Mathf.Max(hitPushDuration, knockbackPushDuration);
-            knockdownPushDuration =
-                Mathf.Max(knockbackPushDuration, knockdownPushDuration);
-            knockdownStayDuration =
-                Mathf.Max(0f, knockdownStayDuration);
-            if (hitPushCurve == null || hitPushCurve.length < 2)
-            {
-                hitPushCurve = CreateDefaultHitPushCurve();
-            }
-
             swordHitShape?.Validate();
         }
 
         private void OnDrawGizmosSelected()
         {
+            if (config == null)
+            {
+                return;
+            }
+
+            NightShadeSwordSettings previewSettings =
+                config.CreateRuntimeSettings();
             Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(transform.position, findRange);
+            Gizmos.DrawWireSphere(
+                transform.position,
+                Mathf.Sqrt(previewSettings.FindRangeSquared));
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position, attackRange);
+            Gizmos.DrawWireSphere(
+                transform.position,
+                previewSettings.AttackRange);
 
             if (swordHitShape == null || !swordHitShape.IsReady)
             {

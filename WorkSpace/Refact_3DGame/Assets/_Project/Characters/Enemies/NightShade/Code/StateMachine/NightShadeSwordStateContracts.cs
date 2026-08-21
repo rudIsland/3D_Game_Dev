@@ -50,6 +50,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
     internal interface INightShadeSwordMovement
     {
         Vector3 Position { get; }
+        Vector3 Forward { get; }
 
         void Reset();
         void MoveTo(Vector3 targetPosition,float moveSpeed,float turnSpeed, float deltaTime);
@@ -65,6 +66,47 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         bool IsFacing(Vector3 targetPosition, float minimumFacingDot);
     }
 
+    internal interface INightShadeSwordRandomProvider
+    {
+        float Next01();
+    }
+
+    internal interface INightShadeSwordCombatAction
+    {
+        // CombatState가 상태별 Action을 같은 순서로 선택하고 실행하기 위한 공통 계약이다.
+        NightShadeSwordActionId ActionId { get; }
+        NightShadeSwordCombatPhase Phase { get; }
+        bool IsFinished { get; }
+
+        bool CanStart(
+            NightShadeSwordSituationReader situation,
+            NightShadeSwordFightMemory fightMemory,
+            out NightShadeSwordActionRejectReason rejectReason);
+        bool CanContinue(
+            NightShadeSwordSituationReader situation,
+            NightShadeSwordFightMemory fightMemory,
+            out NightShadeSwordActionStopReason stopReason);
+        NightShadeSwordActionScore GetScore(
+            NightShadeSwordSituationReader situation,
+            NightShadeSwordFightMemory fightMemory,
+            float randomBonus);
+        void Enter();
+        void Update(float deltaTime);
+        void Exit(NightShadeSwordActionStopReason stopReason);
+    }
+
+    internal interface INightShadeSwordAttackAction : INightShadeSwordCombatAction
+    {
+        // Animation Event는 현재 실행 중인 공격 Action에만 대기열로 전달된다.
+        bool ProtectsSmallHit { get; }
+        int QueuedEventCount { get; }
+
+        void QueueStopTurn();
+        void QueuePlaySound(int hitIndex);
+        void QueueOpenHit(int hitIndex);
+        void QueueCloseHit();
+    }
+
     internal interface INightShadeSwordAnimation
     {
         void PlayIdle();
@@ -77,6 +119,10 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         void PlayKnockbackFromStart();
         void PlayKnockdownFromStart();
         void PlayGetUpFromStart();
+        void PlayStaggerEnterFromStart();
+        void PlayStaggerStartFromStart();
+        void PlayStaggerIdleFromStart();
+        void PlayStaggerEndFromStart();
         void PlayDead();
         void ResetAttackPlaybackSpeed();
         bool TryGetRequestedAnimationTime(out float normalizedTime);

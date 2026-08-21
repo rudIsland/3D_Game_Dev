@@ -16,6 +16,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         public float MaxStagger => stopPoint.MaxPoint;
         public bool IsInCombat => stateMachine.IsInCombat;
         internal bool IsAttackStateActive => stateMachine.IsAttackStateActive;
+        internal NightShadeSwordCombatDebug CombatDebug => stateMachine.Debug;
 
         public event Action<NightShadeSwordWorldUnit> StaggerChanged;
         public event Action<NightShadeSwordWorldUnit> CombatStateChanged;
@@ -54,12 +55,10 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 stateMachine.StopDamageScale;
             bool reachedStopLimit =
                 stopPoint.TryAccumulate(appliedStopDamage);
-            HitReaction reaction = HitReactionSelector.Select(
+            HitReaction reaction = NightShadeSwordHitReactionSelector.Select(
                 hitRequest.Strength,
                 reachedStopLimit,
-                stateMachine.ProtectsSmallHit,
-                true,
-                true);
+                stateMachine.ProtectsSmallHit);
             var hitResult = new EnemyHitResult(
                 HitDamageResult.Damaged,
                 reaction);
@@ -116,7 +115,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
         protected override void OnUnitTick(float deltaTime)
         {
-            if (hitStop.Update(deltaTime))
+            bool isHitStopActive = hitStop.Update(deltaTime);
+            stateMachine.Update(
+                isHitStopActive ? 0f : deltaTime,
+                isHitStopActive);
+            if (isHitStopActive)
             {
                 return;
             }
@@ -126,7 +129,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 StaggerChanged?.Invoke(this);
             }
 
-            stateMachine.Update(deltaTime);
             attackRangeDetector.Tick();
         }
 

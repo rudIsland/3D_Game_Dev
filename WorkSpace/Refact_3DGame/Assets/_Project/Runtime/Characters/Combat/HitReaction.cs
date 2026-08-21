@@ -15,7 +15,8 @@ namespace rudIsland.RPG3D.Characters.Combat
         SmallHit = 1,
         BigHit = 2,
         Knockback = 3,
-        Knockdown = 4
+        Knockdown = 4,
+        StaggerBreak = 5
     }
 
     public enum AttackStrength
@@ -107,6 +108,7 @@ namespace rudIsland.RPG3D.Characters.Combat
                         safeDistance * SmallHitDistanceScale,
                         SmallHitMaximumDistance);
                 case HitReaction.BigHit:
+                case HitReaction.StaggerBreak:
                     return Mathf.Min(
                         safeDistance,
                         BigHitMaximumDistance);

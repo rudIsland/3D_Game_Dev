@@ -14,7 +14,7 @@ namespace rudIsland.RPG3D.EditorTools
     public static class NightShadeSwordEliteAssetBuilder
     {
         private const string ModelPath =
-            "Assets/_Project/Characters/Enemies/NightShade/Models/Meshes/Nightshade J Friedrich 1_Copy.fbx";
+            "Assets/_Project/Characters/Enemies/NightShade/Models/Prefabs/Nightshade.fbx";
         private const string SwordPrefabPath =
             "Assets/_ThirdParty/Danvil/Rusty Sword/Prefabs/RustySword.prefab";
         private const string SwordBodySoundPath =
@@ -27,10 +27,14 @@ namespace rudIsland.RPG3D.EditorTools
             "Assets/_Project/Scenes/Dev/CharacterTest/Prefabs/NightShadeSwordElite.prefab";
         private const string SpawnSettingsPath =
             "Assets/_Project/Scenes/Dev/CharacterTest/Settings/NightShadeTestSpawnSettings.asset";
+        private const string ConfigPath =
+            "Assets/_Project/Characters/Enemies/NightShade/Configs/NightShadeSwordEliteConfig.asset";
         private const string AnimationClipsFolder =
             "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Clips";
         private const string AnimationSourcesFolder =
             "Assets/_Project/Characters/Enemies/NightShade/Models/Animations/Sources";
+        private const string ParryHitSourcesFolder =
+            "Assets/_ThirdParty/AnimationBundle/FBX_Animations/Two Hand Base/Weapon Parry/Hit/InPlace";
         private const string IdleClipPath =
             AnimationClipsFolder + "/Idle/NightShadeSword_Idle.anim";
         private const string ChaseClipPath =
@@ -55,8 +59,14 @@ namespace rudIsland.RPG3D.EditorTools
             AnimationClipsFolder + "/Attack/NightShadeSword_WideSwing.anim";
         private const string DeadClipPath =
             AnimationClipsFolder + "/Death/NightShadeSword_Dead.anim";
-        private const string BigHitClipPath =
-            AnimationClipsFolder + "/Hit/NightShadeSword_BigHit.anim";
+        private const string BigHitFrontClipPath =
+            AnimationClipsFolder + "/Hit/NightShadeSword_BigHitFront.anim";
+        private const string BigHitBackClipPath =
+            AnimationClipsFolder + "/Hit/NightShadeSword_BigHitBack.anim";
+        private const string BigHitLeftClipPath =
+            AnimationClipsFolder + "/Hit/NightShadeSword_BigHitLeft.anim";
+        private const string BigHitRightClipPath =
+            AnimationClipsFolder + "/Hit/NightShadeSword_BigHitRight.anim";
         private const string KnockbackClipPath =
             AnimationClipsFolder + "/Hit/NightShadeSword_Knockback.anim";
         private const string KnockdownClipPath =
@@ -97,8 +107,14 @@ namespace rudIsland.RPG3D.EditorTools
             AnimationSourcesFolder + "/2Hand_Up_Attack_A_3.fbx";
         private const string DeadSourcePath =
             AnimationSourcesFolder + "/@anim_Sword_death.FBX";
-        private const string BigHitSourcePath =
-            AnimationSourcesFolder + "/RPG-Character@2Hand-Sword-GetHit-F2.FBX";
+        private const string BigHitFrontSourcePath =
+            AnimationSourcesFolder + "/RPG-Character@2Hand-Sword-GetHit-F1.FBX";
+        private const string BigHitBackSourcePath =
+            AnimationSourcesFolder + "/RPG-Character@2Hand-Sword-GetHit-B1.FBX";
+        private const string BigHitLeftSourcePath =
+            AnimationSourcesFolder + "/RPG-Character@2Hand-Sword-GetHit-L1.FBX";
+        private const string BigHitRightSourcePath =
+            AnimationSourcesFolder + "/RPG-Character@2Hand-Sword-GetHit-R1.FBX";
         private const string KnockbackSourcePath =
             AnimationSourcesFolder + "/RPG-Character@2Hand-Sword-Knockback-Back2.FBX";
         private const string KnockdownSourcePath =
@@ -106,21 +122,21 @@ namespace rudIsland.RPG3D.EditorTools
         private const string GetUpSourcePath =
             AnimationSourcesFolder + "/RPG-Character@2Hand-Sword-Getup1.FBX";
         private const string SmallHitFrontSourcePath =
-            AnimationSourcesFolder + "/RPG-Character@2Hand-Sword-GetHit-F1.FBX";
+            ParryHitSourcesFolder + "/2Hand_Base_W_Parry_A_Hit_M_2_InPlace.fbx";
         private const string SmallHitBackSourcePath =
-            AnimationSourcesFolder + "/RPG-Character@2Hand-Sword-GetHit-B1.FBX";
+            ParryHitSourcesFolder + "/2Hand_Base_W_Parry_B_Hit_M_2_InPlace.fbx";
         private const string SmallHitLeftSourcePath =
-            AnimationSourcesFolder + "/RPG-Character@2Hand-Sword-GetHit-L1.FBX";
+            ParryHitSourcesFolder + "/2Hand_Base_W_Parry_A_Hit_L_2_InPlace.fbx";
         private const string SmallHitRightSourcePath =
-            AnimationSourcesFolder + "/RPG-Character@2Hand-Sword-GetHit-R1.FBX";
+            ParryHitSourcesFolder + "/2Hand_Base_W_Parry_A_Hit_R_2_InPlace.fbx";
         private const float SwordLength = 1.5f;
         private const float SwordHitRadius = 0.13f;
         private const float KnockbackPlaybackSpeed = 1f;
         private const float KnockdownPlaybackSpeed = 1f;
         private const float GetUpPlaybackSpeed = 1.5f;
-        private const float SmallHitFrontBackPlaybackSpeed = 1.25f;
-        private const float SmallHitLeftRightPlaybackSpeed = 1f;
-        private const float BigHitPlaybackSpeed = 1f;
+        private const float SmallHitPlaybackSpeed = 1f;
+        private const float BigHitFrontBackPlaybackSpeed = 0.7f;
+        private const float BigHitLeftRightPlaybackSpeed = 0.5f;
         private const float DeadPlaybackSpeed = 0.8f;
         private static readonly Vector3 AuthoredSwordDirection =
             new Vector3(-0.76f, -0.35f, -0.54f).normalized;
@@ -128,12 +144,18 @@ namespace rudIsland.RPG3D.EditorTools
         [MenuItem("Tools/rudIsland/Build NightShade Sword Elite")]
         public static void Build()
         {
+            NightShadeSwordStaggerBreakAssetBuilder.
+                PrepareInspectorForAssetUpdate();
             AnimatorController animatorController = BuildAnimatorController();
+            NightShadeSwordStaggerBreakAssetBuilder.ApplyToController(
+                animatorController);
             NightShadeSwordController enemyPrefab =
                 BuildEnemyPrefab(animatorController);
             ConnectSpawnSettings(enemyPrefab);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
+            NightShadeSwordStaggerBreakAssetBuilder.
+                PrepareInspectorForAssetUpdate();
             Debug.Log("NightShadeSwordElite 프리팹과 양손검 Animator를 만들었습니다.");
         }
 
@@ -260,9 +282,18 @@ namespace rudIsland.RPG3D.EditorTools
             AnimationClip getUpClip = CopyReactionAnimationClip(
                 GetUpSourcePath,
                 GetUpClipPath);
-            AnimationClip bigHitClip = CopyReactionAnimationClip(
-                BigHitSourcePath,
-                BigHitClipPath);
+            AnimationClip bigHitFrontClip = CopyReactionAnimationClip(
+                BigHitFrontSourcePath,
+                BigHitFrontClipPath);
+            AnimationClip bigHitBackClip = CopyReactionAnimationClip(
+                BigHitBackSourcePath,
+                BigHitBackClipPath);
+            AnimationClip bigHitLeftClip = CopyReactionAnimationClip(
+                BigHitLeftSourcePath,
+                BigHitLeftClipPath);
+            AnimationClip bigHitRightClip = CopyReactionAnimationClip(
+                BigHitRightSourcePath,
+                BigHitRightClipPath);
             AnimationClip deadClip = CopyReactionAnimationClip(
                 DeadSourcePath,
                 DeadClipPath);
@@ -281,74 +312,82 @@ namespace rudIsland.RPG3D.EditorTools
                 stateMachine,
                 "Small Hit Front",
                 smallHitFrontClip,
-                new Vector3(0f, 270f),
-                SmallHitFrontBackPlaybackSpeed);
+                new Vector3(0f, 450f),
+                SmallHitPlaybackSpeed);
             AddOrUpdateReactionState(
                 stateMachine,
                 "Small Hit Back",
                 smallHitBackClip,
-                new Vector3(130f, 270f),
-                SmallHitFrontBackPlaybackSpeed);
+                new Vector3(180f, 450f),
+                SmallHitPlaybackSpeed);
             AddOrUpdateReactionState(
                 stateMachine,
                 "Small Hit Left",
                 smallHitLeftClip,
-                new Vector3(260f, 270f),
-                SmallHitLeftRightPlaybackSpeed);
+                new Vector3(360f, 450f),
+                SmallHitPlaybackSpeed);
             AddOrUpdateReactionState(
                 stateMachine,
                 "Small Hit Right",
                 smallHitRightClip,
-                new Vector3(390f, 270f),
-                SmallHitLeftRightPlaybackSpeed);
+                new Vector3(540f, 450f),
+                SmallHitPlaybackSpeed);
             AddOrUpdateReactionState(
                 stateMachine,
                 "Knockback",
                 knockbackClip,
-                new Vector3(520f, 180f),
+                new Vector3(180f, 300f),
                 KnockbackPlaybackSpeed);
             AddOrUpdateReactionState(
                 stateMachine,
                 "Knockdown",
                 knockdownClip,
-                new Vector3(650f, 180f),
+                new Vector3(360f, 300f),
                 KnockdownPlaybackSpeed);
             AddOrUpdateReactionState(
                 stateMachine,
                 "Get Up",
                 getUpClip,
-                new Vector3(780f, 180f),
+                new Vector3(540f, 300f),
                 GetUpPlaybackSpeed);
             AddOrUpdateReactionState(
                 stateMachine,
+                "Hit",
+                bigHitFrontClip,
+                new Vector3(0f, 300f),
+                BigHitFrontBackPlaybackSpeed);
+            AddOrUpdateReactionState(
+                stateMachine,
                 "Hit Front",
-                bigHitClip,
-                new Vector3(0f, 180f),
-                BigHitPlaybackSpeed);
+                bigHitFrontClip,
+                new Vector3(0f, 600f),
+                BigHitFrontBackPlaybackSpeed);
             AddOrUpdateReactionState(
                 stateMachine,
                 "Hit Back",
-                bigHitClip,
-                new Vector3(130f, 180f),
-                BigHitPlaybackSpeed);
+                bigHitBackClip,
+                new Vector3(180f, 600f),
+                BigHitFrontBackPlaybackSpeed);
             AddOrUpdateReactionState(
                 stateMachine,
                 "Hit Left",
-                bigHitClip,
-                new Vector3(260f, 180f),
-                BigHitPlaybackSpeed);
+                bigHitLeftClip,
+                new Vector3(360f, 600f),
+                BigHitLeftRightPlaybackSpeed);
             AddOrUpdateReactionState(
                 stateMachine,
                 "Hit Right",
-                bigHitClip,
-                new Vector3(390f, 180f),
-                BigHitPlaybackSpeed);
+                bigHitRightClip,
+                new Vector3(540f, 600f),
+                BigHitLeftRightPlaybackSpeed);
             AddOrUpdateReactionState(
                 stateMachine,
                 "Dead",
                 deadClip,
-                new Vector3(910f, 180f),
+                new Vector3(720f, 300f),
                 DeadPlaybackSpeed);
+            NightShadeSwordStaggerBreakAssetBuilder.ApplyToController(
+                controller);
             ApplyAttackAnimationEvents(
                 LoadClip(HeavyAttackClipPath),
                 CreateHeavyAttackEvents());
@@ -421,9 +460,18 @@ namespace rudIsland.RPG3D.EditorTools
             AnimationClip deadClip = CopyReactionAnimationClip(
                 DeadSourcePath,
                 DeadClipPath);
-            AnimationClip bigHitClip = CopyReactionAnimationClip(
-                BigHitSourcePath,
-                BigHitClipPath);
+            AnimationClip bigHitFrontClip = CopyReactionAnimationClip(
+                BigHitFrontSourcePath,
+                BigHitFrontClipPath);
+            AnimationClip bigHitBackClip = CopyReactionAnimationClip(
+                BigHitBackSourcePath,
+                BigHitBackClipPath);
+            AnimationClip bigHitLeftClip = CopyReactionAnimationClip(
+                BigHitLeftSourcePath,
+                BigHitLeftClipPath);
+            AnimationClip bigHitRightClip = CopyReactionAnimationClip(
+                BigHitRightSourcePath,
+                BigHitRightClipPath);
             AnimationClip knockbackClip = CopyReactionAnimationClip(
                 KnockbackSourcePath,
                 KnockbackClipPath);
@@ -488,132 +536,134 @@ namespace rudIsland.RPG3D.EditorTools
                 stateMachine,
                 "Chase",
                 chaseClip,
-                new Vector3(260f, 0f));
+                new Vector3(180f, 0f));
             AddState(
                 stateMachine,
                 "Walk",
                 walkClip,
-                new Vector3(390f, 0f));
+                new Vector3(360f, 0f));
             AddState(
                 stateMachine,
                 "Combat Back",
                 combatBackClip,
-                new Vector3(520f, 0f));
+                new Vector3(540f, 0f));
             AddState(
                 stateMachine,
                 "Combat Left",
                 combatLeftClip,
-                new Vector3(650f, 0f));
+                new Vector3(720f, 0f));
             AddState(
                 stateMachine,
                 "Combat Right",
                 combatRightClip,
-                new Vector3(780f, 0f));
+                new Vector3(900f, 0f));
             AddState(
                 stateMachine,
                 "Light Attack",
                 lightAttackClip,
-                new Vector3(0f, 90f),
+                new Vector3(0f, 150f),
                 true);
             AddState(
                 stateMachine,
                 "Combo First",
                 comboFirstClip,
-                new Vector3(260f, 90f),
+                new Vector3(180f, 150f),
                 true);
             AddState(
                 stateMachine,
                 "Combo Second",
                 comboSecondClip,
-                new Vector3(390f, 90f),
+                new Vector3(360f, 150f),
                 true);
             AddState(
                 stateMachine,
                 "Heavy Attack",
                 heavyAttackClip,
-                new Vector3(520f, 90f),
+                new Vector3(540f, 150f),
                 true);
             AddState(
                 stateMachine,
                 "Wide Swing",
                 wideSwingClip,
-                new Vector3(520f, 0f),
+                new Vector3(720f, 150f),
                 true);
             AddState(
                 stateMachine,
                 "Small Hit Front",
                 smallHitFrontClip,
-                new Vector3(0f, 270f),
-                playbackSpeed:
-                    SmallHitFrontBackPlaybackSpeed);
+                new Vector3(0f, 450f),
+                playbackSpeed: SmallHitPlaybackSpeed);
             AddState(
                 stateMachine,
                 "Small Hit Back",
                 smallHitBackClip,
-                new Vector3(130f, 270f),
-                playbackSpeed:
-                    SmallHitFrontBackPlaybackSpeed);
+                new Vector3(180f, 450f),
+                playbackSpeed: SmallHitPlaybackSpeed);
             AddState(
                 stateMachine,
                 "Small Hit Left",
                 smallHitLeftClip,
-                new Vector3(260f, 270f),
-                playbackSpeed:
-                    SmallHitLeftRightPlaybackSpeed);
+                new Vector3(360f, 450f),
+                playbackSpeed: SmallHitPlaybackSpeed);
             AddState(
                 stateMachine,
                 "Small Hit Right",
                 smallHitRightClip,
-                new Vector3(390f, 270f),
-                playbackSpeed:
-                    SmallHitLeftRightPlaybackSpeed);
+                new Vector3(540f, 450f),
+                playbackSpeed: SmallHitPlaybackSpeed);
+            AddState(
+                stateMachine,
+                "Hit",
+                bigHitFrontClip,
+                new Vector3(0f, 300f),
+                playbackSpeed: BigHitFrontBackPlaybackSpeed);
             AddState(
                 stateMachine,
                 "Hit Front",
-                bigHitClip,
-                new Vector3(0f, 180f),
-                playbackSpeed: BigHitPlaybackSpeed);
+                bigHitFrontClip,
+                new Vector3(0f, 600f),
+                playbackSpeed: BigHitFrontBackPlaybackSpeed);
             AddState(
                 stateMachine,
                 "Hit Back",
-                bigHitClip,
-                new Vector3(130f, 180f),
-                playbackSpeed: BigHitPlaybackSpeed);
+                bigHitBackClip,
+                new Vector3(180f, 600f),
+                playbackSpeed: BigHitFrontBackPlaybackSpeed);
             AddState(
                 stateMachine,
                 "Hit Left",
-                bigHitClip,
-                new Vector3(260f, 180f),
-                playbackSpeed: BigHitPlaybackSpeed);
+                bigHitLeftClip,
+                new Vector3(360f, 600f),
+                playbackSpeed: BigHitLeftRightPlaybackSpeed);
             AddState(
                 stateMachine,
                 "Hit Right",
-                bigHitClip,
-                new Vector3(390f, 180f),
-                playbackSpeed: BigHitPlaybackSpeed);
+                bigHitRightClip,
+                new Vector3(540f, 600f),
+                playbackSpeed: BigHitLeftRightPlaybackSpeed);
             AddState(
                 stateMachine,
                 "Knockback",
                 knockbackClip,
-                new Vector3(520f, 180f),
+                new Vector3(180f, 300f),
                 playbackSpeed: KnockbackPlaybackSpeed);
             AddState(
                 stateMachine,
                 "Knockdown",
                 knockdownClip,
-                new Vector3(650f, 180f),
+                new Vector3(360f, 300f),
                 playbackSpeed: KnockdownPlaybackSpeed);
             AddState(
                 stateMachine,
                 "Get Up",
                 getUpClip,
-                new Vector3(780f, 180f),
+                new Vector3(540f, 300f),
                 playbackSpeed: GetUpPlaybackSpeed);
             AddState(
                 stateMachine,
                 "Dead",
                 deadClip,
-                new Vector3(910f, 180f),
+                new Vector3(720f, 300f),
                 playbackSpeed: DeadPlaybackSpeed);
             stateMachine.defaultState = idle;
             EditorUtility.SetDirty(controller);
@@ -1158,6 +1208,8 @@ namespace rudIsland.RPG3D.EditorTools
                 LoadRequiredAsset<AudioClip>(SwordBodySoundPath);
             AudioClip swordAccentSound =
                 LoadRequiredAsset<AudioClip>(SwordAccentSoundPath);
+            NightShadeSwordConfig config =
+                LoadRequiredAsset<NightShadeSwordConfig>(ConfigPath);
             GameObject enemy =
                 PrefabUtility.InstantiatePrefab(modelAsset) as GameObject;
             if (enemy == null)
@@ -1182,6 +1234,8 @@ namespace rudIsland.RPG3D.EditorTools
 
                 animator.runtimeAnimatorController = animatorController;
                 animator.applyRootMotion = false;
+                PrefabUtility.RecordPrefabInstancePropertyModifications(
+                    animator);
 
                 CharacterController characterController =
                     enemy.GetComponent<CharacterController>();
@@ -1285,7 +1339,8 @@ namespace rudIsland.RPG3D.EditorTools
                     animator,
                     swordStartPoint,
                     swordEndPoint,
-                    SwordHitRadius);
+                    SwordHitRadius,
+                    config);
                 eventReceiver.ConnectForEditor(animationController, swordController);
 
                 GameObject savedPrefab = PrefabUtility.SaveAsPrefabAsset(enemy, EnemyPrefabPath);

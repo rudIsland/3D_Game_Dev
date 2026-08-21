@@ -1,6 +1,4 @@
 using NUnit.Framework;
-using rudIsland.RPG3D.Characters;
-using rudIsland.RPG3D.Characters.Combat;
 using rudIsland.RPG3D.Characters.Enemies.NightShade;
 using UnityEngine;
 
@@ -8,157 +6,76 @@ namespace rudIsland.RPG3D.Tests
 {
     public sealed class NightShadeSwordApproachTransitionTests
     {
-        [TestCase(5.5f, true)]
-        [TestCase(6f, false)]
-        public void Attack_종료후거리별로Walk또는Chase를선택한다(float distance, bool expectsWalk)
+        [TestCase(1f, 9)]
+        [TestCase(2f, 10)]
+        [TestCase(3.6f, 8)]
+        public void Recovery_거리별Utility최고점Action을고른다(
+            float distance,
+            int expectedActionValue)
         {
             using var scope = new NightShadeSwordTestScope(
-                new Vector3(0f, 0f, 3f));
-            NightShadeSwordStateMachine machine =
-                scope.CreateStateMachine(scope.CreateSettings());
-            machine.Enable();
-            EnterAttack(machine);
-            scope.TargetObject.transform.position =
-                new Vector3(0f, 0f, distance);
-            scope.Animation.NormalizedTime = 1f;
+                new Vector3(0f, 0f, distance));
+            NightShadeSwordStateMachine machine = scope.CreateStateMachine(
+                scope.CreateSettings(),
+                new FixedNightShadeSwordRandomProvider());
 
-            machine.Update(0.1f);
+            EnterRecovery(machine, scope);
 
-            AssertApproachState(machine.CurrentStateId, expectsWalk);
+            var expectedAction = (NightShadeSwordActionId)expectedActionValue;
+            Assert.That(machine.CurrentActionId, Is.EqualTo(expectedAction));
+            Assert.That(machine.Debug.SelectedAction, Is.EqualTo(expectedAction));
         }
 
         [Test]
-        public void Attack_대상이없어지면Idle로전환한다()
+        public void Recovery_고정난수와동점등록순서에따라Right를재현할수있다()
         {
             using var scope = new NightShadeSwordTestScope(
-                new Vector3(0f, 0f, 3f));
-            NightShadeSwordStateMachine machine =
-                scope.CreateStateMachine(scope.CreateSettings());
-            machine.Enable();
-            EnterAttack(machine);
+                new Vector3(0f, 0f, 2f));
+            var random = new SequenceNightShadeSwordRandomProvider(
+                0f, 0f, 0f, 0f,
+                0f, 0f, 0f, 1f);
+            NightShadeSwordStateMachine machine = scope.CreateStateMachine(
+                scope.CreateSettings(),
+                random);
+
+            EnterRecovery(machine, scope);
+
+            Assert.That(machine.CurrentActionId, Is.EqualTo(NightShadeSwordActionId.RightRecovery));
+        }
+
+        [Test]
+        public void Recovery_대상이사라지면즉시Idle로돌아간다()
+        {
+            using var scope = new NightShadeSwordTestScope(
+                new Vector3(0f, 0f, 2f));
+            NightShadeSwordStateMachine machine = scope.CreateStateMachine(
+                scope.CreateSettings(),
+                new FixedNightShadeSwordRandomProvider());
+            EnterRecovery(machine, scope);
+
             scope.TargetDeathState.IsDead = true;
-            scope.Animation.NormalizedTime = 1f;
-
             machine.Update(0.1f);
 
-            Assert.That(
-                machine.CurrentStateId,
-                Is.EqualTo(NightShadeSwordStateId.Idle));
+            Assert.That(machine.CurrentStateId, Is.EqualTo(NightShadeSwordStateId.Idle));
         }
 
-        [TestCase(1f, 2)]
-        [TestCase(3f, 1)]
-        public void Attack_매우가깝거나공격횟수를채우면CombatMove로전환한다(
-            float distance,
-            int attacksBeforeCombatMove)
+        private static void EnterRecovery(
+            NightShadeSwordStateMachine machine,
+            NightShadeSwordTestScope scope)
         {
-            using var scope = new NightShadeSwordTestScope(
-                new Vector3(0f, 0f, distance));
-            NightShadeSwordSettings settings = scope.CreateSettings(
-                attacksBeforeCombatMove: attacksBeforeCombatMove);
-            NightShadeSwordStateMachine machine =
-                scope.CreateStateMachine(settings);
             machine.Enable();
-            machine.FightMemory.RecordAttack(
-                NightShadeSwordAttackType.ComboFirst);
-            EnterAttack(machine);
+            machine.Update(0.1f);
+            machine.Update(0.1f);
             scope.Animation.NormalizedTime = 1f;
-
             machine.Update(0.1f);
-
-            Assert.That(
-                machine.CurrentStateId,
-                Is.EqualTo(NightShadeSwordStateId.CombatMove));
-        }
-
-        [TestCase(5.5f, true)]
-        [TestCase(6f, false)]
-        public void CombatMove_종료후거리별로Walk또는Chase를선택한다(
-            float distance,
-            bool expectsWalk)
-        {
-            using var scope = new NightShadeSwordTestScope(
-                new Vector3(0f, 0f, distance));
-            NightShadeSwordSettings settings = scope.CreateSettings();
-            var targetReader = new NightShadeSwordTargetReader(
-                scope.TargetObject.transform,
-                scope.TargetDeathState,
-                scope.Movement);
-            targetReader.Refresh();
-            var fightMemory = new NightShadeSwordFightMemory();
-            fightMemory.Reset();
-            var state = new NightShadeSwordCombatMoveState(
-                targetReader,
-                scope.Movement,
-                scope.Animation,
-                settings,
-                fightMemory);
-            state.Enter();
-
-            NightShadeSwordStateId? nextState = state.Update(0.6f);
-
-            Assert.That(nextState.HasValue, Is.True);
-            AssertApproachState(nextState.Value, expectsWalk);
-        }
-
-        [TestCase(5.5f, true)]
-        [TestCase(6f, false)]
-        public void Hit_종료후거리별로Walk또는Chase를선택한다(
-            float distance,
-            bool expectsWalk)
-        {
-            using var scope = new NightShadeSwordTestScope(
-                new Vector3(0f, 0f, distance));
-            NightShadeSwordSettings settings = scope.CreateSettings();
-            var targetReader = new NightShadeSwordTargetReader(
-                scope.TargetObject.transform,
-                scope.TargetDeathState,
-                scope.Movement);
-            targetReader.Refresh();
-            var fightMemory = new NightShadeSwordFightMemory();
-            fightMemory.Reset();
-            var state = new NightShadeSwordHitState(
-                targetReader,
-                scope.Movement,
-                scope.Animation,
-                settings,
-                fightMemory);
-            var hitRequest = new EnemyHitRequest(
-                1f,
-                100f,
-                Vector3.zero,
-                Vector3.back,
-                1f,
-                0f);
-            state.SetHitRequest(
-                HitReaction.BigHit,
-                in hitRequest);
-            state.Enter();
-            scope.Animation.NormalizedTime = 1f;
-
-            NightShadeSwordStateId? nextState = state.Update(0.2f);
-
-            Assert.That(nextState.HasValue, Is.True);
-            AssertApproachState(nextState.Value, expectsWalk);
-        }
-
-        private static void EnterAttack(NightShadeSwordStateMachine machine)
-        {
-            machine.Update(0.1f);
-            machine.Update(0.1f);
-            Assert.That(
-                machine.CurrentStateId,
-                Is.EqualTo(NightShadeSwordStateId.Attack));
-        }
-
-        private static void AssertApproachState(
-            NightShadeSwordStateId actualState,
-            bool expectsWalk)
-        {
-            NightShadeSwordStateId expectedState = expectsWalk
-                ? NightShadeSwordStateId.Walk
-                : NightShadeSwordStateId.Chase;
-            Assert.That(actualState, Is.EqualTo(expectedState));
+            if (machine.CurrentCombatPhase == NightShadeSwordCombatPhase.Attack &&
+                machine.CurrentActionId == NightShadeSwordActionId.Combo)
+            {
+                machine.Update(0.15f);
+                scope.Animation.NormalizedTime = 1f;
+                machine.Update(0.1f);
+            }
+            Assert.That(machine.CurrentCombatPhase, Is.EqualTo(NightShadeSwordCombatPhase.Recovery));
         }
     }
 }

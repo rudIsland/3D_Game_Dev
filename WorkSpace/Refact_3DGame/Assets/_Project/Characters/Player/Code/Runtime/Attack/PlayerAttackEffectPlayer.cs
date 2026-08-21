@@ -101,7 +101,8 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
             if (hitResult.DamageResult == HitDamageResult.Killed ||
                 hitResult.Reaction == HitReaction.BigHit ||
                 hitResult.Reaction == HitReaction.Knockback ||
-                hitResult.Reaction == HitReaction.Knockdown)
+                hitResult.Reaction == HitReaction.Knockdown ||
+                hitResult.Reaction == HitReaction.StaggerBreak)
             {
                 return strongHitSoundVolume;
             }
@@ -116,7 +117,8 @@ namespace rudIsland.RPG3D.Player.Runtime.Attack
             if (hitResult.DamageResult == HitDamageResult.Killed ||
                 hitResult.Reaction == HitReaction.BigHit ||
                 hitResult.Reaction == HitReaction.Knockback ||
-                hitResult.Reaction == HitReaction.Knockdown)
+                hitResult.Reaction == HitReaction.Knockdown ||
+                hitResult.Reaction == HitReaction.StaggerBreak)
             {
                 return strongHitImpulseForce;
             }

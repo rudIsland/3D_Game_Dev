@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using rudIsland.RPG3D.Characters;
 using rudIsland.RPG3D.Characters.Combat;
+using rudIsland.RPG3D.Characters.Combat.AttackData;
+using rudIsland.RPG3D.Characters.Enemies.AttackData;
 using rudIsland.RPG3D.Characters.Enemies.NightShade;
+using UnityEditor;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Tests
@@ -30,40 +33,203 @@ namespace rudIsland.RPG3D.Tests
             float attackRange = 4f,
             float walkStartRange = 5f,
             float runStartRange = 6f,
-            int attacksBeforeCombatMove = 2,
             float deadBodyKeepTime = 1f,
             float knockdownStayDuration = 0.5f,
+            float staggerBreakStayDuration = 1.25f,
             float comboFirstExitNormalizedTime = 0.4f,
-            float comboSecondDelay = 0.15f)
+            float comboSecondDelay = 0.15f,
+            float recoveryMoveDuration = 0.6f)
         {
-            return new NightShadeSwordSettings(
-                findRange,
-                attackRange,
-                walkStartRange,
-                runStartRange,
-                15f,
-                1.8f,
-                3f,
-                360f,
-                180f,
-                2f,
-                2.5f,
+            EnemyAttackData[] attacks = CreateAttackData(
                 comboFirstExitNormalizedTime,
-                comboSecondDelay,
-                2.5f,
-                3f,
-                2f,
-                0.6f,
-                attacksBeforeCombatMove,
-                0.2f,
-                0.4f,
-                0.6f,
-                knockdownStayDuration,
-                AnimationCurve.Linear(0f, 0f, 1f, 1f),
-                deadBodyKeepTime);
+                comboSecondDelay);
+            try
+            {
+                return new NightShadeSwordSettings(
+                    new NightShadeSwordLifeSettings(
+                        250f,
+                        100f,
+                        2.5f,
+                        8f,
+                        deadBodyKeepTime),
+                    new NightShadeSwordCombatRangeSettings(
+                        1 << 17,
+                        findRange,
+                        attackRange,
+                        walkStartRange,
+                        runStartRange,
+                        15f),
+                    new NightShadeSwordAttackSelectionSettings(
+                        0.55f,
+                        0.25f,
+                        0.05f),
+                    new NightShadeSwordMovementSettings(
+                        1.8f,
+                        3f,
+                        360f,
+                        180f,
+                        -22f,
+                        -2f),
+                    attacks,
+                    new NightShadeSwordRecoverySettings(
+                        2f,
+                        recoveryMoveDuration,
+                        0.35f,
+                        0.35f,
+                        0.25f,
+                        0.65f,
+                        0.35f,
+                        0.35f,
+                        0.20f,
+                        0.05f),
+                    new NightShadeSwordHitReactionSettings(
+                        0.2f,
+                        0.4f,
+                        0.6f,
+                        knockdownStayDuration,
+                        staggerBreakStayDuration,
+                        AnimationCurve.Linear(0f, 0f, 1f, 1f)));
+            }
+            finally
+            {
+                for (int index = 0; index < attacks.Length; index++)
+                {
+                    UnityEngine.Object.DestroyImmediate(attacks[index]);
+                }
+            }
         }
 
-        internal NightShadeSwordStateMachine CreateStateMachine(NightShadeSwordSettings settings)
+        private static EnemyAttackData[] CreateAttackData(
+            float comboFirstExitNormalizedTime,
+            float comboSecondDelay)
+        {
+            return new EnemyAttackData[]
+            {
+                CreateSingleAttackData(
+                    NightShadeSwordActionId.Light,
+                    2f,
+                    0.35f,
+                    0.55f,
+                    0.55f),
+                CreateComboAttackData(
+                    comboFirstExitNormalizedTime,
+                    comboSecondDelay),
+                CreateSingleAttackData(
+                    NightShadeSwordActionId.Heavy,
+                    3f,
+                    0.40f,
+                    0.90f,
+                    0.30f),
+                CreateSingleAttackData(
+                    NightShadeSwordActionId.WideSwing,
+                    2.5f,
+                    0.38f,
+                    0.65f,
+                    0.45f)
+            };
+        }
+
+        private static NightShadeSwordSingleAttackData CreateSingleAttackData(
+            NightShadeSwordActionId actionId,
+            float postAttackDelay,
+            float baseScore,
+            float preferredDistance,
+            float distanceTolerance)
+        {
+            NightShadeSwordSingleAttackData attack =
+                ScriptableObject.CreateInstance<
+                    NightShadeSwordSingleAttackData>();
+            var serializedAttack = new SerializedObject(attack);
+            serializedAttack.FindProperty("actionId").enumValueIndex =
+                (int)actionId;
+            SetCommonAttackData(
+                serializedAttack,
+                1,
+                postAttackDelay,
+                baseScore,
+                preferredDistance,
+                distanceTolerance);
+            serializedAttack.ApplyModifiedPropertiesWithoutUndo();
+            return attack;
+        }
+
+        private static NightShadeSwordComboAttackData CreateComboAttackData(
+            float firstExitNormalizedTime,
+            float secondDelay)
+        {
+            NightShadeSwordComboAttackData attack =
+                ScriptableObject.CreateInstance<
+                    NightShadeSwordComboAttackData>();
+            var serializedAttack = new SerializedObject(attack);
+            serializedAttack.FindProperty("firstExitNormalizedTime").floatValue =
+                firstExitNormalizedTime;
+            serializedAttack.FindProperty("secondDelay").floatValue =
+                secondDelay;
+            SetCommonAttackData(
+                serializedAttack,
+                2,
+                2.5f,
+                0.40f,
+                0.25f,
+                0.35f);
+            serializedAttack.ApplyModifiedPropertiesWithoutUndo();
+            return attack;
+        }
+
+        private static void SetCommonAttackData(
+            SerializedObject serializedAttack,
+            int hitCount,
+            float postAttackDelay,
+            float baseScore,
+            float preferredDistance,
+            float distanceTolerance)
+        {
+            SerializedProperty hitDamages =
+                serializedAttack.FindProperty("hitDamages");
+            hitDamages.arraySize = hitCount;
+            for (int index = 0; index < hitCount; index++)
+            {
+                SetDamage(
+                    hitDamages.GetArrayElementAtIndex(index),
+                    new AttackDamage());
+            }
+
+            serializedAttack.FindProperty("postAttackDelay").floatValue =
+                postAttackDelay;
+            SerializedProperty utility =
+                serializedAttack.FindProperty("utility");
+            utility.FindPropertyRelative("baseScore").floatValue = baseScore;
+            utility.FindPropertyRelative("preferredDistance").floatValue =
+                preferredDistance;
+            utility.FindPropertyRelative("distanceTolerance").floatValue =
+                distanceTolerance;
+        }
+
+        private static void SetDamage(
+            SerializedProperty property,
+            AttackDamage damage)
+        {
+            property.FindPropertyRelative("healthDamage").floatValue =
+                damage.HealthDamage;
+            property.FindPropertyRelative("strength").enumValueIndex =
+                (int)damage.Strength;
+            property.FindPropertyRelative("staggerDamage").floatValue =
+                damage.StaggerDamage;
+            property.FindPropertyRelative("pushDistance").floatValue =
+                damage.PushDistance;
+            property.FindPropertyRelative("hitStopDuration").floatValue =
+                damage.HitStopDuration;
+            property.FindPropertyRelative("guardStaminaDamage").floatValue =
+                damage.GuardStaminaDamage;
+            property.FindPropertyRelative("canBlock").boolValue =
+                damage.CanBlock;
+            property.FindPropertyRelative("damageSoundType").enumValueIndex =
+                (int)damage.DamageSoundType;
+        }
+
+        internal NightShadeSwordStateMachine CreateStateMachine(
+            NightShadeSwordSettings settings,
+            INightShadeSwordRandomProvider randomProvider = null)
         {
             return new NightShadeSwordStateMachine(
                 TargetObject.transform,
@@ -71,7 +237,8 @@ namespace rudIsland.RPG3D.Tests
                 Movement,
                 Animation,
                 settings,
-                Actions.Value);
+                Actions.Value,
+                randomProvider);
         }
 
         public void Dispose()
@@ -86,6 +253,7 @@ namespace rudIsland.RPG3D.Tests
         internal int MoveToCount { get; private set; }
         internal int TurnToCount { get; private set; }
         internal int StayCount { get; private set; }
+        internal int CombatMoveCount { get; private set; }
 
         internal float LastMoveSpeed { get; private set; }
 
@@ -93,6 +261,7 @@ namespace rudIsland.RPG3D.Tests
         internal bool IsFacingTarget { get; set; } = true;
 
         public Vector3 Position { get; set; }
+        public Vector3 Forward { get; set; } = Vector3.forward;
 
         public void Reset()
         {
@@ -123,6 +292,7 @@ namespace rudIsland.RPG3D.Tests
             float turnSpeed,
             float deltaTime)
         {
+            CombatMoveCount++;
         }
 
         public void StayOnGround(float deltaTime)
@@ -142,11 +312,52 @@ namespace rudIsland.RPG3D.Tests
         }
     }
 
+    internal sealed class FixedNightShadeSwordRandomProvider :
+        INightShadeSwordRandomProvider
+    {
+        private readonly float value;
+
+        internal FixedNightShadeSwordRandomProvider(float value = 0f)
+        {
+            this.value = Mathf.Clamp01(value);
+        }
+
+        public float Next01()
+        {
+            return value;
+        }
+    }
+
+    internal sealed class SequenceNightShadeSwordRandomProvider :
+        INightShadeSwordRandomProvider
+    {
+        private readonly float[] values;
+        private int index;
+
+        internal SequenceNightShadeSwordRandomProvider(params float[] values)
+        {
+            this.values = values;
+        }
+
+        public float Next01()
+        {
+            if (values == null || values.Length == 0)
+            {
+                return 0f;
+            }
+
+            float value = values[index % values.Length];
+            index++;
+            return Mathf.Clamp01(value);
+        }
+    }
+
     internal sealed class FakeNightShadeSwordAnimation : INightShadeSwordAnimation
     {
         internal int IdleCount { get; private set; }
         internal int ChaseCount { get; private set; }
         internal int WalkCount { get; private set; }
+        internal int CombatMoveCount { get; private set; }
 
         internal int AttackCount { get; private set; }
         internal int HitCount { get; private set; }
@@ -155,6 +366,10 @@ namespace rudIsland.RPG3D.Tests
         internal int KnockbackCount { get; private set; }
         internal int KnockdownCount { get; private set; }
         internal int GetUpCount { get; private set; }
+        internal int StaggerEnterCount { get; private set; }
+        internal int StaggerStartCount { get; private set; }
+        internal int StaggerIdleCount { get; private set; }
+        internal int StaggerEndCount { get; private set; }
         internal int DeadCount { get; private set; }
         internal int ResetSpeedCount { get; private set; }
         internal NightShadeSwordAttackType LastAttackType { get; private set; }
@@ -167,6 +382,7 @@ namespace rudIsland.RPG3D.Tests
         public void PlayWalk() => WalkCount++;
         public void PlayCombatMove(NightShadeCombatMoveType moveType)
         {
+            CombatMoveCount++;
         }
 
         public void PlayAttack(NightShadeSwordAttackType attackType)
@@ -207,6 +423,30 @@ namespace rudIsland.RPG3D.Tests
         public void PlayGetUpFromStart()
         {
             GetUpCount++;
+            NormalizedTime = 0f;
+        }
+
+        public void PlayStaggerEnterFromStart()
+        {
+            StaggerEnterCount++;
+            NormalizedTime = 0f;
+        }
+
+        public void PlayStaggerStartFromStart()
+        {
+            StaggerStartCount++;
+            NormalizedTime = 0f;
+        }
+
+        public void PlayStaggerIdleFromStart()
+        {
+            StaggerIdleCount++;
+            NormalizedTime = 0f;
+        }
+
+        public void PlayStaggerEndFromStart()
+        {
+            StaggerEndCount++;
             NormalizedTime = 0f;
         }
 
