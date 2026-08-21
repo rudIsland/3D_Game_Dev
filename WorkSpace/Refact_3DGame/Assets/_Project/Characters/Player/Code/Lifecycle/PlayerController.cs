@@ -122,7 +122,7 @@ namespace rudIsland.RPG3D.Player
 
         [Header("방어 판정")]
         [SerializeField, Range(0f, 180f)] private float guardAngle = 120f;
-        [SerializeField, Min(0f)] private float guardRaiseDuration = 0.1f;
+        [SerializeField, Min(0f)] private float guardRaiseDuration = 0.05f;
         [SerializeField, Min(0f)]
         private float guardBreakControlLockDuration = 1f;
         [SerializeField] private PlayerGuardHitBox guardHitBox;

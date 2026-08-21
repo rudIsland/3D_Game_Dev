@@ -373,7 +373,7 @@ MonoBehaviour:
     m_Bits: 0
   weaponHitRadius: 0.12
   guardAngle: 120
-  guardRaiseDuration: 0.1
+  guardRaiseDuration: 0.05
   guardBreakControlLockDuration: 1
   guardHitBox: {fileID: 0}
   hitPushDuration: 0.15
