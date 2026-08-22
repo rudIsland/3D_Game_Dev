@@ -1,3 +1,4 @@
+using rudIsland.RPG3D.Characters.Enemies.Navigation;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.Zombie
@@ -7,6 +8,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
     {
         private readonly Transform zombieTransform; // 씬 또는 시스템 참조
         private readonly CharacterController characterController; // 씬 또는 시스템 참조
+        private readonly IEnemyPathGuide pathGuide;
         private readonly float gravity; // 내부에서 사용하는 값
         private readonly float groundPull; // 내부에서 사용하는 값
 
@@ -16,14 +18,16 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         public Vector3 Forward => zombieTransform.forward; // 좀비가 바라보는 방향
         public Vector3 Right => zombieTransform.right; // 좀비의 오른쪽 방향
 
-        public ZombieMovement(
+        internal ZombieMovement(
             Transform zombieTransform,
             CharacterController characterController,
+            IEnemyPathGuide pathGuide,
             float gravity,
             float groundPull)
         {
             this.zombieTransform = zombieTransform;
             this.characterController = characterController;
+            this.pathGuide = pathGuide;
             this.gravity = gravity;
             this.groundPull = groundPull;
         }
@@ -31,6 +35,12 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         public void Reset()
         {
             verticalSpeed = 0f;
+            pathGuide.Reset();
+        }
+
+        public void StopPath()
+        {
+            pathGuide.Stop();
         }
 
         public void MoveTo(
@@ -39,13 +49,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             float turnSpeed,
             float deltaTime)
         {
-            Vector3 moveDirection =
-                targetPosition - zombieTransform.position;
-            moveDirection.y = 0f;
-
-            if (moveDirection.sqrMagnitude > 0.0001f)
+            if (pathGuide.TryGetMoveDirection(
+                    targetPosition,
+                    deltaTime,
+                    out Vector3 moveDirection))
             {
-                moveDirection.Normalize();
                 TurnToDirection(moveDirection, turnSpeed, deltaTime);
             }
 

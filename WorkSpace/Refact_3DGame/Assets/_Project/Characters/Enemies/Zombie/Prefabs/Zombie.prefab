@@ -839,8 +839,9 @@ GameObject:
   - component: {fileID: 8519978816152625282}
   - component: {fileID: 8684552503258098905}
   - component: {fileID: 7816699081275481923}
+  - component: {fileID: 6752793140839556006}
   m_Layer: 7
-  m_Name: ZombieTestEnemy
+  m_Name: Zombie
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1036,8 +1037,36 @@ MonoBehaviour:
   bodyHitEffectPrefab: {fileID: 2508344019071891113, guid: 3179f3613d3ad0e4085a8e230b039b81,
     type: 3}
   guardHitEffectPrefab: {fileID: 0}
+  floorLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  floorRayStartHeight: 0.25
+  floorRayDistance: 4
+  floorSurfaceOffset: 0.015
   bodyHitPoolSize: 4
   guardHitPoolSize: 2
+--- !u!195 &6752793140839556006
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3574292244812513450}
+  m_Enabled: 1
+  m_AgentTypeID: -1372625422
+  m_Radius: 0.45
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 360
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 0
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1 &3716168159868397760
 GameObject:
   m_ObjectHideFlags: 0

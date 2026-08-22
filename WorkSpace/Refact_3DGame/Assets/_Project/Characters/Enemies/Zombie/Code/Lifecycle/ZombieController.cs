@@ -2,9 +2,11 @@ using System;
 using rudIsland.RPG3D.Characters;
 using rudIsland.RPG3D.Characters.Combat.AttackData;
 using rudIsland.RPG3D.Characters.Combat;
+using rudIsland.RPG3D.Characters.Enemies.Navigation;
 using rudIsland.RPG3D.Player;
 using rudIsland.RPG3D.World;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 {
@@ -13,6 +15,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         typeof(CharacterController),
         typeof(ZombieAnimationController),
         typeof(CombatHitEffectPlayer))]
+    [RequireComponent(typeof(NavMeshAgent))]
     // Unity 씬과 일반 C# Zombie AI를 연결한다.
     public sealed class ZombieController :
         WorldObjectView,
@@ -81,6 +84,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         private ZombieAttackRangeDetector attackRangeDetector;
         private ZombieWorldUnit zombieWorldUnit; // 씬 또는 시스템 참조
         private CombatHitEffectPlayer hitEffectPlayer;
+        private NavMeshAgent navMeshAgent;
 
 
         public bool IsDead =>
@@ -102,9 +106,13 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             zombieAnimation.ConnectAnimator(zombieAnimator);
 
 
+            var pathGuide = new EnemyNavMeshPathGuide(
+                transform,
+                navMeshAgent);
             var movement = new ZombieMovement(
                 transform,
                 characterController,
+                pathGuide,
                 gravity,
                 groundPull);
             var hitStop = new CombatHitStop(zombieAnimator);
@@ -230,11 +238,28 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             characterController = GetComponent<CharacterController>();
             zombieAnimation = GetComponent<ZombieAnimationController>();
             hitEffectPlayer = GetComponent<CombatHitEffectPlayer>();
+            navMeshAgent = GetComponent<NavMeshAgent>();
+            ConfigureNavMeshAgent();
 
             if (zombieAnimator == null)
             {
                 zombieAnimator = GetComponentInChildren<Animator>(true);
             }
+        }
+
+        private void ConfigureNavMeshAgent()
+        {
+            if (navMeshAgent == null)
+            {
+                return;
+            }
+
+            navMeshAgent.speed = chaseSpeed;
+            navMeshAgent.angularSpeed = turnSpeed;
+            navMeshAgent.autoTraverseOffMeshLink = false;
+            navMeshAgent.updatePosition = false;
+            navMeshAgent.updateRotation = false;
+            navMeshAgent.updateUpAxis = false;
         }
 
 

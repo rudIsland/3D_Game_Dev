@@ -131,6 +131,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             }
 
             currentState?.Exit();
+            movement.StopPath();
             EndAttackHit();
             currentState = null;
             isEnabled = false;
@@ -186,6 +187,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             movement.StayOnGround(deltaTime);
         }
 
+        internal void StopPath()
+        {
+            movement.StopPath();
+        }
+
         internal void ApplyHitMovement(Vector3 horizontalMovement, float deltaTime)
         {
             movement.ApplyHitMovement(horizontalMovement, deltaTime);
@@ -219,6 +225,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             }
 
             EndAttackHit();
+            movement.StopPath();
             if (ReferenceEquals(currentState, hitState))
             {
                 hitState.TryRestart(reaction, in hitRequest);
@@ -248,6 +255,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             }
 
             EndAttackHit();
+            movement.StopPath();
             SetCombatState(false);
             ChangeState(deadState);
         }

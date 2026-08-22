@@ -44,6 +44,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         public void Exit()
         {
+            stateMachine.StopPath();
         }
     }
 }

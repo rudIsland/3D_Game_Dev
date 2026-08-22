@@ -559,7 +559,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 276505471}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.022221565, y: 0.027740857, z: -0.00061683526, w: 0.99936795}
+  m_LocalRotation: {x: 0.022221573, y: 0.027764658, z: -0.0006173648, w: 0.9993673}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3359,7 +3359,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1302424112}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.048199605, y: 0.027715435, z: -0.001337944, w: 0.99845225}
+  m_LocalRotation: {x: 0.048199575, y: 0.027739218, z: -0.001339092, w: 0.9984516}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -4308,6 +4308,7 @@ GameObject:
   - component: {fileID: 1699705003}
   - component: {fileID: 1699705005}
   - component: {fileID: 1699705004}
+  - component: {fileID: 1699705006}
   m_Layer: 6
   m_Name: PlayerRoot
   m_TagString: Player
@@ -4374,135 +4375,12 @@ MonoBehaviour:
   worldObjectManager: {fileID: 600374219}
   moveCamera: {fileID: 519073573}
   playerAnimator: {fileID: 5866666021796340207}
+  guardHitBox: {fileID: 889000000000000002}
+  playerDamageAudio: {fileID: 560169544}
+  weaponHitShape: {fileID: 1699705006}
+  config: {fileID: 11400000, guid: 41f02c7c3c394c945b167895923037b7, type: 2}
   playerFreeLookCamera: {fileID: 1028451436}
   playerTargetLookCamera: {fileID: 1141062990}
-  targetLayers:
-    serializedVersion: 2
-    m_Bits: 262272
-  targetObstructionLayers:
-    serializedVersion: 2
-    m_Bits: 70657
-  targetRange: 12
-  targetBreakDistance: 15
-  targetMaximumAngle: 70
-  targetHiddenGraceDuration: 0.35
-  targetHeightOffset: 1.2
-  maxHealth: 100
-  maxStamina: 100
-  staminaRecoverDelay: 0.8
-  staminaRecoverSpeed: 35
-  guardStaminaRecoveryRate: 0
-  rollStaminaCost: 25
-  sprintStaminaCostPerSecond: 15
-  sprintRestartStamina: 20
-  testDamage: 10
-  freeMoveTurnSpeed: 720
-  targetMoveTurnSpeed: 540
-  attackTurnSpeed: 360
-  walkSpeed: 2.8
-  guardMoveSpeed: 1.5
-  sprintSpeed: 5.5
-  moveAcceleration: 30
-  moveDeceleration: 40
-  animationSmoothTime: 0.06
-  rollDistance: 2.2
-  sprintRollDistance: 2.5
-  rollCompleteNormalizedTime: 0.7
-  rollMovementCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 2
-      outSlope: 2
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 0.49958146
-      value: 0.8525145
-      inSlope: 1.0508289
-      outSlope: 1.0508289
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  walkFootstepSounds:
-  - {fileID: 8300000, guid: 1bbd839d1ff4a5949bc434adb0930ade, type: 3}
-  - {fileID: 8300000, guid: 73d4877bc5aaddb429c35bd6bba414a9, type: 3}
-  - {fileID: 8300000, guid: ec1f67c0bcbcd7a4c9950f8fae225d25, type: 3}
-  runFootstepSounds:
-  - {fileID: 8300000, guid: 8d861021d2b1fc34692631c1598dc731, type: 3}
-  - {fileID: 8300000, guid: fb7478e5ea93e0842935db07784016aa, type: 3}
-  - {fileID: 8300000, guid: 2f0e3ef6a1d8c5848839dfe8303efb54, type: 3}
-  rollSound: {fileID: 8300000, guid: b0032cf95f3d8f44ebf16a0e6905901e, type: 3}
-  walkFootstepVolume: 0.7
-  runFootstepVolume: 0.9
-  rollSoundVolume: 0.8
-  footstepPitchChange: 0.05
-  playerDamageAudio: {fileID: 560169544}
-  attackData:
-  - {fileID: 11400000, guid: a1014b8e7c624e0e91f4d0c3b2a19876, type: 2}
-  - {fileID: 11400000, guid: a2024b8e7c624e0e91f4d0c3b2a19876, type: 2}
-  - {fileID: 11400000, guid: a3034b8e7c624e0e91f4d0c3b2a19876, type: 2}
-  - {fileID: 11400000, guid: a4044b8e7c624e0e91f4d0c3b2a19876, type: 2}
-  - {fileID: 11400000, guid: a5054b8e7c624e0e91f4d0c3b2a19876, type: 2}
-  - {fileID: 11400000, guid: a6064b8e7c624e0e91f4d0c3b2a19876, type: 2}
-  actionInputBufferDuration: 0.2
-  gravity: -22
-  groundPull: -2
-  weaponHitStart: {fileID: 490989438}
-  weaponHitEnd: {fileID: 749509542}
-  attackLayers:
-    serializedVersion: 2
-    m_Bits: 262272
-  weaponHitRadius: 0.08
-  guardAngle: 120
-  guardRaiseDuration: 0.05
-  guardBreakControlLockDuration: 1
-  guardHitBox: {fileID: 889000000000000002}
-  hitPushDuration: 0.15
-  hitPushCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 2
-      outSlope: 2
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  stopPointLimit: 30
-  stopPointRecoverDelay: 1.5
-  stopPointRecoverSpeed: 15
 --- !u!114 &1699705003
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4642,6 +4520,24 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1699705006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1699704999}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 900af80ab9874c55a4d6acfb5f47e5c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Player.Runtime.Attack.PlayerWeaponHitShape
+  startPoint: {fileID: 490989438}
+  endPoint: {fileID: 749509542}
+  targetLayers:
+    serializedVersion: 2
+    m_Bits: 262272
+  radius: 0.08
 --- !u!1 &1712270763
 GameObject:
   m_ObjectHideFlags: 0
@@ -4892,7 +4788,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1835938357}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.0036315534, y: 0.027747527, z: 0.00010080622, w: 0.9996084}
+  m_LocalRotation: {x: -0.0036315504, y: 0.027771335, z: 0.00010089258, w: 0.99960774}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -12596,6 +12492,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2109e09cb84bf3846935c98285101aff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Player.Runtime.Audio.PlayerFootstepAudio
+  walkSounds:
+  - {fileID: 8300000, guid: 1bbd839d1ff4a5949bc434adb0930ade, type: 3}
+  - {fileID: 8300000, guid: 73d4877bc5aaddb429c35bd6bba414a9, type: 3}
+  - {fileID: 8300000, guid: ec1f67c0bcbcd7a4c9950f8fae225d25, type: 3}
+  runSounds:
+  - {fileID: 8300000, guid: 8d861021d2b1fc34692631c1598dc731, type: 3}
+  - {fileID: 8300000, guid: fb7478e5ea93e0842935db07784016aa, type: 3}
+  - {fileID: 8300000, guid: 2f0e3ef6a1d8c5848839dfe8303efb54, type: 3}
+  rollSound: {fileID: 8300000, guid: b0032cf95f3d8f44ebf16a0e6905901e, type: 3}
+  walkVolume: 0.7
+  runVolume: 0.9
+  rollVolume: 0.8
+  pitchChange: 0.05
 --- !u!82 &5866666021796340209
 AudioSource:
   m_ObjectHideFlags: 0
