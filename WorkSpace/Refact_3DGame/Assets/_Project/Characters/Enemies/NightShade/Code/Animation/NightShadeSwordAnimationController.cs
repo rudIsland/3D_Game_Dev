@@ -9,9 +9,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
     {
         private const float DefaultBlendTime = 0.12f;
         private const float HitBlendTime = 0.06f;
-        private const float StaggerEnterToStartBlendTime = 0.18f;
-        private const float StaggerStartToIdleBlendTime = 0.06f;
-        private const float StaggerIdleToEndBlendTime = 0.22f;
 
         private static readonly int IdleStateId =
             Animator.StringToHash("Base Layer.Idle");
@@ -71,6 +68,14 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             Animator.StringToHash("Base Layer.Dead");
         private static readonly int AttackSpeedId =
             Animator.StringToHash("AttackSpeed");
+        private static readonly int StaggerEnterTriggerId =
+            Animator.StringToHash("StaggerEnter");
+        private static readonly int StaggerStartTriggerId =
+            Animator.StringToHash("StaggerStart");
+        private static readonly int StaggerIdleTriggerId =
+            Animator.StringToHash("StaggerIdle");
+        private static readonly int StaggerEndTriggerId =
+            Animator.StringToHash("StaggerEnd");
 
         [SerializeField] private Animator enemyAnimator;
 
@@ -177,22 +182,22 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
         internal void PlayStaggerEnterFromStart()
         {
-            Play(StaggerEnterStateId, HitBlendTime, true);
+            PlayStagger(StaggerEnterStateId, StaggerEnterTriggerId);
         }
 
         internal void PlayStaggerStartFromStart()
         {
-            Play(StaggerStartStateId, StaggerEnterToStartBlendTime, true);
+            PlayStagger(StaggerStartStateId, StaggerStartTriggerId);
         }
 
         internal void PlayStaggerIdleFromStart()
         {
-            Play(StaggerIdleStateId, StaggerStartToIdleBlendTime, true);
+            PlayStagger(StaggerIdleStateId, StaggerIdleTriggerId);
         }
 
         internal void PlayStaggerEndFromStart()
         {
-            Play(StaggerEndStateId, StaggerIdleToEndBlendTime, true);
+            PlayStagger(StaggerEndStateId, StaggerEndTriggerId);
         }
 
         internal void PlayDead()
@@ -278,6 +283,17 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 blendTime,
                 0,
                 0f);
+        }
+
+        private void PlayStagger(int stateId, int triggerId)
+        {
+            requestedStateId = stateId;
+            if (!CanReadAnimator())
+            {
+                return;
+            }
+
+            enemyAnimator.SetTrigger(triggerId);
         }
 
         private bool CanReadAnimator()

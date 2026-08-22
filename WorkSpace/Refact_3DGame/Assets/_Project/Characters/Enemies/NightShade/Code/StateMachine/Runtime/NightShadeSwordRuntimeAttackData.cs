@@ -1,4 +1,5 @@
 using rudIsland.RPG3D.Characters.Combat.AttackData;
+using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 {
@@ -13,7 +14,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         internal NightShadeSwordAttackScoreSettings Score { get; }
         internal float ComboFirstExitNormalizedTime { get; }
         internal float ComboSecondDelay { get; }
-
+        internal float MoveDistance { get; }
+        internal AnimationCurve MovementCurve { get; }
+        internal float TargetStopDistance { get; }
+        internal float MaximumAddedMoveDistance { get; }
+        internal float MaximumTurnAngle { get; }
         internal NightShadeSwordRuntimeAttackData(
             NightShadeSwordAttackData source)
         {
@@ -27,6 +32,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             ComboFirstExitNormalizedTime =
                 source.ComboFirstExitNormalizedTime;
             ComboSecondDelay = source.ComboSecondDelay;
+            MoveDistance = source.MoveDistance;
+            MovementCurve = CloneCurve(source.MovementCurve);
+            TargetStopDistance = source.TargetStopDistance;
+            MaximumAddedMoveDistance = source.MaximumAddedMoveDistance;
+            MaximumTurnAngle = source.MaximumTurnAngle;
             firstHitDamage = CloneDamage(source.GetHitDamage(0));
             secondHitDamage = source.ActionId == NightShadeSwordActionId.Combo
                 ? CloneDamage(source.GetHitDamage(1))
@@ -56,6 +66,20 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 source.CanBlock,
                 source.HitStopDuration,
                 source.DamageSoundType);
+        }
+
+        private static AnimationCurve CloneCurve(AnimationCurve source)
+        {
+            if (source == null)
+            {
+                return null;
+            }
+
+            return new AnimationCurve(source.keys)
+            {
+                preWrapMode = source.preWrapMode,
+                postWrapMode = source.postWrapMode
+            };
         }
     }
 }

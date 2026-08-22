@@ -5,47 +5,40 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
     // 사망 애니메이션과 시체 유지 시간이 끝나면 풀 반환을 한 번 요청한다.
     internal sealed class NightShadeSwordDeadState : INightShadeSwordState
     {
-        private readonly INightShadeSwordMovement movement;
-        private readonly INightShadeSwordAnimation animation;
-        private readonly NightShadeSwordSettings settings;
-        private readonly NightShadeSwordFightMemory fightMemory;
-        private readonly NightShadeSwordActions actions;
+        private readonly NightShadeSwordBehaviorContext context;
+        private readonly NightShadeSwordLifeRuntimeConfig settings;
+        private readonly NightShadeSwordCombatOutput combatOutput;
 
         private bool isAnimationFinished;
         private bool isReleaseRequested;
         private float remainingBodyKeepTime;
 
         internal NightShadeSwordDeadState(
-            INightShadeSwordMovement movement,
-            INightShadeSwordAnimation animation,
-            NightShadeSwordSettings settings,
-            NightShadeSwordFightMemory fightMemory,
-            NightShadeSwordActions actions)
+            NightShadeSwordBehaviorContext context,
+            NightShadeSwordLifeRuntimeConfig settings,
+            NightShadeSwordCombatOutput combatOutput)
         {
-            this.movement = movement;
-            this.animation = animation;
+            this.context = context;
             this.settings = settings;
-            this.fightMemory = fightMemory;
-            this.actions = actions;
+            this.combatOutput = combatOutput;
         }
 
         public void Enter()
         {
-            fightMemory.ClearCombo();
             isAnimationFinished = false;
             isReleaseRequested = false;
             remainingBodyKeepTime = 0f;
-            animation.ResetAttackPlaybackSpeed();
-            animation.PlayDead();
+            context.Animation.ResetAttackPlaybackSpeed();
+            context.Animation.PlayDead();
         }
 
         public NightShadeSwordStateId? Update(float deltaTime)
         {
-            movement.StayOnGround(deltaTime);
+            context.Movement.StayOnGround(deltaTime);
             if (!isAnimationFinished)
             {
-                if (!animation.TryGetRequestedAnimationTime(out float normalizedTime) ||
-                    animation.IsTransitioning() ||
+                if (!context.Animation.TryGetRequestedAnimationTime(out float normalizedTime) ||
+                    context.Animation.IsTransitioning() ||
                     normalizedTime < 1f)
                 {
                     return null;
@@ -59,7 +52,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             if (!isReleaseRequested && remainingBodyKeepTime <= 0f)
             {
                 isReleaseRequested = true;
-                actions.RequestRelease();
+                combatOutput.RequestRelease();
             }
 
             return null;

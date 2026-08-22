@@ -4,8 +4,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
     // 현재 Action 하나의 Enter -> Update -> Exit 호출 순서를 보장한다.
     internal sealed class NightShadeSwordActionRunner
     {
-        private readonly NightShadeSwordSituationReader situation;
-        private readonly NightShadeSwordFightMemory fightMemory;
         private readonly NightShadeSwordCombatDebug debug;
 
         private INightShadeSwordCombatAction currentAction;
@@ -16,13 +14,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             ? currentAction.ActionId
             : NightShadeSwordActionId.None;
 
-        internal NightShadeSwordActionRunner(
-            NightShadeSwordSituationReader situation,
-            NightShadeSwordFightMemory fightMemory,
-            NightShadeSwordCombatDebug debug)
+        internal NightShadeSwordActionRunner(NightShadeSwordCombatDebug debug)
         {
-            this.situation = situation;
-            this.fightMemory = fightMemory;
             this.debug = debug;
         }
 
@@ -48,8 +41,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             }
 
             if (!currentAction.CanContinue(
-                    situation,
-                    fightMemory,
                     out NightShadeSwordActionStopReason stopReason))
             {
                 Stop(stopReason);

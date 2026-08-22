@@ -23,7 +23,7 @@ namespace rudIsland.RPG3D.Tests
         }
 
         [Test]
-        public void Update_Positioning반복호출은관리힙을할당하지않는다()
+        public void Update_Approach반복호출은관리힙을할당하지않는다()
         {
             using var scope = new NightShadeSwordTestScope(
                 new Vector3(0f, 0f, 4.5f));
@@ -44,58 +44,63 @@ namespace rudIsland.RPG3D.Tests
             using var scope = new NightShadeSwordTestScope(
                 new Vector3(0f, 0f, 2.2f));
             NightShadeSwordSettings settings = scope.CreateSettings();
-            var situation = new NightShadeSwordSituationReader(
+            var targetStatus = new NightShadeSwordTargetStatus(
                 scope.TargetObject.transform,
                 scope.TargetDeathState,
                 scope.Movement,
-                settings);
-            var memory = new NightShadeSwordFightMemory();
+                settings.CombatRange);
+            var memory = new NightShadeSwordCombatMemory();
+            var context = new NightShadeSwordBehaviorContext(
+                targetStatus,
+                memory,
+                scope.Movement,
+                scope.Animation);
             var debug = new NightShadeSwordCombatDebug();
             var selector = new NightShadeSwordActionSelector(
                 new FixedNightShadeSwordRandomProvider(),
-                settings,
                 debug);
             var candidates = new INightShadeSwordCombatAction[4];
             candidates[0] = CreateAttack(
                 NightShadeSwordActionId.Light,
                 NightShadeSwordAttackType.Light,
                 scope,
-                situation,
-                memory,
+                context,
                 settings);
             candidates[1] = new NightShadeSwordComboAction(
-                situation,
-                memory,
-                scope.Movement,
-                scope.Animation,
-                settings,
+                context,
+                settings.GetAttackData(NightShadeSwordActionId.Combo),
+                settings.AttackSelection,
                 scope.Actions.Value);
             candidates[2] = CreateAttack(
                 NightShadeSwordActionId.Heavy,
                 NightShadeSwordAttackType.Heavy,
                 scope,
-                situation,
-                memory,
+                context,
                 settings);
             candidates[3] = CreateAttack(
                 NightShadeSwordActionId.WideSwing,
                 NightShadeSwordAttackType.WideSwing,
                 scope,
-                situation,
-                memory,
+                context,
                 settings);
             memory.Reset();
-            situation.Refresh();
+            targetStatus.Refresh();
             for (int index = 0; index < 20; index++)
             {
-                selector.Select(candidates, candidates.Length, situation, memory);
+                selector.Select(
+                    NightShadeSwordCombatPhase.Attack,
+                    candidates,
+                    settings.AttackSelection.RandomBonusMax);
             }
 
             GC.GetAllocatedBytesForCurrentThread();
             long bytesBefore = GC.GetAllocatedBytesForCurrentThread();
             for (int index = 0; index < 1000; index++)
             {
-                selector.Select(candidates, candidates.Length, situation, memory);
+                selector.Select(
+                    NightShadeSwordCombatPhase.Attack,
+                    candidates,
+                    settings.AttackSelection.RandomBonusMax);
             }
 
             long allocatedBytes =
@@ -107,18 +112,15 @@ namespace rudIsland.RPG3D.Tests
             NightShadeSwordActionId actionId,
             NightShadeSwordAttackType attackType,
             NightShadeSwordTestScope scope,
-            NightShadeSwordSituationReader situation,
-            NightShadeSwordFightMemory memory,
+            NightShadeSwordBehaviorContext context,
             NightShadeSwordSettings settings)
         {
             return new NightShadeSwordSingleAttackAction(
                 actionId,
                 attackType,
-                situation,
-                memory,
-                scope.Movement,
-                scope.Animation,
-                settings,
+                context,
+                settings.GetAttackData(actionId),
+                settings.AttackSelection,
                 scope.Actions.Value);
         }
 
@@ -152,22 +154,10 @@ namespace rudIsland.RPG3D.Tests
         {
             using var scope = new NightShadeSwordTestScope(
                 new Vector3(0f, 0f, 2f));
-            NightShadeSwordSettings settings = scope.CreateSettings();
-            var situation = new NightShadeSwordSituationReader(
-                scope.TargetObject.transform,
-                scope.TargetDeathState,
-                scope.Movement,
-                settings);
-            var memory = new NightShadeSwordFightMemory();
             var debug = new NightShadeSwordCombatDebug();
-            var runner = new NightShadeSwordActionRunner(
-                situation,
-                memory,
-                debug);
+            var runner = new NightShadeSwordActionRunner(debug);
             var first = new RunnerTestAction();
             var second = new RunnerTestAction();
-            situation.Refresh();
-            memory.Reset();
 
             Assert.That(runner.Start(first), Is.True);
             Assert.That(runner.Start(second), Is.False);
@@ -184,8 +174,7 @@ namespace rudIsland.RPG3D.Tests
 
         private sealed class RunnerTestAction : INightShadeSwordCombatAction
         {
-            public NightShadeSwordActionId ActionId => NightShadeSwordActionId.WatchTarget;
-            public NightShadeSwordCombatPhase Phase => NightShadeSwordCombatPhase.Positioning;
+            public NightShadeSwordActionId ActionId => NightShadeSwordActionId.Light;
             public bool IsFinished { get; private set; }
             internal bool FinishOnNextUpdate { get; set; }
             internal int EnterCount { get; private set; }
@@ -193,8 +182,6 @@ namespace rudIsland.RPG3D.Tests
             internal int ExitCount { get; private set; }
 
             public bool CanStart(
-                NightShadeSwordSituationReader situation,
-                NightShadeSwordFightMemory fightMemory,
                 out NightShadeSwordActionRejectReason rejectReason)
             {
                 rejectReason = NightShadeSwordActionRejectReason.None;
@@ -202,18 +189,13 @@ namespace rudIsland.RPG3D.Tests
             }
 
             public bool CanContinue(
-                NightShadeSwordSituationReader situation,
-                NightShadeSwordFightMemory fightMemory,
                 out NightShadeSwordActionStopReason stopReason)
             {
                 stopReason = NightShadeSwordActionStopReason.None;
                 return true;
             }
 
-            public NightShadeSwordActionScore GetScore(
-                NightShadeSwordSituationReader situation,
-                NightShadeSwordFightMemory fightMemory,
-                float randomBonus)
+            public NightShadeSwordActionScore GetScore(float randomBonus)
             {
                 return default;
             }

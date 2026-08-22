@@ -4,25 +4,29 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 {
     internal sealed class NightShadeSwordComboAction : NightShadeSwordAttackActionBase
     {
+        private enum ComboStep
+        {
+            FirstAttack = 0,
+            Connecting = 1,
+            SecondAttack = 2
+        }
+
         private float connectionElapsedTime;
+        private ComboStep comboStep;
 
         public override NightShadeSwordActionId ActionId => NightShadeSwordActionId.Combo;
         protected override NightShadeSwordAttackType FirstAttackType => NightShadeSwordAttackType.ComboFirst;
 
         internal NightShadeSwordComboAction(
-            NightShadeSwordSituationReader situation,
-            NightShadeSwordFightMemory fightMemory,
-            INightShadeSwordMovement movement,
-            INightShadeSwordAnimation animation,
-            NightShadeSwordSettings settings,
-            NightShadeSwordActions actions)
+            NightShadeSwordBehaviorContext context,
+            NightShadeSwordRuntimeAttackData attackData,
+            NightShadeSwordAttackSelectionRuntimeConfig attackSelection,
+            NightShadeSwordCombatOutput combatOutput)
             : base(
-                situation,
-                fightMemory,
-                movement,
-                animation,
-                settings,
-                actions)
+                context,
+                attackData,
+                attackSelection,
+                combatOutput)
         {
         }
 
@@ -30,20 +34,20 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         {
             base.Enter();
             connectionElapsedTime = 0f;
-            FightMemory.SetComboStep(NightShadeSwordComboStep.ComboFirst);
+            comboStep = ComboStep.FirstAttack;
         }
 
         public override void Update(float deltaTime)
         {
-            switch (FightMemory.ComboStep)
+            switch (comboStep)
             {
-                case NightShadeSwordComboStep.ComboFirst:
+                case ComboStep.FirstAttack:
                     UpdateFirstAttack(deltaTime);
                     break;
-                case NightShadeSwordComboStep.Connecting:
+                case ComboStep.Connecting:
                     UpdateConnection(deltaTime);
                     break;
-                case NightShadeSwordComboStep.ComboSecond:
+                case ComboStep.SecondAttack:
                     base.Update(deltaTime);
                     break;
             }
@@ -54,7 +58,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             ProcessQueuedEvents();
             UpdateAttackMovement(deltaTime);
             if (!HasCurrentAnimationFinished(
-                    Settings.ComboFirstExitNormalizedTime))
+                    AttackData.ComboFirstExitNormalizedTime))
             {
                 return;
             }
@@ -63,26 +67,26 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             CloseOpenHit();
             Animation.ResetAttackPlaybackSpeed();
             connectionElapsedTime = 0f;
-            FightMemory.SetComboStep(NightShadeSwordComboStep.Connecting);
+            comboStep = ComboStep.Connecting;
         }
 
         private void UpdateConnection(float deltaTime)
         {
             Movement.StayOnGround(deltaTime);
-            if (!Situation.IsTargetDetected ||
-                !Situation.IsInsideAttackRange)
+            if (!TargetStatus.IsDetected ||
+                !TargetStatus.IsInsideAttackRange)
             {
                 IsFinished = true;
                 return;
             }
 
             connectionElapsedTime += Mathf.Max(0f, deltaTime);
-            if (connectionElapsedTime < Settings.ComboSecondDelay)
+            if (connectionElapsedTime < AttackData.ComboSecondDelay)
             {
                 return;
             }
 
-            FightMemory.SetComboStep(NightShadeSwordComboStep.ComboSecond);
+            comboStep = ComboStep.SecondAttack;
             StartAttackClip(NightShadeSwordAttackType.ComboSecond);
         }
     }

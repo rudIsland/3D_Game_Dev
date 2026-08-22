@@ -140,7 +140,7 @@ namespace rudIsland.RPG3D.Tests
                 ScriptableObject.CreateInstance<
                     NightShadeSwordSingleAttackData>();
             var serializedAttack = new SerializedObject(attack);
-            serializedAttack.FindProperty("actionId").enumValueIndex =
+            serializedAttack.FindProperty("actionId").intValue =
                 (int)actionId;
             SetCommonAttackData(
                 serializedAttack,
@@ -192,6 +192,9 @@ namespace rudIsland.RPG3D.Tests
                 SetDamage(
                     hitDamages.GetArrayElementAtIndex(index),
                     new AttackDamage());
+                hitDamages.GetArrayElementAtIndex(index)
+                    .FindPropertyRelative("healthDamage")
+                    .floatValue = hitCount * 10f + index;
             }
 
             serializedAttack.FindProperty("postAttackDelay").floatValue =
@@ -250,15 +253,17 @@ namespace rudIsland.RPG3D.Tests
     internal sealed class FakeNightShadeSwordMovement : INightShadeSwordMovement
     {
 
-        internal int MoveToCount { get; private set; }
+        internal int ChaseCount { get; private set; }
+        internal int WalkCount { get; private set; }
         internal int TurnToCount { get; private set; }
         internal int StayCount { get; private set; }
         internal int CombatMoveCount { get; private set; }
-
-        internal float LastMoveSpeed { get; private set; }
+        internal int AttackMoveCount { get; private set; }
 
         internal Vector3 TotalHitMovement { get; private set; }
-        internal bool IsFacingTarget { get; set; } = true;
+        internal float TotalAttackMoveDistance { get; private set; }
+        internal Vector3 LastAttackTurnDirection { get; private set; }
+        internal bool LastAttackCanTurn { get; private set; }
 
         public Vector3 Position { get; set; }
         public Vector3 Forward { get; set; } = Vector3.forward;
@@ -267,29 +272,24 @@ namespace rudIsland.RPG3D.Tests
         {
         }
 
-        public void MoveTo(
-            Vector3 targetPosition,
-            float moveSpeed,
-            float turnSpeed,
-            float deltaTime)
+        public void ChaseTarget(Vector3 targetPosition, float deltaTime)
         {
-            MoveToCount++;
-            LastMoveSpeed = moveSpeed;
+            ChaseCount++;
         }
 
-        public void TurnTo(
-            Vector3 targetPosition,
-            float turnSpeed,
-            float deltaTime)
+        public void WalkToTarget(Vector3 targetPosition, float deltaTime)
+        {
+            WalkCount++;
+        }
+
+        public void TurnToTarget(Vector3 targetPosition, float deltaTime)
         {
             TurnToCount++;
         }
 
-        public void MoveForCombat(
+        public void MoveForRecovery(
             Vector3 targetPosition,
             NightShadeCombatMoveType moveType,
-            float moveSpeed,
-            float turnSpeed,
             float deltaTime)
         {
             CombatMoveCount++;
@@ -300,16 +300,24 @@ namespace rudIsland.RPG3D.Tests
             StayCount++;
         }
 
+        public void ApplyAttackMovement(
+            Vector3 wantedTurnDirection,
+            bool canTurn,
+            float deltaDistance,
+            float deltaTime)
+        {
+            AttackMoveCount++;
+            LastAttackTurnDirection = wantedTurnDirection;
+            LastAttackCanTurn = canTurn;
+            TotalAttackMoveDistance += deltaDistance;
+        }
+
         public void ApplyHitMovement(Vector3 horizontalMovement, float deltaTime)
         {
 
             TotalHitMovement += horizontalMovement;
         }
 
-        public bool IsFacing(Vector3 targetPosition, float minimumFacingDot)
-        {
-            return IsFacingTarget;
-        }
     }
 
     internal sealed class FixedNightShadeSwordRandomProvider :
@@ -474,14 +482,16 @@ namespace rudIsland.RPG3D.Tests
 
     internal sealed class NightShadeSwordTestActions
     {
-        internal NightShadeSwordActions Value { get; }
+        internal NightShadeSwordCombatOutput Value { get; }
         internal List<string> Calls { get; } = new List<string>();
+        internal List<AttackDamage> OpenedDamages { get; } =
+            new List<AttackDamage>();
         internal int CloseCount { get; private set; }
         internal int ReleaseCount { get; private set; }
 
         internal NightShadeSwordTestActions()
         {
-            Value = new NightShadeSwordActions(
+            Value = new NightShadeSwordCombatOutput(
                 PlaySound,
                 OpenHit,
                 CloseHit,
@@ -493,9 +503,10 @@ namespace rudIsland.RPG3D.Tests
             Calls.Add($"Sound:{hitIndex}");
         }
 
-        private void OpenHit(NightShadeSwordAttackType attackType, int hitIndex)
+        private void OpenHit(AttackDamage attackDamage)
         {
-            Calls.Add($"Open:{hitIndex}");
+            OpenedDamages.Add(attackDamage);
+            Calls.Add("Open");
         }
 
         private void CloseHit()

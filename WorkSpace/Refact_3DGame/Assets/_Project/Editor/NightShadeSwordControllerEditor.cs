@@ -16,25 +16,31 @@ namespace rudIsland.RPG3D.Editor
             }
 
             var controller = (NightShadeSwordController)target;
+            NightShadeSwordCombatDebug combatDebug = controller.CombatDebug;
+            if (combatDebug == null)
+            {
+                return;
+            }
+
             EditorGUILayout.Space();
             EditorGUILayout.LabelField(
                 "Play Mode 전투 선택",
                 EditorStyles.boldLabel);
             using (new EditorGUI.DisabledScope(true))
             {
-                EditorGUILayout.TextField("상위 상태", controller.DebugTopStateName);
-                EditorGUILayout.TextField("Combat 단계", controller.DebugCombatPhaseName);
-                EditorGUILayout.TextField("현재 Action", controller.DebugCurrentActionName);
-                EditorGUILayout.TextField("현재 중단 상태", controller.DebugCurrentStopReasonName);
-                EditorGUILayout.TextField("마지막 평가 단계", controller.DebugLastEvaluatedPhaseName);
-                EditorGUILayout.TextField("선택된 Action", controller.DebugSelectedActionName);
-                EditorGUILayout.TextField("이전 종료 사유", controller.DebugPreviousStopReasonName);
+                EditorGUILayout.TextField("상위 상태", combatDebug.TopState.ToString());
+                EditorGUILayout.TextField("Combat 단계", combatDebug.CombatPhase.ToString());
+                EditorGUILayout.TextField("현재 Action", combatDebug.CurrentAction.ToString());
+                EditorGUILayout.TextField("현재 중단 상태", combatDebug.CurrentActionStopReason.ToString());
+                EditorGUILayout.TextField("마지막 평가 단계", combatDebug.LastEvaluatedPhase.ToString());
+                EditorGUILayout.TextField("선택된 Action", combatDebug.SelectedAction.ToString());
+                EditorGUILayout.TextField("이전 종료 사유", combatDebug.PreviousActionStopReason.ToString());
             }
 
             DrawCandidateHeader();
-            for (int index = 0; index < controller.DebugCandidateCount; index++)
+            for (int index = 0; index < combatDebug.CandidateCount; index++)
             {
-                DrawCandidate(controller, index);
+                DrawCandidate(combatDebug, index);
             }
 
             if (Event.current.type == EventType.Layout)
@@ -58,28 +64,30 @@ namespace rudIsland.RPG3D.Editor
         }
 
         private static void DrawCandidate(
-            NightShadeSwordController controller,
+            NightShadeSwordCombatDebug combatDebug,
             int index)
         {
+            NightShadeSwordActionDebugEntry candidate =
+                combatDebug.Candidates[index];
             using (new EditorGUILayout.HorizontalScope())
             {
-                string actionName = controller.GetDebugCandidateActionName(index);
-                if (controller.GetDebugCandidateIsSelected(index))
+                string actionName = candidate.ActionId.ToString();
+                if (candidate.IsSelected)
                 {
                     actionName = $"> {actionName}";
                 }
 
                 GUILayout.Label(actionName, GUILayout.Width(90f));
                 GUILayout.Label(
-                    controller.GetDebugCandidateCanStart(index)
+                    candidate.CanStart
                         ? "가능"
-                        : controller.GetDebugCandidateRejectReasonName(index),
+                        : candidate.RejectReason.ToString(),
                     GUILayout.Width(110f));
-                DrawScore(controller.GetDebugCandidateBaseScore(index));
-                DrawScore(controller.GetDebugCandidateDistanceScore(index));
-                DrawScore(controller.GetDebugCandidateRepeatPenalty(index));
-                DrawScore(controller.GetDebugCandidateRandomBonus(index));
-                DrawScore(controller.GetDebugCandidateFinalScore(index));
+                DrawScore(candidate.Score.BaseScore);
+                DrawScore(candidate.Score.DistanceScore);
+                DrawScore(candidate.Score.RepeatPenalty);
+                DrawScore(candidate.Score.RandomBonus);
+                DrawScore(candidate.Score.FinalScore);
             }
         }
 

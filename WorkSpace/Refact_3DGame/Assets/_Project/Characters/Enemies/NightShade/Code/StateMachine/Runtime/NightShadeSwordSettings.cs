@@ -1,63 +1,27 @@
-// Config 값을 복사해 런타임 로직에 전달하는 불변 스냅샷이다.
 using System;
 using rudIsland.RPG3D.Characters.Combat;
-using rudIsland.RPG3D.Characters.Combat.AttackData;
 using rudIsland.RPG3D.Characters.Enemies.AttackData;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 {
-    // Inspector에서 받은 전투 수치를 생성 시 한 번 계산해 보관한다.
+    // Inspector Config를 역할별로 복사한 NightShade 런타임 설정이다.
     internal sealed class NightShadeSwordSettings
     {
-        internal LayerMask TargetLayers { get; }
-        internal float MaxHealth { get; }
-        internal float StaggerLimit { get; }
-        internal float StaggerRecoverDelay { get; }
-        internal float StaggerRecoverSpeed { get; }
-        internal float FindRangeSquared { get; }
-        internal float AttackRange { get; }
-        internal float AttackRangeSquared { get; }
-        internal float WalkStartRangeSquared { get; }
-        internal float RunStartRangeSquared { get; }
-        internal float AttackFacingDot { get; }
-        internal float WalkSpeed { get; }
-        internal float ChaseSpeed { get; }
-        internal float TurnSpeed { get; }
-        internal float AttackTurnSpeed { get; }
-        internal float Gravity { get; }
-        internal float GroundPull { get; }
-        internal float RecoveryMoveSpeed { get; }
-        internal float RecoveryMoveDuration { get; }
-        internal float AttackDistanceScoreWeight { get; }
-        internal float AttackRepeatPenalty { get; }
-        internal float AttackRandomBonusMax { get; }
-        internal float IdleRecoveryBaseScore { get; }
-        internal float IdleRecoveryDistanceWeight { get; }
-        internal float BackRecoveryBaseScore { get; }
-        internal float BackRecoveryCloseWeight { get; }
-        internal float SideRecoveryBaseScore { get; }
-        internal float SideRecoveryDistanceWeight { get; }
-        internal float RecoveryRepeatPenalty { get; }
-        internal float RecoveryRandomBonusMax { get; }
-        internal float HitPushDuration { get; }
-        internal float KnockbackPushDuration { get; }
-        internal float KnockdownPushDuration { get; }
-        internal float KnockdownStayDuration { get; }
-        internal float StaggerBreakStayDuration { get; }
-        internal AnimationCurve HitPushCurve { get; }
-        internal float DeadBodyKeepTime { get; }
-        internal float ComboFirstExitNormalizedTime { get; }
-        internal float ComboSecondDelay { get; }
-
-        private readonly NightShadeSwordRuntimeAttackData[] attacks;
+        internal NightShadeSwordLifeRuntimeConfig Life { get; }
+        internal NightShadeSwordTargetRuntimeConfig CombatRange { get; }
+        internal NightShadeSwordAttackSelectionRuntimeConfig AttackSelection { get; }
+        internal NightShadeSwordMovementRuntimeConfig Movement { get; }
+        internal NightShadeSwordRecoveryRuntimeConfig Recovery { get; }
+        internal NightShadeSwordHitReactionRuntimeConfig HitReaction { get; }
+        private readonly NightShadeSwordAttacksRuntimeConfig attacks;
 
         internal NightShadeSwordSettings(
             NightShadeSwordLifeSettings life,
             NightShadeSwordCombatRangeSettings combatRange,
             NightShadeSwordAttackSelectionSettings attackSelection,
             NightShadeSwordMovementSettings movement,
-            EnemyAttackData[] attackData,
+            EnemyAttackData[] attacks,
             NightShadeSwordRecoverySettings recovery,
             NightShadeSwordHitReactionSettings hitReaction)
         {
@@ -67,114 +31,167 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             movement.Validate();
             recovery.Validate();
             hitReaction.Validate();
-            attacks = CreateRuntimeAttacks(attackData);
 
-            TargetLayers = combatRange.TargetLayers;
-            MaxHealth = life.MaxHealth;
-            StaggerLimit = life.StaggerLimit;
-            StaggerRecoverDelay = life.StaggerRecoverDelay;
-            StaggerRecoverSpeed = life.StaggerRecoverSpeed;
-
-            float safeFindRange = combatRange.FindRange;
-            float safeAttackRange = combatRange.AttackRange;
-            float safeWalkStartRange = Mathf.Clamp(
-                combatRange.WalkStartRange,
-                safeAttackRange,
-                safeFindRange);
-            float safeRunStartRange = Mathf.Clamp(
-                combatRange.RunStartRange,
-                safeWalkStartRange,
-                safeFindRange);
-
-            FindRangeSquared = safeFindRange * safeFindRange;
-            AttackRange = safeAttackRange;
-            AttackRangeSquared = safeAttackRange * safeAttackRange;
-            WalkStartRangeSquared = safeWalkStartRange * safeWalkStartRange;
-            RunStartRangeSquared = safeRunStartRange * safeRunStartRange;
-            AttackFacingDot = Mathf.Cos(
-                combatRange.AttackFacingAngle * Mathf.Deg2Rad);
-            WalkSpeed = movement.WalkSpeed;
-            ChaseSpeed = movement.ChaseSpeed;
-            TurnSpeed = movement.TurnSpeed;
-            AttackTurnSpeed = movement.AttackTurnSpeed;
-            Gravity = movement.Gravity;
-            GroundPull = movement.GroundPull;
-
-            NightShadeSwordRuntimeAttackData comboAttack =
-                GetAttackSettings(NightShadeSwordActionId.Combo);
-            ComboFirstExitNormalizedTime =
-                comboAttack.ComboFirstExitNormalizedTime;
-            ComboSecondDelay = comboAttack.ComboSecondDelay;
-            AttackDistanceScoreWeight =
-                attackSelection.DistanceScoreWeight;
-            AttackRepeatPenalty = attackSelection.RepeatPenalty;
-            AttackRandomBonusMax = attackSelection.RandomBonusMax;
-
-            RecoveryMoveSpeed = recovery.MoveSpeed;
-            RecoveryMoveDuration = recovery.MoveDuration;
-            IdleRecoveryBaseScore = recovery.IdleBaseScore;
-            IdleRecoveryDistanceWeight = recovery.IdleDistanceWeight;
-            BackRecoveryBaseScore = recovery.BackBaseScore;
-            BackRecoveryCloseWeight = recovery.BackCloseWeight;
-            SideRecoveryBaseScore = recovery.SideBaseScore;
-            SideRecoveryDistanceWeight = recovery.SideDistanceWeight;
-            RecoveryRepeatPenalty = recovery.RepeatPenalty;
-            RecoveryRandomBonusMax = recovery.RandomBonusMax;
-
-            HitPushDuration = hitReaction.PushDuration;
-            KnockbackPushDuration = hitReaction.KnockbackPushDuration;
-            KnockdownPushDuration = hitReaction.KnockdownPushDuration;
-            KnockdownStayDuration = hitReaction.KnockdownStayDuration;
-            StaggerBreakStayDuration =
-                hitReaction.StaggerBreakStayDuration;
-            HitPushCurve = CloneCurve(hitReaction.PushCurve);
-            DeadBodyKeepTime = life.DeadBodyKeepTime;
-
+            Life = new NightShadeSwordLifeRuntimeConfig(life);
+            CombatRange = new NightShadeSwordTargetRuntimeConfig(combatRange);
+            Movement = new NightShadeSwordMovementRuntimeConfig(movement);
+            AttackSelection = new NightShadeSwordAttackSelectionRuntimeConfig(
+                attackSelection);
+            Recovery = new NightShadeSwordRecoveryRuntimeConfig(recovery);
+            HitReaction = new NightShadeSwordHitReactionRuntimeConfig(
+                hitReaction);
+            this.attacks = new NightShadeSwordAttacksRuntimeConfig(attacks);
         }
 
-        internal AttackDamage GetAttackDamage(
-            NightShadeSwordAttackType attackType)
-        {
-            switch (attackType)
-            {
-                case NightShadeSwordAttackType.ComboFirst:
-                    return GetAttackSettings(
-                        NightShadeSwordActionId.Combo).GetHitDamage(0);
-                case NightShadeSwordAttackType.ComboSecond:
-                    return GetAttackSettings(
-                        NightShadeSwordActionId.Combo).GetHitDamage(1);
-                case NightShadeSwordAttackType.Heavy:
-                    return GetAttackSettings(
-                        NightShadeSwordActionId.Heavy).GetHitDamage(0);
-                case NightShadeSwordAttackType.WideSwing:
-                    return GetAttackSettings(
-                        NightShadeSwordActionId.WideSwing).GetHitDamage(0);
-                default:
-                    return GetAttackSettings(
-                        NightShadeSwordActionId.Light).GetHitDamage(0);
-            }
-        }
-
-        internal NightShadeSwordAttackScoreSettings GetAttackScoreSettings(
+        internal NightShadeSwordRuntimeAttackData GetAttackData(
             NightShadeSwordActionId actionId)
         {
-            return GetAttackSettings(actionId).Score;
+            return attacks.Get(actionId);
         }
+    }
 
-        internal float GetPostAttackDelay(NightShadeSwordActionId actionId)
+    internal sealed class NightShadeSwordLifeRuntimeConfig
+    {
+        internal float MaxHealth { get; }
+        internal float StaggerLimit { get; }
+        internal float StaggerRecoverDelay { get; }
+        internal float StaggerRecoverSpeed { get; }
+        internal float DeadBodyKeepTime { get; }
+
+        internal NightShadeSwordLifeRuntimeConfig(
+            NightShadeSwordLifeSettings source)
         {
-            return GetAttackSettings(actionId).PostAttackDelay;
+            MaxHealth = source.MaxHealth;
+            StaggerLimit = source.StaggerLimit;
+            StaggerRecoverDelay = source.StaggerRecoverDelay;
+            StaggerRecoverSpeed = source.StaggerRecoverSpeed;
+            DeadBodyKeepTime = source.DeadBodyKeepTime;
         }
+    }
 
-        internal float EvaluateHitPushProgress(float normalizedTime)
+    internal sealed class NightShadeSwordTargetRuntimeConfig
+    {
+        internal LayerMask TargetLayers { get; }
+        internal float FindRangeSquared { get; }
+        internal float AttackRange { get; }
+        internal float AttackRangeSquared { get; }
+        internal float WalkStartRangeSquared { get; }
+        internal float RunStartRangeSquared { get; }
+        internal float AttackFacingDot { get; }
+
+        internal NightShadeSwordTargetRuntimeConfig(
+            NightShadeSwordCombatRangeSettings source)
         {
-            float clampedTime = Mathf.Clamp01(normalizedTime);
-            return Mathf.Clamp01(HitPushCurve != null && HitPushCurve.length > 0
-                ? HitPushCurve.Evaluate(clampedTime)
-                : clampedTime);
+            float findRange = source.FindRange;
+            float attackRange = source.AttackRange;
+            float walkStartRange = Mathf.Clamp(
+                source.WalkStartRange,
+                attackRange,
+                findRange);
+            float runStartRange = Mathf.Clamp(
+                source.RunStartRange,
+                walkStartRange,
+                findRange);
+
+            TargetLayers = source.TargetLayers;
+            FindRangeSquared = findRange * findRange;
+            AttackRange = attackRange;
+            AttackRangeSquared = attackRange * attackRange;
+            WalkStartRangeSquared = walkStartRange * walkStartRange;
+            RunStartRangeSquared = runStartRange * runStartRange;
+            AttackFacingDot = Mathf.Cos(
+                source.AttackFacingAngle * Mathf.Deg2Rad);
+        }
+    }
+
+    internal sealed class NightShadeSwordMovementRuntimeConfig
+    {
+        internal float WalkSpeed { get; }
+        internal float ChaseSpeed { get; }
+        internal float TurnSpeed { get; }
+        internal float AttackTurnSpeed { get; }
+        internal float Gravity { get; }
+        internal float GroundPull { get; }
+
+        internal NightShadeSwordMovementRuntimeConfig(
+            NightShadeSwordMovementSettings source)
+        {
+            WalkSpeed = source.WalkSpeed;
+            ChaseSpeed = source.ChaseSpeed;
+            TurnSpeed = source.TurnSpeed;
+            AttackTurnSpeed = source.AttackTurnSpeed;
+            Gravity = source.Gravity;
+            GroundPull = source.GroundPull;
+        }
+    }
+
+    internal sealed class NightShadeSwordAttackSelectionRuntimeConfig
+    {
+        internal float DistanceScoreWeight { get; }
+        internal float RepeatPenalty { get; }
+        internal float RandomBonusMax { get; }
+
+        internal NightShadeSwordAttackSelectionRuntimeConfig(
+            NightShadeSwordAttackSelectionSettings source)
+        {
+            DistanceScoreWeight = source.DistanceScoreWeight;
+            RepeatPenalty = source.RepeatPenalty;
+            RandomBonusMax = source.RandomBonusMax;
+        }
+    }
+
+    internal sealed class NightShadeSwordRecoveryRuntimeConfig
+    {
+        internal float MoveSpeed { get; }
+        internal float MoveDuration { get; }
+        internal float IdleBaseScore { get; }
+        internal float IdleDistanceWeight { get; }
+        internal float BackBaseScore { get; }
+        internal float BackCloseWeight { get; }
+        internal float SideBaseScore { get; }
+        internal float SideDistanceWeight { get; }
+        internal float RepeatPenalty { get; }
+        internal float RandomBonusMax { get; }
+
+        internal NightShadeSwordRecoveryRuntimeConfig(
+            NightShadeSwordRecoverySettings source)
+        {
+            MoveSpeed = source.MoveSpeed;
+            MoveDuration = source.MoveDuration;
+            IdleBaseScore = source.IdleBaseScore;
+            IdleDistanceWeight = source.IdleDistanceWeight;
+            BackBaseScore = source.BackBaseScore;
+            BackCloseWeight = source.BackCloseWeight;
+            SideBaseScore = source.SideBaseScore;
+            SideDistanceWeight = source.SideDistanceWeight;
+            RepeatPenalty = source.RepeatPenalty;
+            RandomBonusMax = source.RandomBonusMax;
+        }
+    }
+
+    internal sealed class NightShadeSwordHitReactionRuntimeConfig
+    {
+        internal float PushDuration { get; }
+        internal float KnockbackPushDuration { get; }
+        internal float KnockdownPushDuration { get; }
+        internal float KnockdownStayDuration { get; }
+        internal float StaggerBreakStayDuration { get; }
+
+        private readonly AnimationCurve pushCurve;
+        internal AnimationCurve PushCurve => pushCurve;
+
+        internal NightShadeSwordHitReactionRuntimeConfig(
+            NightShadeSwordHitReactionSettings source)
+        {
+            PushDuration = source.PushDuration;
+            KnockbackPushDuration = source.KnockbackPushDuration;
+            KnockdownPushDuration = source.KnockdownPushDuration;
+            KnockdownStayDuration = source.KnockdownStayDuration;
+            StaggerBreakStayDuration = source.StaggerBreakStayDuration;
+            pushCurve = CloneCurve(source.PushCurve);
         }
 
-        internal float GetHitPushDuration(HitReaction reaction)
+        internal float GetPushDuration(HitReaction reaction)
         {
             switch (reaction)
             {
@@ -183,11 +200,44 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 case HitReaction.Knockback:
                     return KnockbackPushDuration;
                 default:
-                    return HitPushDuration;
+                    return PushDuration;
             }
         }
 
-        private NightShadeSwordRuntimeAttackData GetAttackSettings(
+        internal float EvaluatePushProgress(float normalizedTime)
+        {
+            float clampedTime = Mathf.Clamp01(normalizedTime);
+            return Mathf.Clamp01(pushCurve != null && pushCurve.length > 0
+                ? pushCurve.Evaluate(clampedTime)
+                : clampedTime);
+        }
+
+        private static AnimationCurve CloneCurve(AnimationCurve source)
+        {
+            if (source == null)
+            {
+                return null;
+            }
+
+            return new AnimationCurve(source.keys)
+            {
+                preWrapMode = source.preWrapMode,
+                postWrapMode = source.postWrapMode
+            };
+        }
+    }
+
+    internal sealed class NightShadeSwordAttacksRuntimeConfig
+    {
+        private readonly NightShadeSwordRuntimeAttackData[] attacks;
+
+        internal NightShadeSwordAttacksRuntimeConfig(
+            EnemyAttackData[] attackData)
+        {
+            attacks = CreateRuntimeAttacks(attackData);
+        }
+
+        internal NightShadeSwordRuntimeAttackData Get(
             NightShadeSwordActionId actionId)
         {
             int index = (int)actionId - (int)NightShadeSwordActionId.Light;
@@ -203,8 +253,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             EnemyAttackData[] attackData)
         {
             const int requiredAttackCount = 4;
-            if (attackData == null ||
-                attackData.Length != requiredAttackCount)
+            if (attackData == null || attackData.Length != requiredAttackCount)
             {
                 throw new ArgumentException(
                     "NightShadeSword 공격 데이터는 Light, Combo, Heavy, WideSwing 4개가 필요합니다.",
@@ -255,16 +304,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             }
 
             return runtimeAttacks;
-        }
-
-        private static AnimationCurve CloneCurve(AnimationCurve source)
-        {
-            var curve = new AnimationCurve(source.keys)
-            {
-                preWrapMode = source.preWrapMode,
-                postWrapMode = source.postWrapMode
-            };
-            return curve;
         }
     }
 }

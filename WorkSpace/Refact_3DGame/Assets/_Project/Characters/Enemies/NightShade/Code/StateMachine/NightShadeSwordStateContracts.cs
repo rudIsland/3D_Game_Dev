@@ -53,17 +53,20 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         Vector3 Forward { get; }
 
         void Reset();
-        void MoveTo(Vector3 targetPosition,float moveSpeed,float turnSpeed, float deltaTime);
-        void TurnTo(Vector3 targetPosition,float turnSpeed,float deltaTime);
-        void MoveForCombat(
+        void ChaseTarget(Vector3 targetPosition, float deltaTime);
+        void WalkToTarget(Vector3 targetPosition, float deltaTime);
+        void TurnToTarget(Vector3 targetPosition, float deltaTime);
+        void MoveForRecovery(
             Vector3 targetPosition,
             NightShadeCombatMoveType moveType,
-            float moveSpeed,
-            float turnSpeed,
             float deltaTime);
         void StayOnGround(float deltaTime);
+        void ApplyAttackMovement(
+            Vector3 wantedTurnDirection,
+            bool canTurn,
+            float deltaDistance,
+            float deltaTime);
         void ApplyHitMovement(Vector3 horizontalMovement, float deltaTime);
-        bool IsFacing(Vector3 targetPosition, float minimumFacingDot);
     }
 
     internal interface INightShadeSwordRandomProvider
@@ -73,23 +76,13 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
     internal interface INightShadeSwordCombatAction
     {
-        // CombatState가 상태별 Action을 같은 순서로 선택하고 실행하기 위한 공통 계약이다.
+        // 공격과 Recovery Action의 공통 생명주기다.
         NightShadeSwordActionId ActionId { get; }
-        NightShadeSwordCombatPhase Phase { get; }
         bool IsFinished { get; }
 
-        bool CanStart(
-            NightShadeSwordSituationReader situation,
-            NightShadeSwordFightMemory fightMemory,
-            out NightShadeSwordActionRejectReason rejectReason);
-        bool CanContinue(
-            NightShadeSwordSituationReader situation,
-            NightShadeSwordFightMemory fightMemory,
-            out NightShadeSwordActionStopReason stopReason);
-        NightShadeSwordActionScore GetScore(
-            NightShadeSwordSituationReader situation,
-            NightShadeSwordFightMemory fightMemory,
-            float randomBonus);
+        bool CanStart(out NightShadeSwordActionRejectReason rejectReason);
+        bool CanContinue(out NightShadeSwordActionStopReason stopReason);
+        NightShadeSwordActionScore GetScore(float randomBonus);
         void Enter();
         void Update(float deltaTime);
         void Exit(NightShadeSwordActionStopReason stopReason);
@@ -99,7 +92,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
     {
         // Animation Event는 현재 실행 중인 공격 Action에만 대기열로 전달된다.
         bool ProtectsSmallHit { get; }
-        int QueuedEventCount { get; }
 
         void QueueStopTurn();
         void QueuePlaySound(int hitIndex);

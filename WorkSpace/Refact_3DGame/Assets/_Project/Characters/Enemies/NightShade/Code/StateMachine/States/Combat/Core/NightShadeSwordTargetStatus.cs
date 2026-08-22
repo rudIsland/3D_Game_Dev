@@ -1,10 +1,9 @@
-// 한 Tick에 한 번 대상 상황을 계산해 Action들이 공유한다.
+// 한 Tick에 한 번 대상 상태를 계산해 State와 Action이 공유한다.
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 {
-    // 한 Tick에서 필요한 대상 상황을 한 번만 계산해 Action들이 함께 사용한다.
-    internal sealed class NightShadeSwordSituationReader
+    internal sealed class NightShadeSwordTargetStatus
     {
         private readonly Transform target;
         private readonly IUnitDeathState targetDeathState;
@@ -12,22 +11,24 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         private readonly float findRangeSquared;
         private readonly float attackRangeSquared;
         private readonly float attackRange;
+        private readonly float walkStartRangeSquared;
+        private readonly float runStartRangeSquared;
         private readonly float attackFacingDot;
 
-        internal bool IsTargetAlive { get; private set; }
-        internal bool IsTargetDetected { get; private set; }
+        internal bool IsAlive { get; private set; }
+        internal bool IsDetected { get; private set; }
         internal bool IsInsideAttackRange { get; private set; }
         internal bool IsFacingAttackDirection { get; private set; }
         internal Vector3 TargetPosition { get; private set; }
-        internal float DistanceSquared { get; private set; }
         internal float AttackDistanceRatio { get; private set; }
-        internal float FacingDot { get; private set; }
+        internal bool ShouldSwitchToWalk { get; private set; }
+        internal bool ShouldSwitchToChase { get; private set; }
 
-        internal NightShadeSwordSituationReader(
+        internal NightShadeSwordTargetStatus(
             Transform target,
             IUnitDeathState targetDeathState,
             INightShadeSwordMovement movement,
-            NightShadeSwordSettings settings)
+            NightShadeSwordTargetRuntimeConfig settings)
         {
             this.target = target;
             this.targetDeathState = targetDeathState;
@@ -35,18 +36,18 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             findRangeSquared = settings.FindRangeSquared;
             attackRangeSquared = settings.AttackRangeSquared;
             attackRange = settings.AttackRange;
+            walkStartRangeSquared = settings.WalkStartRangeSquared;
+            runStartRangeSquared = settings.RunStartRangeSquared;
             attackFacingDot = settings.AttackFacingDot;
-            DistanceSquared = float.PositiveInfinity;
             AttackDistanceRatio = 1f;
-            FacingDot = -1f;
         }
 
         internal void Refresh()
         {
-            IsTargetAlive = target != null &&
+            IsAlive = target != null &&
                 target.gameObject.activeInHierarchy &&
                 (targetDeathState == null || !targetDeathState.IsDead);
-            if (!IsTargetAlive)
+            if (!IsAlive)
             {
                 ClearMissingTarget();
                 return;
@@ -55,33 +56,36 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             TargetPosition = target.position;
             Vector3 direction = TargetPosition - movement.Position;
             direction.y = 0f;
-            DistanceSquared = direction.sqrMagnitude;
-            IsTargetDetected = DistanceSquared <= findRangeSquared;
-            IsInsideAttackRange = DistanceSquared <= attackRangeSquared;
+            float distanceSquared = direction.sqrMagnitude;
+            IsDetected = distanceSquared <= findRangeSquared;
+            IsInsideAttackRange = distanceSquared <= attackRangeSquared;
+            ShouldSwitchToWalk = distanceSquared <= walkStartRangeSquared;
+            ShouldSwitchToChase = distanceSquared >= runStartRangeSquared;
             AttackDistanceRatio = Mathf.Clamp01(
-                Mathf.Sqrt(DistanceSquared) / attackRange);
+                Mathf.Sqrt(distanceSquared) / attackRange);
 
-            if (DistanceSquared <= 0.000001f)
+            float facingDot;
+            if (distanceSquared <= 0.000001f)
             {
-                FacingDot = 1f;
+                facingDot = 1f;
             }
             else
             {
-                direction *= 1f / Mathf.Sqrt(DistanceSquared);
-                FacingDot = Vector3.Dot(movement.Forward, direction);
+                direction *= 1f / Mathf.Sqrt(distanceSquared);
+                facingDot = Vector3.Dot(movement.Forward, direction);
             }
 
-            IsFacingAttackDirection = FacingDot >= attackFacingDot;
+            IsFacingAttackDirection = facingDot >= attackFacingDot;
         }
 
         private void ClearMissingTarget()
         {
-            IsTargetDetected = false;
+            IsDetected = false;
             IsInsideAttackRange = false;
             IsFacingAttackDirection = false;
-            DistanceSquared = float.PositiveInfinity;
+            ShouldSwitchToWalk = false;
+            ShouldSwitchToChase = false;
             AttackDistanceRatio = 1f;
-            FacingDot = -1f;
         }
     }
 }

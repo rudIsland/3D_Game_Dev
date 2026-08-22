@@ -7,6 +7,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
     {
         private readonly Transform enemyTransform;
         private readonly CharacterController characterController;
+        private readonly float walkSpeed;
+        private readonly float chaseSpeed;
+        private readonly float turnSpeed;
+        private readonly float attackTurnSpeed;
+        private readonly float recoveryMoveSpeed;
         private readonly float gravity;
         private readonly float groundPull;
 
@@ -18,13 +23,18 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         internal NightShadeSwordMovement(
             Transform enemyTransform,
             CharacterController characterController,
-            float gravity,
-            float groundPull)
+            NightShadeSwordMovementRuntimeConfig settings,
+            float recoveryMoveSpeed)
         {
             this.enemyTransform = enemyTransform;
             this.characterController = characterController;
-            this.gravity = gravity;
-            this.groundPull = groundPull;
+            walkSpeed = settings.WalkSpeed;
+            chaseSpeed = settings.ChaseSpeed;
+            turnSpeed = settings.TurnSpeed;
+            attackTurnSpeed = settings.AttackTurnSpeed;
+            this.recoveryMoveSpeed = Mathf.Max(0f, recoveryMoveSpeed);
+            gravity = settings.Gravity;
+            groundPull = settings.GroundPull;
         }
 
         public void Reset()
@@ -32,10 +42,31 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             verticalSpeed = 0f;
         }
 
-        public void MoveTo(
+        public void ChaseTarget(Vector3 targetPosition, float deltaTime)
+        {
+            MoveToTarget(targetPosition, chaseSpeed, deltaTime);
+        }
+
+        public void WalkToTarget(Vector3 targetPosition, float deltaTime)
+        {
+            MoveToTarget(targetPosition, walkSpeed, deltaTime);
+        }
+
+        public void TurnToTarget(Vector3 targetPosition, float deltaTime)
+        {
+            Vector3 direction = targetPosition - enemyTransform.position;
+            direction.y = 0f;
+            if (direction.sqrMagnitude > 0.0001f)
+            {
+                TurnToDirection(direction, turnSpeed, deltaTime);
+            }
+
+            StayOnGround(deltaTime);
+        }
+
+        private void MoveToTarget(
             Vector3 targetPosition,
             float moveSpeed,
-            float turnSpeed,
             float deltaTime)
         {
             Vector3 moveDirection = targetPosition - enemyTransform.position;
@@ -53,30 +84,12 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             characterController.Move(movement);
         }
 
-        public void TurnTo(
-            Vector3 targetPosition,
-            float turnSpeed,
-            float deltaTime)
-        {
-            Vector3 direction = targetPosition - enemyTransform.position;
-            direction.y = 0f;
-            if (direction.sqrMagnitude > 0.0001f)
-            {
-                TurnToDirection(direction, turnSpeed, deltaTime);
-            }
-
-            StayOnGround(deltaTime);
-        }
-
-        public void MoveForCombat(
+        public void MoveForRecovery(
             Vector3 targetPosition,
             NightShadeCombatMoveType moveType,
-            float moveSpeed,
-            float turnSpeed,
             float deltaTime)
         {
-            Vector3 targetDirection =
-                targetPosition - enemyTransform.position;
+            Vector3 targetDirection = targetPosition - enemyTransform.position;
             targetDirection.y = 0f;
             if (targetDirection.sqrMagnitude <= 0.0001f)
             {
@@ -85,8 +98,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             }
 
             targetDirection.Normalize();
-            Vector3 rightDirection =
-                Vector3.Cross(Vector3.up, targetDirection);
+            Vector3 rightDirection = Vector3.Cross(Vector3.up, targetDirection);
             Vector3 moveDirection;
             switch (moveType)
             {
@@ -104,7 +116,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             TurnToDirection(targetDirection, turnSpeed, deltaTime);
             UpdateVerticalSpeed(deltaTime);
             Vector3 movement =
-                moveDirection * (moveSpeed * deltaTime);
+                moveDirection * (recoveryMoveSpeed * deltaTime);
             movement.y = verticalSpeed * deltaTime;
             characterController.Move(movement);
         }
@@ -115,26 +127,34 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             characterController.Move(Vector3.up * (verticalSpeed * deltaTime));
         }
 
+        public void ApplyAttackMovement(
+            Vector3 wantedTurnDirection,
+            bool canTurn,
+            float deltaDistance,
+            float deltaTime)
+        {
+            wantedTurnDirection.y = 0f;
+            if (canTurn &&
+                wantedTurnDirection.sqrMagnitude > 0.0001f)
+            {
+                TurnToDirection(
+                    wantedTurnDirection,
+                    attackTurnSpeed,
+                    deltaTime);
+            }
+
+            UpdateVerticalSpeed(deltaTime);
+            Vector3 movement = enemyTransform.forward * deltaDistance;
+            movement.y = verticalSpeed * deltaTime;
+            characterController.Move(movement);
+        }
+
         public void ApplyHitMovement(Vector3 horizontalMovement, float deltaTime)
         {
             horizontalMovement.y = 0f;
             UpdateVerticalSpeed(deltaTime);
             horizontalMovement.y = verticalSpeed * deltaTime;
             characterController.Move(horizontalMovement);
-        }
-
-        public bool IsFacing(Vector3 targetPosition, float minimumFacingDot)
-        {
-            Vector3 direction = targetPosition - enemyTransform.position;
-            direction.y = 0f;
-            if (direction.sqrMagnitude <= 0.0001f)
-            {
-                return true;
-            }
-
-            direction.Normalize();
-            return Vector3.Dot(enemyTransform.forward, direction) >=
-                minimumFacingDot;
         }
 
         private void TurnToDirection(

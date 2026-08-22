@@ -524,6 +524,11 @@ namespace rudIsland.RPG3D.EditorTools
 
             for (int index = 0; index < oldStates.Length; index++)
             {
+                if (IsStaggerState(oldStates[index]))
+                {
+                    continue;
+                }
+
                 stateMachine.RemoveState(oldStates[index]);
             }
 
@@ -668,6 +673,16 @@ namespace rudIsland.RPG3D.EditorTools
             stateMachine.defaultState = idle;
             EditorUtility.SetDirty(controller);
             return controller;
+        }
+
+        // 전체 빌드에서도 Animator에서 조정한 경직 Transition 값을 보존한다.
+        private static bool IsStaggerState(AnimatorState state)
+        {
+            return state != null &&
+                (state.name == "Stagger Enter" ||
+                    state.name == "Stagger Start" ||
+                    state.name == "Stagger Idle" ||
+                    state.name == "Stagger End");
         }
 
         private static AnimatorState AddState(

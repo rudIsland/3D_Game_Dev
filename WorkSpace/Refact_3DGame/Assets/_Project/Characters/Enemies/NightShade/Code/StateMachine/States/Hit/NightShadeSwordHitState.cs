@@ -17,11 +17,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
     // 경직 애니메이션 동안 피격 밀림 곡선을 누적 적용한다.
     internal sealed class NightShadeSwordHitState : INightShadeSwordState
     {
-        private readonly NightShadeSwordSituationReader situation;
-        private readonly INightShadeSwordMovement movement;
-        private readonly INightShadeSwordAnimation animation;
-        private readonly NightShadeSwordSettings settings;
-        private readonly NightShadeSwordFightMemory fightMemory;
+        private readonly NightShadeSwordBehaviorContext context;
+        private readonly NightShadeSwordHitReactionRuntimeConfig settings;
 
         private EnemyHitRequest hitRequest;
         private HitReaction reaction;
@@ -33,17 +30,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         private float pushDistance;
 
         internal NightShadeSwordHitState(
-            NightShadeSwordSituationReader situation,
-            INightShadeSwordMovement movement,
-            INightShadeSwordAnimation animation,
-            NightShadeSwordSettings settings,
-            NightShadeSwordFightMemory fightMemory)
+            NightShadeSwordBehaviorContext context,
+            NightShadeSwordHitReactionRuntimeConfig settings)
         {
-            this.situation = situation;
-            this.movement = movement;
-            this.animation = animation;
+            this.context = context;
             this.settings = settings;
-            this.fightMemory = fightMemory;
         }
 
         internal void SetHitRequest(
@@ -59,7 +50,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
         public void Enter()
         {
-            fightMemory.ClearCombo();
             StartReaction();
         }
 
@@ -84,13 +74,13 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         private void StartReaction()
         {
             elapsedPushTime = 0f;
-            previousPushProgress = settings.EvaluateHitPushProgress(0f);
+            previousPushProgress = settings.EvaluatePushProgress(0f);
             remainingDownTime = 0f;
             elapsedReactionTime = 0f;
             hitStep = reaction == HitReaction.StaggerBreak
                 ? NightShadeHitStep.StaggerEnter
                 : NightShadeHitStep.Reaction;
-            animation.ResetAttackPlaybackSpeed();
+            context.Animation.ResetAttackPlaybackSpeed();
             PlayReactionAnimation();
         }
 
@@ -108,7 +98,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 }
 
                 hitStep = NightShadeHitStep.StaggerEnd;
-                animation.PlayStaggerEndFromStart();
+                context.Animation.PlayStaggerEndFromStart();
                 return null;
             }
 
@@ -121,12 +111,12 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 }
 
                 hitStep = NightShadeHitStep.GetUp;
-                animation.PlayGetUpFromStart();
+                context.Animation.PlayGetUpFromStart();
                 return null;
             }
 
-            if (!animation.TryGetRequestedAnimationTime(out float normalizedTime) ||
-                animation.IsTransitioning())
+            if (!context.Animation.TryGetRequestedAnimationTime(out float normalizedTime) ||
+                context.Animation.IsTransitioning())
             {
                 return null;
             }
@@ -139,7 +129,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             if (hitStep == NightShadeHitStep.StaggerEnter)
             {
                 hitStep = NightShadeHitStep.StaggerStart;
-                animation.PlayStaggerStartFromStart();
+                context.Animation.PlayStaggerStartFromStart();
                 return null;
             }
 
@@ -147,7 +137,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             {
                 hitStep = NightShadeHitStep.StaggerIdle;
                 remainingDownTime = settings.StaggerBreakStayDuration;
-                animation.PlayStaggerIdleFromStart();
+                context.Animation.PlayStaggerIdleFromStart();
                 return null;
             }
 
@@ -159,7 +149,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 return null;
             }
 
-            return situation.IsTargetDetected
+            return context.TargetStatus.IsDetected
                 ? NightShadeSwordStateId.Combat
                 : NightShadeSwordStateId.Idle;
         }
@@ -173,21 +163,21 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             switch (reaction)
             {
                 case HitReaction.SmallHit:
-                    animation.PlaySmallHitFromStart(
+                    context.Animation.PlaySmallHitFromStart(
                         hitRequest.HitDirection);
                     break;
                 case HitReaction.BigHit:
-                    animation.PlayBigHitFromStart(
+                    context.Animation.PlayBigHitFromStart(
                         hitRequest.HitDirection);
                     break;
                 case HitReaction.Knockback:
-                    animation.PlayKnockbackFromStart();
+                    context.Animation.PlayKnockbackFromStart();
                     break;
                 case HitReaction.Knockdown:
-                    animation.PlayKnockdownFromStart();
+                    context.Animation.PlayKnockdownFromStart();
                     break;
                 case HitReaction.StaggerBreak:
-                    animation.PlayStaggerEnterFromStart();
+                    context.Animation.PlayStaggerEnterFromStart();
                     break;
             }
         }
@@ -195,18 +185,18 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         private void ApplyHitMovement(float deltaTime)
         {
             float pushDuration =
-                settings.GetHitPushDuration(reaction);
+                settings.GetPushDuration(reaction);
             elapsedPushTime = Mathf.Min(
                 elapsedPushTime + Mathf.Max(0f, deltaTime), pushDuration);
             float pushProgress = Mathf.Max(
                 previousPushProgress,
-                settings.EvaluateHitPushProgress( elapsedPushTime / pushDuration));
+                settings.EvaluatePushProgress(elapsedPushTime / pushDuration));
             float deltaProgress = pushProgress - previousPushProgress;
             Vector3 movementAmount = hitRequest.PushDirection *
                 (pushDistance * deltaProgress);
 
             previousPushProgress = pushProgress;
-            movement.ApplyHitMovement(movementAmount, deltaTime);
+            context.Movement.ApplyHitMovement(movementAmount, deltaTime);
         }
     }
 }

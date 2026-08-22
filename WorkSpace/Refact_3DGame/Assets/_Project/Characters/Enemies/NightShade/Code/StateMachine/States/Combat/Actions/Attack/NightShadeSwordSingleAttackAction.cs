@@ -3,6 +3,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
     internal sealed class NightShadeSwordSingleAttackAction :
         NightShadeSwordAttackActionBase
     {
+        private const float HeavyProtectionStartNormalizedTime = 0.16f;
+        private const float HeavyProtectionEndNormalizedTime = 0.39f;
+
         private readonly NightShadeSwordActionId actionId;
         private readonly NightShadeSwordAttackType attackType;
 
@@ -20,27 +23,23 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                     return false;
                 }
 
-                return NightShadeSwordAttackTiming.IsHeavyProtectionTime(
-                    normalizedTime);
+                return normalizedTime >= HeavyProtectionStartNormalizedTime &&
+                    normalizedTime < HeavyProtectionEndNormalizedTime;
             }
         }
 
         internal NightShadeSwordSingleAttackAction(
             NightShadeSwordActionId actionId,
             NightShadeSwordAttackType attackType,
-            NightShadeSwordSituationReader situation,
-            NightShadeSwordFightMemory fightMemory,
-            INightShadeSwordMovement movement,
-            INightShadeSwordAnimation animation,
-            NightShadeSwordSettings settings,
-            NightShadeSwordActions actions)
+            NightShadeSwordBehaviorContext context,
+            NightShadeSwordRuntimeAttackData attackData,
+            NightShadeSwordAttackSelectionRuntimeConfig attackSelection,
+            NightShadeSwordCombatOutput combatOutput)
             : base(
-                situation,
-                fightMemory,
-                movement,
-                animation,
-                settings,
-                actions)
+                context,
+                attackData,
+                attackSelection,
+                combatOutput)
         {
             this.actionId = actionId;
             this.attackType = attackType;

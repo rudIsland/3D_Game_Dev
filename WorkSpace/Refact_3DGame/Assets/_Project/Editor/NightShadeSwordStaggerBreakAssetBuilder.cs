@@ -22,10 +22,14 @@ namespace rudIsland.RPG3D.EditorTools
             HitClipFolder + "/StaggerIdle.anim";
         private const string EndClipPath =
             HitClipFolder + "/StaggerEnd.anim";
-        private const string HipsPath = "mixamorig:Hips";
-        private const string LocalPositionX = "m_LocalPosition.x";
-        private const string LocalPositionZ = "m_LocalPosition.z";
+        private const string RootPositionX = "RootT.x";
+        private const string RootPositionZ = "RootT.z";
         private const float StaggerEnterPlaybackSpeed = 1.2f;
+        private const float StaggerStartPlaybackSpeed = 1.15f;
+        private const string StaggerEnterTrigger = "StaggerEnter";
+        private const string StaggerStartTrigger = "StaggerStart";
+        private const string StaggerIdleTrigger = "StaggerIdle";
+        private const string StaggerEndTrigger = "StaggerEnd";
 
         [MenuItem("Tools/rudIsland/Apply NightShade Stagger Break")]
         public static void Apply()
@@ -72,37 +76,57 @@ namespace rudIsland.RPG3D.EditorTools
             ConfigureClip(startClip, false);
             ConfigureClip(idleClip, true);
             ConfigureClip(endClip, false);
-            KeepHorizontalPositionInPlace(enterClip);
+            KeepHorizontalRootPositionInPlace(enterClip);
 
             AnimatorStateMachine stateMachine =
                 controller.layers[0].stateMachine;
             RemoveState(stateMachine, "Stagger Break Enter");
             RemoveState(stateMachine, "Stagger Break Stay");
             RemoveState(stateMachine, "Stagger Break Recover");
-            AddOrUpdateState(
+            AnimatorState enterState = AddOrUpdateState(
                 stateMachine,
                 "Stagger Enter",
                 enterClip,
                 new Vector3(0f, 750f),
                 StaggerEnterPlaybackSpeed);
-            AddOrUpdateState(
+            AnimatorState startState = AddOrUpdateState(
                 stateMachine,
                 "Stagger Start",
                 startClip,
                 new Vector3(220f, 750f),
-                1f);
-            AddOrUpdateState(
+                StaggerStartPlaybackSpeed);
+            AnimatorState idleState = AddOrUpdateState(
                 stateMachine,
                 "Stagger Idle",
                 idleClip,
                 new Vector3(440f, 750f),
                 1f);
-            AddOrUpdateState(
+            AnimatorState endState = AddOrUpdateState(
                 stateMachine,
                 "Stagger End",
                 endClip,
                 new Vector3(660f, 750f),
                 1f);
+            AddTrigger(controller, StaggerEnterTrigger);
+            AddTrigger(controller, StaggerStartTrigger);
+            AddTrigger(controller, StaggerIdleTrigger);
+            AddTrigger(controller, StaggerEndTrigger);
+            AddAnyStateTransition(
+                stateMachine,
+                enterState,
+                StaggerEnterTrigger);
+            AddTransition(
+                enterState,
+                startState,
+                StaggerStartTrigger);
+            AddTransition(
+                startState,
+                idleState,
+                StaggerIdleTrigger);
+            AddTransition(
+                idleState,
+                endState,
+                StaggerEndTrigger);
             EditorUtility.SetDirty(controller);
         }
 
@@ -121,8 +145,8 @@ namespace rudIsland.RPG3D.EditorTools
             EditorUtility.SetDirty(clip);
         }
 
-        // Enter의 수평 이동을 제거해 월드 위치는 CharacterController만 변경한다.
-        private static void KeepHorizontalPositionInPlace(
+        // Enter의 수평 Root 이동을 제거해 월드 위치는 CharacterController만 변경한다.
+        private static void KeepHorizontalRootPositionInPlace(
             AnimationClip clip)
         {
             EditorCurveBinding[] bindings =
@@ -132,10 +156,10 @@ namespace rudIsland.RPG3D.EditorTools
                 bindingIndex++)
             {
                 EditorCurveBinding binding = bindings[bindingIndex];
-                if (binding.type != typeof(Transform) ||
-                    binding.path != HipsPath ||
-                    (binding.propertyName != LocalPositionX &&
-                        binding.propertyName != LocalPositionZ))
+                if (binding.type != typeof(Animator) ||
+                    !string.IsNullOrEmpty(binding.path) ||
+                    (binding.propertyName != RootPositionX &&
+                        binding.propertyName != RootPositionZ))
                 {
                     continue;
                 }
@@ -148,12 +172,13 @@ namespace rudIsland.RPG3D.EditorTools
                 }
 
                 Keyframe[] keys = curve.keys;
+                float firstPosition = keys[0].value;
                 for (int keyIndex = 0;
                     keyIndex < keys.Length;
                     keyIndex++)
                 {
                     Keyframe key = keys[keyIndex];
-                    key.value = 0f;
+                    key.value = firstPosition;
                     key.inTangent = 0f;
                     key.outTangent = 0f;
                     keys[keyIndex] = key;
@@ -183,7 +208,7 @@ namespace rudIsland.RPG3D.EditorTools
                 $"애니메이션 클립을 찾지 못했습니다: {assetPath}");
         }
 
-        private static void AddOrUpdateState(
+        private static AnimatorState AddOrUpdateState(
             AnimatorStateMachine stateMachine,
             string stateName,
             AnimationClip clip,
@@ -237,6 +262,105 @@ namespace rudIsland.RPG3D.EditorTools
             keptState.writeDefaultValues = true;
             keptState.speedParameterActive = false;
             EditorUtility.SetDirty(keptState);
+            return keptState;
+        }
+
+        private static void AddTrigger(
+            AnimatorController controller,
+            string triggerName)
+        {
+            AnimatorControllerParameter[] parameters = controller.parameters;
+            for (int index = 0; index < parameters.Length; index++)
+            {
+                if (parameters[index].name == triggerName)
+                {
+                    return;
+                }
+            }
+
+            controller.AddParameter(
+                triggerName,
+                AnimatorControllerParameterType.Trigger);
+        }
+
+        // 기존 Transition은 건드리지 않아 Inspector에서 조정한 시간을 보존한다.
+        private static void AddAnyStateTransition(
+            AnimatorStateMachine stateMachine,
+            AnimatorState destinationState,
+            string triggerName)
+        {
+            AnimatorStateTransition[] transitions =
+                stateMachine.anyStateTransitions;
+            for (int index = 0; index < transitions.Length; index++)
+            {
+                if (transitions[index].destinationState == destinationState &&
+                    HasCondition(transitions[index], triggerName))
+                {
+                    return;
+                }
+            }
+
+            AnimatorStateTransition transition =
+                stateMachine.AddAnyStateTransition(destinationState);
+            ConfigureNewTransition(
+                transition,
+                triggerName);
+            transition.canTransitionToSelf = false;
+        }
+
+        // 기존 Transition은 건드리지 않아 Inspector에서 조정한 시간을 보존한다.
+        private static void AddTransition(
+            AnimatorState sourceState,
+            AnimatorState destinationState,
+            string triggerName)
+        {
+            AnimatorStateTransition[] transitions = sourceState.transitions;
+            for (int index = 0; index < transitions.Length; index++)
+            {
+                if (transitions[index].destinationState == destinationState &&
+                    HasCondition(transitions[index], triggerName))
+                {
+                    return;
+                }
+            }
+
+            AnimatorStateTransition transition =
+                sourceState.AddTransition(destinationState);
+            ConfigureNewTransition(
+                transition,
+                triggerName);
+        }
+
+        private static void ConfigureNewTransition(
+            AnimatorStateTransition transition,
+            string triggerName)
+        {
+            transition.hasExitTime = false;
+            transition.hasFixedDuration = true;
+            transition.offset = 0f;
+            transition.interruptionSource =
+                TransitionInterruptionSource.None;
+            transition.AddCondition(
+                AnimatorConditionMode.If,
+                0f,
+                triggerName);
+            EditorUtility.SetDirty(transition);
+        }
+
+        private static bool HasCondition(
+            AnimatorStateTransition transition,
+            string parameterName)
+        {
+            AnimatorCondition[] conditions = transition.conditions;
+            for (int index = 0; index < conditions.Length; index++)
+            {
+                if (conditions[index].parameter == parameterName)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static void RemoveState(

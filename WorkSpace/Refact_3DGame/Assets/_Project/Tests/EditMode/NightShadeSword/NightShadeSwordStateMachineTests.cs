@@ -20,8 +20,8 @@ namespace rudIsland.RPG3D.Tests
 
             machine.Update(0.1f);
             Assert.That(machine.CurrentStateId, Is.EqualTo(NightShadeSwordStateId.Combat));
-            Assert.That(machine.CurrentCombatPhase, Is.EqualTo(NightShadeSwordCombatPhase.Positioning));
-            Assert.That(machine.CurrentActionId, Is.EqualTo(NightShadeSwordActionId.WatchTarget));
+            Assert.That(machine.CurrentCombatPhase, Is.EqualTo(NightShadeSwordCombatPhase.PrepareAttack));
+            Assert.That(machine.CurrentActionId, Is.EqualTo(NightShadeSwordActionId.None));
 
             machine.Update(0.1f);
             Assert.That(machine.Debug.LastEvaluatedPhase, Is.EqualTo(NightShadeSwordCombatPhase.Attack));
@@ -33,8 +33,8 @@ namespace rudIsland.RPG3D.Tests
             Assert.That(machine.CurrentActionId, Is.EqualTo(NightShadeSwordActionId.LeftRecovery));
 
             machine.Update(0.6f);
-            Assert.That(machine.CurrentCombatPhase, Is.EqualTo(NightShadeSwordCombatPhase.Positioning));
-            Assert.That(machine.CurrentActionId, Is.EqualTo(NightShadeSwordActionId.WatchTarget));
+            Assert.That(machine.CurrentCombatPhase, Is.EqualTo(NightShadeSwordCombatPhase.PrepareAttack));
+            Assert.That(machine.CurrentActionId, Is.EqualTo(NightShadeSwordActionId.None));
         }
 
         [Test]
@@ -55,8 +55,8 @@ namespace rudIsland.RPG3D.Tests
             machine.Update(0.6f);
             machine.Update(1.3f);
 
-            Assert.That(machine.CurrentCombatPhase, Is.EqualTo(NightShadeSwordCombatPhase.Positioning));
-            Assert.That(machine.CurrentActionId, Is.EqualTo(NightShadeSwordActionId.WatchTarget));
+            Assert.That(machine.CurrentCombatPhase, Is.EqualTo(NightShadeSwordCombatPhase.PrepareAttack));
+            Assert.That(machine.CurrentActionId, Is.EqualTo(NightShadeSwordActionId.None));
             Assert.That(scope.Animation.AttackCount, Is.EqualTo(attackCount));
 
             machine.Update(0.2f);
@@ -74,8 +74,8 @@ namespace rudIsland.RPG3D.Tests
                 new FixedNightShadeSwordRandomProvider());
             machine.Enable();
             machine.Update(0.1f);
-            machine.FightMemory.RecordAttack(NightShadeSwordActionId.Heavy);
-            machine.FightMemory.StartPostAttackDelay(2f);
+            machine.CombatMemory.RecordAttack(NightShadeSwordActionId.Heavy);
+            machine.CombatMemory.StartPostAttackDelay(2f);
 
             machine.Disable();
             machine.Enable();
@@ -83,8 +83,8 @@ namespace rudIsland.RPG3D.Tests
             Assert.That(machine.IsInCombat, Is.False);
             Assert.That(machine.CurrentStateId, Is.EqualTo(NightShadeSwordStateId.Idle));
             Assert.That(machine.CurrentActionId, Is.EqualTo(NightShadeSwordActionId.None));
-            Assert.That(machine.FightMemory.HasPreviousAttack, Is.False);
-            Assert.That(machine.FightMemory.RemainingPostAttackDelay, Is.Zero);
+            Assert.That(machine.CombatMemory.HasPreviousAttack, Is.False);
+            Assert.That(machine.CombatMemory.RemainingPostAttackDelay, Is.Zero);
         }
     }
 }

@@ -7,18 +7,23 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
     internal enum NightShadeSwordCombatPhase
     {
         None = 0,
-        Positioning = 1, // 타겟과의 거리와 방향을 맞춘다.
-        Decision = 2,    // 실행 가능한 공격의 점수를 비교한다.
-        Attack = 3,      // 선택된 공격을 애니메이션 종료까지 수행한다.
-        Recovery = 4     // 공격 후 잠시 쉬거나 이동한다.
+        Approach = 1,
+        PrepareAttack = 2,
+        Attack = 3,
+        Recovery = 4
+    }
+
+    internal enum NightShadeSwordApproachMode
+    {
+        None = 0,
+        Chase = 1,
+        Walk = 2
     }
 
     internal enum NightShadeSwordActionId
     {
         None = 0,
-        Chase = 1,
-        WalkApproach = 2,
-        WatchTarget = 3,
+        // 1~3은 기존 직렬화 값과 디버그 기록 호환을 위해 비워 둔다.
         Light = 4,
         Combo = 5,
         Heavy = 6,
@@ -32,14 +37,10 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
     internal enum NightShadeSwordActionRejectReason
     {
         None = 0,
-        WrongPhase = 1,
-        TargetNotDetected = 2,
-        TargetOutsideAttackRange = 3,
-        TargetInsideAttackRange = 4,
-        TargetTooCloseForChase = 5,
-        TargetTooFarForWalk = 6,
-        DirectionNotMatched = 7,
-        PostAttackDelayRemaining = 8
+        TargetNotDetected = 1,
+        TargetOutsideAttackRange = 2,
+        DirectionNotMatched = 3,
+        PostAttackDelayRemaining = 4
     }
 
     // Action Exit에서 정리 방법을 결정할 때 사용하는 종료 이유다.

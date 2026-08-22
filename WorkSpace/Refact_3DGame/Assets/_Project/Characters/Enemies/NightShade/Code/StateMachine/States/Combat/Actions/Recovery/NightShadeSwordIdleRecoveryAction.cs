@@ -6,25 +6,19 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         public override NightShadeSwordActionId ActionId => NightShadeSwordActionId.IdleRecovery;
 
         internal NightShadeSwordIdleRecoveryAction(
-            NightShadeSwordSituationReader situation,
-            NightShadeSwordFightMemory fightMemory,
-            INightShadeSwordMovement movement,
-            INightShadeSwordAnimation animation,
-            NightShadeSwordSettings settings)
-            : base(situation, fightMemory, movement, animation, settings)
+            NightShadeSwordBehaviorContext context,
+            NightShadeSwordRecoveryRuntimeConfig recovery)
+            : base(context, recovery)
         {
         }
 
-        public override NightShadeSwordActionScore GetScore(
-            NightShadeSwordSituationReader situation,
-            NightShadeSwordFightMemory fightMemory,
-            float randomBonus)
+        public override NightShadeSwordActionScore GetScore(float randomBonus)
         {
             return new NightShadeSwordActionScore(
-                Settings.IdleRecoveryBaseScore,
-                situation.AttackDistanceRatio *
-                    Settings.IdleRecoveryDistanceWeight,
-                GetRepeatPenalty(fightMemory),
+                Recovery.IdleBaseScore,
+                TargetStatus.AttackDistanceRatio *
+                    Recovery.IdleDistanceWeight,
+                GetRepeatPenalty(),
                 randomBonus);
         }
 
@@ -35,10 +29,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
         protected override void Move(float deltaTime)
         {
-            Movement.TurnTo(
-                Situation.TargetPosition,
-                Settings.TurnSpeed,
-                deltaTime);
+            Movement.TurnToTarget(TargetStatus.TargetPosition, deltaTime);
         }
     }
 }

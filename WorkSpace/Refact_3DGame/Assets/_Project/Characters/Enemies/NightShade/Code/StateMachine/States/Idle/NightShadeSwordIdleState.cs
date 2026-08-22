@@ -3,29 +3,23 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
     // 대기 중 중력을 적용하고 감지된 대상이 있으면 Combat 상위 상태로 넘긴다.
     internal sealed class NightShadeSwordIdleState : INightShadeSwordState
     {
-        private readonly NightShadeSwordSituationReader situation;
-        private readonly INightShadeSwordMovement movement;
-        private readonly INightShadeSwordAnimation animation;
+        private readonly NightShadeSwordBehaviorContext context;
 
         internal NightShadeSwordIdleState(
-            NightShadeSwordSituationReader situation,
-            INightShadeSwordMovement movement,
-            INightShadeSwordAnimation animation)
+            NightShadeSwordBehaviorContext context)
         {
-            this.situation = situation;
-            this.movement = movement;
-            this.animation = animation;
+            this.context = context;
         }
 
         public void Enter()
         {
-            animation.PlayIdle();
+            context.Animation.PlayIdle();
         }
 
         public NightShadeSwordStateId? Update(float deltaTime)
         {
-            movement.StayOnGround(deltaTime);
-            if (!situation.IsTargetDetected)
+            context.Movement.StayOnGround(deltaTime);
+            if (!context.TargetStatus.IsDetected)
             {
                 return null;
             }

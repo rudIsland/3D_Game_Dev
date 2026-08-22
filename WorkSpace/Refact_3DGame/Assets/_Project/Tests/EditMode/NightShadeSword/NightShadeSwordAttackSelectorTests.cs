@@ -10,7 +10,7 @@ namespace rudIsland.RPG3D.Tests
         [TestCase(2.2f, 4)]
         [TestCase(2.6f, 7)]
         [TestCase(3.6f, 6)]
-        public void Decision_거리별최고점공격을고른다(
+        public void PrepareAttack_거리별최고점공격을고른다(
             float distance,
             int expectedActionValue)
         {
@@ -28,7 +28,7 @@ namespace rudIsland.RPG3D.Tests
         }
 
         [Test]
-        public void Decision_직전공격반복감점이최종점수와선택에반영된다()
+        public void PrepareAttack_직전공격반복감점이최종점수와선택에반영된다()
         {
             using var scope = new NightShadeSwordTestScope(
                 new Vector3(0f, 0f, 2.2f));
@@ -36,7 +36,7 @@ namespace rudIsland.RPG3D.Tests
                 scope.CreateSettings(),
                 new FixedNightShadeSwordRandomProvider());
             machine.Enable();
-            machine.FightMemory.RecordAttack(NightShadeSwordActionId.Light);
+            machine.CombatMemory.RecordAttack(NightShadeSwordActionId.Light);
 
             machine.Update(0.1f);
             machine.Update(0.1f);
@@ -58,7 +58,7 @@ namespace rudIsland.RPG3D.Tests
         }
 
         [Test]
-        public void Decision_고정난수공급자는같은입력에서같은결과를낸다()
+        public void PrepareAttack_고정난수공급자는같은입력에서같은결과를낸다()
         {
             NightShadeSwordActionId first = SelectAtDistance(2.6f, 0.75f);
             NightShadeSwordActionId second = SelectAtDistance(2.6f, 0.75f);
@@ -67,9 +67,9 @@ namespace rudIsland.RPG3D.Tests
         }
 
         [Test]
-        public void FightMemory_공격Recovery와쿨다운을초기화하고0까지만감소시킨다()
+        public void CombatMemory_공격Recovery와쿨다운을초기화하고0까지만감소시킨다()
         {
-            var memory = new NightShadeSwordFightMemory();
+            var memory = new NightShadeSwordCombatMemory();
             memory.Reset();
             memory.RecordAttack(NightShadeSwordActionId.Heavy);
             memory.RecordRecovery(NightShadeSwordActionId.LeftRecovery);
@@ -84,7 +84,6 @@ namespace rudIsland.RPG3D.Tests
 
             Assert.That(memory.HasPreviousAttack, Is.False);
             Assert.That(memory.HasPreviousRecovery, Is.False);
-            Assert.That(memory.RecentSelection, Is.EqualTo(NightShadeSwordActionId.None));
         }
 
         private static NightShadeSwordActionId SelectAtDistance(

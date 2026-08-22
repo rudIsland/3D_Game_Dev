@@ -28,20 +28,13 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         private NightShadeSwordWorldUnit swordWorldUnit;
         private CombatHitEffectPlayer hitEffectPlayer;
         private NightShadeSwordAttackAudio attackAudio;
-        private NightShadeSwordSettings runtimeSettings;
 
         public bool IsDead => swordWorldUnit != null && swordWorldUnit.IsDead;
         internal bool IsAttackStateActive =>
             swordWorldUnit != null && swordWorldUnit.IsAttackStateActive;
 
-        public string DebugTopStateName => GetCombatDebug()?.TopState.ToString() ?? "없음";
-        public string DebugCombatPhaseName => GetCombatDebug()?.CombatPhase.ToString() ?? "없음";
-        public string DebugCurrentActionName => GetCombatDebug()?.CurrentAction.ToString() ?? "없음";
-        public string DebugCurrentStopReasonName => GetCombatDebug()?.CurrentActionStopReason.ToString() ?? "없음";
-        public string DebugLastEvaluatedPhaseName => GetCombatDebug()?.LastEvaluatedPhase.ToString() ?? "없음";
-        public string DebugSelectedActionName => GetCombatDebug()?.SelectedAction.ToString() ?? "없음";
-        public string DebugPreviousStopReasonName => GetCombatDebug()?.PreviousActionStopReason.ToString() ?? "없음";
-        public int DebugCandidateCount => GetCombatDebug()?.CandidateCount ?? 0;
+        internal NightShadeSwordCombatDebug CombatDebug =>
+            swordWorldUnit?.CombatDebug;
 
         protected override IWorldObject CreateRuntimeObject()
         {
@@ -60,23 +53,23 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
             enemyAnimator.applyRootMotion = false;
             swordAnimation.ConnectAnimator(enemyAnimator);
-            runtimeSettings = config.CreateRuntimeSettings();
+            NightShadeSwordSettings settings = config.CreateRuntimeSettings();
 
             var movement = new NightShadeSwordMovement(
                 transform,
                 characterController,
-                runtimeSettings.Gravity,
-                runtimeSettings.GroundPull);
+                settings.Movement,
+                settings.Recovery.MoveSpeed);
             var hitStop = new CombatHitStop(enemyAnimator);
             attackRangeDetector = new NightShadeSwordAttackRangeDetector(
                 transform,
-                runtimeSettings.TargetLayers,
+                settings.CombatRange.TargetLayers,
                 swordHitShape,
                 hitStop,
                 hitEffectPlayer);
             IUnitDeathState targetDeathState =
                 target.GetComponentInParent<IUnitDeathState>();
-            var actions = new NightShadeSwordActions(
+            var combatOutput = new NightShadeSwordCombatOutput(
                 PlayAttackSound,
                 OpenAttackHit,
                 CloseAttackHit,
@@ -86,15 +79,15 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 targetDeathState,
                 movement,
                 swordAnimation,
-                runtimeSettings,
-                actions);
+                settings,
+                combatOutput);
             var stopPoint = new StopPoint(
-                runtimeSettings.StaggerLimit,
-                runtimeSettings.StaggerRecoverDelay,
-                runtimeSettings.StaggerRecoverSpeed);
+                settings.Life.StaggerLimit,
+                settings.Life.StaggerRecoverDelay,
+                settings.Life.StaggerRecoverSpeed);
 
             swordWorldUnit = new NightShadeSwordWorldUnit(
-                runtimeSettings.MaxHealth,
+                settings.Life.MaxHealth,
                 stateMachine,
                 attackRangeDetector,
                 stopPoint,
@@ -141,91 +134,14 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             attackAudio?.Play(attackType, hitIndex);
         }
 
-        private void OpenAttackHit(NightShadeSwordAttackType attackType, int hitIndex)
+        private void OpenAttackHit(AttackDamage attackDamage)
         {
-            attackRangeDetector?.Open(GetAttackDamage(attackType, hitIndex));
+            attackRangeDetector?.Open(attackDamage);
         }
 
         private void CloseAttackHit()
         {
             attackRangeDetector?.Close();
-        }
-
-        private AttackDamage GetAttackDamage(NightShadeSwordAttackType attackType, int hitIndex)
-        {
-            return runtimeSettings.GetAttackDamage(attackType);
-        }
-
-        public string GetDebugCandidateActionName(int index)
-        {
-            return TryGetDebugCandidate(index, out NightShadeSwordActionDebugEntry entry)
-                ? entry.ActionId.ToString()
-                : "없음";
-        }
-
-        public bool GetDebugCandidateCanStart(int index)
-        {
-            return TryGetDebugCandidate(index, out NightShadeSwordActionDebugEntry entry) &&
-                entry.CanStart;
-        }
-
-        public string GetDebugCandidateRejectReasonName(int index)
-        {
-            return TryGetDebugCandidate(index, out NightShadeSwordActionDebugEntry entry)
-                ? entry.RejectReason.ToString()
-                : "없음";
-        }
-
-        public float GetDebugCandidateBaseScore(int index) =>
-            TryGetDebugCandidate(index, out NightShadeSwordActionDebugEntry entry)
-                ? entry.Score.BaseScore
-                : 0f;
-
-        public float GetDebugCandidateDistanceScore(int index) =>
-            TryGetDebugCandidate(index, out NightShadeSwordActionDebugEntry entry)
-                ? entry.Score.DistanceScore
-                : 0f;
-
-        public float GetDebugCandidateRepeatPenalty(int index) =>
-            TryGetDebugCandidate(index, out NightShadeSwordActionDebugEntry entry)
-                ? entry.Score.RepeatPenalty
-                : 0f;
-
-        public float GetDebugCandidateRandomBonus(int index) =>
-            TryGetDebugCandidate(index, out NightShadeSwordActionDebugEntry entry)
-                ? entry.Score.RandomBonus
-                : 0f;
-
-        public float GetDebugCandidateFinalScore(int index) =>
-            TryGetDebugCandidate(index, out NightShadeSwordActionDebugEntry entry)
-                ? entry.Score.FinalScore
-                : 0f;
-
-        public bool GetDebugCandidateIsSelected(int index)
-        {
-            return TryGetDebugCandidate(index, out NightShadeSwordActionDebugEntry entry) &&
-                entry.IsSelected;
-        }
-
-        private NightShadeSwordCombatDebug GetCombatDebug()
-        {
-            return swordWorldUnit?.CombatDebug;
-        }
-
-        private bool TryGetDebugCandidate(
-            int index,
-            out NightShadeSwordActionDebugEntry entry)
-        {
-            NightShadeSwordCombatDebug combatDebug = GetCombatDebug();
-            if (combatDebug == null ||
-                (uint)index >= (uint)combatDebug.CandidateCount)
-            {
-                entry = default;
-                return false;
-            }
-
-            entry = combatDebug.Candidates[index];
-            return true;
         }
 
         private void FindSceneReferences()
@@ -286,11 +202,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(
                 transform.position,
-                Mathf.Sqrt(previewSettings.FindRangeSquared));
+                Mathf.Sqrt(previewSettings.CombatRange.FindRangeSquared));
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(
                 transform.position,
-                previewSettings.AttackRange);
+                previewSettings.CombatRange.AttackRange);
 
             if (swordHitShape == null || !swordHitShape.IsReady)
             {

@@ -5,56 +5,41 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
     internal sealed class NightShadeSwordActionSelector
     {
         private readonly INightShadeSwordRandomProvider randomProvider;
-        private readonly NightShadeSwordSettings settings;
         private readonly NightShadeSwordCombatDebug debug;
 
         internal NightShadeSwordActionSelector(
             INightShadeSwordRandomProvider randomProvider,
-            NightShadeSwordSettings settings,
             NightShadeSwordCombatDebug debug)
         {
             this.randomProvider = randomProvider;
-            this.settings = settings;
             this.debug = debug;
         }
 
         internal INightShadeSwordCombatAction Select(
+            NightShadeSwordCombatPhase combatPhase,
             INightShadeSwordCombatAction[] candidates,
-            int candidateCount,
-            NightShadeSwordSituationReader situation,
-            NightShadeSwordFightMemory fightMemory)
+            float randomBonusMax)
         {
+            int candidateCount = candidates != null ? candidates.Length : 0;
             candidateCount = candidateCount < 0
                 ? 0
                 : candidateCount > NightShadeSwordCombatDebug.CandidateCapacity
                     ? NightShadeSwordCombatDebug.CandidateCapacity
                     : candidateCount;
-            NightShadeSwordCombatPhase phase = candidateCount > 0
-                ? candidates[0].Phase
-                : NightShadeSwordCombatPhase.None;
-            debug.BeginEvaluation(phase, candidateCount);
+            debug.BeginEvaluation(combatPhase, candidateCount);
 
             int selectedIndex = -1;
             float highestScore = float.NegativeInfinity;
-            float randomBonusMax = phase == NightShadeSwordCombatPhase.Attack
-                ? settings.AttackRandomBonusMax
-                : settings.RecoveryRandomBonusMax;
-
             for (int index = 0; index < candidateCount; index++)
             {
                 INightShadeSwordCombatAction candidate = candidates[index];
                 bool canStart = candidate.CanStart(
-                    situation,
-                    fightMemory,
                     out NightShadeSwordActionRejectReason rejectReason);
                 NightShadeSwordActionScore score = default;
                 if (canStart)
                 {
                     float randomBonus = randomProvider.Next01() * randomBonusMax;
-                    score = candidate.GetScore(
-                        situation,
-                        fightMemory,
-                        randomBonus);
+                    score = candidate.GetScore(randomBonus);
                     if (score.FinalScore > highestScore)
                     {
                         highestScore = score.FinalScore;

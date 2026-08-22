@@ -142,77 +142,93 @@ namespace rudIsland.RPG3D.Tests
         private static void AssertExpectedSettings(
             NightShadeSwordSettings settings)
         {
-            Assert.That(settings.MaxHealth, Is.EqualTo(250f));
-            Assert.That(settings.StaggerLimit, Is.EqualTo(100f));
-            Assert.That(settings.StaggerRecoverDelay, Is.EqualTo(2.5f));
-            Assert.That(settings.StaggerRecoverSpeed, Is.EqualTo(8f));
-            Assert.That(settings.TargetLayers.value, Is.EqualTo(1 << 17));
-            Assert.That(settings.Gravity, Is.EqualTo(-22f));
-            Assert.That(settings.GroundPull, Is.EqualTo(-2f));
+            Assert.That(settings.Life.MaxHealth, Is.EqualTo(250f));
+            Assert.That(settings.Life.StaggerLimit, Is.EqualTo(100f));
+            Assert.That(settings.Life.StaggerRecoverDelay, Is.EqualTo(2.5f));
+            Assert.That(settings.Life.StaggerRecoverSpeed, Is.EqualTo(8f));
+            Assert.That(settings.CombatRange.TargetLayers.value, Is.EqualTo(1 << 17));
+            Assert.That(settings.Movement.Gravity, Is.EqualTo(-22f));
+            Assert.That(settings.Movement.GroundPull, Is.EqualTo(-2f));
 
-            Assert.That(settings.FindRangeSquared, Is.EqualTo(576f));
-            Assert.That(settings.AttackRange, Is.EqualTo(2.4f));
-            Assert.That(settings.AttackRangeSquared, Is.EqualTo(5.76f).Within(0.0001f));
-            Assert.That(settings.WalkStartRangeSquared, Is.EqualTo(25f));
-            Assert.That(settings.RunStartRangeSquared, Is.EqualTo(36f));
-            Assert.That(settings.AttackFacingDot, Is.EqualTo(Mathf.Cos(14f * Mathf.Deg2Rad)).Within(0.0001f));
-            Assert.That(settings.WalkSpeed, Is.EqualTo(1.8f));
-            Assert.That(settings.ChaseSpeed, Is.EqualTo(3.8f));
-            Assert.That(settings.TurnSpeed, Is.EqualTo(420f));
-            Assert.That(settings.AttackTurnSpeed, Is.EqualTo(180f));
+            Assert.That(settings.CombatRange.FindRangeSquared, Is.EqualTo(576f));
+            Assert.That(settings.CombatRange.AttackRange, Is.EqualTo(2.4f));
+            Assert.That(settings.CombatRange.AttackRangeSquared, Is.EqualTo(5.76f).Within(0.0001f));
+            Assert.That(settings.CombatRange.WalkStartRangeSquared, Is.EqualTo(25f));
+            Assert.That(settings.CombatRange.RunStartRangeSquared, Is.EqualTo(36f));
+            Assert.That(settings.CombatRange.AttackFacingDot, Is.EqualTo(Mathf.Cos(14f * Mathf.Deg2Rad)).Within(0.0001f));
+            Assert.That(settings.Movement.WalkSpeed, Is.EqualTo(1.8f));
+            Assert.That(settings.Movement.ChaseSpeed, Is.EqualTo(3.8f));
+            Assert.That(settings.Movement.TurnSpeed, Is.EqualTo(420f));
+            Assert.That(settings.Movement.AttackTurnSpeed, Is.EqualTo(180f));
 
-            Assert.That(settings.GetPostAttackDelay(NightShadeSwordActionId.Light), Is.EqualTo(2f));
-            Assert.That(settings.GetPostAttackDelay(NightShadeSwordActionId.Combo), Is.EqualTo(2.5f));
-            Assert.That(settings.GetPostAttackDelay(NightShadeSwordActionId.Heavy), Is.EqualTo(3f));
-            Assert.That(settings.GetPostAttackDelay(NightShadeSwordActionId.WideSwing), Is.EqualTo(2.5f));
-            Assert.That(settings.ComboFirstExitNormalizedTime, Is.EqualTo(0.4f));
-            Assert.That(settings.ComboSecondDelay, Is.EqualTo(0.15f));
-            Assert.That(settings.AttackDistanceScoreWeight, Is.EqualTo(0.55f));
-            Assert.That(settings.AttackRepeatPenalty, Is.EqualTo(0.25f));
-            Assert.That(settings.AttackRandomBonusMax, Is.EqualTo(0.05f));
+            Assert.That(settings.GetAttackData(NightShadeSwordActionId.Light).PostAttackDelay, Is.EqualTo(2f));
+            Assert.That(settings.GetAttackData(NightShadeSwordActionId.Combo).PostAttackDelay, Is.EqualTo(2.5f));
+            Assert.That(settings.GetAttackData(NightShadeSwordActionId.Heavy).PostAttackDelay, Is.EqualTo(3f));
+            Assert.That(settings.GetAttackData(NightShadeSwordActionId.WideSwing).PostAttackDelay, Is.EqualTo(2.5f));
+            Assert.That(settings.GetAttackData(NightShadeSwordActionId.Combo).ComboFirstExitNormalizedTime, Is.EqualTo(0.4f));
+            Assert.That(settings.GetAttackData(NightShadeSwordActionId.Combo).ComboSecondDelay, Is.EqualTo(0.15f));
+            AssertAttackCorrection(
+                settings,
+                NightShadeSwordActionId.Light,
+                0.18f);
+            AssertAttackCorrection(
+                settings,
+                NightShadeSwordActionId.Combo,
+                0.17f);
+            AssertAttackCorrection(
+                settings,
+                NightShadeSwordActionId.Heavy,
+                0.26f);
+            AssertAttackCorrection(
+                settings,
+                NightShadeSwordActionId.WideSwing,
+                0.18f);
+            Assert.That(settings.AttackSelection.DistanceScoreWeight, Is.EqualTo(0.55f));
+            Assert.That(settings.AttackSelection.RepeatPenalty, Is.EqualTo(0.25f));
+            Assert.That(settings.AttackSelection.RandomBonusMax, Is.EqualTo(0.05f));
 
             AssertAttackScore(
-                settings.GetAttackScoreSettings(NightShadeSwordActionId.Light),
+                settings.GetAttackData(NightShadeSwordActionId.Light).Score,
                 0.35f,
                 0.55f,
                 0.55f);
             AssertAttackScore(
-                settings.GetAttackScoreSettings(NightShadeSwordActionId.Combo),
+                settings.GetAttackData(NightShadeSwordActionId.Combo).Score,
                 0.40f,
                 0.25f,
                 0.35f);
             AssertAttackScore(
-                settings.GetAttackScoreSettings(NightShadeSwordActionId.Heavy),
+                settings.GetAttackData(NightShadeSwordActionId.Heavy).Score,
                 0.40f,
                 0.90f,
                 0.30f);
             AssertAttackScore(
-                settings.GetAttackScoreSettings(NightShadeSwordActionId.WideSwing),
+                settings.GetAttackData(NightShadeSwordActionId.WideSwing).Score,
                 0.38f,
                 0.65f,
                 0.45f);
 
-            Assert.That(settings.RecoveryMoveSpeed, Is.EqualTo(2f));
-            Assert.That(settings.RecoveryMoveDuration, Is.EqualTo(0.6f));
-            Assert.That(settings.IdleRecoveryBaseScore, Is.EqualTo(0.35f));
-            Assert.That(settings.IdleRecoveryDistanceWeight, Is.EqualTo(0.35f));
-            Assert.That(settings.BackRecoveryBaseScore, Is.EqualTo(0.25f));
-            Assert.That(settings.BackRecoveryCloseWeight, Is.EqualTo(0.65f));
-            Assert.That(settings.SideRecoveryBaseScore, Is.EqualTo(0.35f));
-            Assert.That(settings.SideRecoveryDistanceWeight, Is.EqualTo(0.35f));
-            Assert.That(settings.RecoveryRepeatPenalty, Is.EqualTo(0.20f));
-            Assert.That(settings.RecoveryRandomBonusMax, Is.EqualTo(0.05f));
+            Assert.That(settings.Recovery.MoveSpeed, Is.EqualTo(2f));
+            Assert.That(settings.Recovery.MoveDuration, Is.EqualTo(0.6f));
+            Assert.That(settings.Recovery.IdleBaseScore, Is.EqualTo(0.35f));
+            Assert.That(settings.Recovery.IdleDistanceWeight, Is.EqualTo(0.35f));
+            Assert.That(settings.Recovery.BackBaseScore, Is.EqualTo(0.25f));
+            Assert.That(settings.Recovery.BackCloseWeight, Is.EqualTo(0.65f));
+            Assert.That(settings.Recovery.SideBaseScore, Is.EqualTo(0.35f));
+            Assert.That(settings.Recovery.SideDistanceWeight, Is.EqualTo(0.35f));
+            Assert.That(settings.Recovery.RepeatPenalty, Is.EqualTo(0.20f));
+            Assert.That(settings.Recovery.RandomBonusMax, Is.EqualTo(0.05f));
 
-            Assert.That(settings.HitPushDuration, Is.EqualTo(0.18f));
-            Assert.That(settings.KnockbackPushDuration, Is.EqualTo(0.28f));
-            Assert.That(settings.KnockdownPushDuration, Is.EqualTo(0.38f));
-            Assert.That(settings.KnockdownStayDuration, Is.EqualTo(0.75f));
-            Assert.That(settings.HitPushCurve, Is.Not.Null);
-            Assert.That(settings.HitPushCurve.length, Is.EqualTo(2));
-            Assert.That(settings.DeadBodyKeepTime, Is.EqualTo(3f));
+            Assert.That(settings.HitReaction.PushDuration, Is.EqualTo(0.18f));
+            Assert.That(settings.HitReaction.KnockbackPushDuration, Is.EqualTo(0.28f));
+            Assert.That(settings.HitReaction.KnockdownPushDuration, Is.EqualTo(0.38f));
+            Assert.That(settings.HitReaction.KnockdownStayDuration, Is.EqualTo(0.75f));
+            Assert.That(settings.HitReaction.PushCurve, Is.Not.Null);
+            Assert.That(settings.HitReaction.PushCurve.length, Is.EqualTo(2));
+            Assert.That(settings.Life.DeadBodyKeepTime, Is.EqualTo(3f));
 
             AssertDamage(
-                settings.GetAttackDamage(NightShadeSwordAttackType.Light),
+                settings.GetAttackData(NightShadeSwordActionId.Light).GetHitDamage(0),
                 18f,
                 AttackStrength.Heavy,
                 18f,
@@ -220,7 +236,7 @@ namespace rudIsland.RPG3D.Tests
                 30f,
                 0.06f);
             AssertDamage(
-                settings.GetAttackDamage(NightShadeSwordAttackType.ComboFirst),
+                settings.GetAttackData(NightShadeSwordActionId.Combo).GetHitDamage(0),
                 12f,
                 AttackStrength.Heavy,
                 12f,
@@ -228,7 +244,7 @@ namespace rudIsland.RPG3D.Tests
                 20f,
                 0.045f);
             AssertDamage(
-                settings.GetAttackDamage(NightShadeSwordAttackType.ComboSecond),
+                settings.GetAttackData(NightShadeSwordActionId.Combo).GetHitDamage(1),
                 16f,
                 AttackStrength.Heavy,
                 18f,
@@ -236,7 +252,7 @@ namespace rudIsland.RPG3D.Tests
                 25f,
                 0.06f);
             AssertDamage(
-                settings.GetAttackDamage(NightShadeSwordAttackType.Heavy),
+                settings.GetAttackData(NightShadeSwordActionId.Heavy).GetHitDamage(0),
                 28f,
                 AttackStrength.Knockdown,
                 35f,
@@ -244,7 +260,7 @@ namespace rudIsland.RPG3D.Tests
                 45f,
                 0.08f);
             AssertDamage(
-                settings.GetAttackDamage(NightShadeSwordAttackType.WideSwing),
+                settings.GetAttackData(NightShadeSwordActionId.WideSwing).GetHitDamage(0),
                 22f,
                 AttackStrength.Heavy,
                 24f,
@@ -280,6 +296,25 @@ namespace rudIsland.RPG3D.Tests
             Assert.That(score.BaseScore, Is.EqualTo(baseScore));
             Assert.That(score.PreferredDistance, Is.EqualTo(preferredDistance));
             Assert.That(score.DistanceTolerance, Is.EqualTo(distanceTolerance));
+        }
+
+        private static void AssertAttackCorrection(
+            NightShadeSwordSettings settings,
+            NightShadeSwordActionId actionId,
+            float movementEndNormalizedTime)
+        {
+            NightShadeSwordRuntimeAttackData attack =
+                settings.GetAttackData(actionId);
+            Assert.That(attack.MoveDistance, Is.Zero);
+            Assert.That(attack.TargetStopDistance, Is.EqualTo(1.3f));
+            Assert.That(
+                attack.MaximumAddedMoveDistance,
+                Is.EqualTo(0.35f));
+            Assert.That(attack.MaximumTurnAngle, Is.EqualTo(20f));
+            Assert.That(attack.MovementCurve, Is.Not.Null);
+            Assert.That(
+                attack.MovementCurve.Evaluate(movementEndNormalizedTime),
+                Is.EqualTo(1f).Within(0.0001f));
         }
 
         private static void AssertDamage(

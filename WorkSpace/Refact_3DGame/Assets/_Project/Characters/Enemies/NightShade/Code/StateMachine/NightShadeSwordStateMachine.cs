@@ -31,22 +31,21 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
     // 상위 Idle / Combat / Hit / Dead와 강제 반응 우선순위만 관리한다.
     internal sealed class NightShadeSwordStateMachine
     {
-        private readonly INightShadeSwordState[] states;
-        private readonly NightShadeSwordSituationReader situation;
-        private readonly NightShadeSwordFightMemory fightMemory;
-        private readonly NightShadeSwordActions actions;
+        private readonly NightShadeSwordTargetStatus targetStatus;
+        private readonly NightShadeSwordCombatMemory combatMemory;
+        private readonly NightShadeSwordCombatOutput combatOutput;
         private readonly INightShadeSwordMovement movement;
         private readonly INightShadeSwordAnimation animation;
+        private readonly NightShadeSwordIdleState idleState;
         private readonly NightShadeSwordCombatState combatState;
         private readonly NightShadeSwordHitState hitState;
+        private readonly NightShadeSwordDeadState deadState;
         private readonly NightShadeSwordCombatDebug debug;
 
         private INightShadeSwordState currentState;
         private NightShadeSwordStateId currentStateId;
         private EnemyHitRequest pendingHitRequest;
         private HitReaction pendingHitReaction;
-        private bool hasCurrentState;
-        private bool hasPendingHit;
         private bool hasPendingDeath;
         private bool isEnabled;
         private bool isInCombat;
@@ -55,13 +54,13 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         internal bool ProtectsSmallHit => IsAttackStateActive && combatState.ProtectsSmallHit;
         internal float StopDamageScale => ProtectsSmallHit ? 0.5f : 1f;
         internal bool IsAttackStateActive =>
-            isEnabled && hasCurrentState &&
+            isEnabled && currentState != null &&
             currentStateId == NightShadeSwordStateId.Combat &&
             combatState.IsAttackActionActive;
         internal NightShadeSwordStateId CurrentStateId => currentStateId;
         internal NightShadeSwordCombatPhase CurrentCombatPhase => combatState.Phase;
         internal NightShadeSwordActionId CurrentActionId => combatState.CurrentActionId;
-        internal NightShadeSwordFightMemory FightMemory => fightMemory;
+        internal NightShadeSwordCombatMemory CombatMemory => combatMemory;
         internal NightShadeSwordCombatDebug Debug => debug;
 
         internal event Action CombatStateChanged;
@@ -72,62 +71,49 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             INightShadeSwordMovement movement,
             INightShadeSwordAnimation animation,
             NightShadeSwordSettings settings,
-            NightShadeSwordActions actions,
+            NightShadeSwordCombatOutput combatOutput,
             INightShadeSwordRandomProvider randomProvider = null)
         {
             this.movement = movement;
             this.animation = animation;
-            this.actions = actions;
-            fightMemory = new NightShadeSwordFightMemory();
+            this.combatOutput = combatOutput;
+            combatMemory = new NightShadeSwordCombatMemory();
             debug = new NightShadeSwordCombatDebug();
-            situation = new NightShadeSwordSituationReader(
+            targetStatus = new NightShadeSwordTargetStatus(
                 target,
                 targetDeathState,
                 movement,
-                settings);
-            combatState = new NightShadeSwordCombatState(
-                situation,
-                fightMemory,
+                settings.CombatRange);
+            var context = new NightShadeSwordBehaviorContext(
+                targetStatus,
+                combatMemory,
                 movement,
-                animation,
+                animation);
+            combatState = new NightShadeSwordCombatState(
+                context,
                 settings,
-                actions,
+                combatOutput,
                 randomProvider ?? new UnityNightShadeSwordRandomProvider(),
                 debug);
             hitState = new NightShadeSwordHitState(
-                situation,
-                movement,
-                animation,
-                settings,
-                fightMemory);
-
-            states = new INightShadeSwordState[4];
-            states[(int)NightShadeSwordStateId.Idle] =
-                new NightShadeSwordIdleState(
-                    situation,
-                    movement,
-                    animation);
-            states[(int)NightShadeSwordStateId.Combat] = combatState;
-            states[(int)NightShadeSwordStateId.Hit] = hitState;
-            states[(int)NightShadeSwordStateId.Dead] =
-                new NightShadeSwordDeadState(
-                    movement,
-                    animation,
-                    settings,
-                    fightMemory,
-                    actions);
+                context,
+                settings.HitReaction);
+            idleState = new NightShadeSwordIdleState(context);
+            deadState = new NightShadeSwordDeadState(
+                context,
+                settings.Life,
+                combatOutput);
         }
 
         internal void Enable()
         {
             isEnabled = true;
-            hasPendingHit = false;
             hasPendingDeath = false;
             pendingHitReaction = HitReaction.None;
             movement.Reset();
             animation.ResetAttackPlaybackSpeed();
-            fightMemory.Reset();
-            situation.Refresh();
+            combatMemory.Reset();
+            targetStatus.Refresh();
             debug.Reset();
             SetCombatState(false);
             ChangeState(NightShadeSwordStateId.Idle, true);
@@ -136,23 +122,20 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         internal void Disable()
         {
             isEnabled = false;
-            hasPendingHit = false;
             hasPendingDeath = false;
-            fightMemory.ClearCombo();
-            if (hasCurrentState)
+            pendingHitReaction = HitReaction.None;
+            if (currentState != null)
             {
                 if (currentStateId == NightShadeSwordStateId.Combat)
                 {
-                    combatState.Disable();
+                    combatState.InterruptCurrentAction(
+                        NightShadeSwordActionStopReason.Disabled);
                 }
 
                 currentState.Exit();
                 currentState = null;
-                hasCurrentState = false;
             }
 
-            actions.CloseAttackHit();
-            animation.ResetAttackPlaybackSpeed();
             debug.CurrentAction = NightShadeSwordActionId.None;
             debug.CombatPhase = NightShadeSwordCombatPhase.None;
             SetCombatState(false);
@@ -160,13 +143,13 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
         internal void Update(float deltaTime, bool isHitStopActive = false)
         {
-            if (!isEnabled || !hasCurrentState)
+            if (!isEnabled || currentState == null)
             {
                 return;
             }
 
             // 1. 한 Tick에서 공유할 타겟 상황을 먼저 갱신한다.
-            situation.Refresh();
+            targetStatus.Refresh();
             // 2. 일반 상태보다 우선하는 사망과 피격 요청을 처리한다.
             ProcessForcedReaction();
             if (isHitStopActive)
@@ -175,7 +158,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             }
 
             // 3. Hit Stop이 아닐 때만 후딜과 현재 상태의 시간을 진행한다.
-            fightMemory.UpdatePostAttackDelay(deltaTime);
+            combatMemory.UpdatePostAttackDelay(deltaTime);
             NightShadeSwordStateId? nextState = currentState.Update(deltaTime);
             if (nextState.HasValue)
             {
@@ -189,39 +172,36 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         {
             if (reaction == HitReaction.None ||
                 hasPendingDeath ||
-                (hasCurrentState &&
+                (currentState != null &&
                     currentStateId == NightShadeSwordStateId.Dead))
             {
                 return;
             }
 
-            if (!hasPendingHit ||
+            if (pendingHitReaction == HitReaction.None ||
                 GetReactionPriority(reaction) >=
                     GetReactionPriority(pendingHitReaction))
             {
                 pendingHitReaction = reaction;
                 pendingHitRequest = hitRequest;
-                hasPendingHit = true;
             }
         }
 
         internal void ChangeToDeadState()
         {
-            if (hasCurrentState &&
+            if (currentState != null &&
                 currentStateId == NightShadeSwordStateId.Dead)
             {
                 return;
             }
 
             hasPendingDeath = true;
-            hasPendingHit = false;
             pendingHitReaction = HitReaction.None;
         }
 
         internal void NotifyDamaged()
         {
-            if (!hasCurrentState ||
-                currentStateId != NightShadeSwordStateId.Dead)
+            if (currentState == null || currentStateId != NightShadeSwordStateId.Dead)
             {
                 SetCombatState(true);
             }
@@ -264,14 +244,13 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             if (hasPendingDeath)
             {
                 hasPendingDeath = false;
-                hasPendingHit = false;
                 pendingHitReaction = HitReaction.None;
                 InterruptCombatAction();
                 ChangeState(NightShadeSwordStateId.Dead);
                 return;
             }
 
-            if (!hasPendingHit ||
+            if (pendingHitReaction == HitReaction.None ||
                 currentStateId == NightShadeSwordStateId.Dead)
             {
                 return;
@@ -279,7 +258,6 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
             HitReaction reaction = pendingHitReaction;
             EnemyHitRequest hitRequest = pendingHitRequest;
-            hasPendingHit = false;
             pendingHitReaction = HitReaction.None;
 
             if (currentStateId == NightShadeSwordStateId.Hit)
@@ -288,48 +266,58 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 return;
             }
 
-            InterruptCombatAction();
             hitState.SetHitRequest(reaction, in hitRequest);
+            InterruptCombatAction();
             ChangeState(NightShadeSwordStateId.Hit);
         }
 
         private void InterruptCombatAction()
         {
-            if (hasCurrentState &&
-                currentStateId == NightShadeSwordStateId.Combat)
+            if (currentStateId == NightShadeSwordStateId.Combat)
             {
                 combatState.InterruptCurrentAction(
                     NightShadeSwordActionStopReason.Interrupted);
             }
-
-            actions.CloseAttackHit();
-            animation.ResetAttackPlaybackSpeed();
-            fightMemory.ClearCombo();
         }
 
         private void ChangeState(
             NightShadeSwordStateId nextStateId,
             bool force = false)
         {
-            if (!force && hasCurrentState &&
+            if (!force && currentState != null &&
                 currentStateId == nextStateId)
             {
                 return;
             }
 
-            if (hasCurrentState)
+            if (currentState != null)
             {
                 currentState.Exit();
             }
 
             currentStateId = nextStateId;
-            currentState = states[(int)nextStateId];
-            hasCurrentState = true;
+            currentState = GetState(nextStateId);
             debug.TopState = nextStateId;
             SetCombatState(
                 nextStateId != NightShadeSwordStateId.Idle &&
                 nextStateId != NightShadeSwordStateId.Dead);
             currentState.Enter();
+        }
+
+        private INightShadeSwordState GetState(
+            NightShadeSwordStateId stateId)
+        {
+            switch (stateId)
+            {
+                case NightShadeSwordStateId.Combat:
+                    return combatState;
+                case NightShadeSwordStateId.Hit:
+                    return hitState;
+                case NightShadeSwordStateId.Dead:
+                    return deadState;
+                default:
+                    return idleState;
+            }
         }
 
         private void SetCombatState(bool nextState)

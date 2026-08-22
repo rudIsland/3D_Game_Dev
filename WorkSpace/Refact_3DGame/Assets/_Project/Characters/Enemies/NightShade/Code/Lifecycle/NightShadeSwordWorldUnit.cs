@@ -50,11 +50,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 return EnemyHitResult.Killed;
             }
 
-            float appliedStopDamage =
-                hitRequest.StaggerDamage *
-                stateMachine.StopDamageScale;
-            bool reachedStopLimit =
-                stopPoint.TryAccumulate(appliedStopDamage);
+            float appliedStopDamage = hitRequest.StaggerDamage * stateMachine.StopDamageScale;
+            bool reachedStopLimit = stopPoint.TryAccumulate(appliedStopDamage);
             HitReaction reaction = NightShadeSwordHitReactionSelector.Select(
                 hitRequest.Strength,
                 reachedStopLimit,

@@ -1,19 +1,20 @@
 // 전투 Action이 사용하는 Unity 경계 기능을 한곳에 모은다.
 using System;
+using rudIsland.RPG3D.Characters.Combat.AttackData;
 
 namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 {
     // 상태가 요청한 소리, 판정과 풀 반환을 Unity 경계로 전달한다.
-    internal sealed class NightShadeSwordActions
+    internal sealed class NightShadeSwordCombatOutput
     {
         private readonly Action<NightShadeSwordAttackType, int> playAttackSound;
-        private readonly Action<NightShadeSwordAttackType, int> openAttackHit;
+        private readonly Action<AttackDamage> openAttackHit;
         private readonly Action closeAttackHit;
         private readonly Action requestRelease;
 
-        internal NightShadeSwordActions(
+        internal NightShadeSwordCombatOutput(
             Action<NightShadeSwordAttackType, int> playAttackSound,
-            Action<NightShadeSwordAttackType, int> openAttackHit,
+            Action<AttackDamage> openAttackHit,
             Action closeAttackHit,
             Action requestRelease)
         {
@@ -28,9 +29,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             playAttackSound?.Invoke(attackType, hitIndex);
         }
 
-        internal void OpenAttackHit(NightShadeSwordAttackType attackType, int hitIndex)
+        internal void OpenAttackHit(AttackDamage attackDamage)
         {
-            openAttackHit?.Invoke(attackType, hitIndex);
+            openAttackHit?.Invoke(attackDamage);
         }
 
         internal void CloseAttackHit()

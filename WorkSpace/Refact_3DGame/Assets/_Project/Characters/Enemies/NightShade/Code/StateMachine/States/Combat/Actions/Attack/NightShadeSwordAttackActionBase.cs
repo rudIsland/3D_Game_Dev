@@ -1,9 +1,9 @@
+using rudIsland.RPG3D.Characters.Combat;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 {
     internal abstract class NightShadeSwordAttackActionBase :
-        NightShadeSwordCombatActionBase,
         INightShadeSwordAttackAction
     {
         private const int EventQueueCapacity = 8;
@@ -28,69 +28,71 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             }
         }
 
-        protected readonly INightShadeSwordMovement Movement;
-        protected readonly INightShadeSwordAnimation Animation;
-        protected readonly NightShadeSwordSettings Settings;
-        protected readonly NightShadeSwordActions Actions;
+        protected readonly NightShadeSwordBehaviorContext Context;
+        protected readonly NightShadeSwordRuntimeAttackData AttackData;
+        protected readonly NightShadeSwordCombatOutput CombatOutput;
+        private readonly NightShadeSwordAttackSelectionRuntimeConfig attackSelection;
 
         private readonly PendingAttackEvent[] eventQueue =
             new PendingAttackEvent[EventQueueCapacity];
+        private readonly AttackTargetCorrection targetCorrection =
+            new AttackTargetCorrection();
 
         private int firstEventIndex;
         private int queuedEventCount;
         private int nextSoundHitIndex;
         private int nextOpenHitIndex;
         private int openHitIndex;
+        private int currentDamageHitIndex;
         private bool canTurn;
         private bool isActive;
 
         protected NightShadeSwordAttackType CurrentAttackType { get; private set; }
+        protected INightShadeSwordMovement Movement => Context.Movement;
+        protected INightShadeSwordAnimation Animation => Context.Animation;
+        protected NightShadeSwordTargetStatus TargetStatus => Context.TargetStatus;
+        protected NightShadeSwordCombatMemory CombatMemory => Context.CombatMemory;
 
-        public override NightShadeSwordCombatPhase Phase => NightShadeSwordCombatPhase.Attack;
+        public abstract NightShadeSwordActionId ActionId { get; }
+        public bool IsFinished { get; protected set; }
         public virtual bool ProtectsSmallHit => false;
-        public int QueuedEventCount => queuedEventCount;
 
         protected NightShadeSwordAttackActionBase(
-            NightShadeSwordSituationReader situation,
-            NightShadeSwordFightMemory fightMemory,
-            INightShadeSwordMovement movement,
-            INightShadeSwordAnimation animation,
-            NightShadeSwordSettings settings,
-            NightShadeSwordActions actions)
-            : base(situation, fightMemory)
+            NightShadeSwordBehaviorContext context,
+            NightShadeSwordRuntimeAttackData attackData,
+            NightShadeSwordAttackSelectionRuntimeConfig attackSelection,
+            NightShadeSwordCombatOutput combatOutput)
         {
-            Movement = movement;
-            Animation = animation;
-            Settings = settings;
-            Actions = actions;
+            Context = context;
+            AttackData = attackData;
+            this.attackSelection = attackSelection;
+            CombatOutput = combatOutput;
         }
 
         protected abstract NightShadeSwordAttackType FirstAttackType { get; }
 
-        public override bool CanStart(
-            NightShadeSwordSituationReader situation,
-            NightShadeSwordFightMemory fightMemory,
+        public bool CanStart(
             out NightShadeSwordActionRejectReason rejectReason)
         {
-            if (!situation.IsTargetDetected)
+            if (!TargetStatus.IsDetected)
             {
                 rejectReason = NightShadeSwordActionRejectReason.TargetNotDetected;
                 return false;
             }
 
-            if (!situation.IsInsideAttackRange)
+            if (!TargetStatus.IsInsideAttackRange)
             {
                 rejectReason = NightShadeSwordActionRejectReason.TargetOutsideAttackRange;
                 return false;
             }
 
-            if (!situation.IsFacingAttackDirection)
+            if (!TargetStatus.IsFacingAttackDirection)
             {
                 rejectReason = NightShadeSwordActionRejectReason.DirectionNotMatched;
                 return false;
             }
 
-            if (fightMemory.RemainingPostAttackDelay > 0f)
+            if (CombatMemory.RemainingPostAttackDelay > 0f)
             {
                 rejectReason =
                     NightShadeSwordActionRejectReason.PostAttackDelayRemaining;
@@ -101,49 +103,43 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             return true;
         }
 
-        public override bool CanContinue(
-            NightShadeSwordSituationReader situation,
-            NightShadeSwordFightMemory fightMemory,
+        public bool CanContinue(
             out NightShadeSwordActionStopReason stopReason)
         {
             stopReason = NightShadeSwordActionStopReason.None;
             return true;
         }
 
-        public override NightShadeSwordActionScore GetScore(
-            NightShadeSwordSituationReader situation,
-            NightShadeSwordFightMemory fightMemory,
-            float randomBonus)
+        public NightShadeSwordActionScore GetScore(float randomBonus)
         {
             NightShadeSwordAttackScoreSettings scoreSettings =
-                Settings.GetAttackScoreSettings(ActionId);
+                AttackData.Score;
             float distanceFitness = 1f - Mathf.Clamp01(
                 Mathf.Abs(
-                    situation.AttackDistanceRatio -
+                    TargetStatus.AttackDistanceRatio -
                     scoreSettings.PreferredDistance) /
                 scoreSettings.DistanceTolerance);
-            float repeatPenalty = fightMemory.HasPreviousAttack &&
-                fightMemory.PreviousAttack == ActionId
-                    ? Settings.AttackRepeatPenalty
+            float repeatPenalty = CombatMemory.HasPreviousAttack &&
+                CombatMemory.PreviousAttack == ActionId
+                    ? attackSelection.RepeatPenalty
                     : 0f;
             return new NightShadeSwordActionScore(
                 scoreSettings.BaseScore,
-                distanceFitness * Settings.AttackDistanceScoreWeight,
+                distanceFitness * attackSelection.DistanceScoreWeight,
                 repeatPenalty,
                 randomBonus);
         }
 
-        public override void Enter()
+        public virtual void Enter()
         {
-            base.Enter();
-            FightMemory.RecordAttack(ActionId);
-            FightMemory.ClearCombo();
+            IsFinished = false;
+            CombatMemory.RecordAttack(ActionId);
             isActive = true;
             openHitIndex = -1;
             StartAttackClip(FirstAttackType);
         }
 
-        public override void Update(float deltaTime)
+        public virtual void Update(float deltaTime)
         {
             ProcessQueuedEvents();
             UpdateAttackMovement(deltaTime);
@@ -153,17 +149,17 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             }
         }
 
-        public override void Exit(NightShadeSwordActionStopReason stopReason)
+        public virtual void Exit(NightShadeSwordActionStopReason stopReason)
         {
             isActive = false;
             ClearQueuedEvents();
             CloseOpenHit();
             Animation.ResetAttackPlaybackSpeed();
-            FightMemory.ClearCombo();
+            targetCorrection.Reset();
             if (stopReason == NightShadeSwordActionStopReason.Completed)
             {
-                FightMemory.StartPostAttackDelay(
-                    Settings.GetPostAttackDelay(ActionId));
+                CombatMemory.StartPostAttackDelay(
+                    AttackData.PostAttackDelay);
             }
         }
 
@@ -195,7 +191,26 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             nextSoundHitIndex = 0;
             nextOpenHitIndex = 0;
             openHitIndex = -1;
+            currentDamageHitIndex = attackType ==
+                NightShadeSwordAttackType.ComboSecond
+                    ? 1
+                    : 0;
             canTurn = true;
+            targetCorrection.Reset();
+            if (TargetStatus.IsAlive)
+            {
+                targetCorrection.Begin(
+                    Movement.Position,
+                    Movement.Forward,
+                    true,
+                    TargetStatus.TargetPosition,
+                    AttackData.MoveDistance,
+                    AttackData.TargetStopDistance,
+                    AttackData.MaximumAddedMoveDistance,
+                    AttackData.MaximumTurnAngle,
+                    AttackData.MovementCurve);
+            }
+
             Animation.ResetAttackPlaybackSpeed();
             Animation.PlayAttack(attackType);
         }
@@ -228,18 +243,33 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
         protected void UpdateAttackMovement(float deltaTime)
         {
-            if (!Animation.TryGetRequestedAnimationTime(out _))
+            if (!Animation.TryGetRequestedAnimationTime(
+                    out float normalizedTime))
             {
                 Movement.StayOnGround(deltaTime);
                 return;
             }
 
-            if (canTurn && Situation.IsTargetAlive)
+            if (targetCorrection.IsActive)
             {
-                Movement.TurnTo(
-                    Situation.TargetPosition,
-                    Settings.AttackTurnSpeed,
+                if (canTurn && TargetStatus.IsAlive)
+                {
+                    targetCorrection.UpdateTargetDirection(
+                        Movement.Position,
+                        TargetStatus.TargetPosition);
+                }
+
+                Movement.ApplyAttackMovement(
+                    targetCorrection.TurnDirection,
+                    canTurn,
+                    targetCorrection.EvaluateDeltaDistance(normalizedTime),
                     deltaTime);
+                return;
+            }
+
+            if (canTurn && TargetStatus.IsAlive)
+            {
+                Movement.TurnToTarget(TargetStatus.TargetPosition, deltaTime);
             }
             else
             {
@@ -268,7 +298,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 return;
             }
 
-            Actions.CloseAttackHit();
+            CombatOutput.CloseAttackHit();
             openHitIndex = -1;
         }
 
@@ -292,7 +322,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
                 return;
             }
 
-            Actions.PlayAttackSound(CurrentAttackType, hitIndex);
+            CombatOutput.PlayAttackSound(CurrentAttackType, hitIndex);
             nextSoundHitIndex++;
         }
 
@@ -306,7 +336,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
             CloseOpenHit();
             openHitIndex = hitIndex;
             nextOpenHitIndex++;
-            Actions.OpenAttackHit(CurrentAttackType, hitIndex);
+            CombatOutput.OpenAttackHit(
+                AttackData.GetHitDamage(currentDamageHitIndex));
         }
     }
 }

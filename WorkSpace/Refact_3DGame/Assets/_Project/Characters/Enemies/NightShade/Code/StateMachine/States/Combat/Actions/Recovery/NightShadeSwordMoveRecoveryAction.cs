@@ -13,43 +13,37 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
         internal NightShadeSwordMoveRecoveryAction(
             NightShadeSwordActionId actionId,
             NightShadeCombatMoveType moveType,
-            NightShadeSwordSituationReader situation,
-            NightShadeSwordFightMemory fightMemory,
-            INightShadeSwordMovement movement,
-            INightShadeSwordAnimation animation,
-            NightShadeSwordSettings settings)
-            : base(situation, fightMemory, movement, animation, settings)
+            NightShadeSwordBehaviorContext context,
+            NightShadeSwordRecoveryRuntimeConfig recovery)
+            : base(context, recovery)
         {
             this.actionId = actionId;
             this.moveType = moveType;
         }
 
-        public override NightShadeSwordActionScore GetScore(
-            NightShadeSwordSituationReader situation,
-            NightShadeSwordFightMemory fightMemory,
-            float randomBonus)
+        public override NightShadeSwordActionScore GetScore(float randomBonus)
         {
             float distanceScore;
             float baseScore;
             if (actionId == NightShadeSwordActionId.BackRecovery)
             {
-                baseScore = Settings.BackRecoveryBaseScore;
-                distanceScore = (1f - situation.AttackDistanceRatio) *
-                    Settings.BackRecoveryCloseWeight;
+                baseScore = Recovery.BackBaseScore;
+                distanceScore = (1f - TargetStatus.AttackDistanceRatio) *
+                    Recovery.BackCloseWeight;
             }
             else
             {
-                baseScore = Settings.SideRecoveryBaseScore;
+                baseScore = Recovery.SideBaseScore;
                 float sideDistanceFitness = 1f - Mathf.Clamp01(
-                    Mathf.Abs(situation.AttackDistanceRatio - 0.5f) / 0.5f);
+                    Mathf.Abs(TargetStatus.AttackDistanceRatio - 0.5f) / 0.5f);
                 distanceScore = sideDistanceFitness *
-                    Settings.SideRecoveryDistanceWeight;
+                    Recovery.SideDistanceWeight;
             }
 
             return new NightShadeSwordActionScore(
                 baseScore,
                 distanceScore,
-                GetRepeatPenalty(fightMemory),
+                GetRepeatPenalty(),
                 randomBonus);
         }
 
@@ -60,11 +54,9 @@ namespace rudIsland.RPG3D.Characters.Enemies.NightShade
 
         protected override void Move(float deltaTime)
         {
-            Movement.MoveForCombat(
-                Situation.TargetPosition,
+            Movement.MoveForRecovery(
+                TargetStatus.TargetPosition,
                 moveType,
-                Settings.RecoveryMoveSpeed,
-                Settings.TurnSpeed,
                 deltaTime);
         }
     }
