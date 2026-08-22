@@ -14,6 +14,7 @@ using rudIsland.RPG3D.Player.Runtime.Attack;
 using rudIsland.RPG3D.Player.Runtime.Hit;
 using rudIsland.RPG3D.Player.Runtime;
 using rudIsland.RPG3D.Characters.Combat;
+using rudIsland.RPG3D.Player.Config;
 using UnityEngine;
 
 namespace rudIsland.RPG3D.Player.States
@@ -77,37 +78,17 @@ namespace rudIsland.RPG3D.Player.States
             }
         }
 
-        public PlayerStateMachine(
+        internal PlayerStateMachine(
             PlayerInputReader playerInput,
             PlayerMovement playerMovement,
             PlayerStamina playerStamina,
-            float guardStaminaRecoveryRate,
-            float rollStaminaCost,
-            float sprintStaminaCostPerSecond,
-            float sprintRestartStamina,
             Animator playerAnimator,
-            float animationSmoothTime,
-            float rollDistance,
-            float sprintRollDistance,
-            AnimationCurve rollMovementCurve,
-            float rollCompleteNormalizedTime,
-            PlayerAttackData[] attackData,
-            float actionInputBufferDuration,
+            PlayerCharacterRuntimeConfig config,
             PlayerTargetFinder targetFinder,
             PlayerTargetCamera targetCamera,
-            float targetBreakDistance,
-            float targetHiddenGraceDuration,
-            float guardAngle,
-            float guardRaiseDuration,
             PlayerGuardHitBox guardHitBox,
-            float guardBreakControlLockDuration,
-            float hitPushDuration,
-            AnimationCurve hitPushCurve,
             Transform attackerRoot,
-            Transform weaponHitStart,
-            Transform weaponHitEnd,
-            LayerMask attackLayers,
-            float weaponHitRadius,
+            PlayerWeaponHitShape weaponHitShape,
             CombatHitStop hitStop,
             CombatHitEffectPlayer hitEffectPlayer,
             PlayerAttackEffectPlayer attackEffectPlayer)
@@ -115,38 +96,43 @@ namespace rudIsland.RPG3D.Player.States
             this.playerInput = playerInput;
             this.playerMovement = playerMovement;
             this.playerStamina = playerStamina;
-            this.guardStaminaRecoveryRate = Mathf.Clamp01(guardStaminaRecoveryRate);
-            this.rollStaminaCost = Mathf.Max(0f, rollStaminaCost);
-            this.sprintStaminaCostPerSecond = Mathf.Max(0f, sprintStaminaCostPerSecond);
-            this.sprintRestartStamina = Mathf.Clamp(sprintRestartStamina, 0f, playerStamina.MaxStamina);
+            PlayerCombatRuntimeConfig combat = config.Combat;
+            PlayerMovementRuntimeConfig movement = config.Movement;
+            this.guardStaminaRecoveryRate = combat.GuardStaminaRecoveryRate;
+            this.rollStaminaCost = combat.RollStaminaCost;
+            this.sprintStaminaCostPerSecond =
+                combat.SprintStaminaCostPerSecond;
+            this.sprintRestartStamina = combat.SprintRestartStamina;
             this.attackEffectPlayer = attackEffectPlayer;
-            animationController = new PlayerAnimationController(playerAnimator, animationSmoothTime);
-            minimumGuardDot = Mathf.Cos(Mathf.Clamp(guardAngle, 0f, 180f) * 0.5f * Mathf.Deg2Rad);
+            animationController = new PlayerAnimationController(
+                playerAnimator,
+                movement.AnimationSmoothTime);
+            minimumGuardDot = combat.MinimumGuardDot;
 
             var moveState = new PlayerMoveState(this, animationController);
             var blockState = new PlayerBlockState(
                 this,
                 animationController,
                 guardHitBox,
-                guardRaiseDuration);
+                combat.GuardRaiseDuration);
             var rollState = new PlayerRollState(
                 this,
                 animationController,
-                rollDistance,
-                sprintRollDistance,
-                rollMovementCurve,
-                rollCompleteNormalizedTime);
+                movement.RollDistance,
+                movement.SprintRollDistance,
+                movement.RollMovementCurve,
+                movement.RollCompleteNormalizedTime);
             attackState = new PlayerAttackState(
                 this,
                 animationController,
-                attackData);
+                config.Attacks);
             actionStateMachine = new PlayerActionStateMachine(
                 this,
                 moveState,
                 blockState,
                 rollState,
                 attackState,
-                Mathf.Max(0f, actionInputBufferDuration));
+                combat.ActionInputBufferDuration);
             freeLookState = new PlayerFreeLookState(
                 this,
                 actionStateMachine,
@@ -158,24 +144,24 @@ namespace rudIsland.RPG3D.Player.States
                 playerMovement,
                 targetFinder,
                 targetCamera,
-                targetBreakDistance,
-                targetHiddenGraceDuration);
+                config.Target.BreakDistance,
+                config.Target.HiddenGraceDuration);
 
             attackRangeDetector = new PlayerAttackRangeDetector(
                 attackerRoot,
-                weaponHitStart,
-                weaponHitEnd,
-                attackLayers,
-                weaponHitRadius,
+                weaponHitShape.StartPoint,
+                weaponHitShape.EndPoint,
+                weaponHitShape.TargetLayers,
+                weaponHitShape.Radius,
                 hitStop,
                 hitEffectPlayer,
                 attackEffectPlayer);
             hitState = new PlayerHitState(
                 this,
                 animationController,
-                hitPushDuration,
-                hitPushCurve,
-                guardBreakControlLockDuration);
+                combat.HitPushDuration,
+                combat.HitPushCurve,
+                combat.GuardBreakControlLockDuration);
             deadState = new PlayerDeadState(this, animationController);
         }
 
@@ -295,6 +281,23 @@ namespace rudIsland.RPG3D.Player.States
         internal void ClearAttackDirection()
         {
             playerMovement.ClearAttackDirection();
+        }
+
+        internal bool TryGetCurrentAttackTarget(out Transform target)
+        {
+            if (!ReferenceEquals(currentState, targetLookState))
+            {
+                target = null;
+                return false;
+            }
+
+            return targetLookState.TryGetCurrentTarget(out target);
+        }
+
+        internal bool IsAttackTargetAvailable(Transform target)
+        {
+            return ReferenceEquals(currentState, targetLookState) &&
+                targetLookState.IsCurrentTargetAvailable(target);
         }
 
         internal bool TryPrepareAttack()

@@ -11,17 +11,20 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f0e34cba584e7804f946eddb1b27683f, type: 3}
   m_Name: PlayerAttack03Data
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   attackNumber: 3
-  damage: 14
-  staggerDamage: 15
-  attackStrength: 0
-  pushDistance: 0.25
-  hitStopDuration: 0.045
+  attackDamage:
+    healthDamage: 14
+    strength: 0
+    staggerDamage: 15
+    pushDistance: 0.25
+    hitStopDuration: 0.045
+    guardStaminaDamage: 0
+    canBlock: 1
+    damageSoundType: 0
   staminaCost: 20
   swingSound: {fileID: 8300000, guid: bc0d800b2a79c004e8b1a9e9b16df148, type: 3}
   comboOpenNormalizedTime: 0.52
-  comboCloseNormalizedTime: 0.9
   rollCancelOpenNormalizedTime: 0.52
   turnEndNormalizedTime: 0.2923077
   moveDistance: 0.55

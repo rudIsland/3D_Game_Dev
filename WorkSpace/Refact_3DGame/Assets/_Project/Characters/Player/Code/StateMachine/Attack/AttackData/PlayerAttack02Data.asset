@@ -13,15 +13,18 @@ MonoBehaviour:
   m_Name: PlayerAttack02Data
   m_EditorClassIdentifier: 
   attackNumber: 2
-  damage: 12
-  staggerDamage: 12
-  attackStrength: 0
-  pushDistance: 0.25
-  hitStopDuration: 0.04
+  attackDamage:
+    healthDamage: 12
+    strength: 0
+    staggerDamage: 12
+    pushDistance: 0.25
+    hitStopDuration: 0.04
+    guardStaminaDamage: 0
+    canBlock: 1
+    damageSoundType: 0
   staminaCost: 15
   swingSound: {fileID: 8300000, guid: d3a66c93783a4994f9557b9be7cad077, type: 3}
   comboOpenNormalizedTime: 0.58
-  comboCloseNormalizedTime: 0.9
   rollCancelOpenNormalizedTime: 0.58
   turnEndNormalizedTime: 0.4
   moveDistance: 0.6

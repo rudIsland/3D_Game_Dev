@@ -7,13 +7,14 @@ namespace rudIsland.RPG3D.Player.Runtime.Audio
     // 걷기, 달리기와 구르기에서 나는 이동 소리를 재생한다.
     public sealed class PlayerFootstepAudio : MonoBehaviour
     {
-        private AudioClip[] walkSounds;
-        private AudioClip[] runSounds;
-        private AudioClip rollSound;
-        private float walkVolume;
-        private float runVolume;
-        private float rollVolume;
-        private float pitchChange;
+        [Header("발소리")]
+        [SerializeField] private AudioClip[] walkSounds;
+        [SerializeField] private AudioClip[] runSounds;
+        [SerializeField] private AudioClip rollSound;
+        [SerializeField, Range(0f, 1f)] private float walkVolume = 0.7f;
+        [SerializeField, Range(0f, 1f)] private float runVolume = 0.9f;
+        [SerializeField, Range(0f, 1f)] private float rollVolume = 0.8f;
+        [SerializeField, Range(0f, 0.2f)] private float pitchChange = 0.05f;
 
         private AudioSource footstepAudioSource;
         private int lastWalkSoundIndex = -1;
@@ -52,6 +53,26 @@ namespace rudIsland.RPG3D.Player.Runtime.Audio
             pitchChange = Mathf.Clamp(newPitchChange, 0f, 0.2f);
             PrepareAudioSource();
         }
+
+#if UNITY_EDITOR
+        internal void ConnectForEditor(
+            AudioClip[] newWalkSounds,
+            AudioClip[] newRunSounds,
+            AudioClip newRollSound,
+            float newWalkVolume,
+            float newRunVolume,
+            float newRollVolume,
+            float newPitchChange)
+        {
+            walkSounds = newWalkSounds;
+            runSounds = newRunSounds;
+            rollSound = newRollSound;
+            walkVolume = Mathf.Clamp01(newWalkVolume);
+            runVolume = Mathf.Clamp01(newRunVolume);
+            rollVolume = Mathf.Clamp01(newRollVolume);
+            pitchChange = Mathf.Clamp(newPitchChange, 0f, 0.2f);
+        }
+#endif
 
         public void PlayWalkFootstep()
         {

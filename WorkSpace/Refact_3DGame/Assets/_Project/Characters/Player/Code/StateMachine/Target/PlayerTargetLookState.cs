@@ -51,6 +51,19 @@ namespace rudIsland.RPG3D.Player.States.Target
                 targetBreakDistance);
         }
 
+        internal bool TryGetCurrentTarget(out Transform target)
+        {
+            target = currentTarget;
+            return target != null && IsTargetAvailable();
+        }
+
+        internal bool IsCurrentTargetAvailable(Transform target)
+        {
+            return target != null &&
+                ReferenceEquals(currentTarget, target) &&
+                IsTargetAvailable();
+        }
+
         public void ReleaseTarget()
         {
             currentTarget = null;

@@ -3,6 +3,8 @@ using rudIsland.RPG3D.Characters.Combat;
 using rudIsland.RPG3D.Player.Animations;
 using rudIsland.RPG3D.Player.States;
 using rudIsland.RPG3D.Player.Movement;
+using rudIsland.RPG3D.Player.Config;
+using UnityEngine;
 
 namespace rudIsland.RPG3D.Player.States.Attack
 {
@@ -17,10 +19,17 @@ namespace rudIsland.RPG3D.Player.States.Attack
         private readonly PlayerStateMachine stateMachine;
         private readonly PlayerAnimationController animationController;
         private readonly PlayerAttackData[] attackData;
+        private readonly float targetStopDistance;
+        private readonly float maximumAddedMoveDistance;
+        private readonly float maximumTurnAngle;
+        private readonly float comboCloseNormalizedTime;
         private readonly PlayerActionMovementCurve movementCurve;
+        private readonly AttackTargetCorrection targetCorrection;
 
         private PlayerAttackData currentAttackData;
+        private Transform correctionTarget;
         private bool isRunAttack;
+        private bool usesTargetCorrection;
         private bool hasAnimationStarted;
         private bool animationEndedByEvent;
         private bool hasAttackHitEnded;
@@ -29,22 +38,24 @@ namespace rudIsland.RPG3D.Player.States.Attack
 
         public bool IsFinished { get; private set; }
         public float AttackDamage => 
-            currentAttackData != null ? currentAttackData.Damage : 0f;
+            currentAttackData != null
+                ? currentAttackData.Damage.HealthDamage
+                : 0f;
         public float AttackStaggerDamage =>
             currentAttackData != null
-                ? currentAttackData.StaggerDamage
+                ? currentAttackData.Damage.StaggerDamage
                 : 0f;
         public AttackStrength CurrentAttackStrength =>
             currentAttackData != null
-                ? currentAttackData.Strength
+                ? currentAttackData.Damage.Strength
                 : AttackStrength.Light;
         public float AttackPushDistance =>
             currentAttackData != null
-                ? currentAttackData.PushDistance
+                ? currentAttackData.Damage.PushDistance
                 : 0f;
         public float AttackHitStopDuration =>
             currentAttackData != null
-                ? currentAttackData.HitStopDuration
+                ? currentAttackData.Damage.HitStopDuration
                 : 0f;
         public PlayerAttackData CurrentAttackData => currentAttackData;
         internal bool ProtectsSmallHit =>
@@ -64,19 +75,26 @@ namespace rudIsland.RPG3D.Player.States.Attack
             hasAttackTime &&
             currentAttackData.CanStartComboAt(
                 currentNormalizedTime,
-                hasAttackHitEnded);
+                hasAttackHitEnded,
+                comboCloseNormalizedTime);
 
         public PlayerAttackState(
             PlayerStateMachine stateMachine,
             PlayerAnimationController animationController,
-            PlayerAttackData[] attackData)
+            PlayerAttackRuntimeConfig attackConfig)
         {
             this.stateMachine = stateMachine;
             this.animationController = animationController;
-            this.attackData = attackData;
+            attackData = attackConfig.Attacks;
+            targetStopDistance = attackConfig.TargetStopDistance;
+            maximumAddedMoveDistance =
+                attackConfig.MaximumAddedMoveDistance;
+            maximumTurnAngle = attackConfig.MaximumTurnAngle;
+            comboCloseNormalizedTime =
+                attackConfig.ComboCloseNormalizedTime;
             movementCurve = new PlayerActionMovementCurve();
+            targetCorrection = new AttackTargetCorrection();
 
-            ValidateAttackData(attackData);
         }
 
         public void Prepare(bool startAsRunAttack)
@@ -138,11 +156,12 @@ namespace rudIsland.RPG3D.Player.States.Attack
             currentNormalizedTime = normalizedTime;
             if (currentAttackData.CanTurnAt(normalizedTime))
             {
-                stateMachine.UpdateAttackDirection();
-                stateMachine.UpdateAttackTurn(deltaTime);
+                UpdateAttackTurn(deltaTime);
             }
 
-            float deltaDistance = movementCurve.EvaluateDeltaDistance(normalizedTime);
+            float deltaDistance = usesTargetCorrection
+                ? targetCorrection.EvaluateDeltaDistance(normalizedTime)
+                : movementCurve.EvaluateDeltaDistance(normalizedTime);
             stateMachine.Movement.ApplyAttackMovement(deltaDistance);
 
             IsFinished = normalizedTime >= AttackCompleteNormalizedTime;
@@ -155,6 +174,9 @@ namespace rudIsland.RPG3D.Player.States.Attack
             stateMachine.EndAttackHit();
             stateMachine.ClearAttackDirection();
             movementCurve.Reset();
+            targetCorrection.Reset();
+            correctionTarget = null;
+            usesTargetCorrection = false;
         }
 
         internal void NotifyAttackHitEnded()
@@ -237,26 +259,55 @@ namespace rudIsland.RPG3D.Player.States.Attack
             hasAttackHitEnded = false;
             hasAttackTime = false;
             currentNormalizedTime = 0f;
+            movementCurve.Reset();
+            targetCorrection.Reset();
+            correctionTarget = null;
+            usesTargetCorrection = false;
             stateMachine.SetAttackDirection(false);
-            movementCurve.Begin(currentAttackData.MoveDistance, currentAttackData.MovementCurve);
+            if (stateMachine.TryGetCurrentAttackTarget(out correctionTarget))
+            {
+                usesTargetCorrection = true;
+                targetCorrection.Begin(
+                    stateMachine.Movement.Position,
+                    stateMachine.Movement.Forward,
+                    true,
+                    correctionTarget.position,
+                    currentAttackData.MoveDistance,
+                    targetStopDistance,
+                    maximumAddedMoveDistance,
+                    maximumTurnAngle,
+                    currentAttackData.MovementCurve);
+            }
+            else
+            {
+                movementCurve.Begin(
+                    currentAttackData.MoveDistance,
+                    currentAttackData.MovementCurve);
+            }
+
             animationController.PlayAttack(currentAttackData.AttackNumber);
         }
 
-        private static void ValidateAttackData(PlayerAttackData[] attackData)
+        private void UpdateAttackTurn(float deltaTime)
         {
-            if (attackData == null || attackData.Length != LastComboNumber + 1)
+            if (!usesTargetCorrection)
             {
-                throw new System.ArgumentException("PlayerAttackData는 공격 1~6까지 6개가 필요합니다.", nameof(attackData));
+                stateMachine.UpdateAttackDirection();
+                stateMachine.UpdateAttackTurn(deltaTime);
+                return;
             }
 
-            for (int index = 0; index < attackData.Length; index++)
+            if (stateMachine.IsAttackTargetAvailable(correctionTarget))
             {
-                if (attackData[index] == null ||
-                    attackData[index].AttackNumber != index + 1)
-                {
-                    throw new System.ArgumentException($"PlayerAttackData[{index}]의 공격 번호가 올바르지 않습니다.", nameof(attackData));
-                }
+                targetCorrection.UpdateTargetDirection(
+                    stateMachine.Movement.Position,
+                    correctionTarget.position);
             }
+
+            stateMachine.Movement.UpdateAttackTurnTowards(
+                targetCorrection.TurnDirection,
+                deltaTime);
         }
+
     }
 }

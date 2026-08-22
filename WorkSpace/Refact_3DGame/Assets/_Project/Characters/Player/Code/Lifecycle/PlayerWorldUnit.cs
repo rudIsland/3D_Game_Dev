@@ -59,14 +59,16 @@ namespace rudIsland.RPG3D.Player
             switch (resultBeforeHealthDamage)
             {
                 case PlayerHitResult.Ignored:
+                
                 case PlayerHitResult.Avoided:
                     return resultBeforeHealthDamage;
+
                 case PlayerHitResult.Blocked:
-                    playerStamina.TryConsumeGuard(
-                        hitRequest.Damage.GuardStaminaDamage);
+                    playerStamina.TryConsumeGuard(hitRequest.Damage.GuardStaminaDamage);
                     hitStop.Request(CombatHitStop.GuardDuration);
                     playerStateMachine.NotifyAttackBlocked();
                     return PlayerHitResult.Blocked;
+
                 case PlayerHitResult.GuardBroken:
                     playerStamina.TryConsumeGuard(
                         hitRequest.Damage.GuardStaminaDamage);

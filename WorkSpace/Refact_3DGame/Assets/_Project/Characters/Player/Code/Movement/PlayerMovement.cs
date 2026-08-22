@@ -29,6 +29,7 @@ namespace rudIsland.RPG3D.Player.Movement
 
         public bool IsGrounded => characterController != null && // 기능 사용 여부
             characterController.isGrounded;
+        public Vector3 Position => playerTransform.position;
         public Vector3 Forward => playerTransform.forward; // 플레이어가 바라보는 방향
         public Vector3 Right => playerTransform.right; // 플레이어의 오른쪽 방향
 
@@ -180,7 +181,22 @@ namespace rudIsland.RPG3D.Player.Movement
                 return;
             }
 
-            Quaternion wantedRotation = Quaternion.LookRotation(attackDirection);
+            UpdateAttackTurnTowards(attackDirection, deltaTime);
+        }
+
+        public void UpdateAttackTurnTowards(
+            Vector3 wantedDirection,
+            float deltaTime)
+        {
+            wantedDirection.y = 0f;
+            if (wantedDirection.sqrMagnitude <= 0.000001f ||
+                attackTurnSpeed <= 0f)
+            {
+                return;
+            }
+
+            Quaternion wantedRotation = Quaternion.LookRotation(
+                wantedDirection);
             playerTransform.rotation = Quaternion.RotateTowards(
                 playerTransform.rotation,
                 wantedRotation,

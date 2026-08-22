@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.Serialization;
-using rudIsland.RPG3D.Characters;
-using rudIsland.RPG3D.Characters.Combat;
+using rudIsland.RPG3D.Characters.Combat.AttackData;
 
 namespace rudIsland.RPG3D.Player.States.Attack
 {
@@ -13,11 +12,7 @@ namespace rudIsland.RPG3D.Player.States.Attack
         [SerializeField, Range(1, 6)] private int attackNumber = 1;
 
         [Header("피해")]
-        [SerializeField, Min(0f)] private float damage = 10f;
-        [SerializeField, Min(0f)] private float staggerDamage = 10f;
-        [SerializeField] private AttackStrength attackStrength = AttackStrength.Light;
-        [SerializeField, Min(0f)] private float pushDistance = 0.25f;
-        [SerializeField, Min(0f)] private float hitStopDuration = CombatHitStop.DefaultDamageDuration;
+        [SerializeField] private AttackDamage attackDamage = new();
 
         [Header("Stamina")]
         [SerializeField, Min(0f)] private float staminaCost = 20f;
@@ -27,8 +22,6 @@ namespace rudIsland.RPG3D.Player.States.Attack
         [Header("콤보 연결")]
         [FormerlySerializedAs("nextInputTime")]
         [SerializeField, Range(0f, 1f)] private float comboOpenNormalizedTime = 1f;
-        [SerializeField, Range(0f, 1f)]
-        private float comboCloseNormalizedTime = 0.9f;
 
         [Header("구르기 취소")]
         [FormerlySerializedAs("rollCancelStartTime")]
@@ -46,24 +39,19 @@ namespace rudIsland.RPG3D.Player.States.Attack
         private AnimationCurve movementCurve = CreateDefaultMovementCurve();
 
         public int AttackNumber => attackNumber;
-        public float Damage => damage;
-        public float StaggerDamage => staggerDamage;
-        public AttackStrength Strength => attackStrength;
-        public float PushDistance => pushDistance;
-        public float HitStopDuration => hitStopDuration;
+        public AttackDamage Damage => attackDamage;
         public float StaminaCost => staminaCost;
         public AudioClip SwingSound => swingSound;
         public float ComboOpenNormalizedTime => comboOpenNormalizedTime;
-        public float ComboCloseNormalizedTime => comboCloseNormalizedTime;
         public float RollCancelOpenNormalizedTime =>
             rollCancelOpenNormalizedTime;
         public float TurnEndNormalizedTime => turnEndNormalizedTime;
         public float MoveDistance => moveDistance;
         public AnimationCurve MovementCurve => movementCurve;
-
         internal bool CanStartComboAt(
             float normalizedTime,
-            bool hasAttackHitEnded)
+            bool hasAttackHitEnded,
+            float comboCloseNormalizedTime)
         {
             return hasAttackHitEnded &&
                 normalizedTime >= comboOpenNormalizedTime &&
@@ -83,20 +71,9 @@ namespace rudIsland.RPG3D.Player.States.Attack
         private void OnValidate()
         {
             attackNumber = Mathf.Clamp(attackNumber, 1, 6);
-            damage = Mathf.Max(0f, damage);
-            staggerDamage = Mathf.Max(0f, staggerDamage);
-            attackStrength = (AttackStrength)Mathf.Clamp(
-                (int)attackStrength,
-                (int)AttackStrength.Light,
-                (int)AttackStrength.Knockdown);
-            pushDistance = Mathf.Max(0f, pushDistance);
-            hitStopDuration = Mathf.Max(0f, hitStopDuration);
+            attackDamage ??= new AttackDamage();
             staminaCost = Mathf.Max(0f, staminaCost);
             comboOpenNormalizedTime = Mathf.Clamp01(comboOpenNormalizedTime);
-            comboCloseNormalizedTime = Mathf.Clamp(
-                comboCloseNormalizedTime,
-                comboOpenNormalizedTime,
-                1f);
             rollCancelOpenNormalizedTime = Mathf.Clamp01(rollCancelOpenNormalizedTime);
             turnEndNormalizedTime = Mathf.Clamp01(turnEndNormalizedTime);
             moveDistance = Mathf.Max(0f, moveDistance);
