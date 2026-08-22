@@ -666,3 +666,63 @@ Profiler GC·물리 질의:
 ```
 
 자동 테스트가 성공해도 공격 구간, 방향 고정, 벽 반동과 실제 접촉을 Unity PlayMode에서 확인하지 않았다면 완료로 표시하지 않는다.
+
+## 12. Player 공격 1~6·NightShade 전체 공격 타격 보정 기록 (2026-08-22)
+
+```text
+전투 단계: 전투 2단계 공격 거리·회전 보정
+상태: 부분 확인
+
+목표 동작:
+- Player 공격 1~6은 락온 대상이 있을 때만 각 공격 시작 거리와 시작 방향을 저장한다.
+- NightShade Light·Combo 1/2타·Heavy·WideSwing은 각 공격 시작 시 현재 Player 거리와 시작 방향을 저장한다.
+- 모든 대상 공격은 제한 회전과 CharacterController 충돌 이동을 사용한다.
+
+입력 → 처리 → 출력:
+공격 시작 → 대상·거리·시작 방향 한 번 저장 → 제한 회전·곡선 전진 → 기존 타격 이벤트와 HitRequest
+
+책임 경계:
+- AttackTargetCorrection: 계획 거리, 시작 방향 기준 회전 제한, 곡선 누적 거리
+- 공격 상태/Action: 새 공격 시작, 같은 대상의 유효성, 회전 가능 구간
+- PlayerMovement/NightShadeSwordMovement: Transform 회전과 CharacterController.Move
+
+보존한 구현:
+- Player 자유 시점 공격의 기존 방향·이동
+- Player 공격별 기존 기본 이동 거리·이동 곡선·회전 종료 normalized time
+- NightShade 공격별 기존 회전 종료 Animation Event
+- EnemyHitRequest, PlayerHitRequest, 피격 방향 밀림과 Animation Event 이름
+
+측정값:
+- Player 공격 1~6: 정지 거리 0.85m, 기존 기본 이동 유지, 추가 한계 0.25m, 최대 회전 30도
+- Player 공격별 기존 회전 종료 normalized time: 0.25 / 0.40 / 0.2923 / 0.3167 / 0.2933 / 0.40
+- NightShade 전체 공격: 정지 거리 1.30m, 기본 0m, 추가 한계 0.35m, 최대 회전 20도
+- NightShade 이동 곡선 종료: Light 0.18, Combo 0.17, Heavy 0.26, WideSwing 0.18 normalized
+- 실제 곡선 종료 시간: Light 약 0.39초, Combo 1타 약 0.37초·2타 약 0.32초, Heavy 0.65초, WideSwing 0.42초
+- 각 곡선은 기존 회전 종료 이벤트 Light 0.40초, Combo 1타 0.40초·2타 약 0.33초, Heavy 0.70초, WideSwing 약 0.47초 이전에 끝난다.
+
+자동 테스트:
+- Runtime 프로젝트 빌드: 오류 0
+- EditMode 테스트 프로젝트 빌드: 오류 0
+- 변경 관련 Unity EditMode Test Runner: 39 통과, 0 실패
+- 전체 Unity EditMode Test Runner: 124 통과, 기존 Stagger 자산 경로/상태 이름 2 실패
+- 거리 경계, 좌우·뒤 최대 각도, Reset, 곡선 누적, 30·60·120 FPS 요청 거리 포함
+- Player 공격 1~6 설정 유지, NightShade 전체 공격 계획 이동, Combo 2타 시작 시 거리 재계산 포함
+
+Unity PlayMode 조작:
+- 미확인. 현재 수정 중인 CharacterTestScene과 Animator 작업을 보존하기 위해 자동 재생·저장하지 않음.
+
+30·60·120 FPS:
+- 계산기가 요청한 최종 누적 거리는 세 프레임 조건 모두 계획 거리와 0.0001m 이내 일치.
+- 실제 CharacterController 충돌 결과는 PlayMode에서 추가 확인 필요.
+
+Profiler GC·물리 질의:
+- 새 매 프레임 배열·컬렉션·LINQ·클로저 없음.
+- Profiler 실측은 미확인.
+
+실패·미확인:
+- 벽·기둥·좁은 공간의 실제 충돌 이동과 피격자 회귀는 CharacterTestScene 확인 필요.
+- 기존 Stagger Enter 상태 이름과 소스 클립 경로 테스트 2개는 이번 변경 범위 밖.
+
+다음 단계:
+- CharacterTestScene에서 Player 공격 1~6과 NightShade 전체 공격의 거리·각도·벽 충돌을 수동 확인한 뒤 완료 여부를 결정한다.
+```
