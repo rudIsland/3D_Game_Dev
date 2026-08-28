@@ -1,11 +1,13 @@
-using rudIsland.RPG3D.Characters;
-using rudIsland.RPG3D.Player.Input;
-using rudIsland.RPG3D.Player.Runtime;
-using rudIsland.RPG3D.Player.States;
-using rudIsland.RPG3D.Player.Runtime.Hit;
-using rudIsland.RPG3D.Characters.Combat;
+using Characters;
+using Characters.Combat;
+using Characters.Player.Combat.Hit;
+using Characters.Player.Input;
+using Characters.Player.Inventory;
+using Characters.Player.Interaction;
+using Characters.Player.Stats;
+using Characters.Player.StateMachine;
 
-namespace rudIsland.RPG3D.Player
+namespace Characters.Player.Lifecycle
 {
     // 플레이어 체력, Stamina와 입력 상태를 Unit 생명주기로 실행한다.
     public sealed class PlayerWorldUnit : PlayerUnit
@@ -15,19 +17,29 @@ namespace rudIsland.RPG3D.Player
         private readonly PlayerStamina playerStamina;
         private readonly StopPoint stopPoint;
         private readonly CombatHitStop hitStop;
+        private readonly PlayerInteractionController interactionController;
+        private float maximumHealthScale;
+        private float maximumStaminaScale;
 
         public float CurrentHealth => Health.CurrentHealth; // 현재 체력
         public float CurrentStamina => playerStamina.CurrentStamina;
         public float MaxStamina => playerStamina.MaxStamina;
+        public float MaximumHealthScale => maximumHealthScale;
+        public float MaximumStaminaScale => maximumStaminaScale;
         public PlayerStamina Stamina => playerStamina;
+        public PlayerInventory Inventory { get; }
 
         internal PlayerWorldUnit(
             float maxHealth,
+            float maximumHealthScale,
+            float maximumStaminaScale,
             PlayerStamina playerStamina,
             StopPoint stopPoint,
             PlayerInputReader playerInput,
             PlayerStateMachine playerStateMachine,
-            CombatHitStop hitStop)
+            CombatHitStop hitStop,
+            PlayerInteractionController interactionController,
+            PlayerInventory inventory)
             : base(maxHealth)
         {
             this.playerInput = playerInput;
@@ -35,6 +47,10 @@ namespace rudIsland.RPG3D.Player
             this.playerStamina = playerStamina;
             this.stopPoint = stopPoint;
             this.hitStop = hitStop;
+            this.interactionController = interactionController;
+            this.maximumHealthScale = maximumHealthScale;
+            this.maximumStaminaScale = maximumStaminaScale;
+            Inventory = inventory;
         }
 
         public PlayerHitResult TryTakeHit(in PlayerHitRequest hitRequest)
@@ -172,8 +188,15 @@ namespace rudIsland.RPG3D.Player
 
             if (IsDead)
             {
+                interactionController?.ClearCurrentTarget();
                 playerStateMachine.Update(deltaTime, false, false, false);
                 return;
+            }
+
+            interactionController?.RefreshCurrentTarget();
+            if (playerInput.TakeInteractInput())
+            {
+                interactionController?.Interact();
             }
 
             playerStateMachine.Update(
@@ -184,9 +207,38 @@ namespace rudIsland.RPG3D.Player
             playerStamina.UpdateRecovery(deltaTime, playerStateMachine.StaminaRecoveryRate);
         }
 
+        internal void MultiplyMaximumHealth(float multiplier)
+        {
+            if (multiplier <= 1f ||
+                float.IsNaN(multiplier) ||
+                float.IsInfinity(multiplier) ||
+                IsDead)
+            {
+                return;
+            }
+
+            maximumHealthScale *= multiplier;
+            Health.MultiplyMaximum(multiplier);
+        }
+
+        internal void MultiplyMaximumStamina(float multiplier)
+        {
+            if (multiplier <= 1f ||
+                float.IsNaN(multiplier) ||
+                float.IsInfinity(multiplier) ||
+                IsDead)
+            {
+                return;
+            }
+
+            maximumStaminaScale *= multiplier;
+            playerStamina.MultiplyMaximum(multiplier);
+        }
+
         protected override void OnUnitDisable()
         {
             hitStop.Reset();
+            interactionController?.ClearCurrentTarget();
             playerStateMachine.Disable();
             playerInput.Disable();
         }
@@ -200,6 +252,7 @@ namespace rudIsland.RPG3D.Player
         private void HandleHealthDied()
         {
             playerInput.Disable();
+            interactionController?.ClearCurrentTarget();
             playerStateMachine.ChangeToDeadState();
         }
     }

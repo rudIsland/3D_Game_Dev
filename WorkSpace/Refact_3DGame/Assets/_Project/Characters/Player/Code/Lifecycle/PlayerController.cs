@@ -1,21 +1,25 @@
-using rudIsland.RPG3D.Characters;
+using Characters;
+using Characters.Combat;
+using Characters.Combat.AttackData;
+using Characters.Player.Audio;
+using Characters.Player.Camera;
+using Characters.Player.Combat.Attack;
+using Characters.Player.Combat.Hit;
+using Characters.Player.Config;
+using Characters.Player.Input;
+using Characters.Player.Inventory;
+using Characters.Player.Interaction;
+using Characters.Player.Movement;
+using Characters.Player.StateMachine;
+using Characters.Player.StateMachine.States.Target;
+using Characters.Player.Stats;
 using Cinemachine;
-using rudIsland.RPG3D.Player.Camera;
-using rudIsland.RPG3D.Player.Input;
-using rudIsland.RPG3D.Player.Movement;
-using rudIsland.RPG3D.Player.States;
-using rudIsland.RPG3D.Player.States.Target;
-using rudIsland.RPG3D.World;
-using rudIsland.RPG3D.Player.Runtime.Hit;
-using rudIsland.RPG3D.Player.Runtime;
-using rudIsland.RPG3D.Player.Runtime.Attack;
-using rudIsland.RPG3D.Player.Runtime.Audio;
 using UnityEngine;
-using rudIsland.RPG3D.Characters.Combat;
-using rudIsland.RPG3D.Characters.Combat.AttackData;
-using rudIsland.RPG3D.Player.Config;
+using World;
+using World.Interaction;
+using Items;
 
-namespace rudIsland.RPG3D.Player
+namespace Characters.Player.Lifecycle
 {
     [RequireComponent(
         typeof(CharacterController),
@@ -46,12 +50,18 @@ namespace rudIsland.RPG3D.Player
         private PlayerStateMachine playerStateMachine; // 현재 행동 상태
         private PlayerMovement playerMovement; // 이동 정보
         private PlayerWorldUnit playerWorldUnit; // 씬 또는 시스템 참조
+        private PlayerTargetRuntimeConfig targetConfig;
         private CombatHitEffectPlayer hitEffectPlayer;
         private PlayerAttackEffectPlayer attackEffectPlayer;
+        private PlayerInteractionController interactionController;
 
         // 적이 플레이어를 계속 추적할 수 있는지 확인할 때 사용한다.
         public bool IsDead =>
             playerWorldUnit != null && playerWorldUnit.IsDead;
+        internal Transform ViewTransform => moveCamera;
+        internal LayerMask ObstructionLayers => targetConfig != null
+            ? targetConfig.ObstructionLayers
+            : default;
 
         private void Awake()
         {
@@ -82,10 +92,10 @@ namespace rudIsland.RPG3D.Player
                 runtimeConfig.Movement;
             PlayerCombatRuntimeConfig combatConfig =
                 runtimeConfig.Combat;
-            PlayerTargetRuntimeConfig targetConfig =
-                runtimeConfig.Target;
+            targetConfig = runtimeConfig.Target;
 
             characterController = GetComponent<CharacterController>();
+            interactionController = GetComponent<PlayerInteractionController>();
             if (playerAnimator == null)
             {
                 playerAnimator = GetComponentInChildren<Animator>();
@@ -153,9 +163,11 @@ namespace rudIsland.RPG3D.Player
                 playerFreeLookCamera,
                 playerTargetLookCamera);
             var playerStamina = new PlayerStamina(
-                combatConfig.MaxStamina,
+                combatConfig.MaxStamina *
+                    PlayerStatUpgradeSession.CurrentMaxStaminaMultiplier,
                 combatConfig.StaminaRecoverDelay,
                 combatConfig.StaminaRecoverSpeed);
+            var playerInventory = new PlayerInventory();
             var hitStop = new CombatHitStop(playerAnimator);
             var stopPoint = new StopPoint(
                 combatConfig.StopPointLimit,
@@ -176,14 +188,72 @@ namespace rudIsland.RPG3D.Player
                 hitEffectPlayer,
                 attackEffectPlayer
                 );
+            playerStateMachine.SetAttackDamageMultiplier(
+                PlayerStatUpgradeSession.CurrentStrengthMultiplier);
             playerWorldUnit = new PlayerWorldUnit(
-                combatConfig.MaxHealth,
+                combatConfig.MaxHealth *
+                    PlayerStatUpgradeSession.CurrentMaxHealthMultiplier,
+                PlayerStatUpgradeSession.CurrentMaxHealthMultiplier,
+                PlayerStatUpgradeSession.CurrentMaxStaminaMultiplier,
                 playerStamina,
                 stopPoint,
                 playerInput,
                 playerStateMachine,
-                hitStop);
+                hitStop,
+                interactionController,
+                playerInventory);
             worldObjectManager.Register(playerWorldUnit);
+        }
+
+        internal bool CanStoreInventoryItem(ItemDefinition item)
+        {
+            return playerWorldUnit != null &&
+                !IsDead &&
+                playerWorldUnit.Inventory.CanAdd(item);
+        }
+
+        internal bool TryStoreInventoryItem(ItemDefinition item)
+        {
+            return playerWorldUnit != null &&
+                !IsDead &&
+                playerWorldUnit.Inventory.TryAdd(item);
+        }
+
+        internal bool HasStatueUpgrade(StatueUpgradeType upgradeType)
+        {
+            return PlayerStatUpgradeSession.HasUpgrade(upgradeType);
+        }
+
+        internal bool TryApplyStatueUpgrade(StatueUpgradeType upgradeType)
+        {
+            if (playerWorldUnit == null ||
+                playerStateMachine == null ||
+                IsDead ||
+                !PlayerStatUpgradeSession.TryActivate(upgradeType))
+            {
+                return false;
+            }
+
+            switch (upgradeType)
+            {
+                case StatueUpgradeType.MaxHealth:
+                    playerWorldUnit.MultiplyMaximumHealth(
+                        PlayerStatUpgradeSession.MaxHealthMultiplier);
+                    return true;
+
+                case StatueUpgradeType.MaxStamina:
+                    playerWorldUnit.MultiplyMaximumStamina(
+                        PlayerStatUpgradeSession.MaxStaminaMultiplier);
+                    return true;
+
+                case StatueUpgradeType.Strength:
+                    playerStateMachine.SetAttackDamageMultiplier(
+                        PlayerStatUpgradeSession.StrengthMultiplier);
+                    return true;
+
+                default:
+                    return false;
+            }
         }
 
         private void OnEnable()
