@@ -1,14 +1,14 @@
 using NUnit.Framework;
-using rudIsland.RPG3D.Player;
-using rudIsland.RPG3D.Player.Config;
-using rudIsland.RPG3D.Player.Runtime.Attack;
-using rudIsland.RPG3D.Player.Runtime.Audio;
+using Characters.Player.Lifecycle;
+using Characters.Player.Config;
+using Characters.Player.Combat.Attack;
+using Characters.Player.Audio;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace rudIsland.RPG3D.Tests
+namespace Tests.Player
 {
     public sealed class PlayerCharacterConfigTests
     {

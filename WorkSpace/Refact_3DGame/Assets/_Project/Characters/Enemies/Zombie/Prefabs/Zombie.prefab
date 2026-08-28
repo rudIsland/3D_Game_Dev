@@ -923,7 +923,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 44b30a6e56c305c4da9f00ef97b0079e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Characters.Enemies.Zombie.ZombieAnimationController
+  m_EditorClassIdentifier: Game.Runtime::Characters.Enemies.Zombie.ZombieAnimationController
   zombieAnimator: {fileID: 2536206786879619756}
 --- !u!114 &8684552503258098905
 MonoBehaviour:
@@ -936,7 +936,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5b5927d60def09743b3bcdf870f359c6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Characters.Enemies.Zombie.ZombieController
+  m_EditorClassIdentifier: Game.Runtime::Characters.Enemies.Zombie.ZombieController
   target: {fileID: 0}
   zombieAnimator: {fileID: 2536206786879619756}
   maxHealth: 100
@@ -944,11 +944,15 @@ MonoBehaviour:
   staggerRecoverDelay: 3
   staggerRecoverSpeed: 5
   deadBodyKeepTime: 2
+  zoneTrackingMargin: 1
+  homeArrivalDistance: 0.5
+  homeRecoveryDelay: 3
+  healthRecoverySpeed: 10
   testDamage: 100
   testStaggerDamage: 50
-  findRange: 30
+  findRange: 15
   idleTargetCheckInterval: 0.1
-  attackRange: 1.4
+  attackRange: 1
   attackFacingAngle: 10
   targetLayers:
     serializedVersion: 2
@@ -1033,7 +1037,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c8a4c0717de6458095c2b2f7c52919cc, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Characters.Combat.CombatHitEffectPlayer
+  m_EditorClassIdentifier: Game.Runtime::Characters.Combat.CombatHitEffectPlayer
   bodyHitEffectPrefab: {fileID: 2508344019071891113, guid: 3179f3613d3ad0e4085a8e230b039b81,
     type: 3}
   guardHitEffectPrefab: {fileID: 0}
@@ -1135,7 +1139,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: efb93583e4ecdd54e98852abfc45f73a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Characters.Enemies.Zombie.ZombieAnimationEventReceiver
+  m_EditorClassIdentifier: Game.Runtime::Characters.Enemies.Zombie.ZombieAnimationEventReceiver
 --- !u!1 &3754357000472508368
 GameObject:
   m_ObjectHideFlags: 0

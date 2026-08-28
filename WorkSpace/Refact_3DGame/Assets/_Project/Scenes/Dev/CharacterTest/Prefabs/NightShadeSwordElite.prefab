@@ -567,7 +567,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a163d6d99ba4734408bc53ac6262de97, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Characters.Enemies.NightShade.NightShadeSwordAnimationController
+  m_EditorClassIdentifier: Game.Runtime::Characters.Enemies.NightShade.NightShadeSwordAnimationController
   enemyAnimator: {fileID: 8840292377037777354}
 --- !u!114 &8186437990498605642
 MonoBehaviour:
@@ -580,7 +580,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 14a5afd45d4af214cb6cfd9b0951610a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Characters.Enemies.NightShade.NightShadeSwordAnimationEventReceiver
+  m_EditorClassIdentifier: Game.Runtime::Characters.Enemies.NightShade.NightShadeSwordAnimationEventReceiver
   animationController: {fileID: 6647203235645198677}
   swordController: {fileID: 2738947048571151062}
 --- !u!114 &9160338458252292617
@@ -594,7 +594,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c8a4c0717de6458095c2b2f7c52919cc, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Characters.Combat.CombatHitEffectPlayer
+  m_EditorClassIdentifier: Game.Runtime::Characters.Combat.CombatHitEffectPlayer
   bodyHitEffectPrefab: {fileID: 0}
   guardHitEffectPrefab: {fileID: 0}
   floorLayerMask:
@@ -810,7 +810,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6cc0b35352baed64f96c0afefcfd480d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Characters.Enemies.NightShade.NightShadeSwordAttackAudio
+  m_EditorClassIdentifier: Game.Runtime::Characters.Enemies.NightShade.NightShadeSwordAttackAudio
   bodyAudioSource: {fileID: 8216117395447372561}
   accentAudioSource: {fileID: 4346279729800029612}
   swordBodySound: {fileID: 8300000, guid: c813bff4763d6bb40851258a1148ad0c, type: 3}
@@ -834,7 +834,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e1e4ce876c7f2c04caf5a7dbff49fa4c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Characters.Enemies.NightShade.NightShadeSwordController
+  m_EditorClassIdentifier: Game.Runtime::Characters.Enemies.NightShade.NightShadeSwordController
   target: {fileID: 0}
   enemyAnimator: {fileID: 8840292377037777354}
   swordHitShape:

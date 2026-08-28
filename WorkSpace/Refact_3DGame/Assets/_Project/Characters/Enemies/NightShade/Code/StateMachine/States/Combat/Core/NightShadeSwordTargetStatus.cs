@@ -1,7 +1,7 @@
 // 한 Tick에 한 번 대상 상태를 계산해 State와 Action이 공유한다.
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.NightShade
+namespace Characters.Enemies.NightShade
 {
     internal sealed class NightShadeSwordTargetStatus
     {

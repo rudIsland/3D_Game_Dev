@@ -1,9 +1,10 @@
 using System;
-using rudIsland.RPG3D.Characters;
-using rudIsland.RPG3D.Characters.Combat;
+using Characters;
+using Characters.Combat;
 using UnityEngine;
+using World.Zones;
 
-namespace rudIsland.RPG3D.Characters.Enemies.Zombie
+namespace Characters.Enemies.Zombie
 {
     // 좀비의 탐지·경계·추적·공격 상태를 관리한다.
     public sealed class ZombieStateMachine
@@ -21,11 +22,14 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         private readonly AnimationCurve hitPushCurve;
         private readonly float hitPushCurveStart;
         private readonly float hitPushCurveRange;
+        private readonly float zoneTrackingMargin;
+        private readonly float homeArrivalDistanceSquared;
 
         private IZombieState currentState; // 현재 행동 상태
         private bool isEnabled; // 기능 사용 여부
         private Vector3 targetPosition; // 대상 참조
         private float targetDistanceSquared; // 대상 참조
+        private Vector3 homePosition;
 
         internal event Action CombatStateChanged;
 
@@ -38,6 +42,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         internal float KnockbackPushDuration { get; }
         internal float DeadBodyKeepTime { get; } // 시간 설정
         internal bool IsInCombat { get; private set; }
+        internal EnemyZoneArea HomeZone { get; private set; }
+        internal bool CanRecoverAtHome =>
+            isEnabled &&
+            ReferenceEquals(currentState, aliveState) &&
+            aliveState.IsWaitingAtHome;
 
         public ZombieStateMachine(
             Transform target,
@@ -54,6 +63,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             float knockbackPushDuration,
             AnimationCurve hitPushCurve,
             float deadBodyKeepTime,
+            float zoneTrackingMargin,
+            float homeArrivalDistance,
             Action requestRelease,
             Action endAttackHit)
         {
@@ -77,6 +88,10 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             hitPushCurveRange =
                 this.hitPushCurve.Evaluate(1f) - hitPushCurveStart;
             DeadBodyKeepTime = Mathf.Max(0f, deadBodyKeepTime);
+            this.zoneTrackingMargin = Mathf.Max(0f, zoneTrackingMargin);
+            homeArrivalDistanceSquared =
+                Mathf.Max(0.01f, homeArrivalDistance) *
+                Mathf.Max(0.01f, homeArrivalDistance);
             this.requestRelease = requestRelease;
             this.endAttackHit = endAttackHit;
 
@@ -111,7 +126,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 IsInCombat &&
                 !CanTrackTarget())
             {
-                aliveState.ChangeToIdleAfterLostTarget();
+                aliveState.ChangeToReturnAfterLostTarget();
             }
 
             if (ReferenceEquals(currentState, aliveState) &&
@@ -145,12 +160,25 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 targetDistanceSquared <= FindRangeSquared;
         }
 
-        // 목표가 활성 상태이고 살아 있을 때만 추적을 허용한다.
+        // 목표가 활성 상태이고 살아 있으며 허용된 Zone 안에 있을 때만 추적한다.
         internal bool CanTrackTarget()
         {
             return target != null &&
                 target.gameObject.activeInHierarchy &&
-                !targetDeathState.IsDead;
+                !targetDeathState.IsDead &&
+                (HomeZone == null ||
+                    HomeZone.Contains(
+                        target.position,
+                        IsInCombat ? zoneTrackingMargin : 0f));
+        }
+
+        internal bool CanResumeTrackingFromReturn()
+        {
+            return target != null &&
+                target.gameObject.activeInHierarchy &&
+                !targetDeathState.IsDead &&
+                (HomeZone == null || HomeZone.Contains(target.position)) &&
+                targetDistanceSquared <= FindRangeSquared;
         }
 
         internal bool IsTargetInAttackRange()
@@ -175,6 +203,33 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 ChaseSpeed,
                 TurnSpeed,
                 deltaTime);
+        }
+
+        internal void MoveToHome(float deltaTime)
+        {
+            movement.MoveTo(
+                homePosition,
+                ChaseSpeed,
+                TurnSpeed,
+                deltaTime);
+        }
+
+        internal bool HasArrivedHome()
+        {
+            if (HomeZone == null)
+            {
+                return true;
+            }
+
+            Vector3 homeDistance = homePosition - movement.Position;
+            homeDistance.y = 0f;
+            return homeDistance.sqrMagnitude <=
+                homeArrivalDistanceSquared;
+        }
+
+        internal bool ShouldReturnHome()
+        {
+            return HomeZone != null && !HasArrivedHome();
         }
 
         internal void TurnToTarget(float deltaTime)
@@ -265,6 +320,26 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             SetCombatState(true);
         }
 
+        internal void SetHomeZone(
+            EnemyZoneArea homeZone,
+            Vector3 nextHomePosition)
+        {
+            HomeZone = homeZone;
+            homePosition = nextHomePosition;
+
+            if (!isEnabled ||
+                !ReferenceEquals(currentState, aliveState))
+            {
+                return;
+            }
+
+            EndAttackHit();
+            movement.StopPath();
+            SetCombatState(false);
+            aliveState.ResetTargetAwareness();
+            aliveState.RestartAfterHomeZoneChanged();
+        }
+
         internal void EnterCombat()
         {
             SetCombatState(true);
@@ -305,6 +380,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         }
 
         internal void PlayChase()
+        {
+            animation.PlayChase();
+        }
+
+        internal void PlayReturn()
         {
             animation.PlayChase();
         }

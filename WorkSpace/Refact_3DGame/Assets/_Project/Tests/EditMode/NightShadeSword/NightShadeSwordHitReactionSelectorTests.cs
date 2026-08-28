@@ -1,8 +1,8 @@
 using NUnit.Framework;
-using rudIsland.RPG3D.Characters.Combat;
-using rudIsland.RPG3D.Characters.Enemies.NightShade;
+using Characters.Combat;
+using Characters.Enemies.NightShade;
 
-namespace rudIsland.RPG3D.Tests
+namespace Tests.NightShade
 {
     public sealed class NightShadeSwordHitReactionSelectorTests
     {

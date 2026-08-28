@@ -1,7 +1,7 @@
-using rudIsland.RPG3D.Characters.Combat;
+using Characters.Combat;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.Zombie
+namespace Characters.Enemies.Zombie
 {
     // 피격 중에는 공격 방향으로 밀리며 Hit 애니메이션 종료를 기다린다.
     internal sealed class ZombieHitState : IZombieState

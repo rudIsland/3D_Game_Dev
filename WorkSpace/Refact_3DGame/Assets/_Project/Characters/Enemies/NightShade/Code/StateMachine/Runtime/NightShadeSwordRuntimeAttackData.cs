@@ -1,7 +1,7 @@
-using rudIsland.RPG3D.Characters.Combat.AttackData;
+using Characters.Combat.AttackData;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.NightShade
+namespace Characters.Enemies.NightShade
 {
     // EnemyAttackData Asset에서 복사한 런타임 읽기 전용 공격 설정이다.
     internal readonly struct NightShadeSwordRuntimeAttackData

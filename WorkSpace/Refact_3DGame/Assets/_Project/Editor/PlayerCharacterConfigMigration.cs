@@ -1,17 +1,17 @@
 using System;
 using System.Collections.Generic;
-using rudIsland.RPG3D.Characters.Combat.AttackData;
-using rudIsland.RPG3D.Player;
-using rudIsland.RPG3D.Player.Config;
-using rudIsland.RPG3D.Player.Runtime.Attack;
-using rudIsland.RPG3D.Player.Runtime.Audio;
-using rudIsland.RPG3D.Player.States.Attack;
+using Characters.Combat.AttackData;
+using Characters.Player.Lifecycle;
+using Characters.Player.Config;
+using Characters.Player.Combat.Attack;
+using Characters.Player.Audio;
+using Characters.Player.StateMachine.States.Attack;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace rudIsland.RPG3D.Editor
+namespace EditorTools
 {
     // 기존 CharacterTestScene의 Player 값을 대표 Config와 역할 컴포넌트로 옮긴다.
     public static class PlayerCharacterConfigMigration

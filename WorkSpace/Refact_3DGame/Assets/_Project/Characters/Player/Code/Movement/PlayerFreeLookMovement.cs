@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Player.Movement
+namespace Characters.Player.Movement
 {
     // 자유 시점의 카메라 기준 이동·구르기·공격 방향을 계산한다.
     internal sealed class PlayerFreeLookMovement : IPlayerMovementMode

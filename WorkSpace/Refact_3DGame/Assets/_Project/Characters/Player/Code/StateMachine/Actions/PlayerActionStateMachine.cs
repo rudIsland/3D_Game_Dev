@@ -1,8 +1,8 @@
-using rudIsland.RPG3D.Player.States.Attack;
-using rudIsland.RPG3D.Player.States.Block;
-using rudIsland.RPG3D.Player.States.Movement;
+using Characters.Player.StateMachine.States.Attack;
+using Characters.Player.StateMachine.States.Block;
+using Characters.Player.StateMachine.States.Movement;
 
-namespace rudIsland.RPG3D.Player.States.Actions
+namespace Characters.Player.StateMachine.Actions
 {
     // 이동, 방어, 구르기와 공격 사이의 행동 전환을 한곳에서 관리한다.
     internal sealed class PlayerActionStateMachine

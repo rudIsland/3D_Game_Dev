@@ -1278,7 +1278,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 58c31d51adb47864592cfd04d2305062, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Dev.CharacterTest.TestSceneEnemySpawner
+  m_EditorClassIdentifier: Game.Runtime::Development.CharacterTest.TestSceneEnemySpawner
   worldObjectManager: {fileID: 600374219}
   enemySettings:
   - {fileID: 11400000, guid: 2f2c3441eae3dd048b4dfc1b3fdeca61, type: 2}
@@ -1507,7 +1507,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 644db9acc682c7349a6555b12f452292, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Player.Runtime.Audio.PlayerDamageAudio
+  m_EditorClassIdentifier: Game.Runtime::Characters.Player.Audio.PlayerDamageAudio
   damageAudioSource: {fileID: 560169545}
   bodyImpactSound: {fileID: 8300000, guid: 581741dc8a5fb1d43b66c0489ff77fa7, type: 3}
   swordCutSound: {fileID: 8300000, guid: 9fe1486028123884d8fe0e2c7d1732ed, type: 3}
@@ -1722,7 +1722,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7ff34200066bb0e459eda47c9909cca5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.World.WorldObjectManager
+  m_EditorClassIdentifier: Game.Runtime::World.WorldObjectManager
   spawnSettings:
   - {fileID: 11400000, guid: 2f2c3441eae3dd048b4dfc1b3fdeca61, type: 2}
   - {fileID: 11400000, guid: 511312cb3490e204790ef4877d6bfea5, type: 2}
@@ -4293,7 +4293,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 70987d43b83ad76429a31e43b3ef129e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Player.Animations.PlayerAnimationMoveReceiver
+  m_EditorClassIdentifier: Game.Runtime::Characters.Player.Animation.PlayerAnimationMoveReceiver
 --- !u!1 &1699704999
 GameObject:
   m_ObjectHideFlags: 0
@@ -4371,7 +4371,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 76c69612715ed1a42bf78057dd671024, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Player.PlayerController
+  m_EditorClassIdentifier: Game.Runtime::Characters.Player.Lifecycle.PlayerController
   worldObjectManager: {fileID: 600374219}
   moveCamera: {fileID: 519073573}
   playerAnimator: {fileID: 5866666021796340207}
@@ -4392,7 +4392,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c8a4c0717de6458095c2b2f7c52919cc, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Characters.Combat.CombatHitEffectPlayer
+  m_EditorClassIdentifier: Game.Runtime::Characters.Combat.CombatHitEffectPlayer
   bodyHitEffectPrefab: {fileID: 2508344019071891113, guid: 3179f3613d3ad0e4085a8e230b039b81,
     type: 3}
   guardHitEffectPrefab: {fileID: 0}
@@ -4415,7 +4415,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cc5c30e0e1ad420a87008871f98796e0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Player.Runtime.Attack.PlayerAttackEffectPlayer
+  m_EditorClassIdentifier: Game.Runtime::Characters.Player.Combat.Attack.PlayerAttackEffectPlayer
   confirmedHitSound: {fileID: 8300000, guid: a848f901dd0ca264a8ae871d3e2bc7d5, type: 3}
   confirmedHitSoundVolume: 0.8
   smallHitSoundVolume: 0.9
@@ -4531,7 +4531,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 900af80ab9874c55a4d6acfb5f47e5c3, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Player.Runtime.Attack.PlayerWeaponHitShape
+  m_EditorClassIdentifier: Game.Runtime::Characters.Player.Combat.Attack.PlayerWeaponHitShape
   startPoint: {fileID: 490989438}
   endPoint: {fileID: 749509542}
   targetLayers:
@@ -6802,7 +6802,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 831e55ad0a1a40f8a89b430e58ee7d52, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Player.Runtime.Hit.PlayerGuardHitBox
+  m_EditorClassIdentifier: Game.Runtime::Characters.Player.Combat.Hit.PlayerGuardHitBox
 --- !u!4 &889744323492837600
 Transform:
   m_ObjectHideFlags: 0
@@ -12491,7 +12491,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2109e09cb84bf3846935c98285101aff, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::rudIsland.RPG3D.Player.Runtime.Audio.PlayerFootstepAudio
+  m_EditorClassIdentifier: Game.Runtime::Characters.Player.Audio.PlayerFootstepAudio
   walkSounds:
   - {fileID: 8300000, guid: 1bbd839d1ff4a5949bc434adb0930ade, type: 3}
   - {fileID: 8300000, guid: 73d4877bc5aaddb429c35bd6bba414a9, type: 3}

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.AttackData
+namespace Characters.Enemies.AttackData
 {
     [Serializable]
     public sealed class EnemyAttackUtilitySettings

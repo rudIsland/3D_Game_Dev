@@ -1,9 +1,9 @@
 using System.Reflection;
 using NUnit.Framework;
-using rudIsland.RPG3D.Player.Animations;
+using Characters.Player.Animation;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Tests
+namespace Tests.Player
 {
     public sealed class PlayerAnimationControllerTests
     {

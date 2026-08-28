@@ -1,13 +1,15 @@
 using System.Collections.Generic;
-using rudIsland.RPG3D.Characters;
-using rudIsland.RPG3D.Characters.Enemies.NightShade;
-using rudIsland.RPG3D.Characters.Enemies.Zombie;
-using rudIsland.RPG3D.Player;
-using rudIsland.RPG3D.Player.Runtime;
-using rudIsland.RPG3D.World;
+using Characters.Player.Interaction;
+using Characters.Player.Inventory;
+using Characters;
+using Characters.Enemies.NightShade;
+using Characters.Enemies.Zombie;
+using Characters.Player.Lifecycle;
+using Characters.Player.Stats;
+using World;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.UI
+namespace GameUI.CombatHud
 {
     // 플레이어 자원과 현재 전투 중인 적 자원을 화면 HUD에 연결한다.
     public sealed class CombatHudController : MonoBehaviour
@@ -15,36 +17,59 @@ namespace rudIsland.RPG3D.UI
         [Header("World")]
         [SerializeField] private WorldObjectManager worldObjectManager; // 씬 또는 시스템 참조
 
-        [Header("Health Bars")]
-        [SerializeField] private HealthBarView playerHealthBar; // 씬 또는 시스템 참조
-        [SerializeField] private HealthBarView enemyHealthBar;
+        [Header("UI Toolkit")]
+        [SerializeField] private CombatHudToolkitView toolkitView;
 
-        [Header("Stamina Bar")]
-        [SerializeField] private StaminaBarView playerStaminaBar;
-
-        [Header("Enemy Stagger Bar")]
-        [SerializeField] private StaggerBarView enemyStaggerBar;
+        [Header("Interaction UI")]
+        [SerializeField]
+        private PlayerInteractionController playerInteractionController;
 
         private readonly Dictionary<UnitHealth, Unit> trackedUnits = // 씬 또는 시스템 참조
             new Dictionary<UnitHealth, Unit>(3);
+        private PlayerWorldUnit displayedPlayer;
         private Unit displayedEnemy;
 
         private void Awake()
         {
+            if (toolkitView == null)
+            {
+                toolkitView = GetComponent<CombatHudToolkitView>();
+            }
+
+            if (toolkitView == null)
+            {
+                Debug.LogError(
+                    "CombatHudController requires a CombatHudToolkitView.",
+                    this);
+                enabled = false;
+                return;
+            }
+
             if (worldObjectManager == null)
             {
                 worldObjectManager =
                     FindFirstObjectByType<WorldObjectManager>();
             }
 
-            playerHealthBar?.Hide();
-            playerStaminaBar?.Hide();
-            enemyHealthBar?.Hide();
-            enemyStaggerBar?.Hide();
+            if (playerInteractionController == null)
+            {
+                playerInteractionController =
+                    FindFirstObjectByType<PlayerInteractionController>();
+            }
+
+            HideAllHud();
         }
 
         private void OnEnable()
         {
+            if (playerInteractionController != null)
+            {
+                playerInteractionController.AvailableInteractableChanged +=
+                    HandleAvailableInteractableChanged;
+                HandleAvailableInteractableChanged(
+                    playerInteractionController.HasCurrentInteractable);
+            }
+
             if (worldObjectManager == null)
             {
                 Debug.LogError("CombatHudController requires a WorldObjectManager.", this);
@@ -65,6 +90,12 @@ namespace rudIsland.RPG3D.UI
 
         private void OnDisable()
         {
+            if (playerInteractionController != null)
+            {
+                playerInteractionController.AvailableInteractableChanged -=
+                    HandleAvailableInteractableChanged;
+            }
+
             if (worldObjectManager != null)
             {
                 worldObjectManager.WorldObjectEnabled -= HandleWorldObjectEnabled;
@@ -80,6 +111,8 @@ namespace rudIsland.RPG3D.UI
                 {
                     player.Stamina.StaminaChanged -=
                         HandleStaminaChanged;
+                    player.Inventory.Changed -=
+                        HandleInventoryChanged;
                 }
                 else if (entry.Value is ZombieWorldUnit zombie)
                 {
@@ -95,11 +128,20 @@ namespace rudIsland.RPG3D.UI
             }
 
             trackedUnits.Clear();
+            displayedPlayer = null;
             displayedEnemy = null;
-            playerHealthBar?.Hide();
-            playerStaminaBar?.Hide();
-            enemyHealthBar?.Hide();
-            enemyStaggerBar?.Hide();
+            HideAllHud();
+        }
+
+        private void HandleAvailableInteractableChanged(bool hasInteractable)
+        {
+            if (hasInteractable)
+            {
+                ShowInteractionGuide();
+                return;
+            }
+
+            HideInteractionGuide();
         }
 
         private void HandleWorldObjectEnabled(IWorldObject worldObject)
@@ -137,13 +179,25 @@ namespace rudIsland.RPG3D.UI
 
             if (isPlayer)
             {
-                playerHealthBar?.Show("PLAYER", unit.Health);
-
                 if (unit is PlayerWorldUnit player)
                 {
+                    displayedPlayer = player;
+                    ShowPlayerHealth(
+                        unit.Health,
+                        player.MaximumHealthScale);
                     player.Stamina.StaminaChanged +=
                         HandleStaminaChanged;
-                    playerStaminaBar?.Show(player.CurrentStamina, player.MaxStamina);
+                    player.Inventory.Changed +=
+                        HandleInventoryChanged;
+                    ShowPlayerInventory(player.Inventory);
+                    ShowPlayerStamina(
+                        player.CurrentStamina,
+                        player.MaxStamina,
+                        player.MaximumStaminaScale);
+                }
+                else
+                {
+                    ShowPlayerHealth(unit.Health, 1f);
                 }
             }
             else if (unit is ZombieWorldUnit zombie)
@@ -179,15 +233,23 @@ namespace rudIsland.RPG3D.UI
 
             if (unit is PlayerUnit)
             {
-                playerHealthBar?.Hide();
+                HidePlayerHealth();
 
                 if (unit is PlayerWorldUnit player)
                 {
                     player.Stamina.StaminaChanged -=
                         HandleStaminaChanged;
+                    player.Inventory.Changed -=
+                        HandleInventoryChanged;
+
+                    if (ReferenceEquals(displayedPlayer, player))
+                    {
+                        displayedPlayer = null;
+                    }
                 }
 
-                playerStaminaBar?.Hide();
+                HidePlayerInventory();
+                HidePlayerStamina();
             }
             else if (unit is ZombieWorldUnit zombie)
             {
@@ -211,15 +273,23 @@ namespace rudIsland.RPG3D.UI
                 return;
             }
 
+            if (unit is PlayerWorldUnit player)
+            {
+                UpdatePlayerHealth(
+                    health,
+                    player.MaximumHealthScale);
+                return;
+            }
+
             if (unit is PlayerUnit)
             {
-                playerHealthBar?.UpdateHealth(health);
+                UpdatePlayerHealth(health, 1f);
                 return;
             }
 
             if (ReferenceEquals(displayedEnemy, unit))
             {
-                enemyHealthBar?.UpdateHealth(health);
+                UpdateEnemyHealth(health);
             }
         }
 
@@ -242,7 +312,12 @@ namespace rudIsland.RPG3D.UI
 
         private void HandleStaminaChanged(PlayerStamina stamina)
         {
-            playerStaminaBar?.UpdateStamina(stamina.CurrentStamina, stamina.MaxStamina);
+            toolkitView.UpdatePlayerStamina(
+                stamina.CurrentStamina,
+                stamina.MaxStamina,
+                displayedPlayer != null
+                    ? displayedPlayer.MaximumStaminaScale
+                    : 1f);
         }
 
         private void HandleZombieStaggerChanged(ZombieWorldUnit zombie)
@@ -252,7 +327,7 @@ namespace rudIsland.RPG3D.UI
                 return;
             }
 
-            enemyStaggerBar?.UpdateStagger(zombie.CurrentStagger, zombie.MaxStagger);
+            UpdateEnemyStagger(zombie.CurrentStagger, zombie.MaxStagger);
         }
 
         private void HandleZombieCombatStateChanged(ZombieWorldUnit zombie)
@@ -282,7 +357,9 @@ namespace rudIsland.RPG3D.UI
                 return;
             }
 
-            enemyStaggerBar?.UpdateStagger(nightShade.CurrentStagger, nightShade.MaxStagger);
+            UpdateEnemyStagger(
+                nightShade.CurrentStagger,
+                nightShade.MaxStagger);
         }
 
         private void HandleNightShadeCombatStateChanged(NightShadeSwordWorldUnit nightShade)
@@ -312,8 +389,8 @@ namespace rudIsland.RPG3D.UI
             float maxStagger)
         {
             displayedEnemy = enemy;
-            enemyHealthBar?.Show(enemyName, enemy.Health);
-            enemyStaggerBar?.Show(currentStagger, maxStagger);
+            toolkitView.ShowEnemyHealth(enemyName, enemy.Health);
+            toolkitView.ShowEnemyStagger(currentStagger, maxStagger);
         }
 
         private void HideEnemy(Unit enemy)
@@ -324,23 +401,96 @@ namespace rudIsland.RPG3D.UI
             }
 
             displayedEnemy = null;
-            enemyHealthBar?.Hide();
-            enemyStaggerBar?.Hide();
+            toolkitView.HideEnemyHealth();
+            toolkitView.HideEnemyStagger();
+        }
+
+        private void HandleInventoryChanged(PlayerInventory inventory)
+        {
+            toolkitView.UpdatePlayerInventory(inventory);
+        }
+
+        private void HideAllHud()
+        {
+            toolkitView?.HideAll();
+        }
+
+        private void ShowInteractionGuide()
+        {
+            toolkitView.ShowInteractionGuide();
+        }
+
+        private void HideInteractionGuide()
+        {
+            toolkitView.HideInteractionGuide();
+        }
+
+        private void ShowPlayerHealth(
+            UnitHealth health,
+            float maximumScale)
+        {
+            toolkitView.ShowPlayerHealth(
+                "PLAYER",
+                health,
+                maximumScale);
+        }
+
+        private void UpdatePlayerHealth(
+            UnitHealth health,
+            float maximumScale)
+        {
+            toolkitView.UpdatePlayerHealth(health, maximumScale);
+        }
+
+        private void HidePlayerHealth()
+        {
+            toolkitView.HidePlayerHealth();
+        }
+
+        private void ShowPlayerStamina(
+            float currentStamina,
+            float maxStamina,
+            float maximumScale)
+        {
+            toolkitView.ShowPlayerStamina(
+                currentStamina,
+                maxStamina,
+                maximumScale);
+        }
+
+        private void ShowPlayerInventory(PlayerInventory inventory)
+        {
+            toolkitView.ShowPlayerInventory(inventory);
+        }
+
+        private void HidePlayerInventory()
+        {
+            toolkitView.HidePlayerInventory();
+        }
+
+        private void HidePlayerStamina()
+        {
+            toolkitView.HidePlayerStamina();
+        }
+
+        private void UpdateEnemyHealth(UnitHealth health)
+        {
+            toolkitView.UpdateEnemyHealth(health);
+        }
+
+        private void UpdateEnemyStagger(
+            float currentStagger,
+            float maxStagger)
+        {
+            toolkitView.UpdateEnemyStagger(
+                currentStagger,
+                maxStagger);
         }
 
 #if UNITY_EDITOR
-        public void ConnectForEditor(
-            WorldObjectManager manager,
-            HealthBarView playerBar,
-            StaminaBarView staminaBar,
-            HealthBarView enemyBar,
-            StaggerBarView staggerBar)
+        public void ConnectToolkitForEditor(CombatHudToolkitView view)
         {
-            worldObjectManager = manager;
-            playerHealthBar = playerBar;
-            playerStaminaBar = staminaBar;
-            enemyHealthBar = enemyBar;
-            enemyStaggerBar = staggerBar;
+            toolkitView = view;
         }
 #endif
     }

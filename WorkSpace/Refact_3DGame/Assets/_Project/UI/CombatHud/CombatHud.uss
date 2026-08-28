@@ -1,0 +1,246 @@
+.combat-hud {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.is-hidden {
+    display: flex;
+}
+
+.bar-fill, .bar-frame, .bar-value {
+    position: absolute;
+}
+
+.health-group {
+    width: 100%;
+    flex-direction: column;
+}
+
+.player-status {
+    position: absolute;
+    left: 3%;
+    bottom: 4%;
+    width: 22%;
+    min-width: 300px;
+    max-width: 460px;
+    flex-direction: column;
+}
+
+.player-inventory {
+    height: 116px;
+    margin-bottom: 20px;
+    flex-direction: row;
+    align-items: center;
+}
+
+.inventory-slot {
+    position: relative;
+    width: 108px;
+    height: 108px;
+    margin-right: 16px;
+    background-color: rgba(8, 8, 8, 0.9);
+    border-left-width: 4px;
+    border-top-width: 4px;
+    border-right-width: 4px;
+    border-bottom-width: 4px;
+    border-left-color: rgb(156, 128, 82);
+    border-top-color: rgb(156, 128, 82);
+    border-right-color: rgb(156, 128, 82);
+    border-bottom-color: rgb(156, 128, 82);
+}
+
+.inventory-slot-icon {
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    right: 8px;
+    bottom: 8px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.inventory-slot-number {
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 26px;
+    -unity-font-style: bold;
+    -unity-text-outline-color: rgba(0, 0, 0, 0.9);
+    -unity-text-outline-width: 1px;
+}
+
+.enemy-status {
+    position: absolute;
+    left: 50%;
+    top: 4%;
+    width: 34%;
+    min-width: 420px;
+    max-width: 680px;
+    translate: -50% 0;
+    flex-direction: column;
+    align-items: center;
+}
+
+.target-name {
+    width: 100%;
+    color: rgb(230, 199, 143);
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    font-size: 20px;
+    -unity-text-outline-color: rgba(0, 0, 0, 0.8);
+    -unity-text-outline-width: 1px;
+}
+
+.enemy-name {
+    font-size: 24px;
+    height: 28px;
+}
+
+.player-name {
+    height: 24px;
+}
+
+.player-health {
+    height: 56px;
+}
+
+.enemy-health {
+    height: 68px;
+}
+
+.health-bar {
+    position: relative;
+    width: 100%;
+    background-color: rgba(9, 5, 5, 0.96);
+}
+
+.player-health .health-bar {
+    height: 32px;
+}
+
+.enemy-health .health-bar {
+    height: 40px;
+}
+
+.bar-fill {
+    left: 8px;
+    right: 8px;
+    top: 6px;
+    bottom: 6px;
+    transform-origin: 0% 50%;
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+.health-fill {
+    left: 11px;
+    right: 11px;
+    top: 9px;
+    bottom: 9px;
+    background-image: url("../../GUI/CombatHud/Sprites/Hp_line.png");
+}
+
+.stamina-fill {
+    background-image: url("../../../_ThirdParty/GUI/Parts/Mana_line2.png");
+    -unity-background-image-tint-color: rgb(153, 209, 51);
+}
+
+.stagger-fill {
+    background-image: url("../../../_ThirdParty/GUI/Parts/energy_line2.png");
+    -unity-background-image-tint-color: rgb(242, 171, 46);
+}
+
+.bar-frame {
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("../../GUI/CombatHud/Sprites/Hp_frame.png");
+    -unity-background-scale-mode: stretch-to-fill;
+    -unity-slice-left: 20;
+    -unity-slice-top: 20;
+    -unity-slice-right: 20;
+    -unity-slice-bottom: 20;
+}
+
+.bar-value {
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    color: white;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    font-size: 20px;
+    -unity-text-outline-color: rgba(0, 0, 0, 0.8);
+    -unity-text-outline-width: 1px;
+}
+
+.enemy-health-value {
+    font-size: 24px;
+}
+
+.player-stamina {
+    position: relative;
+    width: 75%;
+    height: 22px;
+    margin-top: 8px;
+    background-color: rgba(5, 9, 4, 0.96);
+}
+
+.enemy-stagger {
+    position: relative;
+    width: 78%;
+    height: 24px;
+    margin-top: 8px;
+    background-color: rgba(10, 8, 4, 0.96);
+}
+
+.stagger-value {
+    font-size: 18px;
+}
+
+.interaction-guide {
+    position: absolute;
+    left: 58%;
+    top: 60%;
+    width: 14%;
+    min-width: 220px;
+    max-width: 280px;
+    height: 72px;
+    translate: -50% -50%;
+    flex-direction: row;
+    align-items: center;
+}
+
+.interaction-key {
+    width: 72px;
+    height: 72px;
+    flex-shrink: 0;
+    background-image: url("../../../_ThirdParty/GUI/Parts/mini_button.png");
+    -unity-background-scale-mode: scale-to-fit;
+    justify-content: center;
+    align-items: center;
+}
+
+.interaction-key-text {
+    color: white;
+    font-size: 32px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    -unity-text-outline-color: rgba(0, 0, 0, 0.9);
+    -unity-text-outline-width: 1px;
+}
+
+.interaction-text {
+    flex-grow: 1;
+    margin-left: 12px;
+    color: white;
+    font-size: 24px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    -unity-text-outline-color: rgba(0, 0, 0, 0.9);
+    -unity-text-outline-width: 1px;
+}

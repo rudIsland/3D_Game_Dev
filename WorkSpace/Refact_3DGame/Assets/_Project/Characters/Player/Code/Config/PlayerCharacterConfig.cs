@@ -1,12 +1,12 @@
 using System;
-using rudIsland.RPG3D.Player.States.Attack;
+using Characters.Player.StateMachine.States.Attack;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Player.Config
+namespace Characters.Player.Config
 {
     [CreateAssetMenu(
         fileName = "PlayerCharacterConfig",
-        menuName = "rudIsland/RPG3D/Player/Character Config")]
+        menuName = "Characters/Player/Character Config")]
     // 플레이어의 밸런스 값과 공격 자산 참조를 한곳에 보관한다.
     public sealed class PlayerCharacterConfig : ScriptableObject
     {

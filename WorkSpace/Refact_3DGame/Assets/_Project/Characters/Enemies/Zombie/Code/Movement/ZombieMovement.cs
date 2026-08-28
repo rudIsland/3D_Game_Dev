@@ -1,7 +1,7 @@
-using rudIsland.RPG3D.Characters.Enemies.Navigation;
+using Characters.Enemies.Navigation;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.Zombie
+namespace Characters.Enemies.Zombie
 {
     // Zombie의 이동, 회전, 중력만 계산한다.
     public sealed class ZombieMovement

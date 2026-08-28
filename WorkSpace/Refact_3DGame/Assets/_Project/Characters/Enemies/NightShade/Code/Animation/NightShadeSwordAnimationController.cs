@@ -1,7 +1,7 @@
-using rudIsland.RPG3D.Characters.Combat;
+using Characters.Combat;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.NightShade
+namespace Characters.Enemies.NightShade
 {
     // 상태머신 요청을 NightShade 양손검 Animator 상태로 바꾼다.
     [DisallowMultipleComponent]

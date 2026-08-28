@@ -1,12 +1,12 @@
-using rudIsland.RPG3D.Characters.Enemies.AttackData;
+using Characters.Enemies.AttackData;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.NightShade
+namespace Characters.Enemies.NightShade
 {
     // 프리팹과 분리된 NightShadeSword 전투 속성 모음이다.
     [CreateAssetMenu(
         fileName = "NightShadeSwordConfig",
-        menuName = "rudIsland/RPG3D/NightShade/Sword Config")]
+        menuName = "Characters/Enemies/NightShade/Sword Config")]
     public sealed class NightShadeSwordConfig : ScriptableObject
     {
         [Header("공격")]

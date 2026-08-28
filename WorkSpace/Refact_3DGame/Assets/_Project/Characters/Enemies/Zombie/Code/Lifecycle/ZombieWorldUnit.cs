@@ -1,8 +1,8 @@
 using System;
-using rudIsland.RPG3D.Characters.Combat;
+using Characters.Combat;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.Zombie
+namespace Characters.Enemies.Zombie
 {
     // EnemyUnit 생명주기에서 좀비의 탐지·추적 상태머신을 실행한다.
     public sealed class ZombieWorldUnit : EnemyUnit
@@ -11,6 +11,11 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         private readonly ZombieAttackRangeDetector attackRangeDetector;
         private readonly StopPoint stopPoint;
         private readonly CombatHitStop hitStop;
+        private readonly float homeRecoveryDelay;
+        private readonly float healthRecoverySpeed;
+        private readonly float staggerRecoverySpeed;
+
+        private float homeRecoveryElapsedTime;
 
         public float CurrentHealth => Health.CurrentHealth; // 현재 체력
         public float CurrentStagger => stopPoint.CurrentPoint;
@@ -25,13 +30,19 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             ZombieStateMachine stateMachine,
             ZombieAttackRangeDetector attackRangeDetector,
             StopPoint stopPoint,
-            CombatHitStop hitStop)
+            CombatHitStop hitStop,
+            float homeRecoveryDelay,
+            float healthRecoverySpeed,
+            float staggerRecoverySpeed)
             : base(maxHealth)
         {
             this.stateMachine = stateMachine;
             this.attackRangeDetector = attackRangeDetector;
             this.stopPoint = stopPoint;
             this.hitStop = hitStop;
+            this.homeRecoveryDelay = Mathf.Max(0f, homeRecoveryDelay);
+            this.healthRecoverySpeed = Mathf.Max(0f, healthRecoverySpeed);
+            this.staggerRecoverySpeed = Mathf.Max(0f, staggerRecoverySpeed);
         }
 
         public EnemyHitResult TakeHit(in EnemyHitRequest hitRequest)
@@ -43,6 +54,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 return EnemyHitResult.Ignored;
             }
 
+            homeRecoveryElapsedTime = 0f;
             hitStop.Request(hitRequest.HitStopDuration);
             if (damageResult == HitDamageResult.Killed)
             {
@@ -109,6 +121,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             hitStop.Reset();
             attackRangeDetector.Close();
             stopPoint.Reset();
+            homeRecoveryElapsedTime = 0f;
             stateMachine.Enable();
         }
 
@@ -119,18 +132,15 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 return;
             }
 
-            if (stopPoint.UpdateRecovery(deltaTime))
-            {
-                StaggerChanged?.Invoke(this);
-            }
-
             stateMachine.Update(deltaTime);
             attackRangeDetector.Tick();
+            UpdateHomeRecovery(deltaTime);
         }
 
         protected override void OnUnitDisable()
         {
             hitStop.Reset();
+            homeRecoveryElapsedTime = 0f;
             stateMachine.Disable();
             attackRangeDetector.Close();
         }
@@ -149,7 +159,40 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         private void HandleCombatStateChanged()
         {
+            if (stateMachine.IsInCombat)
+            {
+                homeRecoveryElapsedTime = 0f;
+            }
+
             CombatStateChanged?.Invoke(this);
+        }
+
+        private void UpdateHomeRecovery(float deltaTime)
+        {
+            if (!stateMachine.CanRecoverAtHome || deltaTime <= 0f)
+            {
+                homeRecoveryElapsedTime = 0f;
+                return;
+            }
+
+            float previousElapsedTime = homeRecoveryElapsedTime;
+            homeRecoveryElapsedTime += deltaTime;
+            if (homeRecoveryElapsedTime <= homeRecoveryDelay)
+            {
+                return;
+            }
+
+            float recoveryStartTime = Mathf.Max(
+                previousElapsedTime,
+                homeRecoveryDelay);
+            float recoveryDuration =
+                homeRecoveryElapsedTime - recoveryStartTime;
+
+            Health.Heal(healthRecoverySpeed * recoveryDuration);
+            if (stopPoint.Recover(staggerRecoverySpeed * recoveryDuration))
+            {
+                StaggerChanged?.Invoke(this);
+            }
         }
     }
 }

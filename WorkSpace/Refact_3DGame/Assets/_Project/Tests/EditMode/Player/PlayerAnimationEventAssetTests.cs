@@ -1,9 +1,9 @@
 using NUnit.Framework;
-using rudIsland.RPG3D.Player.States.Attack;
+using Characters.Player.StateMachine.States.Attack;
 using UnityEditor;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Tests
+namespace Tests.Player
 {
     public sealed class PlayerAnimationEventAssetTests
     {
@@ -12,7 +12,7 @@ namespace rudIsland.RPG3D.Tests
         private const string RollFolder =
             "Assets/_Project/Characters/Player/Models/Sources/10_Roll";
         private const string AttackDataFolder =
-            "Assets/_Project/Characters/Player/Code/StateMachine/Attack/AttackData";
+            "Assets/_Project/Characters/Player/Code/StateMachine/States/Attack/AttackData";
 
         [TestCase("1Hand_Base_Attack_A_1_InPlace.anim", 1, 1.3f, 0.28333333f)]
         [TestCase("1Hand_Base_Attack_A_2_InPlace.anim", 2, 1.4666667f, 0.48333332f)]

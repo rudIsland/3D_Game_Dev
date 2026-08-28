@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Tests
+namespace Tests.NightShade
 {
     public sealed class NightShadeSwordAnimationEventAssetTests
     {

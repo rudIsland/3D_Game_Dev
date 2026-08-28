@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.NightShade
+namespace Characters.Enemies.NightShade
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(AudioSource))]

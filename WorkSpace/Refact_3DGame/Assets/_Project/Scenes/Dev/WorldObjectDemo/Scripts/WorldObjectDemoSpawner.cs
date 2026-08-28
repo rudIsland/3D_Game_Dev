@@ -1,7 +1,7 @@
-using rudIsland.RPG3D.World;
+using World;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Dev.WorldDemo
+namespace Development.WorldObjectDemo
 {
     // 씬이 시작되면 테스트 객체 하나를 풀에서 꺼낸다.
     public sealed class WorldObjectDemoSpawner : MonoBehaviour

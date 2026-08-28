@@ -1,9 +1,9 @@
-using rudIsland.RPG3D.Characters.Combat.AttackData;
-using rudIsland.RPG3D.Characters.Combat;
-using rudIsland.RPG3D.Player.Runtime.Hit;
+using Characters.Combat.AttackData;
+using Characters.Combat;
+using Characters.Player.Combat.Hit;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.Zombie
+namespace Characters.Enemies.Zombie
 {
     // 공격창 동안 선택된 손·발 Capsule과 프레임 사이 궤적을 검사한다.
     internal sealed class ZombieAttackRangeDetector

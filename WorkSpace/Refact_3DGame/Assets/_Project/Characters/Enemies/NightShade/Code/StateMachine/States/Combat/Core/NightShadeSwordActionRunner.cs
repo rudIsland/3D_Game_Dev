@@ -1,5 +1,5 @@
 // 현재 전투 Action의 생명주기를 관리한다.
-namespace rudIsland.RPG3D.Characters.Enemies.NightShade
+namespace Characters.Enemies.NightShade
 {
     // 현재 Action 하나의 Enter -> Update -> Exit 호출 순서를 보장한다.
     internal sealed class NightShadeSwordActionRunner

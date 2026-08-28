@@ -1,12 +1,12 @@
 using NUnit.Framework;
-using rudIsland.RPG3D.Characters.Combat;
-using rudIsland.RPG3D.Characters.Combat.AttackData;
-using rudIsland.RPG3D.Characters.Enemies.AttackData;
-using rudIsland.RPG3D.Characters.Enemies.NightShade;
+using Characters.Combat;
+using Characters.Combat.AttackData;
+using Characters.Enemies.AttackData;
+using Characters.Enemies.NightShade;
 using UnityEditor;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Tests
+namespace Tests.NightShade
 {
     public sealed class NightShadeSwordConfigTests
     {
@@ -278,7 +278,7 @@ namespace rudIsland.RPG3D.Tests
                 Component component = components[index];
                 if (component != null &&
                     component.GetType().FullName ==
-                        "rudIsland.RPG3D.Characters.Enemies.NightShade.NightShadeSwordController")
+                        "Characters.Enemies.NightShade.NightShadeSwordController")
                 {
                     return component;
                 }

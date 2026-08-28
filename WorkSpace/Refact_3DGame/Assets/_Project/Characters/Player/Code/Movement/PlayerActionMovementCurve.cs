@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Player.Movement
+namespace Characters.Player.Movement
 {
     // 동작의 정규화 시간과 누적 Curve를 프레임 이동 거리로 변환한다.
     internal sealed class PlayerActionMovementCurve

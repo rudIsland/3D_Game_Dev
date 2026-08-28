@@ -1,4 +1,4 @@
-namespace rudIsland.RPG3D.Player.States.Actions
+namespace Characters.Player.StateMachine.Actions
 {
     internal enum PlayerBufferedAction
     {

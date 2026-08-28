@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.NightShade
+namespace Characters.Enemies.NightShade
 {
     // 타겟 감지와 위치 Action 전환에 사용하는 거리 기준이다.
     [Serializable]

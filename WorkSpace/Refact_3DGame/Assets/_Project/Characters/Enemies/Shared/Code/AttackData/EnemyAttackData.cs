@@ -1,7 +1,7 @@
-using rudIsland.RPG3D.Characters.Combat.AttackData;
+using Characters.Combat.AttackData;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.AttackData
+namespace Characters.Enemies.AttackData
 {
     // 적 종류와 관계없이 공격 하나의 변하지 않는 설정만 보관한다.
     public abstract class EnemyAttackData : ScriptableObject

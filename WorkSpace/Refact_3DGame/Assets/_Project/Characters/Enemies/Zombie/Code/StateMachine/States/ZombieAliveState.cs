@@ -1,4 +1,4 @@
-namespace rudIsland.RPG3D.Characters.Enemies.Zombie
+namespace Characters.Enemies.Zombie
 {
     // 살아 있는 동안 Idle, Alert, Chase, Attack 상태를 관리한다.
     internal sealed class ZombieAliveState : IZombieState
@@ -8,12 +8,18 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         private readonly ZombieAlertState alertState; // 현재 행동 상태
         private readonly ZombieChaseState chaseState; // 현재 행동 상태
         private readonly ZombieAttackState attackState; // 공격 관련 설정 또는 상태
+        private readonly ZombieReturnState returnState;
 
         private IZombieState currentChildState; // 현재 행동 상태
         private bool hasFoundTargetBefore; // 기능 사용 여부
 
         internal bool NeedsTargetUpdateEveryFrame => // 기능 사용 여부
             !ReferenceEquals(currentChildState, idleState);
+        internal bool IsWaitingAtHome =>
+            ReferenceEquals(currentChildState, idleState) &&
+            !stateMachine.IsInCombat &&
+            stateMachine.HomeZone != null &&
+            stateMachine.HasArrivedHome();
 
         public ZombieAliveState(ZombieStateMachine stateMachine)
         {
@@ -22,11 +28,15 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             alertState = new ZombieAlertState(this, stateMachine);
             chaseState = new ZombieChaseState(this, stateMachine);
             attackState = new ZombieAttackState(this, stateMachine);
+            returnState = new ZombieReturnState(this, stateMachine);
         }
 
         public void Enter()
         {
-            ChangeChildState(idleState);
+            ChangeChildState(
+                stateMachine.ShouldReturnHome()
+                    ? returnState
+                    : idleState);
         }
 
         public void Update(float deltaTime)
@@ -47,6 +57,38 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         }
 
         internal void ChangeToIdleAfterLostTarget()
+        {
+            if (stateMachine.ShouldReturnHome())
+            {
+                ChangeToReturnAfterLostTarget();
+                return;
+            }
+
+            hasFoundTargetBefore = false;
+            stateMachine.ExitCombat();
+            ChangeChildState(idleState);
+        }
+
+        internal void ChangeToReturnAfterLostTarget()
+        {
+            if (!stateMachine.ShouldReturnHome())
+            {
+                ChangeToIdleAfterLostTarget();
+                return;
+            }
+
+            stateMachine.ExitCombat();
+            ChangeChildState(returnState);
+        }
+
+        internal void ChangeToChaseFromReturn()
+        {
+            hasFoundTargetBefore = true;
+            stateMachine.EnterCombat();
+            ChangeChildState(chaseState);
+        }
+
+        internal void ChangeToIdleAfterReturn()
         {
             hasFoundTargetBefore = false;
             stateMachine.ExitCombat();
@@ -141,6 +183,16 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         {
             hasFoundTargetBefore = false;
             attackState.ResetAttackHistory();
+        }
+
+        internal void RestartAfterHomeZoneChanged()
+        {
+            currentChildState?.Exit();
+            currentChildState = null;
+            ChangeChildState(
+                stateMachine.ShouldReturnHome()
+                    ? returnState
+                    : idleState);
         }
 
         private void ChangeChildState(IZombieState nextState)

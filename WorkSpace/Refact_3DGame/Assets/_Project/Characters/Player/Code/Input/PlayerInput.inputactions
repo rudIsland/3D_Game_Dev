@@ -70,7 +70,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "ShieldImpactTest",
+                    "name": "Interact",
                     "type": "Button",
                     "id": "ec39ccc2-6fee-4633-9827-ab7924efe55d",
                     "expectedControlType": "Button",
@@ -208,7 +208,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "ShieldImpactTest",
+                    "action": "Interact",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

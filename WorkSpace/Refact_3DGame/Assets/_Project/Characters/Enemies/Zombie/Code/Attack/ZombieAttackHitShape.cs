@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.Zombie
+namespace Characters.Enemies.Zombie
 {
     // 한 공격이 사용하는 신체 부위의 시작점, 끝점과 두께를 보관한다.
     [Serializable]

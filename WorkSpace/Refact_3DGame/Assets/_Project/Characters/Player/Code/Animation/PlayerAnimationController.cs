@@ -1,7 +1,7 @@
-using rudIsland.RPG3D.Characters.Combat;
+using Characters.Combat;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Player.Animations
+namespace Characters.Player.Animation
 {
     // 플레이어 Animator의 파라미터와 재생 시간을 한곳에서 관리한다.
     public sealed class PlayerAnimationController

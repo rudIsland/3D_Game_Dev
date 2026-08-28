@@ -1,7 +1,7 @@
-using rudIsland.RPG3D.Player.Input;
+using Characters.Player.Input;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Player.Movement
+namespace Characters.Player.Movement
 {
     // 공통 이동과 Root Motion을 관리하고 방향 계산은 현재 이동 모드에 맡긴다.
     public sealed class PlayerMovement

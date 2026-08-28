@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.NightShade
+namespace Characters.Enemies.NightShade
 {
     // 공격 Animation Event를 NightShade 전투 경계로 전달한다.
     [DisallowMultipleComponent]

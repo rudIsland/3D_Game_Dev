@@ -1,4 +1,4 @@
-namespace rudIsland.RPG3D.Characters.Enemies.NightShade
+namespace Characters.Enemies.NightShade
 {
     // 대기 중 중력을 적용하고 감지된 대상이 있으면 Combat 상위 상태로 넘긴다.
     internal sealed class NightShadeSwordIdleState : INightShadeSwordState

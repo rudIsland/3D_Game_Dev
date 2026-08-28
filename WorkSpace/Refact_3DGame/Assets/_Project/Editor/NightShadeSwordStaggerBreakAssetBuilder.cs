@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.EditorTools
+namespace EditorTools
 {
     // NightShade의 경직 붕괴 전용 클립과 Animator 상태만 갱신한다.
     public static class NightShadeSwordStaggerBreakAssetBuilder

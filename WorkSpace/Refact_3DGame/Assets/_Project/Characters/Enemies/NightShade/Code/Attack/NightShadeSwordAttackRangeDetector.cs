@@ -1,9 +1,9 @@
-using rudIsland.RPG3D.Characters.Combat;
-using rudIsland.RPG3D.Characters.Combat.AttackData;
-using rudIsland.RPG3D.Player.Runtime.Hit;
+using Characters.Combat;
+using Characters.Combat.AttackData;
+using Characters.Player.Combat.Hit;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.NightShade
+namespace Characters.Enemies.NightShade
 {
     // 공격 구간 동안 RustySword 검날과 프레임 사이 이동 경로를 검사한다.
     internal sealed class NightShadeSwordAttackRangeDetector

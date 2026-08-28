@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.NightShade
+namespace Characters.Enemies.NightShade
 {
     // 실행 가능한 공격 후보들의 Utility 점수를 계산할 때 사용하는 공통 값이다.
     [Serializable]

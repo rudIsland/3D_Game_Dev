@@ -1,8 +1,8 @@
 using System;
-using rudIsland.RPG3D.World;
+using World;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Dev.CharacterTest
+namespace Development.CharacterTest
 {
     // TestScene의 적 설정과 배치 위치를 Manager의 풀 Spawn으로 연결한다.
     public sealed class TestSceneEnemySpawner : MonoBehaviour

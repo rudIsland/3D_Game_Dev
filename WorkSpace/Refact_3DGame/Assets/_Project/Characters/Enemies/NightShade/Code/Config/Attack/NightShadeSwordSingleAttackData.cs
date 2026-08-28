@@ -1,10 +1,10 @@
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.NightShade
+namespace Characters.Enemies.NightShade
 {
     [CreateAssetMenu(
         fileName = "NightShadeSwordSingleAttackData",
-        menuName = "rudIsland/RPG3D/NightShade/Single Sword Attack Data")]
+        menuName = "Characters/Enemies/NightShade/Single Sword Attack Data")]
     public sealed class NightShadeSwordSingleAttackData : NightShadeSwordAttackData
     {
         [Header("NightShade Sword 공격 식별")]

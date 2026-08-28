@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7c9ec64a3ec54244abc33d4c49907658, type: 3}
   m_Name: ZombieSpawnSettings
-  m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.World.SpawnSettings
+  m_EditorClassIdentifier: Game.Runtime::World.SpawnSettings
   prefab: {fileID: 8684552503258098905, guid: 169ad2641acc0f343ad35dbd4a954fec, type: 3}
-  initialSize: 1
-  maxSize: 4
+  initialSize: 6
+  maxSize: 6

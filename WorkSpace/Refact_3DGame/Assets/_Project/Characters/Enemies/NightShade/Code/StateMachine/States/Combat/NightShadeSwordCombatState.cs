@@ -1,5 +1,5 @@
 // Combat 하위 단계와 공격, Recovery Action의 생명주기를 관리한다.
-namespace rudIsland.RPG3D.Characters.Enemies.NightShade
+namespace Characters.Enemies.NightShade
 {
     internal sealed class NightShadeSwordCombatState : INightShadeSwordState
     {

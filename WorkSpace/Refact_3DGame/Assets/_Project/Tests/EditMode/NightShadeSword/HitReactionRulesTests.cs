@@ -1,9 +1,9 @@
 using NUnit.Framework;
-using rudIsland.RPG3D.Characters;
-using rudIsland.RPG3D.Characters.Combat;
-using rudIsland.RPG3D.Characters.Combat.AttackData;
+using Characters;
+using Characters.Combat;
+using Characters.Combat.AttackData;
 
-namespace rudIsland.RPG3D.Tests
+namespace Tests.NightShade
 {
     public sealed class HitReactionRulesTests
     {

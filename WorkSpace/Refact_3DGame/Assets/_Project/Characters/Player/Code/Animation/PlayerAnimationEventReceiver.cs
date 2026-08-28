@@ -1,7 +1,8 @@
-using rudIsland.RPG3D.Player.Runtime.Audio;
+using Characters.Player.Audio;
+using Characters.Player.Lifecycle;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Player.Animations
+namespace Characters.Player.Animation
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Animator))]

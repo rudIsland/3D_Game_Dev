@@ -1,7 +1,7 @@
 using System;
-using rudIsland.RPG3D.Characters.Combat;
+using Characters.Combat;
 
-namespace rudIsland.RPG3D.Characters.Enemies.NightShade
+namespace Characters.Enemies.NightShade
 {
     // EnemyUnit 생명주기에서 NightShade 양손검 전투를 실행한다.
     public sealed class NightShadeSwordWorldUnit : EnemyUnit

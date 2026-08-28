@@ -1,10 +1,10 @@
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.NightShade
+namespace Characters.Enemies.NightShade
 {
     [CreateAssetMenu(
         fileName = "NightShadeSwordComboAttackData",
-        menuName = "rudIsland/RPG3D/NightShade/Combo Sword Attack Data")]
+        menuName = "Characters/Enemies/NightShade/Combo Sword Attack Data")]
     public sealed class NightShadeSwordComboAttackData : NightShadeSwordAttackData
     {
         [Header("Combo 연결 설정")]

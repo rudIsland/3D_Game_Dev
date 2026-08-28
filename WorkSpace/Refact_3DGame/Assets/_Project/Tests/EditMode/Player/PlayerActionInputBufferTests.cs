@@ -1,8 +1,8 @@
 using NUnit.Framework;
-using rudIsland.RPG3D.Player.Runtime;
-using rudIsland.RPG3D.Player.States.Actions;
+using Characters.Player.Stats;
+using Characters.Player.StateMachine.Actions;
 
-namespace rudIsland.RPG3D.Tests
+namespace Tests.Player
 {
     public sealed class PlayerActionInputBufferTests
     {

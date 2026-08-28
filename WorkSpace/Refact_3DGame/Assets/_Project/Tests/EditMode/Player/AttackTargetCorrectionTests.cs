@@ -1,8 +1,8 @@
 using NUnit.Framework;
-using rudIsland.RPG3D.Characters.Combat;
+using Characters.Combat;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Tests
+namespace Tests.Player
 {
     public sealed class AttackTargetCorrectionTests
     {

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.Zombie
+namespace Characters.Enemies.Zombie
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Animator))]

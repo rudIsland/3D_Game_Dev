@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using NUnit.Framework;
-using rudIsland.RPG3D.Characters;
-using rudIsland.RPG3D.Player.States.Target;
+using Characters;
+using Characters.Player.StateMachine.States.Target;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Tests
+namespace Tests.Player
 {
     public sealed class PlayerTargetFinderTests
     {

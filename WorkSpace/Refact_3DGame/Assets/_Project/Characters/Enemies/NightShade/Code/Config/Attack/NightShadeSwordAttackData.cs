@@ -1,7 +1,7 @@
-using rudIsland.RPG3D.Characters.Enemies.AttackData;
+using Characters.Enemies.AttackData;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.NightShade
+namespace Characters.Enemies.NightShade
 {
     public abstract class NightShadeSwordAttackData : EnemyAttackData
     {

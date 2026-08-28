@@ -1,9 +1,9 @@
 using Cinemachine;
 using NUnit.Framework;
-using rudIsland.RPG3D.Player.Camera;
+using Characters.Player.Camera;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Tests
+namespace Tests.Player
 {
     public sealed class PlayerTargetCameraTests
     {

@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using rudIsland.RPG3D.Characters.Combat;
-using rudIsland.RPG3D.Characters.Enemies.NightShade;
-using rudIsland.RPG3D.World;
+using Characters.Combat;
+using Characters.Enemies.NightShade;
+using World;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.EditorTools
+namespace EditorTools
 {
     // NightShade 모델, RustySword와 양손검 애니메이션을 전투 프리팹으로 묶는다.
     public static class NightShadeSwordEliteAssetBuilder

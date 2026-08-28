@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
-using rudIsland.RPG3D.Characters;
-using rudIsland.RPG3D.Characters.Combat;
-using rudIsland.RPG3D.Characters.Combat.AttackData;
-using rudIsland.RPG3D.Characters.Enemies.AttackData;
-using rudIsland.RPG3D.Characters.Enemies.NightShade;
+using Characters;
+using Characters.Combat;
+using Characters.Combat.AttackData;
+using Characters.Enemies.AttackData;
+using Characters.Enemies.NightShade;
 using UnityEditor;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Tests
+namespace Tests.NightShade
 {
     internal sealed class NightShadeSwordTestScope : IDisposable
     {

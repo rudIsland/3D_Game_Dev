@@ -1,7 +1,7 @@
 // 이전 선택과 공격 후딜처럼 Tick 사이에 유지할 전투 기록이다.
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.NightShade
+namespace Characters.Enemies.NightShade
 {
     // 한 번의 활성화 동안 이전 공격, Recovery와 공격 후 대기를 보관한다.
     internal sealed class NightShadeSwordCombatMemory

@@ -1,15 +1,15 @@
 using NUnit.Framework;
-using rudIsland.RPG3D.Player.States.Attack;
-using rudIsland.RPG3D.Player.Config;
+using Characters.Player.StateMachine.States.Attack;
+using Characters.Player.Config;
 using UnityEditor;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Tests
+namespace Tests.Player
 {
     public sealed class PlayerAttackWindowTests
     {
         private const string AttackDataFolder =
-            "Assets/_Project/Characters/Player/Code/StateMachine/Attack/AttackData";
+            "Assets/_Project/Characters/Player/Code/StateMachine/States/Attack/AttackData";
 
         private PlayerAttackData attackData;
 

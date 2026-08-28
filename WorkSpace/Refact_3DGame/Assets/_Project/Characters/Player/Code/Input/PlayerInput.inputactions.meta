@@ -11,4 +11,4 @@ ScriptedImporter:
   generateWrapperCode: 1
   wrapperCodePath: ./PlayerControls.cs
   wrapperClassName: PlayerControls
-  wrapperCodeNamespace: rudIsland.RPG3D.Player.Input
+  wrapperCodeNamespace: Characters.Player.Input

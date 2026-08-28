@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1e54f8e87c9c440f804a1a1ca80c0d65, type: 3}
   m_Name: NightShadeSwordCombo
-  m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.Characters.Enemies.NightShade.NightShadeSwordComboAttackData
+  m_EditorClassIdentifier: Game.Runtime::Characters.Enemies.NightShade.NightShadeSwordComboAttackData
   hitDamages:
   - healthDamage: 12
     strength: 1

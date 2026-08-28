@@ -1,0 +1,55 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="CombatHud.uss" />
+    <ui:VisualElement name="combat-hud" class="combat-hud">
+        <ui:VisualElement name="player-status" class="player-status">
+            <ui:VisualElement name="player-inventory" class="player-inventory is-hidden">
+                <ui:VisualElement class="inventory-slot">
+                    <ui:VisualElement name="inventory-slot-1-icon" class="inventory-slot-icon" />
+                    <ui:Label text="1" class="inventory-slot-number" />
+                </ui:VisualElement>
+                <ui:VisualElement class="inventory-slot">
+                    <ui:VisualElement name="inventory-slot-2-icon" class="inventory-slot-icon" />
+                    <ui:Label text="2" class="inventory-slot-number" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="player-health" class="health-group player-health is-hidden">
+                <ui:Label name="player-name" text="PLAYER" class="target-name player-name" />
+                <ui:VisualElement name="player-health-bar" class="bar health-bar">
+                    <ui:VisualElement name="player-health-fill" class="bar-fill health-fill" />
+                    <ui:VisualElement class="bar-frame" />
+                    <ui:Label name="player-health-text" text="0 / 0" class="bar-value" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="player-stamina" class="bar player-stamina is-hidden">
+                <ui:VisualElement name="player-stamina-fill" class="bar-fill stamina-fill" />
+                <ui:VisualElement class="bar-frame" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="enemy-status" class="enemy-status">
+            <ui:VisualElement name="enemy-health" class="health-group enemy-health is-hidden">
+                <ui:Label name="enemy-name" text="ENEMY" class="target-name enemy-name" />
+                <ui:VisualElement class="bar health-bar">
+                    <ui:VisualElement name="enemy-health-fill" class="bar-fill health-fill" />
+                    <ui:VisualElement class="bar-frame" />
+                    <ui:Label name="enemy-health-text" text="0 / 0" class="bar-value enemy-health-value" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="enemy-stagger" class="bar enemy-stagger is-hidden">
+                <ui:VisualElement name="enemy-stagger-fill" class="bar-fill stagger-fill" />
+                <ui:VisualElement class="bar-frame" />
+                <ui:Label name="enemy-stagger-text" text="STAGGER 0 / 0" class="bar-value stagger-value" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="interaction-guide" class="interaction-guide is-hidden">
+            <ui:VisualElement class="interaction-key">
+                <ui:Label text="G" class="interaction-key-text" />
+            </ui:VisualElement>
+            <ui:Label text="Interaction" class="interaction-text" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

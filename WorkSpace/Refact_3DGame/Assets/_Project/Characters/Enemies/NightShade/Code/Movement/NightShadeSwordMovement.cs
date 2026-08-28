@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.NightShade
+namespace Characters.Enemies.NightShade
 {
     // NightShade 정예 적의 이동, 회전, 중력만 계산한다.
     internal sealed class NightShadeSwordMovement : INightShadeSwordMovement

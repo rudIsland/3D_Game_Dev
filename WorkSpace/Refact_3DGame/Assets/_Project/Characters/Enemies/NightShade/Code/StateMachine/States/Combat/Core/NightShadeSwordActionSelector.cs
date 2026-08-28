@@ -1,5 +1,5 @@
 // 현재 단계에서 실행할 Action을 점수로 선택한다.
-namespace rudIsland.RPG3D.Characters.Enemies.NightShade
+namespace Characters.Enemies.NightShade
 {
     // 고정 후보 배열을 순서대로 평가하고 가장 높은 Utility 점수를 고른다.
     internal sealed class NightShadeSwordActionSelector

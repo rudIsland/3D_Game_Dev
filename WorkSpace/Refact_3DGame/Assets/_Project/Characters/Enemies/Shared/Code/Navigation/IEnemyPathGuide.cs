@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.Navigation
+namespace Characters.Enemies.Navigation
 {
     // 적의 실제 이동 방식과 경로 계산 방식을 분리한다.
     internal interface IEnemyPathGuide

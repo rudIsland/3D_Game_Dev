@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7c9ec64a3ec54244abc33d4c49907658, type: 3}
   m_Name: NightShadeTestSpawnSettings
-  m_EditorClassIdentifier: rudIsland.RPG3D.Runtime::rudIsland.RPG3D.World.SpawnSettings
+  m_EditorClassIdentifier: Game.Runtime::World.SpawnSettings
   prefab: {fileID: 2738947048571151062, guid: bb7d762459e2a044ca4dd05f8fec0ac5, type: 3}
   initialSize: 1
   maxSize: 2

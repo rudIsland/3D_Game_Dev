@@ -1,4 +1,4 @@
-namespace rudIsland.RPG3D.Characters.Enemies.NightShade
+namespace Characters.Enemies.NightShade
 {
     internal sealed class NightShadeSwordSingleAttackAction :
         NightShadeSwordAttackActionBase

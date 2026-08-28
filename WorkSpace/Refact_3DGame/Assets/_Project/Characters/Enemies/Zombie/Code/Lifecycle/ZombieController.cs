@@ -1,14 +1,15 @@
 using System;
-using rudIsland.RPG3D.Characters;
-using rudIsland.RPG3D.Characters.Combat.AttackData;
-using rudIsland.RPG3D.Characters.Combat;
-using rudIsland.RPG3D.Characters.Enemies.Navigation;
-using rudIsland.RPG3D.Player;
-using rudIsland.RPG3D.World;
+using Characters;
+using Characters.Combat.AttackData;
+using Characters.Combat;
+using Characters.Enemies.Navigation;
+using Characters.Player.Lifecycle;
+using World;
+using World.Zones;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace rudIsland.RPG3D.Characters.Enemies.Zombie
+namespace Characters.Enemies.Zombie
 {
     [DisallowMultipleComponent]
     [RequireComponent(
@@ -20,7 +21,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
     public sealed class ZombieController :
         WorldObjectView,
         IUnitDeathState,
-        IEnemyDamageReceiver
+        IEnemyDamageReceiver,
+        IZoneEnemy
     {
         [Header("필수 연결")]
         [SerializeField] private Transform target; // 대상 참조
@@ -36,6 +38,12 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
 
         [Header("사망 후 정리")]
         [SerializeField, Min(0f)] private float deadBodyKeepTime = 2f; // 시간 설정
+
+        [Header("Zone 복귀와 회복")]
+        [SerializeField, Min(0f)] private float zoneTrackingMargin = 1f;
+        [SerializeField, Min(0.01f)] private float homeArrivalDistance = 0.5f;
+        [SerializeField, Min(0f)] private float homeRecoveryDelay = 3f;
+        [SerializeField, Min(0f)] private float healthRecoverySpeed = 10f;
 
 #if UNITY_EDITOR
         [Header("체력 확인")]
@@ -85,10 +93,12 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         private ZombieWorldUnit zombieWorldUnit; // 씬 또는 시스템 참조
         private CombatHitEffectPlayer hitEffectPlayer;
         private NavMeshAgent navMeshAgent;
+        private ZombieStateMachine stateMachine;
 
 
         public bool IsDead =>
             zombieWorldUnit != null && zombieWorldUnit.IsDead;
+        public EnemyZoneArea HomeZone => stateMachine?.HomeZone;
         protected override IWorldObject CreateRuntimeObject()
         {
             FindSceneReferences();
@@ -126,7 +136,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 upDownHitShape,
                 hitStop,
                 hitEffectPlayer);
-            var stateMachine = new ZombieStateMachine(
+            stateMachine = new ZombieStateMachine(
                 target,
                 targetDeathState,
                 movement,
@@ -141,6 +151,8 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 knockbackPushDuration,
                 hitPushCurve,
                 deadBodyKeepTime,
+                zoneTrackingMargin,
+                homeArrivalDistance,
                 RequestDeadZombieRelease,
                 EndAttackHit);
             var stopPoint = new StopPoint(
@@ -153,8 +165,18 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
                 stateMachine,
                 attackRangeDetector,
                 stopPoint,
-                hitStop);
+                hitStop,
+                homeRecoveryDelay,
+                healthRecoverySpeed,
+                staggerRecoverSpeed);
             return zombieWorldUnit;
+        }
+
+        public void SetHomeZone(
+            EnemyZoneArea homeZone,
+            Vector3 homePosition)
+        {
+            stateMachine?.SetHomeZone(homeZone, homePosition);
         }
 
         private void RequestDeadZombieRelease()
@@ -292,6 +314,7 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
         protected override void OnResetForPool()
         {
             EndAttackHit();
+            SetHomeZone(null, default);
             zombieAnimation?.ResetAnimation();
         }
 
@@ -333,6 +356,10 @@ namespace rudIsland.RPG3D.Characters.Enemies.Zombie
             }
 
             deadBodyKeepTime = Mathf.Max(0f, deadBodyKeepTime);
+            zoneTrackingMargin = Mathf.Max(0f, zoneTrackingMargin);
+            homeArrivalDistance = Mathf.Max(0.01f, homeArrivalDistance);
+            homeRecoveryDelay = Mathf.Max(0f, homeRecoveryDelay);
+            healthRecoverySpeed = Mathf.Max(0f, healthRecoverySpeed);
         }
 
         private void OnDrawGizmosSelected()

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.NightShade
+namespace Characters.Enemies.NightShade
 {
     [Serializable]
     internal sealed class NightShadeSwordRecoverySettings

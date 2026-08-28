@@ -1,11 +1,11 @@
 using System;
-using rudIsland.RPG3D.Characters.Combat;
-using rudIsland.RPG3D.Characters.Combat.AttackData;
-using rudIsland.RPG3D.Player;
-using rudIsland.RPG3D.World;
+using Characters.Combat;
+using Characters.Combat.AttackData;
+using Characters.Player.Lifecycle;
+using World;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.NightShade
+namespace Characters.Enemies.NightShade
 {
     [DisallowMultipleComponent]
     [RequireComponent(

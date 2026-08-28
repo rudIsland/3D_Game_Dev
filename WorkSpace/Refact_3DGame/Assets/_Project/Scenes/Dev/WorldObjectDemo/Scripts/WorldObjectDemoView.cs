@@ -1,7 +1,7 @@
-using rudIsland.RPG3D.World;
+using World;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Dev.WorldDemo
+namespace Development.WorldObjectDemo
 {
     // 중앙 Tick과 풀 재사용을 눈으로 확인하기 위한 테스트용 뷰다.
     public sealed class WorldObjectDemoView : WorldObjectView

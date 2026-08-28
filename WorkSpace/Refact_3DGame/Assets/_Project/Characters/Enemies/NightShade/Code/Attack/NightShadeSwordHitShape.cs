@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.NightShade
+namespace Characters.Enemies.NightShade
 {
     // RustySword 검날의 시작점과 끝점으로 공격 Capsule을 만든다.
     [Serializable]

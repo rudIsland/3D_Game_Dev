@@ -1,8 +1,8 @@
-using rudIsland.RPG3D.Characters.Enemies.NightShade;
+using Characters.Enemies.NightShade;
 using UnityEditor;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Editor
+namespace EditorTools
 {
     [CustomEditor(typeof(NightShadeSwordController))]
     public sealed class NightShadeSwordControllerEditor : UnityEditor.Editor

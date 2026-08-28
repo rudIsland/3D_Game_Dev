@@ -1,9 +1,9 @@
 using System;
-using rudIsland.RPG3D.Characters.Combat;
-using rudIsland.RPG3D.Characters.Enemies.AttackData;
+using Characters.Combat;
+using Characters.Enemies.AttackData;
 using UnityEngine;
 
-namespace rudIsland.RPG3D.Characters.Enemies.NightShade
+namespace Characters.Enemies.NightShade
 {
     // Inspector Config를 역할별로 복사한 NightShade 런타임 설정이다.
     internal sealed class NightShadeSwordSettings

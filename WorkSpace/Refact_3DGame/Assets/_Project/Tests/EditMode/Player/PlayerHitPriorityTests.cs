@@ -1,8 +1,8 @@
 using NUnit.Framework;
-using rudIsland.RPG3D.Player;
-using rudIsland.RPG3D.Player.Runtime.Hit;
+using Characters.Player.Lifecycle;
+using Characters.Player.Combat.Hit;
 
-namespace rudIsland.RPG3D.Tests
+namespace Tests.Player
 {
     public sealed class PlayerHitPriorityTests
     {

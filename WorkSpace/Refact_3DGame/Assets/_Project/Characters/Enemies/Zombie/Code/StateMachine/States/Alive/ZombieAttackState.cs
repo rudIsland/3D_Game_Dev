@@ -1,7 +1,7 @@
 using UnityEngine;
 
 
-namespace rudIsland.RPG3D.Characters.Enemies.Zombie
+namespace Characters.Enemies.Zombie
 {
     internal enum ZombieAttackType
     {

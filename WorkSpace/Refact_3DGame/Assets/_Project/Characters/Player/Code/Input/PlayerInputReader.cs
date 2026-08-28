@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace rudIsland.RPG3D.Player.Input
+namespace Characters.Player.Input
 {
     // Input System 값을 게임에서 읽기 쉬운 상태로 저장한다.
     public sealed class PlayerInputReader : PlayerControls.IPlayerActions
@@ -11,6 +11,7 @@ namespace rudIsland.RPG3D.Player.Input
         private bool hasRollInput; // 기능 사용 여부
         private bool hasAttackInput; // 기능 사용 여부
         private bool hasTargetToggleInput; // 기능 사용 여부
+        private bool hasInteractInput; // 상호작용 입력 여부
 
         // 누르고 있는 동안 계속 유지되는 입력 상태다.
         public Vector2 MoveValue { get; private set; } // 이동 정보
@@ -52,6 +53,7 @@ namespace rudIsland.RPG3D.Player.Input
             hasRollInput = false;
             hasAttackInput = false;
             hasTargetToggleInput = false;
+            hasInteractInput = false;
         }
 
         public void Destroy()
@@ -143,8 +145,23 @@ namespace rudIsland.RPG3D.Player.Input
             IsBlocking = context.ReadValueAsButton();
         }
 
-        public void OnShieldImpactTest(InputAction.CallbackContext context)
+        public bool TakeInteractInput()
         {
+            if (!hasInteractInput)
+            {
+                return false;
+            }
+
+            hasInteractInput = false;
+            return true;
+        }
+
+        public void OnInteract(InputAction.CallbackContext context)
+        {
+            if (context.started)
+            {
+                hasInteractInput = true;
+            }
         }
     }
 }
