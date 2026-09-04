@@ -1,6 +1,10 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <Style src="CombatHud.uss" />
     <ui:VisualElement name="combat-hud" class="combat-hud">
+        <ui:VisualElement name="minimap" class="minimap" picking-mode="Ignore">
+            <ui:VisualElement name="minimap-view" class="minimap-view" picking-mode="Ignore" />
+        </ui:VisualElement>
+
         <ui:VisualElement name="player-status" class="player-status">
             <ui:VisualElement name="player-inventory" class="player-inventory is-hidden">
                 <ui:VisualElement class="inventory-slot">
@@ -46,10 +50,10 @@
         </ui:VisualElement>
 
         <ui:VisualElement name="interaction-guide" class="interaction-guide is-hidden">
-            <ui:VisualElement class="interaction-key">
+            <ui:VisualElement name="interaction-key" class="interaction-key">
                 <ui:Label text="G" class="interaction-key-text" />
             </ui:VisualElement>
-            <ui:Label text="Interaction" class="interaction-text" />
+            <ui:Label name="interaction-text" text="Interaction" class="interaction-text" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

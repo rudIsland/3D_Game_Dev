@@ -7,6 +7,7 @@ using Characters.Enemies.Zombie;
 using Characters.Player.Lifecycle;
 using Characters.Player.Stats;
 using World;
+using World.Interaction;
 using UnityEngine;
 
 namespace GameUI.CombatHud
@@ -64,10 +65,10 @@ namespace GameUI.CombatHud
         {
             if (playerInteractionController != null)
             {
-                playerInteractionController.AvailableInteractableChanged +=
-                    HandleAvailableInteractableChanged;
-                HandleAvailableInteractableChanged(
-                    playerInteractionController.HasCurrentInteractable);
+                playerInteractionController.InteractionGuideChanged +=
+                    HandleInteractionGuideChanged;
+                HandleInteractionGuideChanged(
+                    playerInteractionController.CurrentInteractionGuide);
             }
 
             if (worldObjectManager == null)
@@ -92,8 +93,8 @@ namespace GameUI.CombatHud
         {
             if (playerInteractionController != null)
             {
-                playerInteractionController.AvailableInteractableChanged -=
-                    HandleAvailableInteractableChanged;
+                playerInteractionController.InteractionGuideChanged -=
+                    HandleInteractionGuideChanged;
             }
 
             if (worldObjectManager != null)
@@ -133,11 +134,12 @@ namespace GameUI.CombatHud
             HideAllHud();
         }
 
-        private void HandleAvailableInteractableChanged(bool hasInteractable)
+        private void HandleInteractionGuideChanged(
+            PlayerInteractionGuide guide)
         {
-            if (hasInteractable)
+            if (guide.IsVisible)
             {
-                ShowInteractionGuide();
+                ShowInteractionGuide(guide);
                 return;
             }
 
@@ -415,9 +417,9 @@ namespace GameUI.CombatHud
             toolkitView?.HideAll();
         }
 
-        private void ShowInteractionGuide()
+        private void ShowInteractionGuide(PlayerInteractionGuide guide)
         {
-            toolkitView.ShowInteractionGuide();
+            toolkitView.ShowInteractionGuide(guide);
         }
 
         private void HideInteractionGuide()

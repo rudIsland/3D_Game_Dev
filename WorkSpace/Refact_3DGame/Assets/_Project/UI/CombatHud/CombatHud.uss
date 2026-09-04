@@ -6,6 +6,38 @@
     bottom: 0;
 }
 
+.minimap {
+    position: absolute;
+    right: 3%;
+    top: 3%;
+    width: 240px;
+    height: 240px;
+    overflow: hidden;
+    background-color: rgb(14, 17, 15);
+    border-left-width: 3px;
+    border-top-width: 3px;
+    border-right-width: 3px;
+    border-bottom-width: 3px;
+    border-left-color: rgb(58, 64, 61);
+    border-top-color: rgb(58, 64, 61);
+    border-right-color: rgb(58, 64, 61);
+    border-bottom-color: rgb(58, 64, 61);
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.minimap-view {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("../Minimap/MinimapViewTexture.renderTexture");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
 .is-hidden {
     display: flex;
 }
@@ -139,17 +171,15 @@
     right: 11px;
     top: 9px;
     bottom: 9px;
-    background-image: url("../../GUI/CombatHud/Sprites/Hp_line.png");
+    background-image: url("../../10_GUI/CombatHud/Sprites/Hp_line.png");
 }
 
 .stamina-fill {
     background-image: url("../../../_ThirdParty/GUI/Parts/Mana_line2.png");
-    -unity-background-image-tint-color: rgb(153, 209, 51);
 }
 
 .stagger-fill {
     background-image: url("../../../_ThirdParty/GUI/Parts/energy_line2.png");
-    -unity-background-image-tint-color: rgb(242, 171, 46);
 }
 
 .bar-frame {
@@ -157,7 +187,7 @@
     top: 0;
     right: 0;
     bottom: 0;
-    background-image: url("../../GUI/CombatHud/Sprites/Hp_frame.png");
+    background-image: url("../../10_GUI/CombatHud/Sprites/Hp_frame.png");
     -unity-background-scale-mode: stretch-to-fill;
     -unity-slice-left: 20;
     -unity-slice-top: 20;

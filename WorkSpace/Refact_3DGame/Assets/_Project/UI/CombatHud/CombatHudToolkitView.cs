@@ -3,6 +3,7 @@ using Characters.Player.Inventory;
 using Items;
 using UnityEngine;
 using UnityEngine.UIElements;
+using World.Interaction;
 
 namespace GameUI.CombatHud
 {
@@ -37,6 +38,8 @@ namespace GameUI.CombatHud
         private Label enemyStaggerText;
 
         private VisualElement interactionRoot;
+        private VisualElement interactionKey;
+        private Label interactionText;
         private VisualElement cachedDocumentRoot;
 
         private int displayedCurrentStagger = int.MinValue;
@@ -264,10 +267,12 @@ namespace GameUI.CombatHud
             }
         }
 
-        public void ShowInteractionGuide()
+        public void ShowInteractionGuide(PlayerInteractionGuide guide)
         {
             if (EnsureElements())
             {
+                interactionText.text = guide.Message;
+                SetVisible(interactionKey, guide.CanInteract);
                 SetVisible(interactionRoot, true);
             }
         }
@@ -321,6 +326,8 @@ namespace GameUI.CombatHud
             enemyStaggerFill = root.Q<VisualElement>("enemy-stagger-fill");
             enemyStaggerText = root.Q<Label>("enemy-stagger-text");
             interactionRoot = root.Q<VisualElement>("interaction-guide");
+            interactionKey = root.Q<VisualElement>("interaction-key");
+            interactionText = root.Q<Label>("interaction-text");
 
             elementsCached =
                 playerHealthRoot != null &&
@@ -340,7 +347,9 @@ namespace GameUI.CombatHud
                 enemyStaggerRoot != null &&
                 enemyStaggerFill != null &&
                 enemyStaggerText != null &&
-                interactionRoot != null;
+                interactionRoot != null &&
+                interactionKey != null &&
+                interactionText != null;
 
             if (!elementsCached && !missingElementLogged)
             {

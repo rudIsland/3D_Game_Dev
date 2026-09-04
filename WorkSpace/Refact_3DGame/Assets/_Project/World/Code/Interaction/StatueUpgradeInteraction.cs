@@ -15,10 +15,20 @@ namespace World.Interaction
         MonoBehaviour,
         IPlayerInteractable
     {
+        private const string UpgradeGuideMessage = "석상 사용하기";
+
         [SerializeField]
         private StatueUpgradeType upgradeType;
 
         public StatueUpgradeType UpgradeType => upgradeType;
+
+        public PlayerInteractionGuide GetInteractionGuide(
+            PlayerController player)
+        {
+            return CanInteract(player)
+                ? new PlayerInteractionGuide(UpgradeGuideMessage, true)
+                : PlayerInteractionGuide.Hidden;
+        }
 
         public bool CanInteract(PlayerController player)
         {

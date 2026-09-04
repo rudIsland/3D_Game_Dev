@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0e34cba584e7804f946eddb1b27683f, type: 3}
+  m_Name: PlayerAttack05Data
+  m_EditorClassIdentifier: 
+  attackNumber: 5
+  attackDamage:
+    healthDamage: 25
+    strength: 1
+    staggerDamage: 30
+    pushDistance: 0.55
+    hitStopDuration: 0.06
+    guardStaminaDamage: 0
+    canBlock: 1
+    damageSoundType: 0
+  staminaCost: 30
+  swingSound: {fileID: 8300000, guid: bc0d800b2a79c004e8b1a9e9b16df148, type: 3}
+  comboOpenNormalizedTime: 0.9
+  rollCancelOpenNormalizedTime: 0.6
+  turnEndNormalizedTime: 0.29333332
+  moveDistance: 0.4
+  movementCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.36
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
