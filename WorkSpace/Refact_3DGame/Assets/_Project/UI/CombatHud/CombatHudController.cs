@@ -2,8 +2,7 @@ using System.Collections.Generic;
 using Characters.Player.Interaction;
 using Characters.Player.Inventory;
 using Characters;
-using Characters.Enemies.NightShade;
-using Characters.Enemies.Zombie;
+using Characters.Enemies;
 using Characters.Player.Lifecycle;
 using Characters.Player.Stats;
 using World;
@@ -28,7 +27,7 @@ namespace GameUI.CombatHud
         private readonly Dictionary<UnitHealth, Unit> trackedUnits = // 씬 또는 시스템 참조
             new Dictionary<UnitHealth, Unit>(3);
         private PlayerWorldUnit displayedPlayer;
-        private Unit displayedEnemy;
+        private IEnemyCombatStatus displayedEnemy;
 
         private void Awake()
         {
@@ -115,16 +114,10 @@ namespace GameUI.CombatHud
                     player.Inventory.Changed -=
                         HandleInventoryChanged;
                 }
-                else if (entry.Value is ZombieWorldUnit zombie)
+                else if (entry.Value is IEnemyCombatStatus enemy)
                 {
-                    zombie.StaggerChanged -= HandleZombieStaggerChanged;
-                    zombie.CombatStateChanged -= HandleZombieCombatStateChanged;
-                }
-                else if (entry.Value is NightShadeSwordWorldUnit nightShade)
-                {
-                    nightShade.StaggerChanged -= HandleNightShadeStaggerChanged;
-                    nightShade.CombatStateChanged -=
-                        HandleNightShadeCombatStateChanged;
+                    enemy.StaggerChanged -= HandleEnemyStaggerChanged;
+                    enemy.CombatStateChanged -= HandleEnemyCombatStateChanged;
                 }
             }
 
@@ -167,9 +160,8 @@ namespace GameUI.CombatHud
             }
 
             bool isPlayer = unit is PlayerUnit;
-            bool isZombie = unit is ZombieWorldUnit;
-            bool isNightShade = unit is NightShadeSwordWorldUnit;
-            if ((!isPlayer && !isZombie && !isNightShade) ||
+            bool isEnemy = unit is IEnemyCombatStatus status && status.ShowScreenHealthBar;
+            if ((!isPlayer && !isEnemy) ||
                 trackedUnits.ContainsKey(unit.Health))
             {
                 return;
@@ -202,23 +194,13 @@ namespace GameUI.CombatHud
                     ShowPlayerHealth(unit.Health, 1f);
                 }
             }
-            else if (unit is ZombieWorldUnit zombie)
+            else if (unit is IEnemyCombatStatus enemy)
             {
-                zombie.StaggerChanged += HandleZombieStaggerChanged;
-                zombie.CombatStateChanged += HandleZombieCombatStateChanged;
-                if (zombie.IsInCombat)
+                enemy.StaggerChanged += HandleEnemyStaggerChanged;
+                enemy.CombatStateChanged += HandleEnemyCombatStateChanged;
+                if (enemy.IsInCombat)
                 {
-                    ShowZombie(zombie);
-                }
-            }
-            else if (unit is NightShadeSwordWorldUnit nightShade)
-            {
-                nightShade.StaggerChanged += HandleNightShadeStaggerChanged;
-                nightShade.CombatStateChanged +=
-                    HandleNightShadeCombatStateChanged;
-                if (nightShade.IsInCombat)
-                {
-                    ShowNightShade(nightShade);
+                    ShowEnemy(enemy);
                 }
             }
         }
@@ -253,18 +235,11 @@ namespace GameUI.CombatHud
                 HidePlayerInventory();
                 HidePlayerStamina();
             }
-            else if (unit is ZombieWorldUnit zombie)
+            else if (unit is IEnemyCombatStatus enemy)
             {
-                zombie.StaggerChanged -= HandleZombieStaggerChanged;
-                zombie.CombatStateChanged -= HandleZombieCombatStateChanged;
-                HideEnemy(zombie);
-            }
-            else if (unit is NightShadeSwordWorldUnit nightShade)
-            {
-                nightShade.StaggerChanged -= HandleNightShadeStaggerChanged;
-                nightShade.CombatStateChanged -=
-                    HandleNightShadeCombatStateChanged;
-                HideEnemy(nightShade);
+                enemy.StaggerChanged -= HandleEnemyStaggerChanged;
+                enemy.CombatStateChanged -= HandleEnemyCombatStateChanged;
+                HideEnemy(enemy);
             }
         }
 
@@ -307,7 +282,7 @@ namespace GameUI.CombatHud
 
                 if (ReferenceEquals(displayedEnemy, unit))
                 {
-                    HideEnemy(unit);
+                    HideEnemy(displayedEnemy);
                 }
             }
         }
@@ -322,80 +297,35 @@ namespace GameUI.CombatHud
                     : 1f);
         }
 
-        private void HandleZombieStaggerChanged(ZombieWorldUnit zombie)
+        private void HandleEnemyStaggerChanged(IEnemyCombatStatus enemy)
         {
-            if (!ReferenceEquals(displayedEnemy, zombie))
+            if (!ReferenceEquals(displayedEnemy, enemy))
             {
                 return;
             }
 
-            UpdateEnemyStagger(zombie.CurrentStagger, zombie.MaxStagger);
+            UpdateEnemyStagger(enemy.CurrentStagger, enemy.MaxStagger);
         }
 
-        private void HandleZombieCombatStateChanged(ZombieWorldUnit zombie)
+        private void HandleEnemyCombatStateChanged(IEnemyCombatStatus enemy)
         {
-            if (zombie.IsInCombat)
+            if (enemy.IsInCombat)
             {
-                ShowZombie(zombie);
+                ShowEnemy(enemy);
                 return;
             }
 
-            HideEnemy(zombie);
+            HideEnemy(enemy);
         }
 
-        private void ShowZombie(ZombieWorldUnit zombie)
-        {
-            ShowEnemy(
-                "ZOMBIE",
-                zombie,
-                zombie.CurrentStagger,
-                zombie.MaxStagger);
-        }
-
-        private void HandleNightShadeStaggerChanged(NightShadeSwordWorldUnit nightShade)
-        {
-            if (!ReferenceEquals(displayedEnemy, nightShade))
-            {
-                return;
-            }
-
-            UpdateEnemyStagger(
-                nightShade.CurrentStagger,
-                nightShade.MaxStagger);
-        }
-
-        private void HandleNightShadeCombatStateChanged(NightShadeSwordWorldUnit nightShade)
-        {
-            if (nightShade.IsInCombat)
-            {
-                ShowNightShade(nightShade);
-                return;
-            }
-
-            HideEnemy(nightShade);
-        }
-
-        private void ShowNightShade(NightShadeSwordWorldUnit nightShade)
-        {
-            ShowEnemy(
-                "NIGHTSHADE",
-                nightShade,
-                nightShade.CurrentStagger,
-                nightShade.MaxStagger);
-        }
-
-        private void ShowEnemy(
-            string enemyName,
-            Unit enemy,
-            float currentStagger,
-            float maxStagger)
+        private void ShowEnemy(IEnemyCombatStatus enemy)
         {
             displayedEnemy = enemy;
-            toolkitView.ShowEnemyHealth(enemyName, enemy.Health);
-            toolkitView.ShowEnemyStagger(currentStagger, maxStagger);
+            toolkitView.ShowEnemyHealth(enemy.DisplayName, enemy.Health);
+            toolkitView.ShowEnemyStagger(enemy.CurrentStagger, enemy.MaxStagger);
         }
 
-        private void HideEnemy(Unit enemy)
+        private void HideEnemy(IEnemyCombatStatus enemy)
         {
             if (!ReferenceEquals(displayedEnemy, enemy))
             {

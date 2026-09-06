@@ -431,6 +431,11 @@ PrefabInstance:
       objectReference: {fileID: 9100000, guid: 4e5764865a541fc4e8a37fc7ad645d17, type: 2}
     - target: {fileID: 5866666021909216657, guid: dda2b24374a2e4146bb6d980b6009584,
         type: 3}
+      propertyPath: m_CullingMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: dda2b24374a2e4146bb6d980b6009584,
+        type: 3}
       propertyPath: m_ApplyRootMotion
       value: 0
       objectReference: {fileID: 0}
@@ -835,6 +840,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1e4ce876c7f2c04caf5a7dbff49fa4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.Runtime::Characters.Enemies.NightShade.NightShadeSwordController
+  startFromScene: 0
   target: {fileID: 0}
   enemyAnimator: {fileID: 8840292377037777354}
   swordHitShape:
@@ -842,6 +848,12 @@ MonoBehaviour:
     endPoint: {fileID: 6911988785240729414}
     radius: 0.13
   config: {fileID: 11400000, guid: 9fc80d13dd7d4e81968636d6f820e5b8, type: 2}
+  battleArea: {fileID: 0}
+  homeRadius: 30
+  maximumHeightDifference: 2
+  obstacleLayers:
+    serializedVersion: 2
+    m_Bits: 70657
 --- !u!4 &3634473582413048723 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1852576806548013000, guid: dda2b24374a2e4146bb6d980b6009584,

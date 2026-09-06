@@ -1,8 +1,18 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <Style src="CombatHud.uss" />
     <ui:VisualElement name="combat-hud" class="combat-hud">
-        <ui:VisualElement name="minimap" class="minimap" picking-mode="Ignore">
-            <ui:VisualElement name="minimap-view" class="minimap-view" picking-mode="Ignore" />
+        <ui:VisualElement name="exploration-info" class="exploration-info" picking-mode="Ignore">
+            <ui:VisualElement name="minimap" class="minimap" picking-mode="Ignore">
+                <ui:VisualElement name="minimap-view" class="minimap-view" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:Label name="current-location" text="탐색 중" class="current-location" picking-mode="Ignore" />
+            <ui:VisualElement name="ground-quest" class="ground-quest" picking-mode="Ignore">
+                <ui:Label text="지상 탐험" class="quest-title" picking-mode="Ignore" />
+                <ui:Label name="quest-book" text="진행 중 · 책 찾기" class="quest-step quest-current" picking-mode="Ignore" />
+                <ui:Label name="quest-exchange" text="대기 · 책을 스크롤로 교환하기" class="quest-step" picking-mode="Ignore" />
+                <ui:Label name="quest-exit" text="대기 · 출구로 이동하기" class="quest-step" picking-mode="Ignore" />
+                <ui:Label name="quest-hint" text="선택 · 석상을 찾아 능력치 강화" class="quest-hint" picking-mode="Ignore" />
+            </ui:VisualElement>
         </ui:VisualElement>
 
         <ui:VisualElement name="player-status" class="player-status">

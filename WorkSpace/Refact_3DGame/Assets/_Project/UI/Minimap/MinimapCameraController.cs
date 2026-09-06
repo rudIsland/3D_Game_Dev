@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using World.Zones;
 
 namespace GameUI.Minimap
 {
@@ -14,14 +16,19 @@ namespace GameUI.Minimap
         [SerializeField] private float mapSurfaceHeight = 52.11f;
         [SerializeField] private float cameraHeight = 30f;
         [SerializeField] private float markerHeight = 0.3f;
+        [SerializeField, Min(0f)] private float floorBoundaryMargin = 0.5f;
 
         private Transform cameraTransform;
+        private float defaultMapHeight;
+        private MinimapFloor[] floors = System.Array.Empty<MinimapFloor>();
+        public MinimapFloor CurrentFloor { get; private set; }
         private static readonly Quaternion DownwardRotation =
             Quaternion.Euler(90f, 0f, 0f);
 
         private void Awake()
         {
             cameraTransform = transform;
+            defaultMapHeight = mapSurfaceHeight;
 
             if (player == null || playerMarker == null)
             {
@@ -40,9 +47,37 @@ namespace GameUI.Minimap
             UpdateMinimapPosition();
         }
 
+        private void OnEnable()
+        {
+            SceneManager.sceneLoaded += ReadLoadedFloors;
+            SceneManager.sceneUnloaded += ReadRemainingFloors;
+            ReadFloors();
+        }
+
+        private void OnDisable()
+        {
+            SceneManager.sceneLoaded -= ReadLoadedFloors;
+            SceneManager.sceneUnloaded -= ReadRemainingFloors;
+            floors = System.Array.Empty<MinimapFloor>();
+            CurrentFloor = null;
+        }
+
+        private void ReadLoadedFloors(Scene scene, LoadSceneMode mode) => ReadFloors();
+        private void ReadRemainingFloors(Scene scene) => ReadFloors();
+
+        private void ReadFloors()
+        {
+            floors = FindObjectsByType<MinimapFloor>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            CurrentFloor = null;
+            mapSurfaceHeight = defaultMapHeight;
+        }
+
         private void UpdateMinimapPosition()
         {
             Vector3 playerPosition = player.position;
+            CurrentFloor = MinimapFloor.Select(floors, playerPosition.y, CurrentFloor,
+                floorBoundaryMargin);
+            if (CurrentFloor != null) mapSurfaceHeight = CurrentFloor.MapSurfaceHeight;
 
             cameraTransform.SetPositionAndRotation(
                 new Vector3(
