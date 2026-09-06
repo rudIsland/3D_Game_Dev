@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c555f5c0ecfe3f740b560b76c57cab76
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 365864
+  packageName: Demon_Swordsman
+  packageVersion: 1.0
+  assetPath: Assets/Demon Swordsman/Monster_Animator Controller.controller
+  uploadId: 874674
