@@ -39,7 +39,7 @@
 - Player와 Enemy의 피격은 당분간 단순한 `TakeDamage(float)`와 상태머신의 피격 상태만 사용한다.
 - Player 대상 찾기는 `Unit`을 직접 찾지 않고 적 컴포넌트의 `IUnitDeathState`를 찾는다.
 - 씬과 프리팹에 남은 `MeleeHitDetector`, `CombatHitResolver`, `UnitHitBox` 직렬화 블록을 제거했다.
-- 적별 공격 선택·설정 코드는 `Code/Combat`에서 `Code/Attack`으로 이름을 바꿨다. 이것은 공유 Combat 시스템이 아니라 적의 공격 애니메이션 선택용 코드다.
+- 적별 공격 선택·설정 코드는 `Combat`에서 `Attack`으로 이름을 바꿨다. 이것은 공유 Combat 시스템이 아니라 적의 공격 애니메이션 선택용 코드다.
 - `UnitDefenseStatus`, `HitPushMovement`, `UnitMovementSeparation`, `UnitStagger`, `UnitTeam`, `UnitStamina` 로직을 제거했다.
 - Player와 Enemy 이동은 현재 `CharacterController.Move`와 중력만 사용한다.
 - 피격 상태는 애니메이션만 재생하고 밀치기 이동은 사용하지 않는다.
