@@ -12,7 +12,7 @@ namespace Tests.Player
         private const string RollFolder =
             "Assets/_Project/Characters/Player/Models/Sources/10_Roll";
         private const string AttackDataFolder =
-            "Assets/_Project/Characters/Player/Code/StateMachine/States/Attack/AttackData";
+            "Assets/_Project/10.Player/StateMachine/States/Attack/AttackData";
 
         [TestCase("1Hand_Base_Attack_A_1_InPlace.anim", 1, 1.3f, 0.28333333f)]
         [TestCase("1Hand_Base_Attack_A_2_InPlace.anim", 2, 1.4666667f, 0.48333332f)]

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using Core.ConstantValid;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -96,13 +97,13 @@ namespace EditorTools
         private void FindSource()
         {
             if (source != null) return;
-            string[] scenes = { "Ground", "Underground", "Common" };
+            string[] scenes = { ConstantValid.GroundMapName, ConstantValid.UnderGroundMapName, "Common" };
             foreach (string name in scenes)
             {
                 Scene scene = SceneManager.GetSceneByName(name);
                 if (!scene.isLoaded) continue;
                 foreach (GameObject root in scene.GetRootGameObjects())
-                    if (root.name == "Setup&Lights") { source = root.transform; return; }
+                    if (root.name == ConstantValid.MapEnvironmentRootName) { source = root.transform; return; }
             }
         }
 
@@ -122,8 +123,8 @@ namespace EditorTools
             }
             try
             {
-                List<Geometry> ground = ReadGeometry("Ground", "GroundObjects");
-                List<Geometry> underground = ReadGeometry("Underground", "UndergroundObjects");
+                List<Geometry> ground = ReadGeometry(ConstantValid.GroundMapName, ConstantValid.GroundObjectsRootName);
+                List<Geometry> underground = ReadGeometry(ConstantValid.UnderGroundMapName, ConstantValid.UnderGroundObjectsRootName);
                 foreach (Light light in source.GetComponentsInChildren<Light>(true)) AddEntry(light, ground, underground);
                 foreach (Volume volume in source.GetComponentsInChildren<Volume>(true)) AddEntry(volume, ground, underground);
                 foreach (ReflectionProbe probe in source.GetComponentsInChildren<ReflectionProbe>(true)) AddEntry(probe, ground, underground);

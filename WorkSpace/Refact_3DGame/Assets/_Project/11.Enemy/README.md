@@ -7,10 +7,10 @@
 | [Zombie](Zombie/README.md) | 탐지·추격·공격·귀환·피격·사망 코드, 설정과 배치 프리팹 |
 | [NightShade](NightShade/README.md) | 보스 행동 선택, 공격·회복 행동, 전투 범위와 초기화 코드 |
 | [DemonSwordsman](DemonSwordsman/README.md) | 검·야수 동작 리소스와 모델 프리팹 |
-| [Fighter](Fighter/README.md) | 모델·애니메이션·프리팹, 비어 있는 Code 폴더 |
+| [Fighter](Fighter/README.md) | 모델·애니메이션·프리팹, 전용 C# 코드 없음 |
 | [Mummy Warrior](Mummy%20Warrior/README.md) | 모델·애니메이션·프리팹과 보관 애니메이션 |
-| [Mutant](Mutant/README.md) | 모델·애니메이션·프리팹, 비어 있는 Code 폴더 |
-| [Undead](Undead/README.md) | 모델·프리팹과 전용 C# 파일이 없는 Code 폴더 |
+| [Mutant](Mutant/README.md) | 모델·애니메이션·프리팹, 전용 C# 코드 없음 |
+| [Undead](Undead/README.md) | 모델·프리팹, 전용 C# 코드 없음 |
 | [Shared](Shared/README.md) | 적 공통 전투 정보, 공격 데이터와 경로 안내 |
 
 ## 구현된 적의 동작 흐름

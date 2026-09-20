@@ -12,7 +12,7 @@ namespace GameUI.CombatHud
     [RequireComponent(typeof(Canvas))]
     public sealed class EnemyHeadHealthBar : MonoBehaviour
     {
-        [SerializeField] private WorldObjectView enemy;
+        [SerializeField] private EnemyView enemy;
         [SerializeField] private Transform head;
         [SerializeField] private RectTransform healthFill;
         [SerializeField, Min(0f)] private float headGap = 0.3f;

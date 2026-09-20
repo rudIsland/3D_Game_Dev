@@ -3,26 +3,29 @@ using World.Interaction;
 
 namespace Characters.Player.Stats
 {
-    internal static class PlayerStatUpgradeSession
+    // PlayerController 인스턴스가 소유하는 강화 기록이다.
+    // 플레이어 재생성 시 기록을 이어 주는 기능은 실행 흐름을 연결할 때 정한다.
+    // 새 기능에서는 이 클래스를 전역 상태 보관 방식으로 따라 쓰지 않는다.
+    internal sealed class PlayerStatUpgradeSession
     {
         internal const float MaxHealthMultiplier = 1.2f;
         internal const float MaxStaminaMultiplier = 1.5f;
         internal const float StrengthMultiplier = 1.3f;
 
-        private static bool hasMaxHealthUpgrade;
-        private static bool hasMaxStaminaUpgrade;
-        private static bool hasStrengthUpgrade;
+        private bool hasMaxHealthUpgrade;
+        private bool hasMaxStaminaUpgrade;
+        private bool hasStrengthUpgrade;
 
-        internal static float CurrentMaxHealthMultiplier =>
+        internal float CurrentMaxHealthMultiplier =>
             hasMaxHealthUpgrade ? MaxHealthMultiplier : 1f;
 
-        internal static float CurrentMaxStaminaMultiplier =>
+        internal float CurrentMaxStaminaMultiplier =>
             hasMaxStaminaUpgrade ? MaxStaminaMultiplier : 1f;
 
-        internal static float CurrentStrengthMultiplier =>
+        internal float CurrentStrengthMultiplier =>
             hasStrengthUpgrade ? StrengthMultiplier : 1f;
 
-        internal static bool HasUpgrade(StatueUpgradeType upgradeType)
+        internal bool HasUpgrade(StatueUpgradeType upgradeType)
         {
             switch (upgradeType)
             {
@@ -40,7 +43,7 @@ namespace Characters.Player.Stats
             }
         }
 
-        internal static bool TryActivate(StatueUpgradeType upgradeType)
+        internal bool TryActivate(StatueUpgradeType upgradeType)
         {
             if (HasUpgrade(upgradeType))
             {
@@ -66,12 +69,5 @@ namespace Characters.Player.Stats
             }
         }
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        private static void ResetSession()
-        {
-            hasMaxHealthUpgrade = false;
-            hasMaxStaminaUpgrade = false;
-            hasStrengthUpgrade = false;
-        }
     }
 }

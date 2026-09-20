@@ -1,12 +1,12 @@
 # Undead 리소스
 
-언데드 전사와 관련 프리팹·모델 리소스를 보관한다. `Code/Controller` 폴더가 있지만 현재 전용 C# 파일은 없다.
+언데드 전사와 관련 프리팹·모델 리소스를 보관한다. `Controller` 폴더가 있지만 현재 전용 C# 파일은 없다.
 
 ## 폴더 구성
 
 | 폴더 | 설명 |
 | --- | --- |
-| `Code/Controller` | 전용 Controller 코드가 없는 폴더 |
+| `Controller` | 전용 Controller 코드가 없는 폴더 |
 | `Models/Prefabs` | `UndeadWarrior.prefab`, `MummyWarriorRoot.prefab` |
 | `Models/Animations` | 애니메이션 리소스 폴더 |
 | `Models/Meshes`, `Models/Materials` | 모델과 재질 |

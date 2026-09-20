@@ -2,14 +2,21 @@
 
 씬 파일이 지역 리소스 참조를 소유한다. 에셋 파일의 폴더는 제작·수정 위치이며, 실제로 어느 지역에서 사용하는지는 씬의 참조로 구분한다.
 
+## 씬 실행 코드
+
+- [MapContainer.cs](../04.Loading/MapContainer.cs): Address 입력 → 씬 로딩·캐시 → refCount가 0인 씬 정리. 실행 연결은 아직 없다.
+- [UndergroundLightmaps.cs](Underground/UndergroundLightmaps.cs): 저장된 텍스처·Renderer 참조 → 라이트맵 슬롯 연결 → 지하 조명 복원.
+
+씬 폴더와 Underground 폴더는 각각 `Game.Runtime.asmref`로 기존 실행 어셈블리에 연결한다. 객체 생성·갱신·회수 기반은 `02.Core/WorldObjects`에서 담당한다.
+
 | 구분 | 참조를 소유하는 씬 | 주요 대상 | 로딩 시점 |
 | --- | --- | --- | --- |
-| 공통 상주 | Common.unity | 플레이어, 카메라, HUD, 관리자와 퀘스트 | 게임 시작 |
+| 공통 상주 | Start.unity | 플레이어, 카메라, HUD, 관리자와 퀘스트 | 게임 시작 |
 | 지상 전용 | Ground.unity | 지상 건물·나무·지형·충돌, Setup&Lights, Zone·Road, 좀비 생성 설정, 지상 아이템 배치 | 지상 진입 |
-| 지하 전용 | Underground.unity | 지하 건물·지형·충돌, Setup&Lights, 층별 지도, NightShade 프리팹 배치 | 지하 로딩 요청 |
-| 맵 공용 | Ground와 Underground | 양쪽에서 사용하는 같은 원본 모델·머티리얼·텍스처·Bake 텍스처 | 사용하는 지역 진입 |
+| 지하 전용 | UnderGround.unity | 지하 건물·지형·충돌, Setup&Lights, 층별 지도, NightShade 프리팹 배치 | 지하 로딩 요청 |
+| 맵 공용 | Ground와 UnderGround | 양쪽에서 사용하는 같은 원본 모델·머티리얼·텍스처·Bake 텍스처 | 사용하는 지역 진입 |
 
-공통 상주는 Common에서 참조하는 에셋이다. 지상·지하에서도 같은 에셋을 참조할 수 있다. 맵 공용은 두 지역이 사용하지만 Common에서는 참조하지 않는 에셋이다. 공유한다는 이유만으로 Common에 프리팹 참조를 추가하지 않는다.
+공통 상주는 Start에서 참조하는 에셋이다. 지상·지하에서도 같은 에셋을 참조할 수 있다. Addressables의 Common은 씬 이름이 아니라 공용 번들 그룹이다. 맵 공용 원본의 번들 중복 분석에 따라 603개 에셋을 Common 그룹에 등록했다. 공유한다는 이유만으로 Start에 프리팹 참조를 추가하지 않는다.
 
 예를 들어 지상과 지하에 같은 바위 프리팹을 배치하면 각 GameObject는 해당 씬에 소속되지만 원본 모델·머티리얼·텍스처는 맵 공용이다. 지상을 해제하면 지상 바위는 제거되고 지하 바위가 사용하는 원본은 유지된다. 원본 파일을 지상용·지하용으로 복제하거나 공용 목록 ScriptableObject에 모아서 Common이 참조하게 만들지 않는다.
 
@@ -30,13 +37,13 @@ Hierarchy 오브젝트를 우클릭한 뒤 `리소스 소속 찾기`를 선택�
 - 지상 메시·지형은 GroundObjects 아래, 지하 메시·지형은 UndergroundObjects 아래에 둔다. 메시의 충돌체와 생성 위치는 같은 씬에 둔다.
 - 각 지역 씬 루트의 `Setup&Lights`가 해당 지역 환경 묶음이다. Ground에는 원본 지상 조명·프로브·볼륨을 두고, Underground에는 기존 UndergroundLights·지하 볼륨과 PostProcessing을 둔다. 장식 프리팹 안의 조명은 해당 프리팹과 같은 씬에 유지한다.
 - 원본 지하 볼륨은 비활성 HDRP 설정으로 보존했다. 새 지하 PostProcessing은 기존에 공통으로 사용하던 URP DAY 프로필을 함께 참조한다. 지하 전용 톤을 조정할 때 별도 프로필이 필요한지 결정한다.
-- 컨테이너는 로딩 완료 시 해당 지역을 활성 씬으로 지정하고 그 씬의 Setup&Lights를 켠다. 두 맵을 함께 로딩하면 나중에 로딩한 환경을 적용한다. 다른 지역의 Setup&Lights만 끄며 지역의 메시·적·프리팹 내부 조명을 자동으로 숨기지는 않는다.
-- 현재 환경을 해제하면 남은 지역 환경을 적용하고, 지역이 없으면 Common을 활성 씬으로 사용한다. Play 중 소속 툴의 지상 환경 적용·지하 환경 적용 버튼으로 선택을 바꿀 수 있다.
+- MapContainer는 씬 로딩·참조 횟수만 관리한다. 활성 씬 지정과 Setup&Lights 선택은 연결하지 않는다.
+- Start의 MapLoading 오브젝트와 편집 도구의 교체 버튼은 제거했다. 지역 교체 순서는 추후 연결한다.
 - 좀비 설정은 Ground의 Zone에 연결한다. NightShade는 Underground에 직접 배치하고 Start From Scene을 켠다. Common의 WorldObjectManager에는 지역 적 설정을 넣지 않는다.
 - 지역 객체를 Common의 직렬화 필드에 연결하지 않는다. 컨테이너는 미니맵·퀘스트를 참조하지 않는다. 미니맵은 Unity 씬 로딩·해제 알림에서 자신의 표시 자료만 다시 읽는다.
 - 두 지역의 같은 모델·텍스처를 이름 구분 목적으로 복사하지 않는다. 맵 공용으로 관리한다. 현재 원본 Bake 텍스처도 두 지역에서 공유한다.
 
-생성·해제 API와 동작 순서는 [WorldObjectContainer](../00.Core/WorldObjects/README.md#씬과-배치-컨테이너)에서 확인한다. Play 중 소속 도구 상단에서 지상·지하를 각각 불러오거나 해제한다.
+사용법은 [04.Loading](../04.Loading/README.md)에서 확인한다. 빌드 씬 목록과 Ground·UnderGround의 Addressables 등록은 유지하지만 Start에서 자동 로딩하지 않는다.
 
 미니맵은 로딩된 MinimapFloor의 플레이어 높이 범위로 지도를 고른다. GroundObjects는 0m 이상, 지하 1층은 -10.5m 이상 0m 미만, 지하 2층은 -10.5m 미만이다. 두 맵을 함께 로딩해도 컨테이너가 미니맵에 전환 명령을 보내지 않는다.
 

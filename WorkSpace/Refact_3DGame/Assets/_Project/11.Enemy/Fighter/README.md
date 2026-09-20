@@ -1,12 +1,11 @@
 # Fighter 리소스
 
-Fighter 모델과 애니메이션을 보관한다. 현재 `Code` 폴더에는 C# 파일이 없으며, 이 폴더의 전용 탐지·추격·공격 로직은 작성되어 있지 않다.
+Fighter 모델과 애니메이션을 보관한다. 현재 전용 C# 파일이 없으며, 이 폴더의 전용 탐지·추격·공격 로직은 작성되어 있지 않다.
 
 ## 폴더 구성
 
 | 폴더 | 설명 |
 | --- | --- |
-| `Code` | 전용 코드가 없는 빈 폴더 |
 | `Models/Prefabs` | `Fighter.prefab` |
 | `Models/Animations/Clips` | 공격·등장·대기·이동·사망 동작 |
 | `Models/Animations/Controllers`, `Models/Animations/Sources` | Animator Controller와 원본 애니메이션 |

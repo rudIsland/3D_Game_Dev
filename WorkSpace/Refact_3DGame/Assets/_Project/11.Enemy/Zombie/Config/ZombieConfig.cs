@@ -85,6 +85,7 @@ namespace Characters.Enemies.Zombie
 
         private ZombieSettings runtimeSettings;
         private int settingsSession = -1;
+        // 제한된 전역 값: Play 재시작 시 설정 캐시를 새로 만드는 번호이며 게임 진행 상태가 아니다.
         private static int playSession;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]

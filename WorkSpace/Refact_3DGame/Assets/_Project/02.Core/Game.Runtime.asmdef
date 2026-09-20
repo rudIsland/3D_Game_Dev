@@ -3,7 +3,9 @@
   "rootNamespace": "",
   "references": [
     "Cinemachine",
-    "Unity.InputSystem"
+    "Unity.InputSystem",
+    "Unity.Addressables",
+    "Unity.ResourceManager"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

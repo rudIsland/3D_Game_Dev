@@ -1,25 +1,28 @@
+using Characters.Enemies;
+using Characters;
 using System;
 using Characters.Player.Lifecycle;
 using UnityEngine;
 using World.Interaction;
 
-namespace World
+namespace Characters.Enemies
 {
     // Unity GameObject와 일반 C# 월드 객체를 연결한다.
-    public abstract class WorldObjectView : MonoBehaviour
+    public abstract class EnemyView : MonoBehaviour
     {
         // 뷰의 생성과 회수를 맡은 관리자다.
-        private WorldObjectManager manager;
+        private EnemyContainer manager;
         [SerializeField] private bool startFromScene;
 
-        protected virtual void Start()
+        public bool StartFromScene => startFromScene;
+        internal EnemyContainer Owner => manager;
+
+        public void Connect(EnemyContainer owner)
         {
             if (!startFromScene || RuntimeObject != null) return;
-            WorldObjectManager objectManager = FindFirstObjectByType<WorldObjectManager>();
-            if (objectManager == null) return;
-            Prepare(objectManager, null);
+            Prepare(owner, null);
             manager.Register(RuntimeObject);
-            manager.Enable(RuntimeObject);
+            if (isActiveAndEnabled) manager.Enable(RuntimeObject);
         }
 
         protected virtual void OnEnable()
@@ -40,10 +43,10 @@ namespace World
 
         // 실제 게임 규칙은 MonoBehaviour가 아닌 일반 C# 객체가 담당한다.
         // 실제 게임 규칙을 실행하는 일반 C# 객체다.
-        public IWorldObject RuntimeObject { get; private set; }
+        public Unit RuntimeObject { get; private set; }
 
         // 이 뷰가 속한 객체 풀이다.
-        internal WorldObjectPool OwnerPool { get; private set; }
+        internal EnemyPool OwnerPool { get; private set; }
         // 현재 풀이 빌려서 사용 중인지 알려준다.
         internal bool IsTakenFromPool { get; set; }
         // 회수 요청을 이미 등록했는지 알려준다.
@@ -57,7 +60,7 @@ namespace World
         }
 
         // 처음 생성된 뷰에 관리자, 풀, RuntimeObject를 연결한다.
-        internal void Prepare(WorldObjectManager objectManager, WorldObjectPool objectPool)
+        internal void Prepare(EnemyContainer objectManager, EnemyPool objectPool)
         {
             manager = objectManager;
             OwnerPool = objectPool;
@@ -82,7 +85,7 @@ namespace World
         }
 
         // 뷰에 연결할 실제 게임 규칙 객체를 만든다.
-        protected abstract IWorldObject CreateRuntimeObject();
+        protected abstract Unit CreateRuntimeObject();
 
         // 자식 뷰가 풀 반환 전 초기화 작업을 작성하는 지점이다.
         protected virtual void OnResetForPool()

@@ -4,11 +4,15 @@
 
 ## 폴더 구성
 
+[EnemyContainer](EnemyContainer.cs)는 지역별 적 생성·갱신·해제를 맡을 빈 틀이다. 기존 관리자와 풀은 아직 이전하지 않았다. [진입점과 이전 순서](../../01.Boot/README.md)를 참고한다.
+
 | 위치 | 설명 |
 | --- | --- |
-| `Code/IEnemyCombatStatus.cs` | 이름, 체력, 경직, 전투 여부와 변경 알림을 UI에 제공 |
-| `Code/AttackData` | 공통 공격 데이터와 공격 선택 관련 설정 |
-| `Code/Navigation` | 경로 안내 인터페이스와 NavMeshAgent 기반 구현 |
+| `IEnemyCombatStatus.cs` | 이름, 체력, 경직, 전투 여부와 변경 알림을 UI에 제공 |
+| `Lifecycle` | `EnemyUnit`의 적 생명주기와 재활성화 시 체력 초기화 |
+| `Combat/Hit` | 적에게 피해를 전달하는 요청·결과와 수신 인터페이스 |
+| `AttackData` | 공통 공격 데이터와 공격 선택 관련 설정 |
+| `Navigation` | 경로 안내 인터페이스와 NavMeshAgent 기반 구현 |
 | `Shaders` | 적 관련 셰이더 리소스 |
 
 ## 경로 안내 흐름
@@ -25,4 +29,4 @@
 
 NavMeshAgent 기반 적은 NavMesh 배치와 Agent·CharacterController의 역할 분리를 확인한다. 새 공통 기능은 실제로 여러 적이 사용하는지 확인한 뒤 추가한다.
 
-관련 문서: [좀비](../Zombie/README.md), [NightShade](../NightShade/README.md), [공통 캐릭터](../../00.Core/Characters/README.md).
+관련 문서: [좀비](../Zombie/README.md), [NightShade](../NightShade/README.md), [공통 캐릭터](../../13.Characters/README.md).

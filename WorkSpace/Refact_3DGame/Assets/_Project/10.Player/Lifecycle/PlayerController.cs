@@ -1,3 +1,4 @@
+using System;
 using Characters;
 using Characters.Combat;
 using Characters.Combat.AttackData;
@@ -33,7 +34,12 @@ namespace Characters.Player.Lifecycle
         IUnitDeathState
     {
         [Header("필수 연결")]
-        [SerializeField] private WorldObjectManager worldObjectManager; // 씬 또는 시스템 참조
+        private readonly PlayerInventory inventory = new PlayerInventory();
+        private readonly PlayerStatUpgradeSession upgrades = new PlayerStatUpgradeSession();
+        public PlayerWorldUnit RuntimeUnit => playerWorldUnit;
+        public bool IsPaused { get; set; }
+        public event Action<Unit> PlayerEnabled;
+        public event Action<Unit> PlayerDisabled;
         [SerializeField] private Transform moveCamera; // 이동 정보
         [SerializeField] private Animator playerAnimator; // 애니메이터 참조
         [SerializeField] private PlayerGuardHitBox guardHitBox;
@@ -64,15 +70,15 @@ namespace Characters.Player.Lifecycle
             ? targetConfig.ObstructionLayers
             : default;
 
-        private void Awake()
+        public void Create()
         {
-            if (worldObjectManager == null ||
-                moveCamera == null ||
+            if (playerWorldUnit != null) return;
+            if (moveCamera == null ||
                 playerFreeLookCamera == null ||
                 playerTargetLookCamera == null ||
                 config == null)
             {
-                Debug.LogError("PlayerController에 WorldObjectManager, 카메라와 PlayerCharacterConfig가 필요합니다.", this);
+                Debug.LogError("PlayerController에 카메라와 PlayerCharacterConfig가 필요합니다.", this);
                 enabled = false;
                 return;
             }
@@ -156,10 +162,10 @@ namespace Characters.Player.Lifecycle
                 playerTargetLookCamera);
             var playerStamina = new PlayerStamina(
                 combatConfig.MaxStamina *
-                    PlayerStatUpgradeSession.CurrentMaxStaminaMultiplier,
+                    upgrades.CurrentMaxStaminaMultiplier,
                 combatConfig.StaminaRecoverDelay,
                 combatConfig.StaminaRecoverSpeed);
-            var playerInventory = new PlayerInventory();
+            var playerInventory = inventory;
             var hitStop = new CombatHitStop(playerAnimator);
             var stopPoint = new StopPoint(combatConfig.Life);
             playerStateMachine = new PlayerStateMachine(
@@ -178,12 +184,12 @@ namespace Characters.Player.Lifecycle
                 attackEffectPlayer
                 );
             playerStateMachine.SetAttackDamageMultiplier(
-                PlayerStatUpgradeSession.CurrentStrengthMultiplier);
+                upgrades.CurrentStrengthMultiplier);
             playerWorldUnit = new PlayerWorldUnit(
                 combatConfig.MaxHealth *
-                    PlayerStatUpgradeSession.CurrentMaxHealthMultiplier,
-                PlayerStatUpgradeSession.CurrentMaxHealthMultiplier,
-                PlayerStatUpgradeSession.CurrentMaxStaminaMultiplier,
+                    upgrades.CurrentMaxHealthMultiplier,
+                upgrades.CurrentMaxHealthMultiplier,
+                upgrades.CurrentMaxStaminaMultiplier,
                 playerStamina,
                 stopPoint,
                 playerInput,
@@ -191,7 +197,18 @@ namespace Characters.Player.Lifecycle
                 hitStop,
                 interactionController,
                 playerInventory);
-            worldObjectManager.Register(playerWorldUnit);
+            try
+            {
+                playerWorldUnit.Create();
+                if (isActiveAndEnabled) Enable();
+            }
+            catch
+            {
+                Disable();
+                playerWorldUnit.Dispose();
+                playerWorldUnit = null;
+                throw;
+            }
         }
 
         internal bool CanStoreInventoryItem(ItemDefinition item)
@@ -239,12 +256,13 @@ namespace Characters.Player.Lifecycle
 
         internal bool HasStatueUpgrade(StatueUpgradeType upgradeType)
         {
-            return PlayerStatUpgrade.HasUpgrade(upgradeType);
+            return IsReady && PlayerStatUpgrade.HasUpgrade(upgrades, upgradeType);
         }
 
         internal bool TryApplyStatueUpgrade(StatueUpgradeType upgradeType)
         {
-            return PlayerStatUpgrade.TryApply(
+            return IsReady && PlayerStatUpgrade.TryApply(
+                upgrades,
                 upgradeType,
                 playerWorldUnit,
                 playerStateMachine);
@@ -252,13 +270,22 @@ namespace Characters.Player.Lifecycle
 
         private void OnEnable()
         {
+            if (IsReady) Enable();
+        }
+
+        public void Enable()
+        {
+            if (!isActiveAndEnabled || playerWorldUnit == null || playerWorldUnit.IsEnabled) return;
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+            playerWorldUnit.Enable();
+            PlayerEnabled?.Invoke(playerWorldUnit);
+        }
 
-            if (playerWorldUnit != null)
-            {
-                worldObjectManager.Enable(playerWorldUnit);
-            }
+        // 호출자가 갱신 순서를 정한다. Boots의 자동 호출은 아직 연결하지 않는다.
+        public void Tick(float deltaTime)
+        {
+            if (!IsPaused && deltaTime > 0f) playerWorldUnit?.Tick(deltaTime);
         }
 
 
@@ -325,29 +352,25 @@ namespace Characters.Player.Lifecycle
 
         private void OnDisable()
         {
+            Disable();
+        }
+
+        public void Disable()
+        {
+            if (playerWorldUnit == null || !playerWorldUnit.IsEnabled) return;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
-
-            if (playerWorldUnit != null && worldObjectManager != null)
-            {
-                worldObjectManager.Disable(playerWorldUnit);
-            }
+            playerWorldUnit.Disable();
+            PlayerDisabled?.Invoke(playerWorldUnit);
         }
 
         private void OnDestroy()
         {
-            if (playerWorldUnit == null)
-            {
-                return;
-            }
-
-            if (worldObjectManager != null)
-            {
-                worldObjectManager.Unregister(playerWorldUnit);
-                return;
-            }
-
-            playerWorldUnit.Dispose();
+            Disable();
+            playerWorldUnit?.Dispose();
+            playerWorldUnit = null;
+            PlayerEnabled = null;
+            PlayerDisabled = null;
         }
 
         // 에디터 이동 도구가 상태와 이동 속도를 정리한 뒤 위치를 바꾼다.

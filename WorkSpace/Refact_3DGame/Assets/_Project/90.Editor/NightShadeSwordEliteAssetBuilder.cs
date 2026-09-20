@@ -1,3 +1,5 @@
+using Characters.Enemies;
+using Characters;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -1368,8 +1370,8 @@ namespace EditorTools
 
         private static void ConnectSpawnSettings(NightShadeSwordController enemyPrefab)
         {
-            SpawnSettings settings =
-                LoadRequiredAsset<SpawnSettings>(SpawnSettingsPath);
+            EnemySpawnSettings settings =
+                LoadRequiredAsset<EnemySpawnSettings>(SpawnSettingsPath);
             var serializedSettings = new SerializedObject(settings);
             serializedSettings.FindProperty("prefab").objectReferenceValue =
                 enemyPrefab;

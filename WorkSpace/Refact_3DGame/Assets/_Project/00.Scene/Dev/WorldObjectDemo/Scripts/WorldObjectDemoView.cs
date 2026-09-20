@@ -1,15 +1,17 @@
+using Characters.Enemies;
+using Characters;
 using World;
 using UnityEngine;
 
 namespace Development.WorldObjectDemo
 {
     // 중앙 Tick과 풀 재사용을 눈으로 확인하기 위한 테스트용 뷰다.
-    public sealed class WorldObjectDemoView : WorldObjectView
+    public sealed class WorldObjectDemoView : EnemyView
     {
         [SerializeField] private float turnSpeed = 45f; // 이동 속도
 
         // 이 뷰가 사용할 일반 C# 월드 객체를 최초 한 번 만든다.
-        protected override IWorldObject CreateRuntimeObject()
+        protected override Unit CreateRuntimeObject()
         {
             return new RotatingWorldObject(transform, turnSpeed);
         }
@@ -21,18 +23,18 @@ namespace Development.WorldObjectDemo
         }
 
         // Manager가 Tick할 때 연결된 Transform을 천천히 회전시킨다.
-        private sealed class RotatingWorldObject : WorldObject
+        private sealed class RotatingWorldObject : Unit
         {
             private readonly Transform target; // 대상 참조
             private readonly float turnSpeed; // 이동 속도
 
-            public RotatingWorldObject(Transform target, float turnSpeed)
+            public RotatingWorldObject(Transform target, float turnSpeed) : base(1f)
             {
                 this.target = target;
                 this.turnSpeed = turnSpeed;
             }
 
-            protected override void OnTick(float deltaTime)
+            protected override void OnUnitTick(float deltaTime)
             {
                 target.Rotate(
                     0f,

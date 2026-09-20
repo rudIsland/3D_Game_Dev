@@ -13,9 +13,9 @@ namespace Tests
     public sealed class CharacterSettingsTests
     {
         private const string ZombieConfigPath =
-            "Assets/_Project/02.Enemy/Zombie/Configs/ZombieConfig.asset";
+            "Assets/_Project/11.Enemy/Zombie/Configs/ZombieConfig.asset";
         private const string ZombiePrefabPath =
-            "Assets/_Project/02.Enemy/Zombie/Prefabs/Zombie.prefab";
+            "Assets/_Project/11.Enemy/Zombie/Prefabs/Zombie.prefab";
 
         [Test]
         public void SharedLife_DamageUpgradeAndRecoveryRemainPerCharacter()
@@ -93,7 +93,7 @@ namespace Tests
         public void PlayerLife_KeepsAuthoringValuesAndSeparateStamina()
         {
             var source = AssetDatabase.LoadAssetAtPath<PlayerCharacterConfig>(
-                "Assets/_Project/01.Player/Configs/PlayerCharacterConfig.asset");
+                "Assets/_Project/10.Player/Configs/PlayerCharacterConfig.asset");
             Assert.That(source, Is.Not.Null);
             var config = Object.Instantiate(source);
             try

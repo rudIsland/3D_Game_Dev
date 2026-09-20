@@ -6,10 +6,13 @@
 
 | 폴더 | 설명 |
 | --- | --- |
-| `Code/Core` | `Unit`, `PlayerUnit`, `EnemyUnit`, `UnitHealth`와 생명 설정 |
-| `Code/Core/Enemy` | 적에게 피해를 전달하는 요청·결과와 수신 인터페이스 |
-| `Code/Combat/AttackData` | 공격 피해 데이터 |
-| `Code/Combat/Systems` | 피해 계산, 경직 누적, 피격 반응, 타격 정지와 공격 대상 보정 |
+| `Lifecycle` | `Unit`의 캐릭터 공통 생명주기와 사망 여부 |
+| `Health` | `UnitHealth`의 체력과 변경·사망 알림 |
+| `Config` | 체력과 경직 기준값을 공유하는 생명 설정 |
+| `Combat/Attack` | 공격 피해 데이터와 공격 대상 보정 |
+| `Combat/Hit` | 피해 계산, 경직 누적, 피격 반응과 타격 정지 |
+
+플레이어 전용 `PlayerUnit`은 `../10.Player/Lifecycle`, 적 전용 `EnemyUnit`은 `../11.Enemy/Shared/Lifecycle`에 둔다. 적 피해 요청·결과·수신 인터페이스는 `../11.Enemy/Shared/Combat/Hit`, 타격 파티클은 `../15.Effects/Combat`에서 담당한다.
 
 ## 동작 흐름
 
@@ -25,14 +28,14 @@
 
 ## 먼저 읽을 코드
 
-- [Unit.cs](Code/Core/Unit.cs): 공통 호출 순서와 확장 지점.
-- [EnemyUnit.cs](Code/Core/EnemyUnit.cs): 적 재활성화 시 체력 초기화.
-- [UnitHealth.cs](Code/Core/UnitHealth.cs): 현재 체력과 변경·사망 알림.
-- [HitDamageCalculator.cs](Code/Combat/Systems/HitDamageCalculator.cs): 피해 적용 결과.
-- [StopPoint.cs](Code/Combat/Systems/StopPoint.cs): 경직 수치 누적과 회복.
+- [Unit.cs](Lifecycle/Unit.cs): 공통 호출 순서와 확장 지점.
+- [EnemyUnit.cs](../11.Enemy/Shared/Lifecycle/EnemyUnit.cs): 적 재활성화 시 체력 초기화.
+- [UnitHealth.cs](Health/UnitHealth.cs): 현재 체력과 변경·사망 알림.
+- [HitDamageCalculator.cs](Combat/Hit/HitDamageCalculator.cs): 피해 적용 결과.
+- [StopPoint.cs](Combat/Hit/StopPoint.cs): 경직 수치 누적과 회복.
 
 ## 변경 후 확인
 
 공통 피해·생명주기를 바꾸면 플레이어, 좀비, NightShade에 모두 영향이 갈 수 있다. Unity에서 피해, 사망, 비활성화와 풀 재사용을 구분해서 확인한다. 특정 적의 공격 선택 규칙은 이 폴더에 넣지 않는다.
 
-관련 문서: [월드 객체](../../00.Core/WorldObjects/README.md), [플레이어](../../01.Player/README.md), [적](../../02.Enemy/README.md).
+관련 문서: [월드 객체](../02.Core/WorldObjects/README.md), [플레이어](../10.Player/README.md), [적](../11.Enemy/README.md).

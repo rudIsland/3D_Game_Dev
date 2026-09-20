@@ -1568,7 +1568,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76c69612715ed1a42bf78057dd671024, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.Runtime::Characters.Player.Lifecycle.PlayerController
-  worldObjectManager: {fileID: 0}
   moveCamera: {fileID: 0}
   playerAnimator: {fileID: 721643049174057638}
   guardHitBox: {fileID: 4860392827719473560}

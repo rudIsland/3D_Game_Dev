@@ -4,18 +4,20 @@
 
 ## 폴더 구성
 
+[PlayerController](Lifecycle/PlayerController.cs)가 플레이어 상태·인벤토리·강화 기록을 직접 소유한다. HUD·퀘스트는 이 컨트롤러를 전달받는다. Create와 Tick은 명시적으로 호출하는 구조이며 Boots의 자동 실행은 아직 연결하지 않았다. [진입점과 이전 순서](../01.Boot/README.md)를 참고한다.
+
 | 폴더 | 설명 |
 | --- | --- |
-| `Code/Lifecycle` | Unity 참조 연결과 플레이어 런타임 객체의 생명주기 |
-| `Code/Input` | Input System 입력과 누른 행동 저장 |
-| `Code/Movement` | 속도·중력·충돌 이동, 자유 시점·락온 방향, 행동 이동 곡선 |
-| `Code/StateMachine` | 시점·행동·피격·사망 상태와 공격·구르기 입력 예약 |
-| `Code/Combat` | 공격 범위, 무기 궤적, 방어 판정과 피해 수신 |
-| `Code/Animation`, `Code/Audio` | Animator 파라미터, 애니메이션 이벤트와 효과음 |
-| `Code/Camera` | 락온 카메라 제어 |
-| `Code/Interaction` | 상호작용 대상 탐지와 실행 |
-| `Code/Inventory`, `Code/Stats` | 가방, 스태미나와 능력치 강화 |
-| `Code/Config`, `Configs` | 설정 타입과 실제 설정 에셋 |
+| `Lifecycle` | `PlayerUnit`, Unity 참조 연결과 플레이어 런타임 객체의 생명주기 |
+| `Input` | Input System 입력과 누른 행동 저장 |
+| `Movement` | 속도·중력·충돌 이동, 자유 시점·락온 방향, 행동 이동 곡선 |
+| `StateMachine` | 시점·행동·피격·사망 상태와 공격·구르기 입력 예약 |
+| `Combat` | 공격 범위, 무기 궤적, 방어 판정과 피해 수신 |
+| `Animation`, `Audio` | Animator 파라미터, 애니메이션 이벤트와 효과음 |
+| `Camera` | 락온 카메라 제어 |
+| `Interaction` | 상호작용 대상 탐지와 실행 |
+| `Inventory`, `Stats` | 가방, 스태미나와 능력치 강화 |
+| `Config`, `Configs` | 설정 타입과 실제 설정 에셋 |
 | `Models` | 모델, 텍스처, 애니메이션 원본·클립·Controller |
 
 ## 생성과 갱신 흐름
@@ -39,11 +41,11 @@
 | 수정할 내용 | 시작 파일 |
 | --- | --- |
 | 이동 속도·회전·스태미나 수치 | [PlayerCharacterConfig.asset](Configs/PlayerCharacterConfig.asset) |
-| 이동·충돌 결과 처리 | [PlayerMovement.cs](Code/Movement/PlayerMovement.cs) |
-| 걷기·달리기 표현 | [PlayerAnimationController.cs](Code/Animation/PlayerAnimationController.cs) |
-| 행동 전환·입력 예약 | [PlayerActionStateMachine.cs](Code/StateMachine/Actions/PlayerActionStateMachine.cs) |
-| 공격별 설정 | `Code/StateMachine/States/Attack/AttackData` |
-| 초기 연결·등록 | [PlayerController.cs](Code/Lifecycle/PlayerController.cs) |
+| 이동·충돌 결과 처리 | [PlayerMovement.cs](Movement/PlayerMovement.cs) |
+| 걷기·달리기 표현 | [PlayerAnimationController.cs](Animation/PlayerAnimationController.cs) |
+| 행동 전환·입력 예약 | [PlayerActionStateMachine.cs](StateMachine/Actions/PlayerActionStateMachine.cs) |
+| 공격별 설정 | `StateMachine/States/Attack/AttackData` |
+| 초기 연결·등록 | [PlayerController.cs](Lifecycle/PlayerController.cs) |
 
 ## Unity에서 확인
 
@@ -52,4 +54,4 @@
 - 걷기·달리기, 벽 앞 이동, 락온 옆걸음, 구르기와 방어 전환을 확인한다.
 - 이동 애니메이션의 `MovePlaybackSpeed` 연결과 실제 이동 속도가 함께 반영되는지 확인한다.
 
-관련 문서: [공통 캐릭터](../00.Core/Characters/README.md), [아이템](../03.Item/README.md), [월드 객체](../00.Core/WorldObjects/README.md).
+관련 문서: [공통 캐릭터](../13.Characters/README.md), [아이템](../12.Item/README.md), [월드 객체](../02.Core/WorldObjects/README.md).

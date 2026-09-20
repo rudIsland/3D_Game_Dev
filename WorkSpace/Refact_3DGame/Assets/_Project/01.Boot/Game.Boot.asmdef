@@ -1,21 +1,17 @@
 {
-  "name": "Game.Tests.PlayMode",
-  "rootNamespace": "Tests",
+  "name": "Game.Boot",
+  "rootNamespace": "World.Boot",
   "references": [
     "Game.Runtime",
-    "Unity.Addressables",
-    "Unity.ResourceManager"
+    "Game.UI"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
   "overrideReferences": false,
   "precompiledReferences": [],
-  "autoReferenced": false,
+  "autoReferenced": true,
   "defineConstraints": [],
   "versionDefines": [],
-  "noEngineReferences": false,
-  "optionalUnityReferences": [
-    "TestAssemblies"
-  ]
+  "noEngineReferences": false
 }

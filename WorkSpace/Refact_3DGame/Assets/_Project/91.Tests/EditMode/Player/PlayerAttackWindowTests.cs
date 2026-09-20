@@ -9,7 +9,7 @@ namespace Tests.Player
     public sealed class PlayerAttackWindowTests
     {
         private const string AttackDataFolder =
-            "Assets/_Project/Characters/Player/Code/StateMachine/States/Attack/AttackData";
+            "Assets/_Project/10.Player/StateMachine/States/Attack/AttackData";
 
         private PlayerAttackData attackData;
 

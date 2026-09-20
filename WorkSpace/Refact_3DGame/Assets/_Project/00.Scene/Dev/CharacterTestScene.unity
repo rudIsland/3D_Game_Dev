@@ -1722,7 +1722,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7ff34200066bb0e459eda47c9909cca5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::World.WorldObjectManager
+  m_EditorClassIdentifier: Game.Boot::World.Boot.Boots
   spawnSettings:
   - {fileID: 11400000, guid: 2f2c3441eae3dd048b4dfc1b3fdeca61, type: 2}
   - {fileID: 11400000, guid: 511312cb3490e204790ef4877d6bfea5, type: 2}

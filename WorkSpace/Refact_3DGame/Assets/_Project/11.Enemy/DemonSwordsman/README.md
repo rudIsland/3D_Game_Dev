@@ -17,6 +17,6 @@
 
 프리팹·동작 선택 → 씬 또는 캐릭터 구성에 연결 → 외형과 애니메이션 확인 순서로 사용한다. 전투에 투입하려면 행동 코드, 피해 판정과 소환 설정의 실제 연결을 별도로 확인해야 한다.
 
-개발용 `DemonSwordsmanTestEnemy.prefab`은 `0_Scenes/Dev/CharacterTest/Prefabs`에 있다. 파일 이름만 보고 이 폴더에 독립된 AI가 있다고 판단하지 않는다. Unity에서 두 형태의 Animator, Avatar, 무기와 동작 전환을 확인한다.
+개발용 `DemonSwordsmanTestEnemy.prefab`은 `00.Scene/Dev/CharacterTest/Prefabs`에 있다. 파일 이름만 보고 이 폴더에 독립된 AI가 있다고 판단하지 않는다. Unity에서 두 형태의 Animator, Avatar, 무기와 동작 전환을 확인한다.
 
 관련 문서: [적 목록](../README.md).

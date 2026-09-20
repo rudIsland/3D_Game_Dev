@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Core.ConstantValid;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using World;
 
 namespace EditorTools
 {
@@ -15,9 +15,9 @@ namespace EditorTools
         private const int PageSize = 80;
         private static readonly string[] ScenePaths =
         {
-            "Assets/_Project/0_Scenes/Common.unity",
-            "Assets/_Project/0_Scenes/Ground.unity",
-            "Assets/_Project/0_Scenes/Underground.unity"
+            ConstantValid.StartScenePath,
+            ConstantValid.GroundScenePath,
+            ConstantValid.UnderGroundScenePath
         };
         private static readonly string[] Tabs = { "전체", "지상 전용", "지하 전용", "공용" };
         private static readonly string[] ActiveFilters = { "전체", "활성", "비활성" };
@@ -59,7 +59,6 @@ namespace EditorTools
         private int selectedTab;
         private int page;
         private Vector2 scroll;
-        private WorldObjectContainer container;
         private string placementCheckSummary;
         private bool placementCheckHasIssues;
         private int activeFilter = 1;
@@ -475,36 +474,11 @@ namespace EditorTools
         private void OnGUI()
         {
             EditorGUILayout.LabelField("월드 리소스 소속", EditorStyles.boldLabel);
-            if (Application.isPlaying && container == null) container = FindFirstObjectByType<WorldObjectContainer>();
-            using (new EditorGUI.DisabledScope(!Application.isPlaying || container == null || !container.isActiveAndEnabled || container.IsBusy))
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                if (GUILayout.Button("지상 불러오기")) container.Load("Ground");
-                if (GUILayout.Button("지상 해제")) container.Unload("Ground");
-                if (GUILayout.Button("지하 불러오기")) container.Load("Underground");
-                if (GUILayout.Button("지하 해제")) container.Unload("Underground");
-            }
-            if (Application.isPlaying && container != null)
-            {
-                using (new EditorGUI.DisabledScope(!container.isActiveAndEnabled || container.IsBusy))
-                using (new EditorGUILayout.HorizontalScope())
-                {
-                    EditorGUILayout.LabelField("현재 환경: " + SceneManager.GetActiveScene().name);
-                    using (new EditorGUI.DisabledScope(!container.IsLoaded("Ground")))
-                        if (GUILayout.Button("지상 환경 적용")) container.ApplyEnvironment("Ground");
-                    using (new EditorGUI.DisabledScope(!container.IsLoaded("Underground")))
-                        if (GUILayout.Button("지하 환경 적용")) container.ApplyEnvironment("Underground");
-                }
-                EditorGUILayout.LabelField($"로딩된 씬: {container.LoadedCount}개 · 지상 {(container.IsLoaded("Ground") ? "로딩됨" : "해제됨")} · 지하 {(container.IsLoaded("Underground") ? "로딩됨" : "해제됨")}" +
-                    (container.IsBusy ? " · 처리 중" : ""));
-                if (!string.IsNullOrEmpty(container.LastError)) EditorGUILayout.HelpBox(container.LastError, MessageType.Error);
-            }
             EditorGUILayout.LabelField(countText ?? "목록을 불러오는 중");
             using (new EditorGUILayout.HorizontalScope())
             {
                 if (GUILayout.Button("에셋·배치 다시 읽기", GUILayout.Width(190f))) RefreshResources();
-                using (new EditorGUI.DisabledScope(container != null && container.IsBusy))
-                    if (GUILayout.Button("현재 목록 배치 검사", GUILayout.Width(155f))) CheckDisplayedPlacements();
+                if (GUILayout.Button("현재 목록 배치 검사", GUILayout.Width(155f))) CheckDisplayedPlacements();
                 if (GUILayout.Button("조명 소속 확인", GUILayout.Width(120f))) SceneLightWindow.OpenWindow();
                 GUILayout.FlexibleSpace();
             }

@@ -1,3 +1,5 @@
+using Characters.Enemies;
+using Characters;
 using System;
 using World;
 using UnityEngine;
@@ -8,28 +10,32 @@ namespace Development.CharacterTest
     public sealed class TestSceneEnemySpawner : MonoBehaviour
     {
         [Header("필수 연결")]
-        [SerializeField] private WorldObjectManager worldObjectManager; // 씬 또는 시스템 참조
+        private EnemyContainer enemyContainer;
 
         [Header("적 설정과 배치 위치")]
-        [SerializeField] private SpawnSettings[] enemySettings = // 행동 설정 참조
-            Array.Empty<SpawnSettings>();
+        [SerializeField] private EnemySpawnSettings[] enemySettings = // 행동 설정 참조
+            Array.Empty<EnemySpawnSettings>();
         [SerializeField] private Transform[] spawnPoints = // 씬 또는 시스템 참조
             Array.Empty<Transform>();
 
         [Header("다시 생성")]
         [SerializeField, Min(0f)] private float respawnDelay = 3f; // 시간 설정
 
-        private WorldObjectView[] spawnedEnemies; // 씬 또는 시스템 참조
+        private EnemyView[] spawnedEnemies; // 씬 또는 시스템 참조
         private float[] remainingRespawnTimes; // 시간 설정
 
-        private void Start()
+        public void Connect(EnemyContainer container)
         {
+            if (enemyContainer != null) return;
+            enemyContainer = container;
             if (!CanSpawn())
             {
                 return;
             }
 
-            spawnedEnemies = new WorldObjectView[enemySettings.Length];
+            foreach (EnemySpawnSettings settings in enemySettings)
+                if (settings != null) enemyContainer.RegisterPool(settings);
+            spawnedEnemies = new EnemyView[enemySettings.Length];
             remainingRespawnTimes = new float[enemySettings.Length];
             SpawnMissingEnemies();
         }
@@ -43,7 +49,7 @@ namespace Development.CharacterTest
 
             for (int index = 0; index < spawnedEnemies.Length; index++)
             {
-                WorldObjectView currentEnemy = spawnedEnemies[index];
+                EnemyView currentEnemy = spawnedEnemies[index];
                 if (currentEnemy != null && currentEnemy.gameObject.activeSelf)
                 {
                     remainingRespawnTimes[index] = respawnDelay;
@@ -62,7 +68,7 @@ namespace Development.CharacterTest
 
         private void OnDestroy()
         {
-            if (worldObjectManager == null || spawnedEnemies == null)
+            if (enemyContainer == null || spawnedEnemies == null)
             {
                 return;
             }
@@ -71,7 +77,7 @@ namespace Development.CharacterTest
             {
                 if (spawnedEnemies[index] != null)
                 {
-                    worldObjectManager.Despawn(spawnedEnemies[index]);
+                    enemyContainer.Despawn(spawnedEnemies[index]);
                 }
             }
         }
@@ -104,7 +110,7 @@ namespace Development.CharacterTest
 
             for (int index = 0; index < enemySettings.Length; index++)
             {
-                WorldObjectView currentEnemy = spawnedEnemies[index];
+                EnemyView currentEnemy = spawnedEnemies[index];
                 if (currentEnemy != null &&
                     currentEnemy.gameObject.activeSelf)
                 {
@@ -118,7 +124,7 @@ namespace Development.CharacterTest
         private void SpawnEnemy(int index)
         {
             Transform spawnPoint = spawnPoints[index];
-            SpawnSettings enemySetting = enemySettings[index];
+            EnemySpawnSettings enemySetting = enemySettings[index];
 
             if (spawnPoint == null || enemySetting == null)
             {
@@ -127,7 +133,7 @@ namespace Development.CharacterTest
                 return;
             }
 
-            if (!worldObjectManager.TrySpawn(
+            if (!enemyContainer.TrySpawn(
                     enemySetting,
                     spawnPoint.position,
                     spawnPoint.rotation,
@@ -143,9 +149,9 @@ namespace Development.CharacterTest
 
         private bool CanSpawn()
         {
-            if (worldObjectManager == null)
+            if (enemyContainer == null)
             {
-                Debug.LogError("TestSceneEnemySpawner에 WorldObjectManager가 필요합니다.", this);
+                Debug.LogError("TestSceneEnemySpawner에 EnemyContainer가 필요합니다.", this);
                 return false;
             }
 

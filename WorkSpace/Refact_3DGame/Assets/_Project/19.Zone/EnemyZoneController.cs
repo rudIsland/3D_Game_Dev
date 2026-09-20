@@ -1,3 +1,5 @@
+using Characters.Enemies;
+using Characters;
 using System;
 using Characters.Player.Lifecycle;
 using UnityEngine;
@@ -14,7 +16,7 @@ namespace World.Zones
         private sealed class EnemySpawnSlot
         {
             private readonly Transform spawnPoint;
-            private WorldObjectView spawnedView;
+            private EnemyView spawnedView;
             private IZoneEnemy spawnedEnemy;
             private bool hasLoggedNavMeshError;
             private bool hasLoggedEnemyTypeError;
@@ -44,8 +46,8 @@ namespace World.Zones
 
             internal void TrySpawn(
                 EnemyZoneArea zoneArea,
-                WorldObjectManager objectManager,
-                SpawnSettings spawnSettings,
+                EnemyContainer objectManager,
+                EnemySpawnSettings spawnSettings,
                 float navMeshSampleRadius,
                 UnityEngine.Object logContext)
             {
@@ -75,7 +77,7 @@ namespace World.Zones
                         spawnSettings,
                         navMeshHit.position,
                         spawnPoint.rotation,
-                        out WorldObjectView view))
+                        out EnemyView view))
                 {
                     return;
                 }
@@ -101,8 +103,8 @@ namespace World.Zones
         }
 
         [Header("필수 연결")]
-        [SerializeField] private WorldObjectManager worldObjectManager;
-        [SerializeField] private SpawnSettings enemySpawnSettings;
+        private EnemyContainer enemyContainer;
+        [SerializeField] private EnemySpawnSettings enemySpawnSettings;
         [SerializeField] private Transform player;
         [SerializeField] private Transform enemySpawnPoints;
 
@@ -118,19 +120,21 @@ namespace World.Zones
         private bool isReady;
         private bool hasStarted;
 
-        private void Awake()
+        public void Connect(EnemyContainer container)
         {
+            if (isReady) return;
+            enemyContainer = container;
             FindSceneReferences();
             BuildSpawnSlots();
 
             if (zoneCollider == null ||
-                worldObjectManager == null ||
+                enemyContainer == null ||
                 enemySpawnSettings == null ||
                 player == null ||
                 spawnSlots.Length == 0)
             {
                 Debug.LogError(
-                    $"{name}의 BoxCollider, WorldObjectManager, SpawnSettings, Player와 SpawnPoint 연결을 확인하세요.",
+                    $"{name}의 BoxCollider, EnemyContainer, EnemySpawnSettings, Player와 SpawnPoint 연결을 확인하세요.",
                     this);
                 enabled = false;
                 return;
@@ -138,12 +142,7 @@ namespace World.Zones
 
             zoneArea = new EnemyZoneArea(zoneCollider);
             isReady = true;
-        }
-
-        private void Start()
-        {
-            if (!isReady) return;
-            worldObjectManager.RegisterScenePool(gameObject.scene, enemySpawnSettings);
+            enemyContainer.RegisterPool(enemySpawnSettings);
             StartSpawning();
         }
 
@@ -166,7 +165,7 @@ namespace World.Zones
 
         private void Update()
         {
-            if (!hasStarted || !isReady || player == null || worldObjectManager.IsPaused) return;
+            if (!hasStarted || !isReady || player == null || enemyContainer.IsPaused) return;
             for (int index = 0; index < spawnSlots.Length; index++)
             {
                 spawnSlots[index].RefreshOwner(zoneArea);
@@ -187,7 +186,7 @@ namespace World.Zones
             {
                 spawnSlots[index].TrySpawn(
                     zoneArea,
-                    worldObjectManager,
+                    enemyContainer,
                     enemySpawnSettings,
                     navMeshSampleRadius,
                     this);
@@ -197,12 +196,6 @@ namespace World.Zones
         private void FindSceneReferences()
         {
             zoneCollider = GetComponent<BoxCollider>();
-
-            if (worldObjectManager == null)
-            {
-                worldObjectManager =
-                    FindFirstObjectByType<WorldObjectManager>();
-            }
 
             if (player == null)
             {

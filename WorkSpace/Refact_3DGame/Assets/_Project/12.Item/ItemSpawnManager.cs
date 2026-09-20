@@ -8,15 +8,17 @@ namespace Items
         [SerializeField]
         private ItemCatalog itemCatalog;
         private bool hasSpawned;
+        private ItemContainer items;
 
-        private void Awake()
+        public void Connect(ItemContainer container)
         {
+            items = container;
             SpawnItems();
         }
 
         public void SpawnItems()
         {
-            if (hasSpawned) return;
+            if (hasSpawned || items == null) return;
             if (itemCatalog == null)
             {
                 return;
@@ -44,13 +46,8 @@ namespace Items
                 return;
             }
 
-            WorldItemPickup worldItem = Instantiate(
-                item.WorldItemPrefab,
-                spawnPoint.transform.position,
-                spawnPoint.transform.rotation,
-                spawnPoint.transform);
-
-            worldItem.SetItemDefinition(item.ItemDefinition);
+            items.TrySpawn(item, spawnPoint.transform.position,
+                spawnPoint.transform.rotation, out _);
         }
     }
 }

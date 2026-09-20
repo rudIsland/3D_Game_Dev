@@ -14,8 +14,42 @@ namespace GameUI.CombatHud
     // 플레이어 자원과 현재 전투 중인 적 자원을 화면 HUD에 연결한다.
     public sealed class CombatHudController : MonoBehaviour
     {
-        [Header("World")]
-        [SerializeField] private WorldObjectManager worldObjectManager; // 씬 또는 시스템 참조
+        private PlayerController playerController;
+        private readonly List<EnemyContainer> enemyContainers = new List<EnemyContainer>();
+        private bool connected;
+
+        public void Connect(PlayerController player)
+        {
+            if (ReferenceEquals(playerController, player)) return;
+            OnDisable();
+            playerController = player;
+            if (isActiveAndEnabled) OnEnable();
+        }
+        public void Disconnect()
+        {
+            OnDisable();
+            playerController = null;
+            enemyContainers.Clear();
+        }
+        public void WatchEnemies(EnemyContainer enemies)
+        {
+            if (enemyContainers.Contains(enemies)) return;
+            enemyContainers.Add(enemies);
+            if (connected) SubscribeEnemies(enemies);
+        }
+        public void StopWatchingEnemies(EnemyContainer enemies)
+        {
+            if (!enemyContainers.Remove(enemies)) return;
+            enemies.EnemyEnabled -= HandleUnitEnabled;
+            enemies.EnemyDisabled -= HandleUnitDisabled;
+            foreach (Unit unit in enemies.ActiveObjects) StopTracking(unit);
+        }
+        private void SubscribeEnemies(EnemyContainer enemies)
+        {
+            enemies.EnemyEnabled += HandleUnitEnabled;
+            enemies.EnemyDisabled += HandleUnitDisabled;
+            foreach (Unit unit in enemies.ActiveObjects) Track(unit);
+        }
 
         [Header("UI Toolkit")]
         [SerializeField] private CombatHudToolkitView toolkitView;
@@ -45,12 +79,6 @@ namespace GameUI.CombatHud
                 return;
             }
 
-            if (worldObjectManager == null)
-            {
-                worldObjectManager =
-                    FindFirstObjectByType<WorldObjectManager>();
-            }
-
             if (playerInteractionController == null)
             {
                 playerInteractionController =
@@ -62,30 +90,17 @@ namespace GameUI.CombatHud
 
         private void OnEnable()
         {
+            if (connected || playerController == null || toolkitView == null) return;
+            connected = true;
             if (playerInteractionController != null)
             {
-                playerInteractionController.InteractionGuideChanged +=
-                    HandleInteractionGuideChanged;
-                HandleInteractionGuideChanged(
-                    playerInteractionController.CurrentInteractionGuide);
+                playerInteractionController.InteractionGuideChanged += HandleInteractionGuideChanged;
+                HandleInteractionGuideChanged(playerInteractionController.CurrentInteractionGuide);
             }
-
-            if (worldObjectManager == null)
-            {
-                Debug.LogError("CombatHudController requires a WorldObjectManager.", this);
-                enabled = false;
-                return;
-            }
-
-            worldObjectManager.WorldObjectEnabled += HandleWorldObjectEnabled;
-            worldObjectManager.WorldObjectDisabled += HandleWorldObjectDisabled;
-
-            IReadOnlyList<IWorldObject> activeObjects =
-                worldObjectManager.ActiveObjects;
-            for (int index = 0; index < activeObjects.Count; index++)
-            {
-                Track(activeObjects[index]);
-            }
+            playerController.PlayerEnabled += HandleUnitEnabled;
+            playerController.PlayerDisabled += HandleUnitDisabled;
+            if (playerController.RuntimeUnit != null && playerController.RuntimeUnit.IsEnabled) Track(playerController.RuntimeUnit);
+            foreach (EnemyContainer enemies in enemyContainers) SubscribeEnemies(enemies);
         }
 
         private void OnDisable()
@@ -96,11 +111,17 @@ namespace GameUI.CombatHud
                     HandleInteractionGuideChanged;
             }
 
-            if (worldObjectManager != null)
+            if (playerController != null)
             {
-                worldObjectManager.WorldObjectEnabled -= HandleWorldObjectEnabled;
-                worldObjectManager.WorldObjectDisabled -= HandleWorldObjectDisabled;
+                playerController.PlayerEnabled -= HandleUnitEnabled;
+                playerController.PlayerDisabled -= HandleUnitDisabled;
             }
+            foreach (EnemyContainer enemies in enemyContainers)
+            {
+                enemies.EnemyEnabled -= HandleUnitEnabled;
+                enemies.EnemyDisabled -= HandleUnitDisabled;
+            }
+            connected = false;
 
             foreach (KeyValuePair<UnitHealth, Unit> entry in trackedUnits)
             {
@@ -139,12 +160,12 @@ namespace GameUI.CombatHud
             HideInteractionGuide();
         }
 
-        private void HandleWorldObjectEnabled(IWorldObject worldObject)
+        private void HandleUnitEnabled(Unit worldObject)
         {
             Track(worldObject);
         }
 
-        private void HandleWorldObjectDisabled(IWorldObject worldObject)
+        private void HandleUnitDisabled(Unit worldObject)
         {
             if (worldObject is Unit unit)
             {
@@ -152,7 +173,7 @@ namespace GameUI.CombatHud
             }
         }
 
-        private void Track(IWorldObject worldObject)
+        private void Track(Unit worldObject)
         {
             if (!(worldObject is Unit unit))
             {

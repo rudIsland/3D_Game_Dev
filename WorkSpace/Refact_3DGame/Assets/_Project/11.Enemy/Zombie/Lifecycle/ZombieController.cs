@@ -1,3 +1,4 @@
+using Characters.Enemies;
 using System;
 using Characters;
 using Characters.Combat.AttackData;
@@ -19,7 +20,7 @@ namespace Characters.Enemies.Zombie
     [RequireComponent(typeof(NavMeshAgent))]
     // Unity 씬과 일반 C# Zombie AI를 연결한다.
     public sealed class ZombieController :
-        WorldObjectView,
+        EnemyView,
         IUnitDeathState,
         IEnemyDamageReceiver,
         IZoneEnemy
@@ -52,7 +53,7 @@ namespace Characters.Enemies.Zombie
         public bool IsDead =>
             zombieWorldUnit != null && zombieWorldUnit.IsDead;
         public EnemyZoneArea HomeZone => stateMachine?.HomeZone;
-        protected override IWorldObject CreateRuntimeObject()
+        protected override Unit CreateRuntimeObject()
         {
             if (config == null)
                 throw new InvalidOperationException("ZombieController에 ZombieConfig가 필요합니다.");

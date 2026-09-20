@@ -1,12 +1,11 @@
 # Mutant 리소스
 
-Mutant 모델과 애니메이션을 보관한다. 현재 `Code` 폴더에는 C# 파일이 없어 이 폴더의 전용 행동 로직은 없다.
+Mutant 모델과 애니메이션을 보관한다. 현재 전용 C# 파일이 없어 이 폴더의 전용 행동 로직은 없다.
 
 ## 폴더 구성
 
 | 폴더 | 설명 |
 | --- | --- |
-| `Code` | 전용 코드가 없는 빈 폴더 |
 | `Models/Prefabs` | `Mutant.prefab` |
 | `Models/Animations/Clips` | 공격·대기·이동·피격·사망 동작 |
 | `Models/Animations/Controllers`, `Models/Animations/Sources` | Animator Controller와 애니메이션 원본 |

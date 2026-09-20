@@ -1,3 +1,5 @@
+using Characters.Enemies;
+using Characters;
 using System;
 using Characters.Combat;
 using Characters.Combat.AttackData;
@@ -14,7 +16,7 @@ namespace Characters.Enemies.NightShade
         typeof(CombatHitEffectPlayer))]
     [RequireComponent(typeof(NightShadeSwordAttackAudio))]
     // Unity 프리팹과 일반 C# NightShade 양손검 전투를 연결한다.
-    public sealed class NightShadeSwordController : WorldObjectView, IUnitDeathState, IEnemyDamageReceiver
+    public sealed class NightShadeSwordController : EnemyView, IUnitDeathState, IEnemyDamageReceiver
     {
         [Header("필수 연결")]
         [SerializeField] private Transform target;
@@ -47,7 +49,7 @@ namespace Characters.Enemies.NightShade
         internal NightShadeSwordCombatDebug CombatDebug =>
             swordWorldUnit?.CombatDebug;
 
-        protected override IWorldObject CreateRuntimeObject()
+        protected override Unit CreateRuntimeObject()
         {
             FindSceneReferences();
             FindUnityComponents();

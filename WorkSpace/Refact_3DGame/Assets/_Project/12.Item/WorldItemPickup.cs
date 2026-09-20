@@ -16,6 +16,14 @@ namespace Items
         private ItemDefinition itemDefinition;
 
         private bool isCollected;
+        internal ItemPool OwnerPool { get; private set; }
+        internal bool IsTaken { get; set; }
+        internal void Prepare(ItemPool pool, ItemDefinition definition)
+        {
+            OwnerPool = pool;
+            IsTaken = true;
+            SetItemDefinition(definition);
+        }
 
         internal void SetItemDefinition(ItemDefinition definition)
         {
@@ -59,7 +67,8 @@ namespace Items
             }
 
             isCollected = true;
-            gameObject.SetActive(false);
+            if (OwnerPool != null) OwnerPool.Return(this);
+            else gameObject.SetActive(false);
             return true;
         }
     }

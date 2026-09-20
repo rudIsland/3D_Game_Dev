@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Core.ConstantValid;
 using GameUI.Minimap;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -13,7 +14,7 @@ namespace EditorTools
     // 지하 바닥 충돌체를 편집 시에만 읽어 층별 지도 메시를 저장한다.
     public static class UndergroundMinimapBuilder
     {
-        private const string ScenePath = "Assets/_Project/0_Scenes/Underground.unity";
+        private const string ScenePath = ConstantValid.UnderGroundScenePath;
         private const string AssetFolder = "Assets/_Project/UI/Minimap/Underground";
         private const float CellSize = 0.5f;
         private const float FloorBoundary = -10.5f;
@@ -34,7 +35,7 @@ namespace EditorTools
 
             Transform mapParent = null;
             foreach (GameObject root in scene.GetRootGameObjects())
-                if (root.name == "UndergroundObjects") mapParent = root.transform;
+                if (root.name == ConstantValid.UnderGroundObjectsRootName) mapParent = root.transform;
             if (mapParent == null) throw new InvalidOperationException("지하 배치 부모 UndergroundObjects가 필요합니다.");
 
             var cells = new[] { new HashSet<Vector2Int>(), new HashSet<Vector2Int>() };

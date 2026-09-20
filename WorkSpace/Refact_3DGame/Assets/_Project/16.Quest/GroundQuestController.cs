@@ -1,3 +1,4 @@
+using Characters;
 using System;
 using Characters.Player.Inventory;
 using Characters.Player.Lifecycle;
@@ -10,58 +11,59 @@ namespace World.Quests
     [DisallowMultipleComponent]
     public sealed class GroundQuestController : MonoBehaviour
     {
-        [SerializeField] private WorldObjectManager worldObjectManager;
         [SerializeField] private ItemCatalog itemCatalog;
         [SerializeField] private PlayerController player;
         [Tooltip("출구가 만들어지면 도착 범위를 연결합니다.")]
         [SerializeField] private BoxCollider exitArea;
 
-        private readonly GroundQuestProgress progress = new GroundQuestProgress();
+        private GroundQuestProgress progress;
         private PlayerInventory inventory;
         [SerializeField] private ItemDefinition book;
         [SerializeField] private ItemDefinition scroll;
         private bool connected;
 
-        public GroundQuestStep Step => progress.Step;
+        public GroundQuestStep Step => progress != null ? progress.Step : GroundQuestStep.FindBook;
         public bool HasExitArea => exitArea != null;
         public event Action Changed;
 
-        private void Awake()
+        public void Connect(PlayerController playerController, GroundQuestProgress state)
         {
+            Disconnect();
+            progress = state;
+            player = playerController;
             if (itemCatalog != null)
             {
                 if (book == null && itemCatalog.TryGetItem(ItemType.Book, out ItemCatalogEntry bookEntry)) book = bookEntry.ItemDefinition;
                 if (scroll == null && itemCatalog.TryGetItem(ItemType.Scroll, out ItemCatalogEntry scrollEntry)) scroll = scrollEntry.ItemDefinition;
             }
             itemCatalog = null;
-            if (worldObjectManager == null || player == null || book == null || scroll == null)
+            if (progress == null || player == null || book == null || scroll == null)
             {
-                Debug.LogError("GroundQuestController에 월드 관리, 플레이어, 책과 스크롤 목록을 연결하세요.", this);
+                Debug.LogError("GroundQuestController에 퀘스트 진행 기록, 플레이어, 책과 스크롤 목록을 연결하세요.", this);
                 enabled = false;
                 return;
             }
-
+            if (isActiveAndEnabled) OnEnable();
         }
 
         private void OnEnable()
         {
-            if (connected || book == null || scroll == null)
+            if (connected || progress == null || player == null || book == null || scroll == null)
             {
                 return;
             }
 
             connected = true;
             progress.Changed += HandleProgressChanged;
-            worldObjectManager.WorldObjectEnabled += HandleWorldObjectEnabled;
-            worldObjectManager.WorldObjectDisabled += HandleWorldObjectDisabled;
-            var activeObjects = worldObjectManager.ActiveObjects;
-            for (int index = 0; index < activeObjects.Count; index++)
-            {
-                HandleWorldObjectEnabled(activeObjects[index]);
-            }
+            player.PlayerEnabled += HandlePlayerEnabled;
+            player.PlayerDisabled += HandlePlayerDisabled;
+            if (player.RuntimeUnit != null && player.RuntimeUnit.IsEnabled)
+                HandlePlayerEnabled(player.RuntimeUnit);
         }
 
-        private void OnDisable()
+        private void OnDisable() => Disconnect();
+
+        public void Disconnect()
         {
             if (!connected)
             {
@@ -70,17 +72,17 @@ namespace World.Quests
 
             connected = false;
             progress.Changed -= HandleProgressChanged;
-            if (worldObjectManager != null)
+            if (player != null)
             {
-                worldObjectManager.WorldObjectEnabled -= HandleWorldObjectEnabled;
-                worldObjectManager.WorldObjectDisabled -= HandleWorldObjectDisabled;
+                player.PlayerEnabled -= HandlePlayerEnabled;
+                player.PlayerDisabled -= HandlePlayerDisabled;
             }
             DisconnectInventory();
         }
 
-        private void Update()
+        public void Tick()
         {
-            if (worldObjectManager == null || worldObjectManager.IsPaused) return;
+            if (!connected || player == null || player.IsPaused) return;
             if (progress.Step != GroundQuestStep.ReachExit || exitArea == null ||
                 !exitArea.enabled || !exitArea.gameObject.activeInHierarchy ||
                 player == null || !player.isActiveAndEnabled || player.IsDead)
@@ -97,7 +99,7 @@ namespace World.Quests
             }
         }
 
-        private void HandleWorldObjectEnabled(IWorldObject worldObject)
+        private void HandlePlayerEnabled(Unit worldObject)
         {
             if (!(worldObject is PlayerWorldUnit playerUnit) ||
                 ReferenceEquals(inventory, playerUnit.Inventory))
@@ -112,7 +114,7 @@ namespace World.Quests
             HandleInventoryChanged(inventory);
         }
 
-        private void HandleWorldObjectDisabled(IWorldObject worldObject)
+        private void HandlePlayerDisabled(Unit worldObject)
         {
             if (worldObject is PlayerWorldUnit playerUnit &&
                 ReferenceEquals(inventory, playerUnit.Inventory))
