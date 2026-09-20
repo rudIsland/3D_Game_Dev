@@ -235,7 +235,7 @@
     right: 11px;
     top: 9px;
     bottom: 9px;
-    background-image: url("../../10_GUI/CombatHud/Sprites/Hp_line.png");
+    background-image: url("../../18.GUI/CombatHud/Sprites/Hp_line.png");
 }
 
 .stamina-fill {
@@ -251,7 +251,7 @@
     top: 0;
     right: 0;
     bottom: 0;
-    background-image: url("../../10_GUI/CombatHud/Sprites/Hp_frame.png");
+    background-image: url("../../18.GUI/CombatHud/Sprites/Hp_frame.png");
     -unity-background-scale-mode: stretch-to-fill;
     -unity-slice-left: 20;
     -unity-slice-top: 20;
