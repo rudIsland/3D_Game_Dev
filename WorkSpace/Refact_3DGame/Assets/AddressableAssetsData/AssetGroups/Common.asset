@@ -1,0 +1,3042 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Common
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: Common
+  m_GUID: 6413b41bb68f54f4490bd37946cc353a
+  m_SerializeEntries:
+  - m_GUID: 00395c4410098574796d24a2b8e15d24
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelArch_01_04.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 00972fbdcc05e4247b799ba3243a5374
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_SpiderWeb_01_02_Single.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0406db5a14f94604a8c57ccfbc9f3b46
+    m_Address: Packages/com.unity.render-pipelines.universal/Shaders/Particles/ParticlesUnlit.shader
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 04f5e51eb91094448b2449094a667d1a
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelArch_01_03.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 05ba4e1ef467fd244832c406fcdec57c
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptCeiling_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 07dfd86b701ecae4393765f6731107bb
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/URPPostprocessVolumes/Sky
+      and Fog Local Volume Forest DAY Profile.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 085afe8b8eef48f46a6747bdb33889f4
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Relief_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 087ed02be0e8b004b8616bee3a817365
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_SpiderWeb_01_11.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0ba367dead85a5a40a20a6257699e380
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_SpiderWeb_01_06_Single.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0d9ce35ee92e92b49b9a0e9002e8440b
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelColumn_01_03.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0dcf72a3b44047d40acc91effdb059da
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptColumn_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0de8d423b84974142a3cb0d071b32fbd
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/HDRP/Demo/MedievalRuins_01_P_Lightmap/New
+      Lighting Settings Last.lighting
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0dfd134504a0e7044aa8aaa90ad9f33b
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptEntrance_01_06.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 10e5b54e73955ed4695b9f1b72eeb82e
+    m_Address: Assets/_Project/12.Physics/StairWalkSurfaces/SM_Stairs_01_04_WalkSurface.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 119cfa84f32c2064791a88b37a70cc2c
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-12_comp_dir.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 11cee72205cab98409c9ea6d1b89b8ec
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptEntrance_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 12bd9a7ecfe58df4482990b919d0f003
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-6_comp_light.exr
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 16cd7289d4c15c848becdd108db62636
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_01_06.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 17ec5888a4024ac4eb5e5f42e4521032
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptWall_01_03.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1b432b0c31d3351488f34cb1b05dce48
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_SkullCow_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1bfd1448115dba846bc139f25327cb7d
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelColumn_01_02.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1f39050f74d2087489d77261a8951a14
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_SpiderWeb_01_04_Single.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1fcb9bda66b8e8045b010910d99d30cf
+    m_Address: Assets/_Project/12.Physics/StairWalkSurfaces/SM_Stairs_01_06_WalkSurface.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2213bdcbf813a4749bbe58a92624761a
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelArch_01_06.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 230753ea76353e14a8f911c6444aa91b
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptCeiling_02_02.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 24c37f0e05068e44e9ae5ad18a9a43e2
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_BurntLog_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 28a33c237426f5a4aa54aa4ea0a16332
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptCeiling_01_03.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2ace617700b874646b07462e59ecee6c
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptWall_04_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2c649bde066be5c41b6ee4ff1dd3468c
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Stairs_01_03.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2f9b02cfe22f4d8438470d960f86ea4d
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_01_07.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 31efb5c54b261514f9daaef5746e00a5
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Roots_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3273938ff6220da418af9c1979201ffd
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-4_comp_shadowmask.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 33d39bca06bca6744b3218640accc6cb
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-7_comp_dir.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 36a74b7661c8ce042ae2268c24b4f919
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-13_comp_dir.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 36e335017ad71d54fbb10842863188ae
+    m_Address: Packages/com.unity.render-pipelines.core/Runtime/RenderPipelineResources/FallbackShader.shader
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 380d14d77edba024ab35f1798cd7ec01
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-5_comp_light.exr
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 383cf29f752cf0c4dbe4bef8a8ed6545
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-14_comp_light.exr
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 39467ffb087ff1742a53a8e8b3a13bee
+    m_Address: Assets/_Project/12.Physics/StairWalkSurfaces/SM_Stairs_01_14_L_WalkSurface.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3b637f45a07d1f543a40f3906873a475
+    m_Address: Assets/_Project/12.Physics/StairWalkSurfaces/SM_Stairs_01_05_WalkSurface.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3ba74acf59da9cc439652f980a1aef81
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_01_13.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3c97f65b20bb7e74a995eb3207302e61
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Hangers_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3ef001d78c1f8bf4b9ec3cf9f7f97335
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptWall_02_02.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3fc0e74d793235944a7f01153020f316
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Brick_01_02.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4048730643f984347958ece2d052cc90
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Particle/Materials/M_CandleParticle.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 40e35e173575c854182d6046b4610e56
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_01_08.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 40eaef734b6a1234e83483cc70fca168
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Foliage/Bush_01/M_Branch_02_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 45e9bad1cbc58394f9a6471b50879b31
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Candle_01_02.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 46b8a49eb5cfe864895056e2d8a3a720
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelColumnPedestal_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 46bf85a8126d5e24394088e902b67540
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Shaders/S_Water_01_URP.shadergraph
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 47246907abedfae4a89ac6527d4d28df
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptCeiling_02_03.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4bfe16fafc9533c41842146b42b6638a
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Stairs_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4c5cc1a6f2792fb478affc763c7f0dcd
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Door_02_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4c78777788720c74b988eabea2f13dfb
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_01_10.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4e95e1d30292e6445b425c125f8ce042
+    m_Address: Assets/_Project/12.Physics/StairWalkSurfaces/SM_Stairs_01_13_R_WalkSurface.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5075a9b695282944bac47bdc3fc36ac9
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Water_02.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5332fe4ec7c00b141b5bd3fa71ff8acc
+    m_Address: Assets/_Project/12.Physics/StairWalkSurfaces/SM_Stairs_01_08_WalkSurface.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 538efff754c870e4e8f3edc5d9ba5755
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-6_comp_shadowmask.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 53c5124c642a9d945a2487b4c6b31d30
+    m_Address: Assets/_Project/12.Physics/StairWalkSurfaces/SM_Stairs_01_17_WalkSurface.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 541ddde542b36f44d8d28901a96f1932
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_01_03.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 55b18d46e8c4c8940a10f7dd9cd0da2d
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelArch_01_02.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 56c444898dce0f84281be3ba4e355bd2
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/Particles/T_ps_Fire_01_01_bc.TGA
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 57256e184defad64785e27d5c02d8788
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Brick_01_06.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5a559bead3a85d1488259eeaf2d5ac49
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-0_comp_light.exr
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5c84fecbedb74444b968705fbf21ec8c
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_RootsGround_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5dfdad1062a2d6a4dbe97ea6a6230b53
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-0_comp_shadowmask.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5fc243584163561429010fe6247a80da
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Foliage/Bush_01/M_Branch_01_01_Interactive.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 616df3ae07248c049b016b07b566cc54
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_04_04.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 61c453754f9cc474aafaefe4e3fa0292
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_04_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 637b229ded9bf2f4683973063ae6c62b
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_06_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 63cf637e4e5f7f14a86edfd94eacdb87
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Foliage/Bush_01/M_BushTrunk_01_01_Interactive.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 63d3df36838b12a4aae54946df5688c4
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-9_comp_shadowmask.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 650dd9526735d5b46b79224bc6e94025
+    m_Address: Packages/com.unity.render-pipelines.universal/Shaders/Unlit.shader
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6527925f1dc9177499867c1e5f1439d0
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelArch_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6839460c050e50e4c9a731b82d69aed5
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/Particles/T_ps_Fire_01_01_Candle_m.TGA
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 68dfba3c52cb2c3449e437562de68dbe
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptEntrance_01_04.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6bd378b65109bc7409b71058eeeab523
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_01_04.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6d25f8fe3d58e1f4e8f09eb0fd96a0bb
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_SmallWaves_N.TGA
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 70d4e5095ee7d1242b2febbd0a6f9a56
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-0_comp_dir.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7178d5ebd7f7d03419da96bce70fd28b
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_01_18.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 740a27dfd2dd71b4ca5cdfd909b9248d
+    m_Address: Assets/_Project/12.Physics/StairWalkSurfaces/SM_Stairs_01_07_WalkSurface.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 74c0b90879b73504ab5dff369f59f899
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-11_comp_light.exr
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 770c800a06b69f14690cf6f159edd7f2
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_01_11.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 77973b709933cf046951723798f31010
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptWindow_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7870943031dc7e345ac553ec5989d2d2
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-8_comp_dir.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 79749b094511c494badfcae7a23dd2fd
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-2_comp_dir.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7a270a72941b6454ba1c91e96a8ea8a0
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_GraveSculpture_02_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7b74e73ddc973af49b2a7f32885d65cc
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_01_15.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7bd9a096b9e9c71418f0dc817ef7e994
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_04_02.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7dadc0bd61d996a458399aacd7459238
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_GraveSculpture_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7fb051052cce6f24fbf57cbe3aa20c98
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptArch_01_03.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 80477b59f4117d842b8f19f6b37d7a14
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptWall_04_03.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8066778bb001028418a9ee85d12f6d15
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptWall_03_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 81c5f3ce55b13e0429ef8a5f21e474f8
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Particle/Materials/M_FireParticle.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 824edb24a14546d42a5304a8aa1d0dc4
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_01_14.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 840d38b01ebc0fa4aaee88c5af7a3dab
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_01_19.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 84b860ba9da5242449d66c2cb4b4077a
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-4_comp_dir.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 84fc585c0eac1b9478f80984984eaf50
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptWall_03_02.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 85fc30f47d5b84c499749c685083ff17
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_WoodPlank_01_02.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 865dfa318b3da2e4489eb43ebcde9f55
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptWall_01_02.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 86bac396d5c43bc4da0f17b664604fe8
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_01_02.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 88a4629cb57ee5849935c8ab1a7df895
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelColumn_01_04.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8ac6ec78933b70d4ebfc36f52a3127da
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Water_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8d271bd94bf765045a83e40dee2a4f8b
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_OldCeramicRoofTiles_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8e9ee9784d3010e4f9777ff923bfcb78
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelColumn_02_02.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9162eca7f46a5694eb03ec77b05a5552
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Stairs_01_02.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 933532a4fcc9baf4fa0491de14d08ed7
+    m_Address: Packages/com.unity.render-pipelines.universal/Shaders/Lit.shader
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9636dc0ff3d60284296cf8c65ef671b9
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Debris_03_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 966cf109ad14be148bfcbbfbc0515ff7
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-8_comp_light.exr
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 992ed5d706e29b149b131e81c37974e6
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_FallenTree_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9ba9a60854f89f64dae1675b8167c2e5
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelColumn_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9d03b71fede48be40951bdb31ed3a115
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-7_comp_shadowmask.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9d0490da4c06b3943882268565d14efe
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptWall_01_04.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9d7f4bb8b6db4b0448f2a7e56082f86b
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-10_comp_dir.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9d88d9cfbfdcde14eaf6d611fe651d82
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptArch_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9e29e8394b5dfab43bbfe888a1a53f51
+    m_Address: Assets/_Project/12.Physics/StairWalkSurfaces/SM_Stairs_01_03_WalkSurface.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9e2cce7b219deb447b68dc1838f895b3
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptArch_01_02.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9f06beebe4487b14a8714a70dc1dd694
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Shaders/S_BaseMasked_URP.shadergraph
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a0134877ba629bf4185eb4a9765e90d6
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-7_comp_light.exr
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a05f3471c7966ac49b1e01cbec2e972e
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-11_comp_dir.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a0766ac68fcec444aab1d92efeae8deb
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-9_comp_light.exr
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a190b77ea73fdea448a07749e785cff3
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/Particles/T_ps_Fire_01_01_bc
+      1.TGA
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a3171f50a8380d8459392f20431c44d5
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-8_comp_shadowmask.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a45f0b2909f04934b9f793a261aa3af7
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Rubble_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a566b1c1ce133d14eb59909a618f57dc
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-10_comp_shadowmask.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a71abf1f65cbaf14e9c6ecee2af855a5
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-3_comp_light.exr
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a8647368335c5db41a9879f63dc86d14
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-1_comp_light.exr
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a8b8eea734fe7d648a51d5b42efe3c02
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_GroundStones_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a9070aff07916f14c835ca815f3cb09c
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_01_20.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a98adb2a6758e9a4ba12f5b83852e86d
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-3_comp_shadowmask.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: aa08d6bcc1b0a3848976a6e46e959dad
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_SpiderWeb_01_10_Wall.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ab0292b0c934bd7449ef70a8f81ab192
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_GroundStones_01_02.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000000017572142421693085
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptWall_04_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000000095978885274616526
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelColumnTop_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000000187189208986328099
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_17_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000000347786062100505444
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_WoodPlank_01_11_bridge.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000000352069779452213915
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelColumn_01_05.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000000462550218568720459
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Door_02_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000000536704667059175795
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptEntrance_01_04_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000000539945389963001076
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_PathRocky_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000000578776868333830438
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_GroundStones_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000000699531381889666104
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Arch_01_02_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000000762378362037124291
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Relief_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000000794954422192356587
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelColumn_02_05_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000000848366879005099622
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_05_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000000876435345175715751
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelColumn_01_04_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000000973216327498680615
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Arch_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000001061683931341313317
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelColumn_01_02_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000001102085333104843471
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Door_01_03.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000001221829105110463143
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_04_04_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000001232415240555917666
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Stairs_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000001266302453415983441
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_WoodPlank_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000001352497835835055159
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Brick_01_03.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000001386261995793555300
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptCeiling_02_03_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000001407077691276060709
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_04_02_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000001410937785896314995
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptWindow_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000001415457800892617554
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelArch_01_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000001466646328987678353
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_WoodPlank_01_09.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000001480049418092396425
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_14_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000001487404341197182505
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptCeiling_01_02_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000001607386241807252660
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_SpiderWeb_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000001634288967443504302
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_12_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000001653550824592648986
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_OldCup_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000001787723847105387854
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptEntrance_01_06_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000001788904537749196300
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptWall_01_03_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000001789361248183614188
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Brick_01_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000001809617238565083670
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_GroundStones_01_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000001822673578055164639
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_01_12.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000001890637872423179349
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_15_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000001984775791668457945
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_GraveSculpture_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002008849688920747745
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_06_02_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002014653760617011348
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_01_13.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002036267953130089882
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Candle_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002046692135649171097
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_07_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002062853871248527513
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_WoodPlank_02_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002143341123874690239
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Stairs_01_13_R.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002152212003855821506
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_TileGround_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002171977017940134482
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptWall_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002239733334081210970
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Water_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002267129763216953445
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptColumn_01_05.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002380371278409161842
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelColumn_01_06_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002391178106814960388
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_04_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002508352475588279686
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_20_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002519216232478713176
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelColumn_01_04_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002614217285085662194
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_FallenTree_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002802435748489725507
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelArch_01_05.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002810494453037022298
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelColumn_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002812166179645714718
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_15_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002831934122828840178
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_SpiderWeb_01_04_Wall.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002837734883459991287
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_GraveSculpture_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002856217530869410094
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelColumn_01_06.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002897614365821001010
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Candle_01_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002907275435359987162
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Arch_01_04_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002917598742378094761
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptCeiling_02_03_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002935981195280695163
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Door_02_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002937749498754273072
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptWall_04_02_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002939763474978951514
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptArch_01_04.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000002988420836228273190
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Door_02_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000003117733447556507441
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Rubble_02_03.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000003155888212971769690
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_04_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000003246695695099086497
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptArch_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000003337438761874448754
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_02_08.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000003401688032424213306
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_05_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000003431548460788975587
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptCeiling_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000003554507751910285638
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Bush_01_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000003700573556097905163
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_02_07.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000003792738405194797337
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelColumnPedestal_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000003963193502424672273
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_DryGrass_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000003994255128495969007
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Candle_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000004048868567755902064
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelColumnPedestal_01_02_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000004194886983642862077
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptCeiling_01_03_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000004280545552245843383
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Rubble_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000004297721475789122926
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_GraveSculpture_02_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000004311668864243865229
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Stairs_01_02_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000004391899020954419110
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Stairs_01_08.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000004407961510116047357
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelColumn_01_03.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000004449130046246059919
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelColumn_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000004546111764573150984
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Hangers_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000004547668182636168624
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/Foliage/T_Branch_01_02_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000004548526300713490140
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_BushGroup_01_03.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000004557103703441222205
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_20_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000004584429902869596796
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Grave_01_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000004607606377553719498
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_04_04.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000004607822992027396714
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelColumn_01_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000004622700035675220725
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptCeiling_02_02_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000004629171965038440345
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptArch_01_03_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000004630349847553873842
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_WoodPlank_02_04.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000004658243270741724267
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_03_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000004802195273600587129
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_01_03.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000004865520810309221283
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_GroundStones_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000004866802137899798589
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptEntrance_01_03_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000004961803322021950555
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptWall_03_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000004982736749748661531
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Brick_01_02_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000005064183963613990457
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_04_03_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000005085784771105471511
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Brick_01_03_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000005131699704790099343
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_08_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000005134711819594224849
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_WoodPlank_01_18_bridge.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000005213828218739323250
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptEntrance_01_02_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000005304775741954878437
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Grave_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000005343845473733520565
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_18_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000005368344555376987118
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_SpiderWeb_01_06_Single_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000005452932345951441230
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_WoodPlank_01_13_bridge.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000005517790380047371137
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptWall_03_02_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000005525246266109125121
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Stairs_01_03_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000005567555779688328847
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_GraveSculpture_02_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000005576090274847335485
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelCeiling_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000005576709997345434454
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_RootsGround_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000005609352805995160167
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_FallenTree_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000005700890560910263947
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_09_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000005701047100735725814
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_01_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000005726990610228841839
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_WoodPlank_02_07.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000005794188278345096266
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Relief_02_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000005825049403873854615
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/Foliage/T_TreeTail_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000005877255002397213070
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Door_02_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000005961160313745628368
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Campfire_02_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000005962697720566023687
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Stairs_01_07.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000006004042714136234907
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelColumn_03_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000006031992888568671865
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptColumn_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000006126835551669121256
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_WoodPlank_01_15_bridge.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000006213208988692031457
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptCeiling_02_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000006234530705546178420
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_07_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000006262492499914516131
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_WoodPlank_02_03.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000006389188045719788059
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptWall_04_03_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000006390274624249204782
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_06_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000006463036745645802361
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_WoodPlank_01_10_bridge.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000006496217399025994564
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_14_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000006576359493907761887
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_16_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000006714505280714992573
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Arch_01_02_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000006765068839282509929
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_OldCeramicRoofTiles_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000006797982246237426813
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptWindow_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000006802168281753472834
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Brick_01_03_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000006910014600168468241
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Rubble_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000006929037622077114110
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelColumn_01_05_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000006960665355054471788
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_RootsGround_01_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000006985894359441833875
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Bush_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000007061531361554517234
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Arch_01_03_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000007107195679584034916
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelColumnPedestal_03_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000007184824175089488793
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_11_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000007200376315624068568
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Arch_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000007254209471938676650
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_19_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000007270935625634979007
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelColumnPedestal_01_02_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000007282586986576221327
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptEntrance_01_05_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000007307221289852826277
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_06_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000007457986383159312130
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_11_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000007502412483862158603
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptArch_01_03.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000007506069330408591031
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_OldCup_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000007568234746312778683
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Door_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000007582210480871013449
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptWall_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000007672108780867283808
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Brick_01_06_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000007687832698315809011
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_GraveSculpture_02_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000007694306408504164171
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_GroundStones_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000007758505090246614291
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptWall_02_03.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000007794215685558586235
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Torch_01_03.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000007870974701437917450
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Campfire_01_06.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000007931011341664068177
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_GroundStones_01_02_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000007931762510914622391
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Hangers_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000007952850452145059437
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_SpiderWeb_01_01_m.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000007988193076373756951
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_TileGround_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000007996438771131293062
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_SkullCow_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000008090628650251427615
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Campfire_02_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000008145307325014194506
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptColumn_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000008147346447871342138
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptArch_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000008206658141172298531
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Rubble_02_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000008229426926086384776
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptFloor_01_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000008289239186414889503
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptWall_01_07.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000008304208110815215127
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Lantern_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000008493181208969577776
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Stairs_01_14_L.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000008508190465553431086
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelColumn_03_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000008611052999244643461
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_06_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000008641745773235000663
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_PathRocky_01_04_rocks.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000008658293363516688847
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_01_05.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000008693511792051600655
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_06_03.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000008716780574636526595
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000008725430979275242483
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Arch_01_05_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000008734252545864528267
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_SpiderWeb_01_10_Single_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000008797664585290195779
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_05_01_OneSide.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000008838700924096917702
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelColumn_02_05_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000008971901694916084495
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Brick_01_06_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000008972754453638474030
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptArch_01_02_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000009025660459209782594
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Lantern_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000009089238395467109739
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_OldCeramicRoofTiles_01_18.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000009130290129391415311
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Arch_01_04_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000009131129673430898816
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelCornice_01_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000009159076721163960912
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelColumnPedestal_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000009184002550258508752
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Brick_01_06.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000009200809606577439292
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Brick_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000009219843576339468627
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_04_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000009273875000805121896
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Bench_01_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000009321307924504955533
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_10_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000009426529927987813992
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptColumn_02_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000009443290463523793616
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_01_04_OneSide.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000009457852692050978207
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Relief_02_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000009534911606016571241
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptEntrance_01_02_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000009646078957011801104
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptWall_04_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000009727560845917742107
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Stairs_01_03.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000009751260506097261815
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelColumn_02_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000009810419963830824848
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/Foliage/T_Branch_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000009847559756134683205
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptWall_03_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000009928278648512419603
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_01_01_OneSide.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000009955555900043119843
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Relief_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000009978891631843947746
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_01_11.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000010037358503269237736
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelArch_01_04.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000010093007760407993105
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelCornice_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000010104871806804695865
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Bench_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000010141811008400795442
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptCeiling_01_02_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000010235034595123979345
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelColumn_02_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000010247439180130858737
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelColumn_02_06_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000010272907350732178106
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_OldCeramicRoofTiles_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000010404439308692189281
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_19_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000010489325212874180839
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_BushGroup_01_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000010519196112215696927
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Debris_03_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000010529437450260810536
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_10_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000010556343636317858430
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_03_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000010637029695078425260
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Brick_01_02_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000010738694662824327579
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Rubble_02_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000010781444685923457222
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptWall_01_02_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000010921810283826246451
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_12_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000010957549143383151032
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptEntrance_01_03_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000010974532334591916113
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptWall_01_03_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000010977225148992192144
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Roots_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000010980189120993307252
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptArch_01_03_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000011091000346179943919
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_OldCeramicRoofTiles_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000011100346841849720121
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelColumn_01_03_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000011111702739339616504
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_WoodPlank_01_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000011121709713266486637
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_02_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000011139186788107452593
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Lantern_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000011173656433309607380
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Candle_01_03_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000011177852637893945393
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelColumn_01_07.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000011314203886584825290
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Roots_01_04.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000011348892861031068474
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_GroundStones_01_02_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000011364848102249048398
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_04_02_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000011391619704771595484
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_WoodPlank_01_02_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000011416482675157763109
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptEntrance_01_06_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000011429363746386966331
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelColumn_02_03.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000011526182286308771596
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Stairs_01_15.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000011540064410302881808
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptArch_01_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000011792925434505958175
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Debris_03_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000011801714747021003156
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelColumn_01_03_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000011853665440481738629
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelColumnPedestal_03_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000011898495729343968020
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Arch_01_06_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000011912126069068810055
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptWall_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000011922227936241371996
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Door_02_04.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000012002431051990671312
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptWall_01_04_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000012017036630116766523
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_06_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000012091425533582294319
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Torch_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000012092234835823935637
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_SpiderWeb_01_08_Single_m.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000012141043808710571819
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_WoodPlank_01_12_bridge.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000012147108506955750548
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_04_03_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000012207322551292612784
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_01_08.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000012251122223482584154
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelColumn_02_06_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000012270248397446470677
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptWall_04_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000012287175522873585788
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Stairs_01_06.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000012351732505407656739
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelColumn_01_05_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000012363958833519214967
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_02_03.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000012385830711427654554
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptCeiling_02_04.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000012414333918684334519
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptCeiling_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000012434009531849112537
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/Foliage/T_DryGrass_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000012567205306009545005
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Brick_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000012630740586547317959
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_BurntLog_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000012650351827300969098
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_16_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000012653588162426901808
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_18_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000012682110359468545657
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Candle_01_03_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000012806842668531767425
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_03_03.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000012810692771995810402
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Rubble_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000012868772333759708797
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_SpiderWeb_01_07_WallFloor.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000012980876984193447763
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_WoodPlank_01_03.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013026532951092257647
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_05_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013067312521483604660
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/Foliage/T_DryGrass_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013098544035972342241
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Brick_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013165293196853472090
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptEntrance_01_05_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013242842414241523758
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Rubble_02_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013296742191991796316
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_SpiderWeb_01_08_Single_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013337881422009317029
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelArch_01_03.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013355154952835280657
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Brick_01_04_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013356711414691772293
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptArch_01_02_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013357276415081853304
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptCeiling_01_03_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013365012375169426142
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013377611563786170187
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_BurntLog_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013388782649479994392
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_03_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013410302735826347279
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptWall_02_02_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013425125395885322126
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptWall_01_08.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013477052796081667243
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_SkullCow_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013495465665486079166
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptCeiling_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013497133779717206344
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_WoodPlank_02_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013506117920505764566
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptWall_03_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013516375569680500986
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Brick_01_04_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013615411314382638838
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_SpiderWeb_01_07_Single_m.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013638413518075486359
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_13_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013701985478562873270
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelColumn_02_02_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013741858602967037797
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Candle_01_02_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013783452576581575549
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Stairs_01_05.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013796041838933944594
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_01_06.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013880167081328366229
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/Foliage/T_Branch_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013908852013886469824
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Plane.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013961909844436521753
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_PathRocky_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013978213879204421249
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Gallows_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000013983314058492924906
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Stairs_01_04.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014050651342834368639
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptCeiling_02_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014057719889629020541
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptWall_01_02_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014094450529231744930
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelColumn_02_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014136371516237710810
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_SpiderWeb_01_02_PillarFloor.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014138500368245199924
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_17_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014167623903269805493
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_WoodPlank_01_05.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014198359803637042986
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_06_02_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014209288228927782632
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_13_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014212098512008325931
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_01_09.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014246370042201286262
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Stairs_01_02_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014378812047553538389
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelColumnPedestal_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014436360687291061407
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptColumn_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014647132371622203446
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Door_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014751742408659361104
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptCeiling_02_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014768665748424523563
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_WoodPlank_01_02_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014800164138665404158
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Rubble_02_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014814247084406075219
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptWall_01_03.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014871120288839641542
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptEntrance_01_04.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014905414667086175402
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptCeiling_02_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014912079145498962183
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_02_10.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014921177043135357650
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_BurntLog_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014923548641030740077
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptArch_01_05.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014929797427952535128
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_04_04_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014979348622308470793
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptColumn_02_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014982771165824250948
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_01_04.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000014991295575462975963
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_RatHole_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000015033950727810047111
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelColumn_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000015041054337157550756
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptEntrance_01_04_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000015057897850965460009
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_05_03.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000015179641247415195765
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptWall_02_05.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000015185189445737818147
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptEntrance_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000015227018313663476168
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelColumnPedestal_01_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000015257164042637022213
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Candle_01_03.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000015287987971912569527
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Stairs_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000015375532237852894805
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_OldCeramicRoofTiles_01_05.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000015413849125296391807
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptWall_04_02_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000015428184491294586883
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000015479544349244047628
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_WoodPlank_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000015507298897411631309
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelColumn_02_02_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000015578190132115415551
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/Foliage/T_Branch_01_02_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000015609012780481526895
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptArch_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000015716116179479712358
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_09_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000015738271118323608322
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_PathRocky_01_03_rocks.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000015781506924995075513
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Arch_01_06_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000015791556899972051738
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelColumnBase_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000015833344634743085086
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_02_04.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000015987310967457679253
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Roots_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000016000994003482432949
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptWall_01_05.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000016013700863001644149
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_01_10.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000016082091281719356701
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_03_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000016121814231694205245
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_SpiderWeb_01_03_PillarFloor.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000016161965773010322326
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptWall_04_03_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000016190027226591677858
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_GraveSculpture_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000016201789968857895092
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelWall_05_04.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000016212568780792335684
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptColumn_01_06.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000016236701131218026094
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_ChapelCeiling_01_04.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000016362950540216172218
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Stairs_01_17.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000016591583144033432054
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Door_01_04.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000016657982106262671619
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptColumn_01_03.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000016720902520890057039
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_OldCup_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000016859711241719881871
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_04_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000016868017639746901199
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Candle_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000016888757479972744740
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Arch_01_05_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000016921261642643728512
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Grave_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000016922636920451101696
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Roots_01_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000016928678630768558797
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptColumn_02_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000016948198245334039627
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptCeiling_02_03.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000016989899524369895045
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_WoodPlank_02_05.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017074025510424508411
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_SpiderWeb_01_06_Single_m.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017124505805428606646
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_06_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017192346864338189214
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Relief_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017217654199004366734
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Candle_01_02_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017245085300198508242
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_02_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017253798462008189403
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_RootsGround_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017278840227486143454
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Brick_01_04.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017283836365893563902
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptEntrance_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017371138950209222494
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_WoodPlank_02_08.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017401010980484778062
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelColumn_01_02_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017488403884363693792
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_08_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017527614438641163514
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Torch_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017539789362032704917
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_SkullCow_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017558609535617841700
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptWall_03_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017626856935909673065
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelColumn_01_06_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017658234147973138088
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptColumn_01_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017669435257078347807
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptWall_01_04_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017677200404230436298
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Debris_03_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017702427992012535582
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_SpiderWeb_01_06_WallFloor.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017723637918232637929
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Arch_01_03_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017737465196177581788
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_Stairs_01_03_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017738509412880402605
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_RootsGround_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017835244261847030346
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptWall_03_02_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017860257856498068135
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Campfire_01_05.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017863026848402062695
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Door_02_05.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017879926935876081562
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptCeiling_01_02.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017884515007428195985
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Roots_01_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017896359501376679358
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptCeiling_02_02_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017906517762380169410
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/Foliage/T_TreeTail_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000017968553581971281113
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Relief_01_03.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000018062264978135653473
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_Relief_02_01.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000018134945164410397357
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Meshes/SM_CryptCeiling_02_05.fbx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000018263670280647078551
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_TileGround_01_01_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000018285821203278217568
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptWall_02_02_n.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000018344158555214818286
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_CryptWindow_01_01_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abc00000000018409730391255829449
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/Common/Textures/T_ChapelWall_01_02_bc.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ac4b8f89197055f4f888361536843225
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_04_03.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ac93ca3fed2ae8b48888b8e2f7a15b74
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptCeiling_02_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ae04d2d2d4f099e409f2f4a79f480e4a
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Brick_01_03.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b274148a02d17b747b82ec2b94232dd6
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-12_comp_shadowmask.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b3d8d5e7c0bd96f4d8c50b9885282fde
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Foliage/DryGrass_01/M_DryGrass_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b466117d7dfeebd4e84e4da2063d3723
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Shaders/S_Base
+      BlendingWithTerrain_URP.shadergraph
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b4e1809ef2d7f54488001976318ecad6
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptWall_04_02.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b5912ecd0c10884438d767e4e692d592
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-6_comp_dir.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b73866702a337e14195aa73951bf8bf8
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelColumn_01_06.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b812d1c2c7202c34294a2d28b4e1dc5c
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptWall_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bc742248b93a489458abcd18c12d8bab
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Grave_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bfc542fa2ef8b8c4f92f22abc62a523d
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Brick_01_04.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c05f69dace7514646b752753fbde1b04
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-14_comp_dir.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c2dd9e343d5a4d345a98e1d13b39893e
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Torch_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c30be8902de2c9f418b823bbbb42e8c2
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Lantern_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c4a37d4e9b9728248b6f399981c44b9c
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelArch_01_05.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c51259539d422314192ed3aa1f228bea
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-1_comp_shadowmask.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c53055799f135b24e946dd8725a09e13
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_PathRocky_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c9c001d266ab07d42a23cfedcda2999c
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Relief_02_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c9e88efcbf834c048a6b800008bd3149
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelColumn_01_05.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ca4087cb95642674cb7b166c4a403bfd
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Candle_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: caf5e9e62ae82ff4cb0e6c80f412f2b3
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-2_comp_shadowmask.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cbc81b1b701e58841a3a8500023d8587
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-1_comp_dir.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cd13773ae69a68b478cbdc87583b5d83
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_01_09.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ce80350beddb3b84fa9838f4594d38c3
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptEntrance_01_03.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ce9ede9ed0fc66c409036eeaa0ea6b4a
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_01_17.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cfd288c98feb16e419a471fbe4c84d6c
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-12_comp_light.exr
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d0cffab15b99f1248b056196492eb081
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptEntrance_01_05.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d4da11698769f9f4199e64359abf783c
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelColumn_02_05.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d570bbe40d19d4c468bfd378211ea85a
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptColumn_02_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d6fdaad044f508d4a928b19f5d145d52
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelColumn_02_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d874052cb54bd8543adec5f73fd9e103
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-2_comp_light.exr
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: da36bad312dc3fa4ba463c591e5f6f0b
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_06_02.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: da79472e5ece2f341b8c8ec1be5795d9
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptEntrance_01_02.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: db6afacbe4d32944aa4272e6fbf6ace5
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Door_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dba084b424e5638459de7771abd971e1
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-4_comp_light.exr
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dc22117ffb43e3948982446d20e5e9aa
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_01_12.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dce390ce6584cf24b8ec4f4caf1d605a
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_01_16.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dd4054881ed7c334c91901b25db5d912
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_CryptCeiling_01_02.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: df93b0a426e75d64188c833f41b81d60
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Brick_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e0127800edce179418d6c297d2aab2a0
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-11_comp_shadowmask.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e073a1165b19b2d4aa53faaf4ba7a7d9
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Shaders/S_Base_URP.shadergraph
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e0f366d348e65a64e980b8982b236f4a
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Campfire_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e66a20a460c33d04dbf600700b24fa8e
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-3_comp_dir.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e6e9a19c3678ded42a3bc431ebef7dbd
+    m_Address: Packages/com.unity.render-pipelines.universal/Shaders/Utils/FallbackError.shader
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e9c438aca7a60e54a9f08ba9d2b4132c
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-13_comp_light.exr
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ec0a4e457c03f3c4099fe03bc8bb1098
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelColumnPedestal_01_02.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ecd9c6eb2622c7b4a9257d764dc565c7
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-10_comp_light.exr
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ed11080f822e1d9468fb167015346c4f
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-14_comp_shadowmask.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ef7aab0275b79544d930e297baa37e5d
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_OldCup_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: efe7dfd423e537d438120e5b77fe800f
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_01_05.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f2446784fea50f640a594010a92133ff
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Bench_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f35ed727925760548871cde1fad5ba6a
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_TileGround_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f4bfc535d29159a499cbfabbec1588e9
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_SpiderWeb_01_05_Single.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f5abc31e45e74f04f88dd483b5cfe73b
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Candle_01_03.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f79c7b2fd3c0de44faa0bca90cb446c6
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-5_comp_dir.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f93061dc9015fa74ba7312cd5bcd5539
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelWall_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f964f65dc48992c49aa1a33ef81495e4
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_ChapelColumn_02_06.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f9d801ce4b6a1504ba8eb8f9b7eebf40
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_WoodPlank_01_01.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fa14752e3263c6a4c89414b1517feaa0
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-13_comp_shadowmask.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fac5c1032afc2b94abde263befe3103c
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-9_comp_dir.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fbaa22b9b69b47a40a3709cbc5c731da
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Demo/MedievalRuins_01_P/Lightmap-5_comp_shadowmask.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fc12ea9898dde204ead6533f418a1929
+    m_Address: Assets/UI Toolkit/_ThirdParty/InGameMap/MedievalRuins/URP/Materials/M_Rubble_02.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 47c9a54b13168f2458066709d049664a, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 1cfe5ce4d6511ef439ddaa8f0ca3414f, type: 2}
+    - {fileID: 11400000, guid: 3e707301b506cf6458cff484970dc106, type: 2}
