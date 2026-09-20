@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f5a64916b03594c4181e86701c9eedd1
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 258405
+  packageName: Medieval Fantasy Ruins - Dark Forest Environment
+  packageVersion: 1.3
+  assetPath: Assets/ScansFactory/MedievalRuins/Common/Animations/CameraAnim01.anim
+  uploadId: 790534

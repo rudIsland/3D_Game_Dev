@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 5436d3c26f81b314d82b7a96374c6726
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 258405
+  packageName: Medieval Fantasy Ruins - Dark Forest Environment
+  packageVersion: 1.3
+  assetPath: Assets/ScansFactory/MedievalRuins/BuiltIn/Materials/M_TileGround_01_01.mat
+  uploadId: 790534
