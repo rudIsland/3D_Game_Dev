@@ -1,0 +1,39 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="AddressableTools.uss" />
+    <ui:VisualElement name="toolsRoot" class="tools-root">
+        <ui:VisualElement class="body">
+            <ui:VisualElement class="sidebar">
+                <ui:Button name="addressableTab" text="Addressable" class="tab selected" />
+                <ui:Button name="playerTab" text="플레이어" class="tab" />
+            </ui:VisualElement>
+            <ui:VisualElement class="content">
+              <ui:VisualElement name="addressablePage" class="tab-page">
+                <ui:VisualElement class="subtabs">
+                    <ui:Button name="spawnTab" text="생성 · 삭제" class="tab selected" />
+                    <ui:Button name="loadedTab" text="로드 현황" class="tab" />
+                    <ui:Label name="loadState" class="status" />
+                </ui:VisualElement>
+                <ui:VisualElement name="spawnPage" class="tab-page">
+                    <ui:Label text="등록된 Addressables" class="section-title" />
+                    <ui:ListView name="catalogList" fixed-item-height="44" selection-type="Single" class="resource-list" />
+                    <ui:Label name="selectedAddress" class="selection" />
+                    <ui:VisualElement class="actions">
+                        <ui:Button name="createSelected" text="생성" class="action primary" />
+                        <ui:Button name="deleteSelected" text="삭제" class="action danger" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="loadedPage" class="tab-page hidden">
+                    <ui:Label text="현재 로드된 리소스" class="section-title" />
+                    <ui:ListView name="loadedList" fixed-item-height="44" selection-type="Single" class="resource-list" />
+                    <ui:Label text="프로젝트 로더의 요청 수와 핸들 보관 상태입니다. 이 창에서 만든 요청을 삭제할 수 있습니다." class="selection" />
+                    <ui:VisualElement class="actions">
+                        <ui:Button name="deleteLoaded" text="선택한 리소스 삭제" class="action danger" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+              </ui:VisualElement>
+              <ui:VisualElement name="playerPage" class="tab-page hidden" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Label name="resultMessage" class="message hidden" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -4,6 +4,7 @@
   "references": [
     "Game.Runtime",
     "Game.UI",
+    "Unity.Addressables.Editor",
     "Unity.ugui",
     "Unity.RenderPipelines.Core.Runtime"
   ],

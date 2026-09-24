@@ -2,12 +2,13 @@ using Characters.Player.Lifecycle;
 using Items;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 using World.Interaction;
 
 namespace EditorTools
 {
     // 씬의 상호작용 물체를 골라 Play 중인 플레이어를 그 앞으로 옮긴다.
-    public sealed class PlayerMoveWindow : EditorWindow
+    public sealed class PlayerMovePanel
     {
         private const float FrontGap = 0.35f;
         private const float GroundSearchHeight = 2f;
@@ -22,13 +23,17 @@ namespace EditorTools
             new MoveTarget("스크롤")
         };
         private PlayerController player;
-        private Vector2 scrollPosition;
+        private VisualElement view;
+        private Button playButton;
+        private Label playerLabel;
+        private Label resultLabel;
         private string moveMessage;
 
         private sealed class MoveTarget
         {
             public MonoBehaviour Object;
             public readonly GUIContent Label;
+            public Button Button;
 
             public MoveTarget(string name)
             {
@@ -36,96 +41,57 @@ namespace EditorTools
             }
         }
 
-        [MenuItem("Tools/Player/플레이어 이동")]
-        private static void OpenWindow()
+        // 공용 치트 창의 플레이어 탭에 기존 이동 기능을 연결한다.
+        public VisualElement CreateView()
         {
-            GetWindow<PlayerMoveWindow>("플레이어 이동");
-        }
-
-        private void OnEnable()
-        {
-            minSize = new Vector2(420f, 320f);
-            EditorApplication.playModeStateChanged += HandlePlayModeChanged;
-            RefreshTargets();
-        }
-
-        private void OnDisable()
-        {
-            EditorApplication.playModeStateChanged -= HandlePlayModeChanged;
-        }
-
-        private void OnFocus()
-        {
-            RefreshTargets();
-        }
-
-        private void HandlePlayModeChanged(PlayModeStateChange state)
-        {
-            if (state == PlayModeStateChange.EnteredPlayMode ||
-                state == PlayModeStateChange.EnteredEditMode)
-            {
-                RefreshTargets();
-            }
-        }
-
-        private void OnGUI()
-        {
-            bool isPlaying = EditorApplication.isPlaying;
-            bool isChangingPlayMode =
-                isPlaying != EditorApplication.isPlayingOrWillChangePlaymode;
-            using (new EditorGUI.DisabledScope(
-                EditorApplication.isCompiling || isChangingPlayMode))
-            {
-                if (GUILayout.Button(isPlaying ? "Stop" : "Play", GUILayout.Height(30f)))
-                {
-                    EditorApplication.isPlaying = !isPlaying;
-                }
-            }
-
-            EditorGUILayout.Space();
-            scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
+            view = new VisualElement();
+            view.AddToClassList("tab-page");
+            var title = new Label("플레이어 이동");
+            title.AddToClassList("section-title");
+            view.Add(title);
+            playButton = new Button(() => EditorApplication.isPlaying = !EditorApplication.isPlaying);
+            playButton.AddToClassList("player-move-button");
+            view.Add(playButton);
             foreach (MoveTarget target in targets)
             {
-                using (new EditorGUI.DisabledScope(
-                    !isPlaying || isChangingPlayMode || player == null || player.IsDead ||
-                    !player.isActiveAndEnabled || target.Object == null ||
-                    !target.Object.gameObject.activeInHierarchy))
-                {
-                    if (GUILayout.Button(target.Label, GUILayout.Height(28f)))
-                    {
-                        MovePlayer(target.Object);
-                    }
-                }
+                target.Button = new Button(() => { MovePlayer(target.Object); RefreshButtons(); });
+                target.Button.text = target.Label.text;
+                target.Button.AddToClassList("player-move-button");
+                view.Add(target.Button);
             }
-            EditorGUILayout.EndScrollView();
-
-            if (GUILayout.Button("목적지 새로고침"))
-            {
-                RefreshTargets();
-            }
-
-            using (new EditorGUI.DisabledScope(true))
-            {
-                EditorGUILayout.ObjectField("플레이어", player, typeof(PlayerController), true);
-            }
-
-            if (!isPlaying)
-            {
-                EditorGUILayout.HelpBox("위의 Play 버튼을 누르면 이동 버튼을 사용할 수 있습니다.",
-                    MessageType.Info);
-            }
-            else if (player == null || player.IsDead || !player.isActiveAndEnabled)
-            {
-                EditorGUILayout.HelpBox("이동할 수 있는 플레이어를 찾을 수 없습니다.", MessageType.Info);
-            }
-
-            if (!string.IsNullOrEmpty(moveMessage))
-            {
-                EditorGUILayout.HelpBox(moveMessage, MessageType.Info);
-            }
+            var refresh = new Button(RefreshTargets) { text = "목적지 새로고침" };
+            refresh.AddToClassList("player-move-button");
+            view.Add(refresh);
+            playerLabel = new Label();
+            playerLabel.AddToClassList("selection");
+            view.Add(playerLabel);
+            resultLabel = new Label();
+            resultLabel.AddToClassList("selection");
+            view.Add(resultLabel);
+            RefreshTargets();
+            return view;
         }
 
-        private void RefreshTargets()
+        // 이동 가능한 상태와 목적지를 버튼에 반영한다.
+        public void RefreshButtons()
+        {
+            if (view == null) return;
+            bool playing = EditorApplication.isPlaying;
+            bool changing = playing != EditorApplication.isPlayingOrWillChangePlaymode;
+            playButton.text = playing ? "Stop" : "Play";
+            playButton.SetEnabled(!EditorApplication.isCompiling && !changing);
+            bool canMove = playing && !changing && player != null && !player.IsDead && player.isActiveAndEnabled;
+            foreach (MoveTarget target in targets)
+            {
+                target.Button.SetEnabled(canMove && target.Object != null && target.Object.gameObject.activeInHierarchy);
+                target.Button.tooltip = target.Label.tooltip;
+            }
+            playerLabel.text = player == null ? "플레이어 없음" : "플레이어: " + player.name;
+            resultLabel.text = !string.IsNullOrEmpty(moveMessage) ? moveMessage :
+                !playing ? "Play 중에 이동할 수 있습니다." : !canMove ? "목적지를 새로고침해 플레이어를 확인하세요." : string.Empty;
+        }
+
+        public void RefreshTargets()
         {
             foreach (MoveTarget target in targets)
             {
@@ -178,7 +144,7 @@ namespace EditorTools
                 target.Object = candidate;
                 target.Label.tooltip = candidate.gameObject.scene.name + "/" + path;
             }
-            Repaint();
+            RefreshButtons();
         }
 
         private static int FindDestinationIndex(MonoBehaviour candidate)
@@ -316,7 +282,7 @@ namespace EditorTools
             }
 
             moveMessage = target.name + " 앞으로 이동했습니다.";
-            Repaint();
+            RefreshButtons();
             return true;
         }
 
