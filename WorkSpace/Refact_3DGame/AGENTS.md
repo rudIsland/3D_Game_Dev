@@ -6,9 +6,17 @@
 
 수정 전 설명·변경 범위·적용 절차는 [작업 규칙](Docs/Rules/work-rules.md)을 따른다.
 
-## 테스트 코드
+## AI 작업 시작
 
-새 테스트 파일·케이스 생성 금지를 포함한 검증 기준은 [작업 규칙](Docs/Rules/work-rules.md)을 따른다.
+[공통 작업 순서](Docs/Rules/work-rules.md#공통-작업-순서)에 따라 요청 범위와 실제 호출자를 확인한다. 시작·생성·반환 흐름은 [진입점 안내](Assets/_Project/01.Boot/README.md), 책임 배치는 [구조와 객체 소유 규칙](Docs/Rules/architecture.md)을 기준으로 한다. 과거 세션의 미구현 설명을 현재 코드보다 우선하지 않는다.
+
+## 기능 변경과 문서 갱신
+
+현재 구현·연결·검증·남은 작업은 각 기능 폴더의 README.md에 둔다. 기능을 변경한 단계에서 관련 설명을 즉시 수정하며 다음 작업이나 커밋까지 미루지 않는다. [기능 폴더의 현재 상태 갱신](Docs/Rules/work-rules.md#기능-폴더의-현재-상태-갱신)을 따른다.
+
+## 검증
+
+EditMode·PlayMode 테스트 코드 금지와 Cheat 창을 통한 검증 기준은 [작업 규칙](Docs/Rules/work-rules.md)을 따른다.
 
 ## Unity C#과 GC
 

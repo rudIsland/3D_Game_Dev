@@ -13,11 +13,11 @@
 | 위치 | 역할 |
 | --- | --- |
 | Assets/_Project/00.Scene | Start·Ground·UnderGround와 개발 씬 |
-| Assets/_Project/01.Boot | 실행 진입점. 현재 자동 실행 연결 없음 |
+| Assets/_Project/01.Boot | 실행 진입점. GameManager에 시작·갱신·종료 요청 |
 | Assets/_Project/02.Core | 기능별 게임 규칙에 종속되지 않는 기반과 Constant |
 | Assets/_Project/03.Settings | 공통 설정 에셋 |
-| Assets/_Project/04.Loading | MapContainer 등 리소스 로딩·반환 코드 |
-| Assets/_Project/05.Manager | 실행 관리 코드 자리. 필요가 생길 때 구현 |
+| Assets/_Project/04.Loading | MapManager 등 리소스 로딩·반환 코드 |
+| Assets/_Project/05.Manager | GameManager의 생성·반환 순서. Game.Boot.asmref로 Boot 어셈블리에 포함 |
 | Assets/_Project/10.Player | 플레이어 코드·설정·리소스 |
 | Assets/_Project/11.Enemy | 적 코드·설정·리소스, Shared는 적끼리 공유 |
 | Assets/_Project/12.Item | 아이템 |
@@ -28,12 +28,14 @@
 | Assets/_Project/18.GUI | UI 이미지·표시 리소스 |
 | Assets/_Project/19.Zone | 구역·생성 지점·맵 영역 |
 | Assets/_Project/20.Physics | 물리 관련 코드·데이터 |
-| Assets/_Project/90.Editor | 편집기 전용 도구 |
-| Assets/_Project/91.Tests | 기존 테스트. 새 테스트 생성·케이스 추가 금지 |
+| Assets/_Project/90.Editor | 편집기 전용 도구와 기능별 Cheat 창 |
 | Assets/_Project/UI | 기존 HUD·미니맵 코드와 에셋 |
 | Assets/_Project/Runtime | 기존 실행용 프리팹 |
 
 기존 UI·Runtime 위치는 실제 참조를 따라 유지한다. 이 표를 이유로 에셋 이동을 자동 수행하지 않는다. Core에 전투·퀘스트·플레이어 전용 규칙을 모으지 않는다.
+EditMode·PlayMode 테스트를 위한 `91.Tests` 폴더와 테스트 어셈블리는 만들지 않는다. 실제 동작을 조작할 기능별 Cheat 창은 `90.Editor`에 둔다.
+
+엔티티 자체의 치트 전용 코드·필드·메뉴는 대상 클래스와 같은 폴더의 `엔티티이름Cheat.cs`에 둔다. 공용 Editor 창과 구분하며 분리 방식은 [검증 규칙](work-rules.md#검증-방식)을 따른다.
 
 ## 어셈블리와 에셋 이동
 
@@ -50,7 +52,9 @@
 | 에이전트의 규칙 진입점 | 루트 AGENTS.md |
 | 공통 규칙 원문 | Docs/Rules |
 | 마지막 세션과 작업 기록 | Docs/Work/last-session.md 및 Docs/Work |
-| 기능별 역할·API·설정·확인 방법 | 해당 기능 폴더 README.md |
+| 기능별 역할·API·설정·현재 구현·검증·남은 작업 | 해당 기능 폴더 README.md |
 | 프로젝트 폴더 안내 | Assets/_Project/README.md |
 
 새 규칙은 Docs/Rules에, 새 작업 기록은 Docs/Work에 둔다. 기존 Docs의 기획·작업 문서는 별도 요청 없이 옮기지 않는다. 규칙과 세션 기록은 Assets 밖에 두므로 Unity .meta를 만들지 않는다.
+
+기능 변경 시 해당 README도 같은 단계에서 즉시 갱신한다. 문서 선택·여러 폴더에 걸친 변경·README가 없는 경우는 [작업 규칙](work-rules.md#기능-폴더의-현재-상태-갱신)을 따른다. 이 문서의 폴더 표는 책임 배치 안내이며 기능별 진행 상태는 각 README에서 관리한다.
