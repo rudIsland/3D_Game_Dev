@@ -1,5 +1,4 @@
 using System;
-using Core.ConstantValid;
 using Characters.Player.Lifecycle;
 using GameUI.Minimap;
 using UnityEditor;
@@ -13,7 +12,7 @@ namespace EditorTools
 {
     public static class MinimapSetupBuilder
     {
-        private const string ScenePath = ConstantValid.GroundScenePath;
+        private const string ScenePath = "Assets/_Project/00.Scene/Ground.unity";
         private const string MinimapFolder = "Assets/_Project/UI/Minimap";
         private const string RenderTexturePath =
             MinimapFolder + "/MinimapViewTexture.renderTexture";

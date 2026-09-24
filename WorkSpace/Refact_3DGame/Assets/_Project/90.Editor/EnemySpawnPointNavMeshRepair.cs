@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Core.ConstantValid;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -15,7 +14,7 @@ namespace EditorTools
     public static class EnemySpawnPointNavMeshRepair
     {
         private const string ScenePath =
-            ConstantValid.GroundScenePath;
+            "Assets/_Project/00.Scene/Ground.unity";
         private const float SearchStep = 0.5f;
         private const float CandidateSampleRadius = 1f;
         private const float ZoneEdgeMargin = 0.6f;

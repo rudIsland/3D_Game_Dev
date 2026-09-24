@@ -94,20 +94,21 @@ namespace EditorTools
         private void OnSceneSaving(Scene scene, string path) => RestorePreview();
         private void MarkStale() { stale = entries.Count > 0; Repaint(); }
 
+        // 열린 맵 씬에서 조명 루트를 찾아 분석 대상으로 보관한다.
         private void FindSource()
         {
             if (source != null) return;
-            string[] scenes = { ConstantValid.GroundMapName, ConstantValid.UnderGroundMapName, "Common" };
+            string[] scenes = { ConstantValid.GroundMapAddress, ConstantValid.UnderGroundMapAddress, "Common" };
             foreach (string name in scenes)
             {
                 Scene scene = SceneManager.GetSceneByName(name);
                 if (!scene.isLoaded) continue;
                 foreach (GameObject root in scene.GetRootGameObjects())
-                    if (root.name == ConstantValid.MapEnvironmentRootName) { source = root.transform; return; }
+                    if (root.name == "Setup&Lights") { source = root.transform; return; }
             }
         }
 
-        // 분석 요청 시에만 순회한다. 화면 갱신이나 런타임 Update에서 전체 메시를 찾지 않는다.
+        /// <summary>열린 맵의 배치와 조명 대상을 비교해 소속 후보를 갱신한다. 분석할 루트와 맵 씬이 열려 있어야 한다.</summary>
         public void Analyze()
         {
             RestorePreview();
@@ -123,8 +124,8 @@ namespace EditorTools
             }
             try
             {
-                List<Geometry> ground = ReadGeometry(ConstantValid.GroundMapName, ConstantValid.GroundObjectsRootName);
-                List<Geometry> underground = ReadGeometry(ConstantValid.UnderGroundMapName, ConstantValid.UnderGroundObjectsRootName);
+                List<Geometry> ground = ReadGeometry(ConstantValid.GroundMapAddress, "GroundObjects");
+                List<Geometry> underground = ReadGeometry(ConstantValid.UnderGroundMapAddress, "UndergroundObjects");
                 foreach (Light light in source.GetComponentsInChildren<Light>(true)) AddEntry(light, ground, underground);
                 foreach (Volume volume in source.GetComponentsInChildren<Volume>(true)) AddEntry(volume, ground, underground);
                 foreach (ReflectionProbe probe in source.GetComponentsInChildren<ReflectionProbe>(true)) AddEntry(probe, ground, underground);
@@ -328,7 +329,7 @@ namespace EditorTools
         {
             RestorePreview();
             selected = entry;
-            Component component = EditorUtility.InstanceIDToObject(entry.ComponentId) as Component;
+            Component component = EditorUtility.EntityIdToObject(entry.ComponentId) as Component;
             if (component == null) return;
             Selection.activeGameObject = component.gameObject;
             EditorGUIUtility.PingObject(component.gameObject);
@@ -346,7 +347,7 @@ namespace EditorTools
         private void DrawSelected()
         {
             if (selected == null) { EditorGUILayout.LabelField("목록의 이름을 누르면 해당 위치와 주변 메시를 확인할 수 있습니다."); return; }
-            Component component = EditorUtility.InstanceIDToObject(selected.ComponentId) as Component;
+            Component component = EditorUtility.EntityIdToObject(selected.ComponentId) as Component;
             if (component == null) { EditorGUILayout.HelpBox("선택한 객체가 제거됐습니다. 다시 분석하세요.", MessageType.Info); return; }
             EditorGUILayout.LabelField(selected.Path, EditorStyles.boldLabel);
             EditorGUILayout.LabelField(selected.Reason, EditorStyles.wordWrappedLabel);
@@ -376,7 +377,7 @@ namespace EditorTools
             using (new EditorGUI.DisabledScope(nearby == null))
                 if (GUILayout.Button(label))
                 {
-                    UnityEngine.Object target = EditorUtility.InstanceIDToObject(nearby.Id);
+                    UnityEngine.Object target = EditorUtility.EntityIdToObject(nearby.Id);
                     if (target != null) { Selection.activeObject = target; EditorGUIUtility.PingObject(target); FocusBounds(nearby.Bounds); }
                 }
         }
@@ -384,7 +385,7 @@ namespace EditorTools
         private void RestorePreview()
         {
             if (previewLightId == 0) return;
-            Light light = EditorUtility.InstanceIDToObject(previewLightId) as Light;
+            Light light = EditorUtility.EntityIdToObject(previewLightId) as Light;
             if (light != null) light.enabled = true;
             previewLightId = 0;
             SceneView.RepaintAll();
@@ -394,7 +395,7 @@ namespace EditorTools
         private void DrawSceneArea(SceneView view)
         {
             if (!showArea || selected == null || Event.current.type != EventType.Repaint) return;
-            Component component = EditorUtility.InstanceIDToObject(selected.ComponentId) as Component;
+            Component component = EditorUtility.EntityIdToObject(selected.ComponentId) as Component;
             if (component == null) return;
             Color previous = Handles.color;
             Handles.color = Color.yellow;

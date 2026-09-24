@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Core.ConstantValid;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -15,9 +14,9 @@ namespace EditorTools
         private const int PageSize = 80;
         private static readonly string[] ScenePaths =
         {
-            ConstantValid.StartScenePath,
-            ConstantValid.GroundScenePath,
-            ConstantValid.UnderGroundScenePath
+            "Assets/_Project/00.Scene/Start.unity",
+            "Assets/_Project/00.Scene/Ground.unity",
+            "Assets/_Project/00.Scene/UnderGround.unity"
         };
         private static readonly string[] Tabs = { "전체", "지상 전용", "지하 전용", "공용" };
         private static readonly string[] ActiveFilters = { "전체", "활성", "비활성" };
@@ -307,7 +306,7 @@ namespace EditorTools
                 {
                     string sceneName = use.SceneName + (use.SavedScene ? " (닫힘)" : "");
                     if (!sceneNames.Contains(sceneName)) sceneNames.Add(sceneName);
-                    GameObject target = use.SavedScene ? null : EditorUtility.InstanceIDToObject(use.InstanceId) as GameObject;
+                    GameObject target = use.SavedScene ? null : EditorUtility.EntityIdToObject(use.InstanceId) as GameObject;
                     if (!use.SavedScene && target == null) continue;
                     bool isActive = use.SavedScene ? use.IsActive : target.activeInHierarchy;
                     if (activeFilter == 1 && !isActive || activeFilter == 2 && isActive) continue;
@@ -343,7 +342,7 @@ namespace EditorTools
                 if (use.SavedScene) menu.AddDisabledItem(label);
                 else menu.AddItem(label, false, () =>
                 {
-                    GameObject target = EditorUtility.InstanceIDToObject(selectedUse.InstanceId) as GameObject;
+                    GameObject target = EditorUtility.EntityIdToObject(selectedUse.InstanceId) as GameObject;
                     if (target == null) return;
                     Selection.activeGameObject = target;
                     EditorGUIUtility.PingObject(target);
@@ -388,7 +387,7 @@ namespace EditorTools
                         continue;
                     }
 
-                    GameObject target = EditorUtility.InstanceIDToObject(row.InstanceId) as GameObject;
+                    GameObject target = EditorUtility.EntityIdToObject(row.InstanceId) as GameObject;
                     if (target == null)
                         row.PlacementIssue = "배치 객체가 제거됐습니다. 목록을 다시 읽어 주세요.";
                     else if (target.scene != scene)
