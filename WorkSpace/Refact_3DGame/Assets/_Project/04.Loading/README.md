@@ -33,3 +33,14 @@ await maps.CleanUpAsync();                           // 씬 해제, 씬 0개
 Start의 MapLoading 오브젝트와 기존 MapManager·MapLoader는 제거했다. Boots도 빈 컴포넌트이므로 Play만으로 맵이 로딩되지 않는다. MapContainer는 Inspector에 붙이지 않는다.
 
 Ground·UnderGround의 Addressables 등록은 유지한다. 실행 연결 후 위 순서에 따라 ResourceCount와 GetRefCount를 확인한다. 새 테스트 코드는 만들지 않으며 현재 Unity 컴파일·실행 검증은 보류한다.
+
+## 플레이어와 전투 HUD 프리팹
+
+두 프리팹은 각각 별도 Addressables 그룹에 등록되어 있다. 주소는 프리팹 이름과 같게 유지한다.
+
+| 그룹 | 주소 | 프리팹 |
+| --- | --- | --- |
+| Player | `PlayerRoot` | [PlayerRoot.prefab](../Runtime/Characters/PlayerRoot.prefab) |
+| CombatHud | `CombatHud` | [CombatHud.prefab](../18.GUI/CombatHud/CombatHud.prefab) |
+
+각 그룹은 기존 Common의 번들·콘텐츠 갱신 설정만 복사해 만들었다. `LoadAssetAsync<GameObject>(주소)`로 원본을 로드하고, 사용이 끝나면 `Release(주소)`와 `CleanUpUnusedAssets()`로 반환한다. GameManager가 비활성 부모 아래에서 생성·플레이어 초기화·HUD 연결을 마친 뒤 활성화한다. 반환 시 객체 파괴 완료를 기다린 뒤 원본 핸들을 정리한다. 실제 번들 빌드는 별도 검증이다.
