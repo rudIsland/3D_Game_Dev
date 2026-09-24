@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Development.CharacterTest
 {
     // TestScene의 적 설정과 배치 위치를 Manager의 풀 Spawn으로 연결한다.
-    public sealed class TestSceneEnemySpawner : MonoBehaviour
+    public sealed partial class TestSceneEnemySpawner : MonoBehaviour
     {
         [Header("필수 연결")]
         private EnemyContainer enemyContainer;
@@ -82,24 +82,6 @@ namespace Development.CharacterTest
             }
         }
 
-#if UNITY_EDITOR
-        [ContextMenu("Spawn Missing Enemies")]
-        private void SpawnMissingEnemiesFromInspector()
-        {
-            if (!Application.isPlaying)
-            {
-                Debug.LogWarning("Spawn Missing Enemies는 Play 중에 사용해 주세요.", this);
-                return;
-            }
-
-            for (int index = 0; index < remainingRespawnTimes.Length; index++)
-            {
-                remainingRespawnTimes[index] = 0f;
-            }
-
-            SpawnMissingEnemies();
-        }
-#endif
 
         private void SpawnMissingEnemies()
         {

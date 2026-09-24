@@ -19,7 +19,7 @@ namespace Characters.Enemies.Zombie
         typeof(CombatHitEffectPlayer))]
     [RequireComponent(typeof(NavMeshAgent))]
     // Unity 씬과 일반 C# Zombie AI를 연결한다.
-    public sealed class ZombieController :
+    public sealed partial class ZombieController :
         EnemyView,
         IUnitDeathState,
         IEnemyDamageReceiver,
@@ -34,11 +34,6 @@ namespace Characters.Enemies.Zombie
         [SerializeField] private ZombieAttackHitShape swingHitShape;
         [SerializeField] private ZombieAttackHitShape kickHitShape;
         [SerializeField] private ZombieAttackHitShape upDownHitShape;
-#if UNITY_EDITOR
-        [Header("체력 확인")]
-        [SerializeField, Min(0f)] private float testDamage = 10f;
-        [SerializeField, Min(0f)] private float testStaggerDamage = 50f;
-#endif
         private ZombieSettings settings;
 
         private CharacterController characterController; // 씬 또는 시스템 참조
@@ -162,29 +157,6 @@ namespace Characters.Enemies.Zombie
             zombieWorldUnit?.NotifyAlertAnimationEnded();
         }
 
-#if UNITY_EDITOR
-        [ContextMenu("Test Damage")]
-        private void TestDamage()
-        {
-            if (!Application.isPlaying || zombieWorldUnit == null)
-            {
-                Debug.LogWarning("Test Damage는 Play 중이고 좀비 준비가 끝난 뒤 사용할 수 있습니다.", this);
-                return;
-            }
-
-            float healthBeforeDamage = zombieWorldUnit.CurrentHealth;
-
-            var hitRequest = new EnemyHitRequest(
-                testDamage,
-                testStaggerDamage,
-                transform.position,
-                -transform.forward,
-                0.25f);
-            zombieWorldUnit.TakeHit(in hitRequest);
-
-            Debug.Log($"좀비 체력: {healthBeforeDamage} → {zombieWorldUnit.CurrentHealth}", this);
-        }
-#endif
 
         private void FindSceneReferences()
         {
@@ -276,7 +248,7 @@ namespace Characters.Enemies.Zombie
             swingHitShape?.Validate();
             kickHitShape?.Validate();
             upDownHitShape?.Validate();
-            testStaggerDamage = Mathf.Max(0f, testStaggerDamage);
+            ValidateCheatValues();
         }
 
         private void OnDrawGizmosSelected()

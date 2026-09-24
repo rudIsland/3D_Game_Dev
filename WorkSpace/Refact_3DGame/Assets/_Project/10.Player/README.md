@@ -55,3 +55,5 @@
 - 이동 애니메이션의 `MovePlaybackSpeed` 연결과 실제 이동 속도가 함께 반영되는지 확인한다.
 
 관련 문서: [공통 캐릭터](../13.Characters/README.md), [아이템](../12.Item/README.md), [월드 객체](../02.Core/WorldObjects/README.md).
+
+플레이어의 `Test Damage` 메뉴는 같은 Lifecycle 폴더의 [PlayerCheat.cs](Lifecycle/PlayerCheat.cs)에 분리했다. PlayerController의 Editor 전용 partial 선언이므로 별도 컴포넌트 부착 없이 기존 Inspector 메뉴에서 피해 처리를 호출한다.

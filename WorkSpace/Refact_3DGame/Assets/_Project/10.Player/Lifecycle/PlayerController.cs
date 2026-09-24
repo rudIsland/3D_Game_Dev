@@ -1,7 +1,6 @@
 using System;
 using Characters;
 using Characters.Combat;
-using Characters.Combat.AttackData;
 using Characters.Player.Audio;
 using Characters.Player.Camera;
 using Characters.Player.Combat.Attack;
@@ -28,7 +27,7 @@ namespace Characters.Player.Lifecycle
         typeof(PlayerAttackEffectPlayer))]
     [RequireComponent(typeof(PlayerWeaponHitShape))]
     // Unity 생명주기에서 플레이어 입력, 이동, Animator를 연결한다.
-    public sealed class PlayerController :
+    public sealed partial class PlayerController :
         MonoBehaviour,
         IPlayerDamageReceiver,
         IUnitDeathState
@@ -402,32 +401,6 @@ namespace Characters.Player.Lifecycle
             return true;
         }
 
-#if UNITY_EDITOR
-        [ContextMenu("Test Damage")]
-        private void TestDamage()
-        {
-            if (!Application.isPlaying || playerWorldUnit == null)
-            {
-                Debug.LogWarning("Test Damage는 Play 중이고 플레이어 준비가 끝난 뒤 사용할 수 있습니다.", this);
-                return;
-            }
 
-            float healthBeforeDamage = playerWorldUnit.CurrentHealth;
-            var damage = new AttackDamage(
-                10f,
-                AttackStrength.Light,
-                0f,
-                0f,
-                0f,
-                false);
-            var hitRequest = new PlayerHitRequest(
-                damage,
-                transform.position,
-                Vector3.zero);
-            TryTakeHit(in hitRequest);
-
-            Debug.Log($"플레이어 체력: {healthBeforeDamage} → {playerWorldUnit.CurrentHealth}", this);
-        }
-#endif
     }
 }

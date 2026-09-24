@@ -4,6 +4,7 @@
 
 ## 폴더 구성
 
+
 | 폴더 | 설명 |
 | --- | --- |
 | `Lifecycle` | Unity 연결용 `ZombieController`와 실행용 `ZombieWorldUnit` |
@@ -33,6 +34,9 @@
 - 화면 HUD 체력바는 사용하지 않고, 머리 위 체력바의 표시는 `UI/CombatHud/EnemyHeadHealthBar.cs`에서 처리한다.
 
 ## Unity에서 확인
+
+치트 피해·경직 수치와 `Test Damage` 메뉴는 [ZombieCheat.cs](Lifecycle/ZombieCheat.cs)에 분리했다. ZombieController의 Editor 전용 partial 선언이므로 기존 Inspector 필드·메뉴와 직렬화 필드 이름을 유지한다.
+분리 후 Unity 컴파일은 통과했으며, Inspector 값·피해 메뉴의 실제 Play 실행은 이번 분리 작업에서 재검증하지 않았다.
 
 - Controller의 Animator, Config, 공격별 HitShape 연결을 확인한다.
 - 소환 설정이 WorldObjectManager에 등록되어 있는지 확인한다.
