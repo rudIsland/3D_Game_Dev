@@ -248,6 +248,7 @@ namespace Characters.Enemies
             }
 
             registeredObjects.Add(enemy);
+            enemy.Init();
             enemy.Create();
         }
 
@@ -293,7 +294,7 @@ namespace Characters.Enemies
 
             ApplyDisable(enemy);
             registeredObjects.Remove(enemy);
-            enemy.Dispose();
+            enemy.Release();
         }
 
         // 풀에서 꺼낸 뷰의 GameObject와 RuntimeObject를 켠다.

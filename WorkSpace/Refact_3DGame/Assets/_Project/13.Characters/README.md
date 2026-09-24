@@ -16,18 +16,22 @@
 
 ## 동작 흐름
 
-`WorldObjectManager` 호출 → `WorldObject` 생명주기 → `Unit` 공통 처리 → 각 캐릭터의 전용 처리 순서로 실행한다.
+소유자의 호출 → `Core.ObjectLifecycle`의 상태 확인 → `Unit`의 체력·활성화 번호 처리 → 각 캐릭터의 전용 처리 순서다. 플레이어는 PlayerController, 적은 EnemyContainer가 호출한다.
 
-- `Create`: 전용 생성 작업을 호출한다.
+- `Init`: 생성자로 전달받은 참조·설정에 대한 초기화 단계다. 현재 Unit은 별도 초기화 콜백이 없다.
+- `Create`: OnUnitCreate로 내부 생성 작업을 실행한다.
 - `Enable`: 활성화 번호를 올리고 자원 준비 후 전용 활성화 작업을 호출한다.
 - `Tick`: 해당 유닛의 갱신 작업을 호출한다.
 - `Disable`: 전용 비활성화 작업을 호출한다.
-- `Dispose`: 전용 정리 작업과 체력 이벤트 해제를 처리한다.
+- `Release`: OnUnitRelease와 체력 이벤트 해제를 처리한다. 먼저 소유자가 Disable해야 한다.
+
+공통 단계 정의는 [Core 안내](../02.Core/README.md)를 따른다. Core가 Init·Create·Enable·Tick·Disable·Release와 상태를 제공한다. 단계 사이 자동 호출은 없으며 Unit.Dispose만 IDisposable 호환용으로 Disable → Release를 연결한다. 별도 생명주기 관리자는 없다.
 
 `EnemyUnit`은 활성화할 때 체력을 초기화한다. 기본 `Unit` 자체가 모든 캐릭터의 체력을 매번 초기화하는 것은 아니다. `ActivationSequence`는 같은 풀 객체가 다시 활성화된 경우를 구분하는 번호다.
 
 ## 먼저 읽을 코드
 
+- [ObjectLifecycle.cs](../02.Core/ObjectLifecycle.cs): 객체 하나의 생명주기 순서와 중복 호출 방어.
 - [Unit.cs](Lifecycle/Unit.cs): 공통 호출 순서와 확장 지점.
 - [EnemyUnit.cs](../11.Enemy/Shared/Lifecycle/EnemyUnit.cs): 적 재활성화 시 체력 초기화.
 - [UnitHealth.cs](Health/UnitHealth.cs): 현재 체력과 변경·사망 알림.
@@ -36,6 +40,8 @@
 
 ## 변경 후 확인
 
+여섯 단계 통일 후 Unity 컴파일을 확인했다. 이번 변경의 Play 검증과 적 풀 재사용은 미실행이다. 이전 공통화 단계의 실행 결과를 이번 변경의 검증으로 간주하지 않는다. 별도 임시 스크립트·관리자·분리 계층·생명주기 치트는 두지 않는다.
+
 공통 피해·생명주기를 바꾸면 플레이어, 좀비, NightShade에 모두 영향이 갈 수 있다. Unity에서 피해, 사망, 비활성화와 풀 재사용을 구분해서 확인한다. 특정 적의 공격 선택 규칙은 이 폴더에 넣지 않는다.
 
-관련 문서: [월드 객체](../02.Core/WorldObjects/README.md), [플레이어](../10.Player/README.md), [적](../11.Enemy/README.md).
+관련 문서: [플레이어](../10.Player/README.md), [적](../11.Enemy/README.md).

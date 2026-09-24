@@ -242,13 +242,14 @@ namespace Characters.Player.Lifecycle
                 playerInventory);
             try
             {
+                playerWorldUnit.Init();
                 playerWorldUnit.Create();
                 if (isActiveAndEnabled) Enable();
             }
             catch
             {
                 Disable();
-                playerWorldUnit.Dispose();
+                playerWorldUnit.Release();
                 playerWorldUnit = null;
                 throw;
             }
@@ -433,7 +434,7 @@ namespace Characters.Player.Lifecycle
         private void ReleasePlayerObjects()
         {
             Disable();
-            playerWorldUnit?.Dispose();
+            playerWorldUnit?.Release();
             playerWorldUnit = null;
             playerInput?.Destroy();
             playerInput = null;

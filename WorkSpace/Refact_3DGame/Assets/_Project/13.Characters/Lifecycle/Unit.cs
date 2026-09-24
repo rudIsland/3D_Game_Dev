@@ -1,5 +1,5 @@
+using Core;
 using System;
-using UnityEngine;
 
 namespace Characters
 {
@@ -11,90 +11,14 @@ namespace Characters
     }
 
     // 모든 유닛의 체력과 공통 생명주기를 관리한다.
-    public abstract class Unit : IDisposable, IUnitDeathState
+    public abstract class Unit : ObjectLifecycle, IUnitDeathState, IDisposable
     {
-        // 객체가 완전히 제거되었는지 기록한다.
-        private bool isDisposed;
-
-        // 최초 생성 작업이 끝났는지 알려준다.
-        public bool IsCreated { get; private set; }
-        // 현재 객체가 활성화되어 있는지 알려준다.
-        public bool IsEnabled { get; private set; }
-
-        // 객체를 최초 한 번만 생성하고 준비 작업을 실행한다.
-        public void Create()
-        {
-            // 이미 생성되었거나 제거된 객체는 다시 만들지 않는다.
-            if (IsCreated || isDisposed)
-            {
-                return;
-            }
-
-            IsCreated = true;
-            OnCreate();
-        }
-
-        // 생성된 객체를 사용 중인 상태로 바꾸고 활성화 작업을 실행한다.
-        public void Enable()
-        {
-            // 제거된 객체는 다시 사용할 수 없다.
-            if (isDisposed)
-            {
-                throw new ObjectDisposedException(GetType().Name);
-            }
-
-            // 생성 전에 활성화하면 호출 순서를 잘못 사용한 것이다.
-            if (!IsCreated)
-            {
-                throw new InvalidOperationException("Unit.Create()를 먼저 호출해야 합니다.");
-            }
-
-            // 이미 활성화된 객체는 중복 처리하지 않는다.
-            if (IsEnabled)
-            {
-                return;
-            }
-
-            IsEnabled = true;
-            OnEnable();
-        }
-
-        // 활성 상태인 객체의 갱신 작업을 실행한다.
-        public void Tick(float deltaTime)
-        {
-            if (!IsEnabled || isDisposed)
-            {
-                return;
-            }
-
-            OnTick(deltaTime);
-        }
-
-        // 사용 중인 객체를 비활성화하고 중복 호출은 무시한다.
-        public void Disable()
-        {
-            if (!IsEnabled)
-            {
-                return;
-            }
-
-            IsEnabled = false;
-            OnDisable();
-        }
-
-        // 객체를 비활성화한 뒤 마지막 정리 작업을 한 번만 실행한다.
+        /// <summary>IDisposable 호환용으로 비활성화 후 자원을 정리한다. 직접 종료하는 소유자는 Disable·Release를 호출한다.</summary>
         public void Dispose()
         {
-            if (isDisposed)
-            {
-                return;
-            }
-
-            Disable();
-            isDisposed = true;
-            OnDispose();
+            try { Disable(); }
+            finally { Release(); }
         }
-
 
         // 유닛의 현재 체력과 최대 체력을 관리한다.
         public UnitHealth Health { get; }
@@ -112,13 +36,13 @@ namespace Characters
         }
 
         // 최초 생성 시 유닛 전용 생성 작업을 호출한다.
-        private void OnCreate()
+        protected sealed override void OnCreate()
         {
             OnUnitCreate();
         }
 
         // 활성화 횟수를 올리고 유닛 전용 활성화 작업을 호출한다.
-        private void OnEnable()
+        protected sealed override void OnEnable()
         {
             IncreaseActivationSequence();
             OnUnitResourceEnable();
@@ -126,21 +50,21 @@ namespace Characters
         }
 
         // 매 프레임 유닛 전용 갱신 작업을 호출한다.
-        private void OnTick(float deltaTime)
+        protected sealed override void OnTick(float deltaTime)
         {
             OnUnitTick(deltaTime);
         }
 
         // 비활성화 시 유닛 전용 정리 작업을 호출한다.
-        private void OnDisable()
+        protected sealed override void OnDisable()
         {
             OnUnitDisable();
         }
 
         // 제거 시 유닛 전용 정리와 체력 이벤트 해제를 처리한다.
-        private void OnDispose()
+        protected sealed override void OnRelease()
         {
-            OnUnitDispose();
+            OnUnitRelease();
             Health.ClearListeners();
         }
 
@@ -170,7 +94,7 @@ namespace Characters
         }
 
         // 자식 유닛이 완전히 제거될 때 작업을 작성하는 지점이다.
-        protected virtual void OnUnitDispose()
+        protected virtual void OnUnitRelease()
         {
         }
 

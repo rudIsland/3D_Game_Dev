@@ -177,7 +177,7 @@ namespace Characters.Enemies.NightShade
             attackRangeDetector.Close();
         }
 
-        protected override void OnUnitDispose()
+        protected override void OnUnitRelease()
         {
             Health.Died -= HandleHealthDied;
             stateMachine.CombatStateChanged -= HandleCombatStateChanged;

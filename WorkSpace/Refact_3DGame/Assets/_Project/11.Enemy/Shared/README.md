@@ -4,7 +4,7 @@
 
 ## 폴더 구성
 
-[EnemyContainer](EnemyContainer.cs)는 지역별 적 생성·갱신·해제를 맡을 빈 틀이다. 기존 관리자와 풀은 아직 이전하지 않았다. [진입점과 이전 순서](../../01.Boot/README.md)를 참고한다.
+[EnemyContainer](EnemyContainer.cs)는 적 등록 시 Unit.Init → Create, 활성화 시 Enable, 갱신 시 Tick, 반환 시 Disable, 등록 제거 시 Release를 호출한다. 풀 재사용은 Disable → Enable이며 기존 풀·목록 관리 방식을 유지한다. [진입점](../../01.Boot/README.md)을 참고한다.
 
 | 위치 | 설명 |
 | --- | --- |

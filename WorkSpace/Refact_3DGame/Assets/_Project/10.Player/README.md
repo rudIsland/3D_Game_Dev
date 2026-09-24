@@ -26,7 +26,7 @@
 2. `PlayerController.Init(MainCamera.transform)`이 씬 인스턴스·중복 등록을 검사하고 CreatePlayerObjects를 호출한다. 내부 PlayerWorldUnit.Init → Create 후 Instance를 등록한다. 활성 객체라면 Enable까지 호출한다. GameManager는 비활성 부모 아래에서 호출해 조기 입력을 막는다. 상호작용 감지기의 Unity Start는 유지한다.
 3. HUD 연결 후 부모를 활성화하면 `OnEnable` → PlayerController.Enable → PlayerWorldUnit.Enable로 입력이 시작된다. `Boots.Update` → `GameManager.Tick` → `PlayerController.Tick` → `PlayerWorldUnit.Tick`에서 타격 정지, 상호작용, 상태머신과 스태미나 회복을 처리한다. IsPaused면 PlayerController가 갱신을 건너뛴다.
 4. 상태머신이 현재 행동에 맞는 이동·공격·방어·애니메이션 처리를 호출한다.
-5. 반환 시 Disable → HUD 구독 해제 → PlayerController.Release → PlayerWorldUnit.Dispose가 자원을 정리하고 Instance 등록도 지운다. Release는 비활성화를 자동 호출하지 않으므로 PlayerController가 먼저 Disable한다. GameManager가 Unity 객체 파괴 완료 후 원본 요청을 반환한다. 초기화 실패도 같은 정리 경로를 사용하며 해제한 객체는 재초기화하지 않는다.
+5. 반환 시 Disable → HUD 구독 해제 → PlayerController.Release → PlayerWorldUnit.Release가 자원을 정리하고 Instance 등록도 지운다. Release는 비활성화를 자동 호출하지 않으므로 PlayerController가 먼저 Disable한다. GameManager가 Unity 객체 파괴 완료 후 원본 요청을 반환한다. 초기화 실패도 같은 정리 경로를 사용하며 해제한 객체는 재초기화하지 않는다.
 
 ## 단일 플레이어와 원본 수명
 
@@ -34,6 +34,7 @@
 - 다른 플레이어가 등록되어 있으면 초기화를 거절한다. 같은 객체·카메라의 중복 Init은 재생성이나 재구독 없이 종료한다. 실패한 객체의 Release는 다른 플레이어의 등록에 영향을 주지 않는다.
 - Disable은 입력과 행동만 멈추며 Instance·체력·인벤토리·강화 기록을 유지한다. Release는 최종 해제이며 자신의 등록을 지운다. OnDestroy도 Release를 호출한다. 별도 Play 초기화 콜백 없이 매 실행 새 객체를 생성·등록한다.
 - 원본 프리팹과 편집 상태의 객체는 등록하지 않는다. Init은 카메라 필드를 바꾸기 전에 이 조건부터 확인한다.
+- Unit의 Init·Create·Enable·Tick·Disable·Release 호출은 Core.ObjectLifecycle의 공통 상태 검사로 연결된다. PlayerWorldUnit·입력·상태머신·상호작용의 내부 처리 순서는 유지한다. IsReady는 상호작용 Start 완료를 뜻하지 않는다.
 - 싱글톤 참조는 Addressables 핸들이 아니다. 원본 요청과 파괴 완료 대기는 GameManager·AddressableManager의 기존 계약을 따른다.
 
 ## 이동 입력이 화면에 반영되는 순서

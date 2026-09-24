@@ -147,7 +147,7 @@ namespace Characters.Enemies.Zombie
             attackRangeDetector.Close();
         }
 
-        protected override void OnUnitDispose()
+        protected override void OnUnitRelease()
         {
             Health.Died -= HandleHealthDied;
             stateMachine.CombatStateChanged -=

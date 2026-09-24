@@ -4,6 +4,8 @@
 
 ## 폴더 구성
 
+생명주기는 Core의 Init·Create·Enable·Tick·Disable·Release를 따른다. NightShadeSwordWorldUnit의 생성 작업은 OnUnitCreate, 구독 정리는 OnUnitRelease에 있다. 호출 순서는 [EnemyContainer](../Shared/README.md)가 담당한다.
+
 | 폴더 | 설명 |
 | --- | --- |
 | `Lifecycle` | Controller 참조 연결, 런타임 유닛 생성과 전투 초기화 |

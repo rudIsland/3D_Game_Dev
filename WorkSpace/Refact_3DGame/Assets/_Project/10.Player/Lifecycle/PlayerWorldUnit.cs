@@ -243,7 +243,7 @@ namespace Characters.Player.Lifecycle
             playerInput.Disable();
         }
 
-        protected override void OnUnitDispose()
+        protected override void OnUnitRelease()
         {
             Health.Died -= HandleHealthDied;
             playerInput.Destroy();
