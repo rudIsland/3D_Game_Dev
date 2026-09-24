@@ -1,3 +1,4 @@
+using Core;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,8 +7,22 @@ using UnityEngine.SceneManagement;
 namespace Characters.Enemies
 {
     // 한 씬의 적과 적 풀만 소유한다. 갱신과 해제는 Boots가 호출한다.
-    public sealed class EnemyContainer : IDisposable
+    public sealed class EnemyContainer : Singleton<EnemyContainer>, IDisposable
     {
+        /// <summary>소속 씬으로 단일 컨테이너를 준비한다. 같은 씬은 재사용하며, 다른 씬은 Dispose 후 지정한다.</summary>
+        public static EnemyContainer Create(Scene scene)
+        {
+            if (!scene.IsValid() || !scene.isLoaded)
+                throw new ArgumentException("로드된 적 소속 씬이 필요합니다.", nameof(scene));
+            if (CurrentInstance != null && CurrentInstance.scene != scene)
+                throw new InvalidOperationException("기존 EnemyContainer를 Dispose한 뒤 소속 씬을 바꾸세요.");
+            return CurrentInstance ?? StoreInstance(new EnemyContainer(scene));
+        }
+
+        // Domain Reload를 꺼도 이전 Play의 적 목록과 풀에 접근하지 않는다.
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetForPlay() { ResetInstance(); }
+
         private readonly Scene scene;
         private readonly List<Unit> registeredObjects = new List<Unit>(64);
         private readonly HashSet<Unit> registeredSet = new HashSet<Unit>();
@@ -24,7 +39,8 @@ namespace Characters.Enemies
         public int ActiveCount => activeObjects.Count;
         public int RegisteredCount => registeredObjects.Count;
         public int PoolCount => pools.Count;
-        public EnemyContainer(Scene scene) { this.scene = scene; }
+        // Create에서 전달한 씬에 적 풀을 배치한다.
+        private EnemyContainer(Scene scene) { this.scene = scene; }
 
         public void RegisterPool(EnemySpawnSettings settings, bool warmUp = false)
         {
@@ -36,7 +52,14 @@ namespace Characters.Enemies
             try { pools.Add(settings, new EnemyPool(this, settings, parent, warmUp)); }
             catch { UnityEngine.Object.Destroy(parent.gameObject); throw; }
         }
-        public void Dispose() { Shutdown(); EnemyEnabled = null; EnemyDisabled = null; }
+        /// <summary>적과 풀·구독을 정리하고 단일 인스턴스를 해제한다. 다음 사용 전에 Create를 호출한다.</summary>
+        public void Dispose()
+        {
+            Shutdown();
+            EnemyEnabled = null;
+            EnemyDisabled = null;
+            ClearInstance();
+        }
         // Tick 중 발생한 변경 요청의 종류다.
         private enum PendingActionType
         {
