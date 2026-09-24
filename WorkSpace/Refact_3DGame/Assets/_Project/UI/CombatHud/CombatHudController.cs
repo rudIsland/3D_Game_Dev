@@ -18,17 +18,25 @@ namespace GameUI.CombatHud
         private readonly List<EnemyContainer> enemyContainers = new List<EnemyContainer>();
         private bool connected;
 
+        /// <summary>플레이어 이벤트 구독과 필수 HUD 요소 준비가 완료되었는지 반환한다.</summary>
+        public bool IsReady => connected && toolkitView != null && toolkitView.IsReady;
+
+        /// <summary>전달받은 플레이어와 그 상호작용 컴포넌트를 표시 대상으로 연결한다.</summary>
         public void Connect(PlayerController player)
         {
             if (ReferenceEquals(playerController, player)) return;
             OnDisable();
             playerController = player;
+            playerInteractionController = player != null
+                ? player.GetComponent<PlayerInteractionController>() : null;
             if (isActiveAndEnabled) OnEnable();
         }
+        /// <summary>플레이어·적 이벤트 구독과 표시 대상 참조를 해제한다.</summary>
         public void Disconnect()
         {
             OnDisable();
             playerController = null;
+            playerInteractionController = null;
             enemyContainers.Clear();
         }
         public void WatchEnemies(EnemyContainer enemies)
@@ -54,8 +62,6 @@ namespace GameUI.CombatHud
         [Header("UI Toolkit")]
         [SerializeField] private CombatHudToolkitView toolkitView;
 
-        [Header("Interaction UI")]
-        [SerializeField]
         private PlayerInteractionController playerInteractionController;
 
         private readonly Dictionary<UnitHealth, Unit> trackedUnits = // 씬 또는 시스템 참조
@@ -77,12 +83,6 @@ namespace GameUI.CombatHud
                     this);
                 enabled = false;
                 return;
-            }
-
-            if (playerInteractionController == null)
-            {
-                playerInteractionController =
-                    FindFirstObjectByType<PlayerInteractionController>();
             }
 
             HideAllHud();

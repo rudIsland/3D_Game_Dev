@@ -1504,6 +1504,7 @@ GameObject:
   - component: {fileID: 5495058732513574150}
   - component: {fileID: 7680108299689711903}
   - component: {fileID: 2293064980094560054}
+  - component: {fileID: 2706838634380604548}
   m_Layer: 6
   m_Name: PlayerRoot
   m_TagString: Untagged
@@ -1574,8 +1575,8 @@ MonoBehaviour:
   playerDamageAudio: {fileID: 3329236849620706126}
   weaponHitShape: {fileID: 2293064980094560054}
   config: {fileID: 11400000, guid: 41f02c7c3c394c945b167895923037b7, type: 2}
-  playerFreeLookCamera: {fileID: 0}
-  playerTargetLookCamera: {fileID: 0}
+  playerFreeLookCamera: {fileID: 8268856604052827231}
+  playerTargetLookCamera: {fileID: 4944390031981466489}
 --- !u!114 &5180795654792450061
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1733,6 +1734,22 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 262272
   radius: 0.08
+--- !u!114 &2706838634380604548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6381702802126765991}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcff859505350ed49869a20bcd5ac86e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Runtime::Characters.Player.Interaction.PlayerInteractionController
+  interactionRange: 1.5
+  interactableLayers:
+    serializedVersion: 2
+    m_Bits: 4194304
 --- !u!1 &6781708399048602634
 GameObject:
   m_ObjectHideFlags: 0

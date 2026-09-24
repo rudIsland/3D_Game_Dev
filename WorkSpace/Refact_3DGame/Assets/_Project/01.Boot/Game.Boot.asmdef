@@ -3,7 +3,9 @@
   "rootNamespace": "World.Boot",
   "references": [
     "Game.Runtime",
-    "Game.UI"
+    "Game.UI",
+    "Cinemachine",
+    "Unity.RenderPipelines.Universal.Runtime"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

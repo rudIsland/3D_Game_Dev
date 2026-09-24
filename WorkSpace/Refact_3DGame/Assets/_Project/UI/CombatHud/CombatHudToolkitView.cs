@@ -47,6 +47,9 @@ namespace GameUI.CombatHud
         private bool elementsCached;
         private bool missingElementLogged;
 
+        /// <summary>UIDocument의 필수 표시 요소가 연결되었는지 확인한다. 활성화 후 호출한다.</summary>
+        public bool IsReady => EnsureElements();
+
         public void HideAll()
         {
             if (!EnsureElements())

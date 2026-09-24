@@ -1,5 +1,4 @@
 using System;
-using Characters;
 using Characters.Combat;
 using Characters.Player.Audio;
 using Characters.Player.Camera;
@@ -26,16 +25,22 @@ namespace Characters.Player.Lifecycle
         typeof(CombatHitEffectPlayer),
         typeof(PlayerAttackEffectPlayer))]
     [RequireComponent(typeof(PlayerWeaponHitShape))]
-    // Unity 생명주기에서 플레이어 입력, 이동, Animator를 연결한다.
+    // Addressables로 생성한 플레이어 한 명의 등록·활성·해제 경계를 제공한다. 원본 로드·반환은 GameManager가 맡는다.
     public sealed partial class PlayerController :
         MonoBehaviour,
         IPlayerDamageReceiver,
         IUnitDeathState
     {
+        private bool released;
+
+        // 초기화한 플레이어를 제공하며, 생성 전과 해제 후에는 null이다.
+        public static PlayerController Instance { get; private set; }
+
         [Header("필수 연결")]
         private readonly PlayerInventory inventory = new PlayerInventory();
         private readonly PlayerStatUpgradeSession upgrades = new PlayerStatUpgradeSession();
         public PlayerWorldUnit RuntimeUnit => playerWorldUnit;
+        /// <summary>플레이어의 갱신만 중지하며 비활성화나 데이터 초기화를 수행하지 않는다.</summary>
         public bool IsPaused { get; set; }
         public event Action<Unit> PlayerEnabled;
         public event Action<Unit> PlayerDisabled;
@@ -69,7 +74,38 @@ namespace Characters.Player.Lifecycle
             ? targetConfig.ObstructionLayers
             : default;
 
+        /// <summary>카메라를 전달받아 내부 Unit을 초기화한다. GameManager는 비활성 부모 아래에서 호출한다.</summary>
+        public void Init(Transform moveCamera)
+        {
+            CheckPlayerObject();
+            if (moveCamera == null) throw new ArgumentNullException(nameof(moveCamera));
+            if (IsReady && this.moveCamera != moveCamera)
+                throw new InvalidOperationException("준비된 플레이어의 이동 카메라는 바꿀 수 없습니다.");
+            this.moveCamera = moveCamera;
+            Create();
+            if (!IsReady) throw new InvalidOperationException("PlayerRoot 초기화에 실패했습니다. 필수 연결을 확인하세요.");
+        }
+
+        /// <summary>씬에 생성된 플레이어만 기존 초기화를 실행하고 성공 후 등록한다. 원본 프리팹·중복 객체는 거절한다.</summary>
         public void Create()
+        {
+            CheckPlayerObject();
+            CreatePlayerObjects();
+            if (IsReady) Instance = this;
+        }
+
+        // 원본 프리팹을 변경하거나 다른 플레이어를 초기화하기 전에 객체 수명과 단일 등록을 검사한다.
+        private void CheckPlayerObject()
+        {
+            if (released) throw new ObjectDisposedException(nameof(PlayerController));
+            if (!Application.isPlaying || !gameObject.scene.IsValid() || !gameObject.scene.isLoaded)
+                throw new InvalidOperationException("Play 중 씬에 생성한 PlayerRoot만 초기화할 수 있습니다. 원본 프리팹은 등록하지 않습니다.");
+            if (Instance != null && Instance != this)
+                throw new InvalidOperationException("이미 준비된 플레이어가 있습니다. 기존 플레이어를 반환한 뒤 생성하세요.");
+        }
+
+        // 기존 내부 생성 순서를 유지한다. 단일 객체 등록과 Addressables 처리는 이 안에 넣지 않는다.
+        private void CreatePlayerObjects()
         {
             if (playerWorldUnit != null) return;
             if (moveCamera == null ||
@@ -128,6 +164,14 @@ namespace Characters.Player.Lifecycle
             if (guardHitBox == null)
             {
                 Debug.LogError("PlayerController에 방패의 PlayerGuardHitBox 연결이 필요합니다.", this);
+            }
+
+            if (characterController == null || playerAnimator == null ||
+                playerDamageAudio == null || guardHitBox == null || interactionController == null)
+            {
+                Debug.LogError("PlayerController의 이동·애니메이션·소리·방패·상호작용 연결을 확인하세요.", this);
+                enabled = false;
+                return;
             }
 
             if (weaponHitShape == null || !weaponHitShape.IsReady)
@@ -272,6 +316,7 @@ namespace Characters.Player.Lifecycle
             if (IsReady) Enable();
         }
 
+        /// <summary>준비된 활성 플레이어의 입력·행동을 시작한다. 중복 호출은 무시한다.</summary>
         public void Enable()
         {
             if (!isActiveAndEnabled || playerWorldUnit == null || playerWorldUnit.IsEnabled) return;
@@ -281,12 +326,13 @@ namespace Characters.Player.Lifecycle
             PlayerEnabled?.Invoke(playerWorldUnit);
         }
 
-        // 호출자가 갱신 순서를 정한다. Boots의 자동 호출은 아직 연결하지 않는다.
+
+        /// <summary>GameManager가 전달한 프레임 시간으로 준비된 플레이어를 갱신한다. 일시정지 중에는 건너뛴다.</summary>
         public void Tick(float deltaTime)
         {
-            if (!IsPaused && deltaTime > 0f) playerWorldUnit?.Tick(deltaTime);
+            if (IsPaused || !isActiveAndEnabled) return;
+            playerWorldUnit?.Tick(deltaTime);
         }
-
 
         public PlayerHitResult TryTakeHit(in PlayerHitRequest hitRequest)
         {
@@ -365,9 +411,32 @@ namespace Characters.Player.Lifecycle
 
         private void OnDestroy()
         {
+            Release();
+        }
+
+        /// <summary>입력·구독·단일 객체 등록을 해제한다. 비활성 생성 실패에도 호출하며 해제한 객체는 재초기화하지 않는다.</summary>
+        public void Release()
+        {
+            if (released) return;
+            released = true;
+            try
+            {
+                ReleasePlayerObjects();
+            }
+            finally
+            {
+                if (Instance == this) Instance = null;
+            }
+        }
+
+        // 기존 내부 해제 순서를 유지한다. 객체 파괴와 원본 요청 반환은 생성한 GameManager가 처리한다.
+        private void ReleasePlayerObjects()
+        {
             Disable();
             playerWorldUnit?.Dispose();
             playerWorldUnit = null;
+            playerInput?.Destroy();
+            playerInput = null;
             PlayerEnabled = null;
             PlayerDisabled = null;
         }
@@ -400,7 +469,6 @@ namespace Characters.Player.Lifecycle
             interactionController?.RefreshCurrentTarget();
             return true;
         }
-
 
     }
 }

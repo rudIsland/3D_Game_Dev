@@ -4,14 +4,17 @@
 
 ## 씬 실행 코드
 
-- [MapContainer.cs](../04.Loading/MapContainer.cs): Address 입력 → 씬 로딩·캐시 → refCount가 0인 씬 정리. 실행 연결은 아직 없다.
+- [MapManager.cs](../04.Loading/MapManager.cs): GameManager의 Ground Address 입력 → AddressableManager에 씬 추가 로딩·캐시 요청 → refCount가 0인 씬 정리.
+- [MapScene.cs](MapScene.cs): Inspector의 StartArrival·환경음 참조 → 필수 연결 확인 → 게임 준비 후 환경음 재생·반환 전 정지.
 - [UndergroundLightmaps.cs](Underground/UndergroundLightmaps.cs): 저장된 텍스처·Renderer 참조 → 라이트맵 슬롯 연결 → 지하 조명 복원.
 
-씬 폴더와 Underground 폴더는 각각 `Game.Runtime.asmref`로 기존 실행 어셈블리에 연결한다. 객체 생성·갱신·회수 기반은 `02.Core/WorldObjects`에서 담당한다.
+씬 폴더와 Underground 폴더는 각각 `Game.Runtime.asmref`로 기존 실행 어셈블리에 연결한다. 캐릭터 생명주기는 `13.Characters/Lifecycle/Unit.cs`, 게임 생성·반환 순서는 `05.Manager/GameManager.cs`에서 담당한다.
+
+Start 단독 Play에서 Ground 활성 씬 지정, Start 소속 플레이어·HUD 생성, 낮 환경 화면, 환경음 재생 상태, 활성 Camera·AudioListener 각각 1개와 Missing Script 0을 확인했다. 실제 스피커 청음과 번들 빌드는 미검증이다. 전체 생성·반환 검증은 [진입점 안내](../01.Boot/README.md#확인과-남은-작업)에 기록한다.
 
 | 구분 | 참조를 소유하는 씬 | 주요 대상 | 로딩 시점 |
 | --- | --- | --- | --- |
-| 공통 상주 | Start.unity | 플레이어, 카메라, HUD, 관리자와 퀘스트 | 게임 시작 |
+| 시작 진입점 | Start.unity | Boot·MainCamera, 실행 중 GameObjects 아래의 PlayerRoot·CombatHud | 게임 시작 |
 | 지상 전용 | Ground.unity | 지상 건물·나무·지형·충돌, Setup&Lights, Zone·Road, 좀비 생성 설정, 지상 아이템 배치 | 지상 진입 |
 | 지하 전용 | UnderGround.unity | 지하 건물·지형·충돌, Setup&Lights, 층별 지도, NightShade 프리팹 배치 | 지하 로딩 요청 |
 | 맵 공용 | Ground와 UnderGround | 양쪽에서 사용하는 같은 원본 모델·머티리얼·텍스처·Bake 텍스처 | 사용하는 지역 진입 |
@@ -32,18 +35,25 @@ Hierarchy 오브젝트를 우클릭한 뒤 `리소스 소속 찾기`를 선택�
 
 이 도구는 에디터에서 에셋 경로를 읽는다. 실행용 카탈로그, 프리팹 복제본, 에셋 라벨을 만들지 않는다. 목록은 씬 의존 관계이며 메모리 측정 결과는 아니다. 코드·패키지 및 문자열로 별도 로딩하는 리소스는 별도로 확인한다.
 
+## 개발 씬 치트
+
+CharacterTest의 `Spawn Missing Enemies` 메뉴는 [EnemySpawnerCheat.cs](Dev/CharacterTest/Scripts/EnemySpawnerCheat.cs)에 분리했다. TestSceneEnemySpawner의 Editor 전용 partial 선언에서 기존 소환 처리를 호출하며 컴포넌트를 추가하지 않는다.
+분리 후 Unity 컴파일은 통과했으며, 개발 씬의 실제 수동 소환은 이번 분리 작업에서 재검증하지 않았다.
+
 ## 배치를 추가할 때
 
 - 지상 메시·지형은 GroundObjects 아래, 지하 메시·지형은 UndergroundObjects 아래에 둔다. 메시의 충돌체와 생성 위치는 같은 씬에 둔다.
 - 각 지역 씬 루트의 `Setup&Lights`가 해당 지역 환경 묶음이다. Ground에는 원본 지상 조명·프로브·볼륨을 두고, Underground에는 기존 UndergroundLights·지하 볼륨과 PostProcessing을 둔다. 장식 프리팹 안의 조명은 해당 프리팹과 같은 씬에 유지한다.
 - 원본 지하 볼륨은 비활성 HDRP 설정으로 보존했다. 새 지하 PostProcessing은 기존에 공통으로 사용하던 URP DAY 프로필을 함께 참조한다. 지하 전용 톤을 조정할 때 별도 프로필이 필요한지 결정한다.
-- MapContainer는 씬 로딩·참조 횟수만 관리한다. 활성 씬 지정과 Setup&Lights 선택은 연결하지 않는다.
+- Ground의 비활성 HDRP Volume 4개(Global, Forest, Forest DAY (1), Chappel)는 sharedProfile 참조를 제거했다. URP DAY·NIGHT 프로필과 원본 HDRP 에셋은 유지한다. Start에서 Ground를 로딩해 Missing Script 경고가 발생하지 않음을 확인했다. UnderGround의 HDRP 참조는 이번 변경 대상이 아니다.
+- MapManager는 맵 요청을 전달하고 AddressableManager가 씬 로딩·핸들·사용 횟수를 관리한다. GameManager가 첫 Ground를 활성 씬으로 지정하며 기존 Setup&Lights·URP DAY Volume을 사용한다.
+- Ground의 MapScene에는 기존 StartArrival과 같은 오브젝트의 환경음 AudioSource를 직접 연결한다. SwampForestDayLoop를 loop=true, playOnAwake=false, 2D, volume=0.2로 재생하며 GameManager 준비 완료 후 시작한다. 시작 위치를 이름 검색하거나 고정 좌표로 대체하지 않는다.
 - Start의 MapLoading 오브젝트와 편집 도구의 교체 버튼은 제거했다. 지역 교체 순서는 추후 연결한다.
 - 좀비 설정은 Ground의 Zone에 연결한다. NightShade는 Underground에 직접 배치하고 Start From Scene을 켠다. Common의 WorldObjectManager에는 지역 적 설정을 넣지 않는다.
 - 지역 객체를 Common의 직렬화 필드에 연결하지 않는다. 컨테이너는 미니맵·퀘스트를 참조하지 않는다. 미니맵은 Unity 씬 로딩·해제 알림에서 자신의 표시 자료만 다시 읽는다.
 - 두 지역의 같은 모델·텍스처를 이름 구분 목적으로 복사하지 않는다. 맵 공용으로 관리한다. 현재 원본 Bake 텍스처도 두 지역에서 공유한다.
 
-사용법은 [04.Loading](../04.Loading/README.md)에서 확인한다. 빌드 씬 목록과 Ground·UnderGround의 Addressables 등록은 유지하지만 Start에서 자동 로딩하지 않는다.
+사용법은 [04.Loading](../04.Loading/README.md)과 [01.Boot](../01.Boot/README.md)에서 확인한다. 빌드 씬 목록과 Ground·UnderGround의 Addressables 등록은 유지한다. Start의 Boots → GameManager가 Ground·플레이어·HUD를 준비한다. MainCamera의 Camera·CinemachineBrain·AudioListener·URP 설정을 복원했고 Post Processing을 켰다. Ground의 데모 카메라는 비활성 상태를 유지한다. 미니맵·퀘스트는 다음 단계다.
 
 미니맵은 로딩된 MinimapFloor의 플레이어 높이 범위로 지도를 고른다. GroundObjects는 0m 이상, 지하 1층은 -10.5m 이상 0m 미만, 지하 2층은 -10.5m 미만이다. 두 맵을 함께 로딩해도 컨테이너가 미니맵에 전환 명령을 보내지 않는다.
 
