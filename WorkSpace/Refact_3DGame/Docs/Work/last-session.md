@@ -1,5 +1,264 @@
 # 세션 기록
 
+## 마지막 작업 (2026-09-25 15:39)
+
+- 작업 내용: 현재 프로젝트 구조와 실행 흐름에 맞춰 README를 다시 구성하고, 주요 그림을 입력·연결·실행·표시/정리 단계의 가로 열로 정렬.
+- 진행 상태: Boots·SceneLoader·MapPlayScene·StartScene의 실제 호출 관계, 데이터·플레이어·적·아이템·HUD·Editor 연결을 코드와 대조; 루트·씬·Boot·Manager·Core/Character·Data·Player·Enemy·Item·UI·Editor README의 흐름·경로를 갱신. 상대 링크·코드 울타리 검사와 `git diff --check` 완료. 문서 작업으로 Unity 실행 검증은 없음.
+- 다음 할 일: 실행 흐름이나 객체 소유가 달라지면 루트 그림과 해당 기능 그림의 구성요소 이름·연결을 함께 갱신하고 Mermaid를 저장소 미리보기에서 확인.
+- 수정한 파일: Assets/_Project 루트·Scene·Boot·Manager·Character 공통·Data·Player·Enemy 공통/종류·Item·Interaction·Quest·UI·Editor README와 meta, 세션 기록.
+
+## 마지막 작업 (2026-09-25 15:36)
+
+- 작업 내용: 치트에 지상 퀘스트 기록·완료·진행 초기화 탭을 추가하고 Data 창을 네 데이터 컨테이너 선택 → 원본·연결 데이터 → 상세 보기로 변경.
+- 진행 상태: 최종 Unity 컴파일 성공·현재 Console 오류 및 경고 0, 미실행 컨테이너별 7/8/3/3개 목록·퀘스트 준비 전 버튼 비활성화·meta·diff 확인; 편집 중 호출부 불일치는 해소했으며 Play 상태 변경·빌드는 미수행.
+- 다음 할 일: Start Play에서 퀘스트 기록·HUD 갱신과 초기화 후 실제 인벤토리/출구 판정을 확인하고 컨테이너별 실제 보관·반환 상태 표시를 확인.
+- 수정한 파일: BootsCheat, GroundQuestProgress·GroundQuestCheat와 meta, QuestCheatPanel과 meta, 치트 창·Data 창·데이터 조회·UXML·USS, Editor·Data·Boot·Scene·프로젝트 README와 세션 기록.
+
+## 이전 작업 (2026-09-25 15:24)
+
+- 작업 내용: 프로젝트 C# 220개 파일의 속성 선언·실제 참조·인터페이스 계약을 분석해 미사용·중복 속성 54개를 제거하고 5개를 readonly 필드로 바꿔 653개에서 594개로 간소화.
+- 진행 상태: 전체 컴파일러 참조 분석 오류 0·Unity 재컴파일 성공·현재 Console 오류 및 경고 0, 직렬화 설정 유지와 diff 확인; Play 조작·빌드는 미수행이며 상세 근거와 유지한 진단 속성은 [속성 정리 결과](property-cleanup.md)에 기록.
+- 다음 할 일: 기존 치트로 체력·사망·아이템과 좀비/NightShade의 방어·경직·로딩 현황을 실행 확인하며 필요한 상태 관찰은 기존 HUD·진단 계약을 사용.
+- 수정한 파일: Scene·Manager·Core·Player·Enemy·Zombie·NightShade·Item의 C# 33개, 해당 기능 README·프로젝트 안내·리소스 조회 설명·속성 정리 문서·세션 기록.
+
+## 이전 작업 (2026-09-25 15:17)
+
+- 작업 내용: GameManager·MapMoveManager를 제거하고 SceneLoader로 씬 정리·이동을 통합했으며 Constant 시작 씬 이름 전달·Task 필드 두 개·동기식 맵 정리로 간소화하고 씬/매니저/로더를 각 번호 폴더와 이름공간에 배치.
+- 진행 상태: Unity 재컴파일 성공·Console 오류 및 경고 0, 이동한 타입의 실제 어셈블리·Start의 컴포넌트 참조·GUID 유지·문서 코드 링크·diff 공백 확인; 이번 변경 후 Play 왕복·치트 반환·빌드·메모리 프로파일링은 미수행.
+- 다음 할 일: 현재 플레이어·HUD·진행 기록 유지 기준으로 맵 왕복과 개별·전체 반환을 실행 확인하며 출구 트리거는 미연결 상태 유지.
+- 수정한 파일: SceneLoader·Cheat, GameScene·StartScene·MapPlayScene, Boots·Cheat, MapManager·AddressableManager와 asmref/meta 이동, MapConstant·치트 using·씬 타입 표기, 관련 README·구조/폴더 규칙·세션 기록.
+
+## 이전 작업 (2026-09-25 15:03)
+
+- 작업 내용: 프로젝트 README 그림을 Figma에서 이어 그리기 쉽도록 공유 구성요소 이름과 좌→우 단계 방향을 맞추고 루트·세부 흐름 연결을 갱신.
+- 진행 상태: StartScene 유지 객체, GameManager 씬 전환, MapPlayScene 맵 기능 소유 관계를 현재 코드와 대조; 21개 Mermaid 그림의 코드 울타리·방향·반복 노드와 diff 공백 확인. 문서만 변경했으며 Unity 실행 검증은 해당 없음.
+- 다음 할 일: 호출이나 소유 관계가 달라지면 루트 그림과 관련 기능 README에서 같은 구성요소 이름·연결을 함께 갱신.
+- 수정한 파일: Assets/_Project README의 흐름도와 연결 설명, Docs/Work/last-session.md.
+
+## 마지막 작업 (2026-09-25 15:05)
+
+- 작업 내용: 치트 창에 플레이어 체력 감소·피격·즉사와 현재 맵 아이템 지급·획득·수량 소모·사용처 실행을 추가하고 Tools/Data에 등록 데이터·연결 설정·실제 보관 상태 조회 창을 추가.
+- 진행 상태: Unity 컴파일·치트 패널 구성·Data 미실행 21개 행과 상세 연결 확인, 최종 Console 현재 오류·경고 0; 새 치트 실행·Data 상태 전환의 Play 확인과 빌드는 미수행이며 앞선 도구 시간 초과·그림자 경고는 Editor README에 구분.
+- 다음 할 일: Start Play에서 체력·HUD·사망과 아이템의 가방/월드/교환 효과를 버튼별로 확인하고 Data 사용 상태가 준비·반환·재시작에 따라 갱신되는지 확인.
+- 수정한 파일: 90.Editor 치트·Data 창과 스타일·문서·meta, PlayerCheat, BootsCheat·GameManagerCheat, Item·Interaction·EnemyData의 Editor 전용 partial 조회, 관련 기능 README·프로젝트 안내·세션 기록.
+
+## 이전 작업 (2026-09-25 15:00)
+
+- 작업 내용: GameManager에 씬 정리·리소스 반환·이동 순서를 두고 StartScene의 유지 객체와 GameScene·MapPlayScene의 맵 실행을 분리하여 Start·Ground·UnderGround에 연결.
+- 진행 상태: Unity 재컴파일 성공·최종 Console 오류 및 경고 0, 씬 직렬화 연결과 호출부 확인; 도구 시간 초과·편집 중 그림자 경고는 Manager·Scene README에 기록했으며 이번 변경 후 Play·빌드·메모리 프로파일링은 미수행.
+- 다음 할 일: 당장은 플레이어·HUD·진행 기록을 유지하며 Ground↔UnderGround 왕복, 이전 맵 풀·구독·요청 반환을 확인하고 출구 트리거·씬별 유지 정책은 별도 요청에서 연결.
+- 수정한 파일: GameManager·MapMoveManager·Boots와 Cheat, GameScene·StartScene·MapPlayScene과 meta, PlayerSpawnManager·MapScene·QuestContainer, 세 씬, 관련 기능 README·구조·폴더 규칙·세션 기록.
+
+## 이전 작업 (2026-09-25 14:33)
+
+- 작업 내용: 적 HUD의 EnemyContainer 직접 참조를 Core.IEnemyHudSource로 교체하고 IEnemyCombatStatus를 GUID 유지해 Core로 이동; 플레이어·적 HUD Play 확인.
+- 진행 상태: 컴파일·Console 오류 및 경고 0, 표시 값·아이템/안내·재활성화·적 소환/반환·HUD/플레이어/전체 반환 완료 확인; 빌드·모든 입력 조합은 미수행이며 상세 범위와 도구 실패 이력은 UI README에 기록.
+- 다음 할 일: 실제 공격·구르기 입력과 보스 전투의 전체 흐름을 확인하고 남은 표시 연결은 필요에 따라 별도 범위로 진행.
+- 수정한 파일: IEnemyHudSource·meta, 이동한 IEnemyCombatStatus·meta, EnemyContainer·HudContainer·CombatHudController, Core/Character·Enemy/Shared·Player·UI README, 구조 규칙·세션 기록.
+
+## 이전 작업 (2026-09-25 14:26)
+
+- 작업 내용: GameManager 초기화를 생성자로 합치고 반환 대기·대상별 정리를 두 함수로 통합하여 본체 메서드를 18개에서 12개로 정리.
+- 진행 상태: Unity 재컴파일 성공, 중복 Task·시작 실패·개별 반환 호출 경로와 diff 확인; 이번 변경 후 Play·빌드는 미수행.
+- 다음 할 일: Start 준비·HUD/플레이어/전체 반환·로딩 중 반환·중복 요청·Boot 종료를 현재 코드에서 확인.
+- 수정한 파일: GameManager.cs, Manager·Boot README, 세션 기록.
+
+## 이전 작업 (2026-09-25 14:16)
+
+- 작업 내용: Core의 IPlayerHudSource와 PlayerController partial 구현으로 HUD 표시 값·알림을 분리하고 HUD 생성·연결·그리기의 플레이어 구체 타입 참조 제거.
+- 진행 상태: Unity 컴파일 성공과 최종 up_to_date·compilationFailed=false, UI의 플레이어 구현 참조 없음·새 meta 확인; Play·빌드는 미수행이며 도구 통신 실패·기존 Console 기록은 컴파일 결과와 구분.
+- 다음 할 일: Start에서 체력·스태미나·아이템·안내 표시, 플레이어와 HUD의 비활성화·재활성화·반환 시 구독 해제를 확인.
+- 수정한 파일: IPlayerHudSource·PlayerHudSource와 meta, PlayerController 반환 경로, HudContainer·CombatHudController·CombatHudToolkitView·HudSpawnManager, 관련 README·구조 규칙·세션 기록.
+
+## 이전 작업 (2026-09-25 14:11)
+
+- 작업 내용: PlayerSpawnManager·HudSpawnManager로 원본 요청·생성·연결·반환을 분리하고 GameManager에는 실행 순서·기능 간 연결과 기존 반환 진입점을 유지.
+- 진행 상태: Unity 재컴파일 성공·Console 오류 및 경고 0, 호출부·반환 경로와 diff 확인; 이번 분리 후 Play·빌드는 미수행.
+- 다음 할 일: Start 준비와 HUD·플레이어·맵 치트 반환·Boot 종료를 새 생성 담당 구조에서 확인한 뒤 맵 이동을 별도 연결.
+- 수정한 파일: GameManager·GameManagerCheat, PlayerSpawnManager·HudSpawnManager와 각 Cheat·meta, Manager·Boot·UI·Data·프로젝트 README, 구조·폴더 규칙과 세션 기록.
+
+## 이전 작업 (2026-09-25 13:55)
+
+- 작업 내용: 프로젝트 README의 시작 호출 그림을 고정 3열×2행 Mermaid 그리드로 바꿔 단계 상자를 열에 맞춰 정렬.
+- 진행 상태: 번호 1→2→3 다음 줄 4→5→6의 지그재그 순서를 표시하고 호출 내용은 유지. Markdown 코드 블록·diff 공백 확인; 문서만 수정했으며 Unity 실행 검증은 해당 없음.
+- 다음 할 일: Mermaid 미리보기에서 3열 배치가 지원되지 않는 렌더러에서는 README 미리보기에서 표 형태 대체가 필요한지 확인.
+- 수정한 파일: Assets/_Project/README.md, Docs/Work/last-session.md.
+
+## 마지막 작업 (2026-09-25 13:54)
+
+- 작업 내용: 프로젝트 README의 세로 시작 흐름도를 두 줄·6단계로 묶어 호출 순서를 빠르게 훑도록 정리.
+- 진행 상태: Start·Boot·Ground 준비와 플레이어/HUD·적·준비 완료를 두 묶음으로 표시하고 실제 순서는 유지. Mermaid 블록·diff 공백 확인; 문서만 수정해 Unity 실행 검증은 해당 없음.
+- 다음 할 일: 호출 순서가 바뀌면 프로젝트 안내 README의 두 흐름 묶음과 기능 README를 실제 코드와 대조.
+- 수정한 파일: Assets/_Project/README.md, Docs/Work/last-session.md.
+
+## 마지막 작업 (2026-09-25 13:48)
+
+- 작업 내용: Start Play에서 종류별 데이터 전달·이동·피격·아이템 교환·퀘스트 HUD와 치트 반환·Boot 데이터 해제·재시작을 확인.
+- 진행 상태: 마지막 재시작 준비 완료·컴파일 정상·Console 오류 및 경고 0이며 초기 열린 씬 참조 불일치와 조회 도구 시간 초과는 별도 기록; 메모리 프로파일링·빌드는 미수행.
+- 다음 할 일: 맵 이동 연결은 별도 작업으로 진행하며 Ground 출구·지하 미니맵·실제 상호작용 입력 등 미확인 범위는 기능 README를 기준으로 확인.
+- 수정한 파일: Data·Boot·Player·Enemy/Shared·Item·UI README와 세션 기록만 갱신; 코드·씬·프리팹·설정 에셋 변경 없음.
+
+## 이전 작업 (2026-09-25 13:27)
+
+- 작업 내용: 통합 GameDataContainer를 제거하고 Player·Enemy·Item·QuestDataContainer로 보관·조회를 분리하며 Boots의 생성·반환과 게임·맵 호출부를 변경.
+- 진행 상태: Unity 컴파일 성공·새 타입 4개 로딩·기존 타입 제거와 diff 공백 확인; 기존 Pipeline 오류 기록과 새로고침 도구 네트워크 오류는 컴파일 결과와 구분하며 Play·빌드는 미수행.
+- 다음 할 일: Start 실행에서 종류별 설정 전달과 게임 종료 후 데이터 컨테이너 등록 해제를 확인.
+- 수정한 파일: 06.Data의 컨테이너·meta·README, Boots·GameManager·GameManagerCheat·MapMoveManager·MapEnemySpawner, 관련 기능 README·구조·폴더 규칙.
+
+## 이전 작업 (2026-09-25 13:21)
+
+- 작업 내용: Boots의 ScriptableObject 목록 → 전역 GameDataContainer → 게임 흐름 → 엔티티 설정 전달로 변경하고 기능 간 직접 참조를 공통 계약과 Scene 연결 코드로 정리.
+- 진행 상태: Unity 컴파일·현재 Console 오류 및 경고 0, 설정 에셋 타입·참조와 Start·Ground 연결을 확인; Play·빌드는 미수행이며 출구 영역은 기존 미지정 상태 유지.
+- 다음 할 일: Start에서 데이터 수치 반영·적 소환·아이템 획득·교환·퀘스트 표시와 치트 반환을 확인하며 요청하지 않은 저장·예외 보완·추가 기능은 구현하지 않음.
+- 수정한 파일: 06.Data와 Quest 설정, Boots·GameManager·MapMoveManager·Scene 연결부, Player·Enemy·Item·Interaction·Effects 공통 계약과 호출부, 관련 씬·설정 에셋·README·공통 규칙.
+
+## 이전 작업 (2026-09-25 12:49)
+
+- 작업 내용: 기존 전투 HUD에 미니맵 카메라·플레이어 표시·현재 위치를 연결하고 HudContainer를 통한 플레이어 전달·구독·실행용 텍스처 정리를 추가.
+- 진행 상태: Unity 프리팹 저장·직렬화 연결과 compilationFailed=false 확인; 재컴파일 도구의 상태 파일 충돌·응답 시간 초과는 UI README에 기록했으며 Play·빌드는 미수행.
+- 다음 할 일: Start Play에서 HUD·지도·화살표·위치 표시와 치트 HUD 삭제 후 카메라·텍스처 정리, 지하 층 선택 확인.
+- 수정한 파일: GameManager·HudContainer·MinimapCameraController·MinimapInfoController, CombatHud 프리팹, UI README·meta와 관련 기능 안내·세션 기록.
+
+## 이전 작업 (2026-09-25 12:47)
+
+- 작업 내용: PlayerWorldUnit 구현을 PlayerUnit으로 합쳐 Unit을 직접 상속하고 생성·HUD·퀘스트·강화·치트 참조를 변경; 불필요해진 파일과 meta 제거.
+- 진행 상태: Unity 컴파일 성공과 이름·상속·공백 외 코드 본문 보존, 기존 PlayerUnit GUID 유지 확인; Play·빌드는 미수행이며 도구 상태 파일 접근 오류·추가 타입 조회 시간 초과는 게임 컴파일 결과와 구분해 기록.
+- 다음 할 일: Start에서 플레이어 생성·이동·피격·HUD 표시와 반환을 확인하고, 퀘스트·강화 연결을 확인.
+- 수정한 파일: PlayerUnit·PlayerController·PlayerCheat·PlayerStatUpgrade, 삭제한 PlayerWorldUnit·meta, CombatHudController·GroundQuestController, Player README·세션 기록.
+
+## 이전 작업 (2026-09-25 12:41)
+
+- 작업 내용: 프로젝트 안내 README에서 실제 게임 시작 호출 순서를 번호가 있는 세로 흐름도로 정리하고 어셈블리 참조 그림을 분리.
+- 진행 상태: Boots부터 Ground 로드, 플레이어·HUD 생성, 적 연결과 준비 완료까지 현재 코드 호출 순서를 문서에 반영. Mermaid 블록과 변경 diff를 확인; 문서만 수정했으며 Unity 실행 검증은 해당 없음.
+- 다음 할 일: 시작 호출이나 소유 관계가 바뀌면 프로젝트 안내 README와 기능 README의 연결 설명을 함께 확인.
+- 수정한 파일: Assets/_Project/README.md, Docs/Work/last-session.md.
+
+## 마지막 작업 (2026-09-25 12:34)
+
+- 작업 내용: 폴더 번호를 Start 씬 → Boot → GameManager → 맵 로딩 흐름에 맞춰 재배치하고 README 흐름도를 갱신.
+- 진행 상태: 폴더 .meta GUID와 변경한 씬 경로를 확인하고 공통 경로·문서 참조를 갱신; Unity 재실행 검증은 미수행.
+- 다음 할 일: Unity에서 Start 실행, Ground 추가 로딩, 플레이어·HUD·적 준비를 확인.
+- 수정한 파일: Assets/_Project의 Scene·Boot·Manager·Loading·Core·Settings 폴더와 경로 참조, 프로젝트 안내·폴더 규칙·세션 기록.
+
+## 마지막 작업 (2026-09-25 12:29)
+
+- 작업 내용: GameManager의 ResetForPlay 콜백을 제거하고 당장은 Play마다 Domain·Scene Reload 후 Boots가 새 관리자를 생성하는 흐름으로 문서를 수정.
+- 진행 상태: 연결된 Editor의 Reload 기본 설정과 Unity 컴파일 성공을 확인; Play 재진입 실행은 미수행.
+- 다음 할 일: Domain·Scene Reload를 켠 상태로 개발하며 GameManager에 Reload 비활성화 대응 콜백을 추가하지 않음.
+- 수정한 파일: GameManager.cs, Manager·Boot README, 세션 기록.
+
+## 이전 작업 (2026-09-25 12:27)
+
+- 작업 내용: Ground의 기존 좀비 구역을 게임 시작·갱신·반환 흐름에 연결하고 GameManager를 기존 Singleton 기반으로 전환; 플레이어·HUD 주소 상수를 Core/Constant의 GameAddressConstant.cs로 이동.
+- 진행 상태: Unity 컴파일 성공·현재 Console 오류 및 경고 0, Ground의 3개 구역·10개 배치 지점과 NavMesh 위치 확인; AI·공격 로직과 주소 값은 유지했으며 새 연결의 Play 실행·빌드는 미수행.
+- 다음 할 일: Start 실행 후 좀비 소환·추적·공격·구역 재진입과 치트의 HUD·플레이어·맵 반환, 전체 반환 후 GameManager 재생성을 Play에서 확인.
+- 수정한 파일: MapEnemySpawner·meta, GameManager·GameManagerCheat·MapMoveManager·Boots, EnemyZoneController·EnemyPool, GameAddressConstant·meta, 관련 기능 README·구조 규칙·세션 기록.
+
+## 마지막 작업 (2026-09-25 12:18)
+
+- 작업 내용: 폴더를 00.Boot → 01.Loading → 02.Scene 순으로 재배치하고 Core·Settings 및 경로 표기를 조정.
+- 진행 상태: 이동한 폴더 .meta GUID를 보존하고 Build Settings·Editor 경로·문서 참조를 갱신; Unity 재실행 검증은 미수행.
+- 다음 할 일: Unity에서 씬 목록과 진입 흐름이 정상으로 로드되는지 확인.
+- 수정한 파일: Assets/_Project의 Boot·Loading·Scene·Core·Settings 폴더와 경로 참조, EditorBuildSettings, 공통 규칙·README·Addressables 경로 목록.
+
+## 마지막 작업 (2026-09-25 12:17)
+
+- 작업 내용: 치트의 두 삭제 버튼을 전체 참조 기준으로 바꾸고 게임 소유 항목은 HUD·플레이어·맵의 실제 반환 경로로 연결.
+- 진행 상태: Unity 컴파일 성공·Console 오류 및 경고 0, 변경 범위 공백 확인; 삭제·공유 참조·종료 중 반환의 Play 확인은 미수행이며 로딩 README에 기록.
+- 다음 할 일: 치트에서 HUD → 플레이어 → 맵 삭제와 치트 추가 참조의 우선 반환을 Play에서 확인.
+- 수정한 파일: AddressableSpawnWindow·UXML·Game.Editor 참조, GameManager 개별 반환과 Boots·MapMoveManager partial 및 Cheat 파일·meta, 관련 README·세션 기록.
+
+## 이전 작업 (2026-09-25 12:08)
+
+- 작업 내용: 프로젝트 내 현재 README 19개에 Mermaid 시각화를 추가하고 코드 흐름과 맞지 않는 아이템·적 문서 설명을 바로잡음.
+- 진행 상태: 모든 README에서 Mermaid 블록 존재를 확인하고 문서 변경의 공백 검사를 완료; Unity 실행 검증은 하지 않음.
+- 다음 할 일: 코드·씬 설정이 바뀌면 영향을 받는 기능 README의 흐름도를 함께 갱신.
+- 수정한 파일: Docs/Rules와 Assets/_Project의 README 전체 및 세션 기록.
+
+## 마지막 작업 (2026-09-25 12:07)
+
+- 작업 내용: 13.Characters의 공용 코드·문서를 02.Core/Character로 이동하고 Core 이름공간·외부 참조·공통 배치 규칙을 반영하며 중복 asmref 제거.
+- 진행 상태: Unity 컴파일·Console 오류 및 경고 0, 공용 C# 9개의 기존 어셈블리·상속 연결과 코드 본문·meta 17개 보존 확인; Play 재실행·빌드는 미수행.
+- 다음 할 일: 캐릭터 공통 코드는 Core/Character에서 관리하고 엔티티별 입력·AI·행동 선택은 각 엔티티에 유지.
+- 수정한 파일: Core/Character 이동 파일·meta와 Core·호출부 using, 관련 README·구조·폴더 규칙·세션 기록.
+
+## 이전 작업 (2026-09-25 12:05)
+
+- 작업 내용: AudioListenerManager를 추가해 MainCamera 리스너 상태·참조 관리를 맡기고 GameManager의 시작·반환·실패·종료 경로에 연결.
+- 진행 상태: Unity 컴파일 오류 없음 확인; 실행 중 상태 확인은 연결 도구 시간 초과로 미완료이며 현재 Play 중지 상태, 상세 내용은 관리자 README에 기록.
+- 다음 할 일: 시작 시 리스너 활성화와 반환·종료 시 비활성화·참조 정리를 실행 중 확인.
+- 수정한 파일: 05.Manager의 AudioListenerManager·meta·GameManager·README, Boot·프로젝트 안내, 구조 규칙·세션 기록.
+
+## 이전 작업 (2026-09-25 11:14)
+
+- 작업 내용: 자체 프로젝트 이름공간을 Player·Zombie·NightShade 등 폴더 기준으로 단축하고 참조·자동 생성 설정·에셋 타입 표기·문서를 함께 반영.
+- 진행 상태: Unity 컴파일·Console 오류 및 경고 0, 코드 본문·직렬화 값 보존, 스크립트 189개 GUID·타입 및 주요 프리팹·설정 연결 확인; Play 재실행·빌드는 미수행.
+- 다음 할 일: 엔진·패키지·외부 에셋은 그대로 두고 자체 코드에만 이름공간 규칙을 적용하며 편집기 도구는 충돌 방지를 위해 EditorTools 유지.
+- 수정한 파일: Assets/_Project의 C# 참조·에셋 타입 표기·Boot/UI 생성 이름공간·Player 입력 생성 설정·관련 README, 코드 작성 규칙·세션 기록.
+
+## 이전 작업 (2026-09-25 11:02)
+
+- 작업 내용: 번호가 붙은 엔티티 폴더의 번호·구분자를 뺀 이름을 모든 하위 코드의 단일 이름공간으로 사용하고 Characters 등의 접두사를 제외하도록 규칙 정정.
+- 진행 상태: 코드 작성·폴더 규칙의 문구와 예시를 맞추고 diff 공백을 확인했으며 실행 코드는 변경하지 않음.
+- 다음 할 일: 엔티티 이름공간 작성·정리 시 폴더 기준의 단일 이름공간 규칙 적용.
+- 수정한 파일: Docs/Rules/coding-style.md, Docs/Rules/folder-rules.md, Docs/Work/last-session.md.
+
+## 이전 작업 (2026-09-25 11:00)
+
+- 작업 내용: 엔티티 이름공간에서 Enemies 같은 중간 분류를 제외하고 Characters.Zombie처럼 최상위 영역 바로 아래에 엔티티 이름을 두도록 규칙 수정.
+- 진행 상태: 규칙 예시와 diff 공백 확인을 마쳤으며 실행 코드는 변경하지 않음.
+- 다음 할 일: 엔티티 이름공간 작성·정리 시 중간 분류 없이 공통 규칙 적용.
+- 수정한 파일: Docs/Rules/coding-style.md, Docs/Work/last-session.md.
+
+## 이전 작업 (2026-09-25 10:59)
+
+- 작업 내용: 프로젝트 폴더·어셈블리 참조, 게임 시작·반환, 맵 씬 요청 흐름을 Mermaid 그림 3개로 추가.
+- 진행 상태: 실제 호출 코드와 asmdef 참조를 대조하고 Markdown 코드 블록·diff 공백을 확인; Unity 실행 검증은 하지 않음.
+- 다음 할 일: 관련 기능 흐름이 바뀔 때 해당 README의 Mermaid 그림도 함께 갱신.
+- 수정한 파일: Assets/_Project/README.md, Assets/_Project/01.Boot/README.md, Assets/_Project/04.Loading/README.md, Docs/Work/last-session.md.
+
+## 마지막 작업 (2026-09-25 10:58)
+
+- 작업 내용: 이름공간을 엔티티 이름까지만 두고 세부 역할은 폴더·클래스로 구분하는 규칙을 모든 엔티티로 확대.
+- 진행 상태: 공통 코드 작성 규칙과 세션 기록만 갱신하고 기존 이름공간 예시·문서 diff를 확인했으며 실행 코드는 변경하지 않음.
+- 다음 할 일: 모든 엔티티의 코드 작성과 이름공간 정리에 공통 규칙 적용.
+- 수정한 파일: Docs/Rules/coding-style.md, Docs/Work/last-session.md.
+
+## 이전 작업 (2026-09-25 10:57)
+
+- 작업 내용: 플레이어 이름공간을 Characters.Player로 통일하고 외부 참조·입력 코드 생성 설정·직렬화 타입 표기와 문서 규칙을 갱신.
+- 진행 상태: Unity 컴파일 성공, Console 오류·경고 0, PlayerRoot 누락 스크립트 0과 Config·공격 설정 6개 연결 확인; Play 재실행·빌드는 미수행.
+- 다음 할 일: 플레이어 참조는 using Characters.Player를 사용하고 세부 역할은 기존 기능별 폴더에서 확인.
+- 수정한 파일: 10.Player와 외부 C# 참조부, PlayerRoot·CharacterTestScene·PlayerCharacterConfig 에셋 타입 표기, 코드 작성 규칙·플레이어 README·세션 기록.
+
+## 이전 작업 (2026-09-25 10:49)
+
+- 작업 내용: 플레이어 행동 스태미나·공격 판정 책임을 분리하고 상태 의존성을 직접 연결하며 상태·공격 설정 파일을 기능별 폴더로 이동.
+- 진행 상태: Unity 컴파일, 이동 전후 600프레임의 12지점 동일성, 공격·구르기·방어·락온·피격·사망·반환 검증과 GUID 보존 확인; 전체 지형·입력 경계·빌드는 미검증으로 플레이어 README에 기록.
+- 다음 할 일: 플레이어 README의 남은 수동 비교 항목을 확인하며 현재 동작과 다른 기능 수정은 별도 범위로 진행.
+- 수정한 파일: 10.Player의 Lifecycle·StateMachine·Movement·Combat·Camera·Stats·README와 이동/추가 meta, 세션 기록.
+
+## 이전 작업 (2026-09-25 10:39)
+
+- 작업 내용: GameManager의 맵 로딩·설정 확인·플레이어 배치·환경음·씬 요청 반환을 일반 C# MapMoveManager로 분리.
+- 진행 상태: 새 타입의 Unity 로드 및 compilationFailed=false·diff 공백 검사 확인; 진행 중인 Play는 유지했고 진입·이탈 시나리오 재실행은 미수행.
+- 다음 할 일: 맵 진입·이탈 동작을 확인한 뒤 맵 소환 담당과 EnemySpawnManager 연결 단계 진행.
+- 수정한 파일: 05.Manager의 MapMoveManager·GameManager·README, Scene·Boot·Loading·프로젝트 안내, 구조·폴더 규칙과 세션 기록.
+
+## 이전 작업 (2026-09-25 10:09)
+
+- 작업 내용: 잘못 추가한 EntityContainerManager·meta와 GameManager 호출을 제거하고 엔티티 생명주기와 맵 몬스터 컨테이너 책임을 문서·구조 규칙에 명시.
+- 진행 상태: Unity 재컴파일 성공(compilationFailed=false), 삭제한 클래스 참조 없음과 diff 공백 검사 확인; Play 재검증은 미실행.
+- 다음 할 일: 기존 EnemyContainer는 한 씬을 관리하는 싱글톤이며 실제 소환·갱신·반환의 게임 연결은 후속 요청 범위에서 진행.
+- 수정한 파일: EntityContainerManager 삭제, GameManager·진입점·관리자·프로젝트 안내 복원, Core·Enemy·Item README와 EnemyContainer 주석·구조 규칙·세션 기록 갱신.
+
+## 이전 작업 (2026-09-25 09:57, 아래 구현은 10:09 작업에서 철회)
+
+- 작업 내용: ObjectLifecycle 기반 EntityContainerManager를 추가해 Ground 씬의 EnemyContainer·ItemContainer 생성과 적 갱신·반환을 GameManager 흐름에 연결.
+- 진행 상태: 관련 README·진입점 안내와 코드 갱신, diff 공백 검사 통과. Unity Editor가 재컴파일 불필요(up-to-date)로 응답했고 새 타입 Roslyn 조회 성공, Console 오류·경고 0; Play 동작은 미검증.
+- 다음 할 일: Unity에서 컴파일 후 Ground 준비·적 Tick·게임 반환 시 풀 정리를 확인.
+- 수정한 파일: 05.Manager EntityContainerManager·GameManager·README, 01.Boot·02.Core·11.Enemy·12.Item·프로젝트 README, 세션 기록.
+
 ## 마지막 작업 (2026-09-24 16:40)
 
 - 작업 내용: 상단 제목을 제거하고 Addressable·플레이어 탭으로 통합하며 빨간 삭제 버튼과 행 오른쪽 실시간 참조 횟수를 적용.

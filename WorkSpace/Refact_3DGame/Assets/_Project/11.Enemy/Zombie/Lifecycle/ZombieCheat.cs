@@ -1,8 +1,9 @@
+using Core;
 #if UNITY_EDITOR
-using Characters;
 using UnityEngine;
+using Enemy;
 
-namespace Characters.Enemies.Zombie
+namespace Zombie
 {
     // Inspector 치트 수치와 실행 메뉴를 좀비 런타임 구현에서 분리한다.
     public sealed partial class ZombieController

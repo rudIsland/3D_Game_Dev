@@ -1,0 +1,12 @@
+.data-toolbar { flex-direction: row; align-items: center; margin-bottom: 10px; }
+.data-toolbar .data-search { flex-grow: 1; min-width: 120px; margin-right: 10px; }
+.data-containers { width: 205px; margin-right: 12px; }
+.data-container-name { padding: 12px 8px; font-size: 12px; }
+.data-source { margin-bottom: 8px; }
+.data-summary { margin-bottom: 10px; white-space: normal; -unity-font-style: bold; }
+.data-body { flex-direction: row; flex-grow: 1; min-height: 0; }
+.data-list { flex-grow: 1; flex-basis: 0; min-width: 280px; }
+.data-details { width: 340px; margin-left: 12px; }
+.data-state { min-width: 62px; margin-left: 10px; -unity-text-align: middle-right; color: var(--dim); }
+.data-state--used { color: var(--ink); -unity-font-style: bold; }
+.data-row { padding: 7px 10px; }

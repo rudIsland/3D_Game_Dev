@@ -1,7 +1,7 @@
 #if UNITY_EDITOR
 using UnityEngine;
 
-namespace Development.CharacterTest
+namespace Scene
 {
     // 개발 씬의 수동 소환 메뉴를 기존 소환 동작과 분리한다.
     public sealed partial class TestSceneEnemySpawner

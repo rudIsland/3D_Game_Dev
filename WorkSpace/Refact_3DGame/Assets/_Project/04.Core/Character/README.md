@@ -61,7 +61,8 @@ flowchart LR
     Disable -->|최종 정리| Release
     Unit --> UnitHealth
     PlayerControllerHud --> PlayerHudContract
-    EnemyRuntime --> EnemyHudContract --> UnitHealth
+    UnitHealth --> EnemyHudContract
+    EnemyRuntime --> EnemyHudContract
     HitRequest --> HitDamageCalculator --> UnitHealth
     HitDamageCalculator --> DamageResult
 ```

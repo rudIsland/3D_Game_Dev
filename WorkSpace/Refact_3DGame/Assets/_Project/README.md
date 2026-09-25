@@ -16,6 +16,7 @@ flowchart LR
         direction TB
         StartScene["StartScene<br/>플레이어·HUD·퀘스트 기록"]
         SceneLoader["SceneLoader<br/>현재 맵 전환"]
+        DataContainers["Player·Enemy·Item·Quest<br/>DataContainer"]
     end
     subgraph prepare["생성·맵 준비"]
         direction TB
@@ -30,6 +31,7 @@ flowchart LR
         PlayerController["PlayerController"]
         MapEnemySpawner["MapEnemySpawner"]
         EnemyContainer["EnemyContainer"]
+        ItemSpawnManager["ItemSpawnManager"]
         ItemContainer["ItemContainer"]
         QuestContainer["QuestContainer"]
         HudContainer["HudContainer · CombatHud"]
@@ -42,18 +44,23 @@ flowchart LR
 
     Boots --> StartScene
     Boots --> SceneLoader
+    Boots --> DataContainers
     StartScene --> PlayerSpawnManager --> PlayerController
     StartScene --> HudSpawnManager --> HudContainer
     StartScene --> QuestContainer
+    DataContainers --> StartScene
+    DataContainers --> PlayerSpawnManager
     SceneLoader --> MapManager --> AddressableManager --> MapPlayScene
     MapPlayScene --> MapEnemySpawner --> EnemyContainer
-    MapPlayScene --> ItemContainer
+    DataContainers --> MapEnemySpawner
+    MapPlayScene --> ItemSpawnManager --> ItemContainer
+    DataContainers --> ItemSpawnManager
     MapPlayScene --> QuestContainer
     PlayerController --> IPlayerHudSource["Core.IPlayerHudSource"] --> HudContainer
     EnemyContainer --> IEnemyHudSource["Core.IEnemyHudSource"] --> HudContainer
     CheatPanel -. "기존 게임 API 호출" .-> PlayerController
     CheatPanel -. "기존 진행 기록 API 호출" .-> QuestContainer
-    GameDataWindow -. "선택한 컨테이너 참조 조회" .-> Boots
+    GameDataWindow -. "선택한 컨테이너 참조 조회" .-> DataContainers
 ```
 
 씬 이동에서는 `SceneLoader`가 현재 `GameScene`을 정리하고 `MapManager`에 다음 주소를 요청한다. 새 `MapPlayScene`은 맵 전용 객체를 만들고, `StartScene`은 기존 플레이어·HUD·퀘스트 진행을 유지해 새 맵에 연결한다. 현재 맵 이동 트리거는 연결되지 않았다.

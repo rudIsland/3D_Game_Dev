@@ -40,6 +40,7 @@ flowchart LR
     subgraph input["입력"]
         direction TB
         PlayerInputReader["PlayerInputReader"]
+        PlayerController["PlayerController"]
     end
     subgraph decision["상태 선택"]
         direction TB
@@ -57,12 +58,11 @@ flowchart LR
     end
     subgraph output["결과"]
         direction TB
-        PlayerController["PlayerController"]
         PlayerAnimationController["PlayerAnimationController"]
         IPlayerHudSource["Core.IPlayerHudSource"]
         HudContainer["HudContainer"]
     end
-    PlayerInputReader --> PlayerUnit --> PlayerStateMachine
+    PlayerInputReader --> PlayerController --> PlayerUnit --> PlayerStateMachine
     PlayerStateMachine --> LookState
     PlayerStateMachine --> ActionStates --> PlayerMovement --> CharacterController
     ActionStates --> PlayerAttackHit

@@ -1,0 +1,27 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements">
+    <ui:Style src="AddressableTools.uss" />
+    <ui:Style src="GameDataWindow.uss" />
+    <ui:VisualElement name="dataRoot" class="tools-root content">
+        <ui:Label text="게임 데이터" class="section-title" />
+        <editor:ObjectField name="gameDataSource" label="등록 목록" class="data-source" />
+        <ui:VisualElement class="data-toolbar">
+            <ui:TextField name="dataSearch" tooltip="이름·종류·경로 검색" class="data-search" />
+            <ui:Toggle name="usedOnly" label="사용 중만" />
+            <ui:Button name="refreshData" text="새로고침" />
+        </ui:VisualElement>
+        <ui:Label name="dataSummary" class="data-summary" />
+        <ui:VisualElement class="data-body">
+            <ui:VisualElement class="data-containers">
+                <ui:Label text="데이터 컨테이너" class="section-title" />
+                <ui:ListView name="dataContainers" selection-type="Single" class="resource-list" />
+            </ui:VisualElement>
+            <ui:ListView name="dataList" class="resource-list data-list" />
+            <ui:VisualElement class="data-details">
+                <ui:Label name="dataSelection" text="목록에서 데이터를 선택하세요." class="selection" />
+                <ui:Button name="selectDataAsset" text="Project · Inspector에서 열기" />
+                <ui:ScrollView name="dataInspector" class="cheat-scroll" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Label text="선택한 컨테이너의 등록 예정 데이터와 실제 보관 데이터를 표시합니다. 원본은 직접 보관할 설정, 연결 데이터는 그 설정이 참조하는 항목입니다. 실행 여부와 관계없이 목록을 볼 수 있습니다." class="selection" />
+    </ui:VisualElement>
+</ui:UXML>
