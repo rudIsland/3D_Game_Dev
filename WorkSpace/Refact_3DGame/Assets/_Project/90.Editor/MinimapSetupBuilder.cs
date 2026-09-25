@@ -1,12 +1,13 @@
 using System;
-using Characters.Player.Lifecycle;
-using GameUI.Minimap;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
+using Player;
+using UI;
+using UnityScene = UnityEngine.SceneManagement.Scene;
 
 namespace EditorTools
 {
@@ -27,7 +28,7 @@ namespace EditorTools
             RenderTexture renderTexture = GetOrCreateRenderTexture();
             Mesh markerMesh = GetOrCreateMarkerMesh();
             Material markerMaterial = GetOrCreateMarkerMaterial();
-            Scene scene = OpenTargetScene();
+            UnityScene scene = OpenTargetScene();
 
             GameObject minimapShapes = FindSceneObject(
                 scene,
@@ -77,9 +78,9 @@ namespace EditorTools
             Debug.Log("지상 미니맵 카메라, 플레이어 표시와 Render Texture 연결을 완료했습니다.");
         }
 
-        private static Scene OpenTargetScene()
+        private static UnityScene OpenTargetScene()
         {
-            Scene activeScene = SceneManager.GetActiveScene();
+            UnityScene activeScene = SceneManager.GetActiveScene();
             if (activeScene.path == ScenePath)
             {
                 return activeScene;
@@ -330,7 +331,7 @@ namespace EditorTools
         }
 
         private static GameObject GetOrCreateSceneObject(
-            Scene scene,
+            UnityScene scene,
             string objectName)
         {
             GameObject sceneObject = FindSceneObject(scene, objectName);
@@ -360,7 +361,7 @@ namespace EditorTools
         }
 
         private static GameObject FindSceneObject(
-            Scene scene,
+            UnityScene scene,
             string objectName)
         {
             GameObject[] roots = scene.GetRootGameObjects();

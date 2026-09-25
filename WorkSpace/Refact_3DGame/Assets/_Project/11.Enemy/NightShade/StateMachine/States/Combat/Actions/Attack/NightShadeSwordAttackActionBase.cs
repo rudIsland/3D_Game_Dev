@@ -1,7 +1,7 @@
-using Characters.Combat;
 using UnityEngine;
+using Core;
 
-namespace Characters.Enemies.NightShade
+namespace NightShade
 {
     internal abstract class NightShadeSwordAttackActionBase :
         INightShadeSwordAttackAction

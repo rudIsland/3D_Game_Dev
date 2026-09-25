@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Characters.Player.Movement
+namespace Player
 {
     // 타깃 시점의 타깃 기준 이동·구르기·공격 방향을 계산한다.
     internal sealed class PlayerTargetMovement : IPlayerMovementMode

@@ -1,7 +1,8 @@
+using Core;
 using System;
 using UnityEngine;
 
-namespace Items
+namespace Item
 {
     [Serializable]
     public sealed class ItemCatalogEntry

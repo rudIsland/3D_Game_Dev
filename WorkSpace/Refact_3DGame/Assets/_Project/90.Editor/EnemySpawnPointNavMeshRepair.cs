@@ -1,3 +1,4 @@
+using Scene;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -6,7 +7,8 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.SceneManagement;
-using World.Zones;
+using Zone;
+using UnityScene = UnityEngine.SceneManagement.Scene;
 
 namespace EditorTools
 {
@@ -22,7 +24,7 @@ namespace EditorTools
 
         public static void RepairEnemySpawnPoints()
         {
-            Scene activeScene = SceneManager.GetActiveScene();
+            UnityScene activeScene = SceneManager.GetActiveScene();
             if (activeScene.path != ScenePath)
             {
                 throw new InvalidOperationException(
@@ -57,7 +59,7 @@ namespace EditorTools
 
         public static void RebuildSceneNavMesh()
         {
-            Scene activeScene = SceneManager.GetActiveScene();
+            UnityScene activeScene = SceneManager.GetActiveScene();
             if (activeScene.path != ScenePath)
             {
                 throw new InvalidOperationException(

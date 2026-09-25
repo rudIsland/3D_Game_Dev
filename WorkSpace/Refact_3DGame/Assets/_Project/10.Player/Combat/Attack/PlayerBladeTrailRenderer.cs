@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
-namespace Characters.Player.Combat.Attack
+namespace Player
 {
     // 검의 시작점과 끝점을 기록해 실제로 지나간 자리에 잔상 면을 만든다.
     [DisallowMultipleComponent]

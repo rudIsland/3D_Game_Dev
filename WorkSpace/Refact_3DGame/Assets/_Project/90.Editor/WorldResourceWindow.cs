@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityScene = UnityEngine.SceneManagement.Scene;
 
 namespace EditorTools
 {
@@ -144,7 +145,7 @@ namespace EditorTools
             var usage = new Dictionary<string, int>(StringComparer.Ordinal);
             for (int sceneIndex = 0; sceneIndex < ScenePaths.Length; sceneIndex++)
             {
-                Scene scene = SceneManager.GetSceneByPath(ScenePaths[sceneIndex]);
+                UnityScene scene = SceneManager.GetSceneByPath(ScenePaths[sceneIndex]);
                 bool savedScene = !scene.isLoaded;
                 if (savedScene && !includeClosed) continue;
                 try
@@ -379,7 +380,7 @@ namespace EditorTools
                 {
                     int sceneIndex = row.SceneMask == 1 ? 0 : row.SceneMask == 2 ? 1 : 2;
                     string scenePath = ScenePaths[sceneIndex];
-                    Scene scene = SceneManager.GetSceneByPath(scenePath);
+                    UnityScene scene = SceneManager.GetSceneByPath(scenePath);
                     if (!scene.isLoaded || row.SavedScene)
                     {
                         row.PlacementIssue = "검사 제외: 저장된 씬 목록입니다. 씬을 열고 목록을 다시 읽은 뒤 검사하세요.";
@@ -443,7 +444,7 @@ namespace EditorTools
                         savedScene |= row.SavedScene;
                     }
 
-                Scene scene = SceneManager.GetSceneByPath(scenePath);
+                UnityScene scene = SceneManager.GetSceneByPath(scenePath);
                 if (!scene.isLoaded || savedScene)
                 {
                     results.Add($"{sceneName}: 저장된 배치 {listedIds.Count}개 · 실제 객체 비교는 씬을 열고 다시 읽은 뒤 가능합니다.");

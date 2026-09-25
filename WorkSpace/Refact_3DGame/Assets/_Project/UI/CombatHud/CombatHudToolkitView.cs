@@ -1,11 +1,8 @@
-using Characters;
-using Characters.Player.Inventory;
-using Items;
 using UnityEngine;
 using UnityEngine.UIElements;
-using World.Interaction;
+using Core;
 
-namespace GameUI.CombatHud
+namespace UI
 {
     // 한 개의 UIDocument에서 전투 HUD 전체를 찾아 표시한다.
     public sealed class CombatHudToolkitView : MonoBehaviour
@@ -67,10 +64,11 @@ namespace GameUI.CombatHud
 
         public void ShowPlayerHealth(
             string targetName,
-            UnitHealth health,
+            float currentHealth,
+            float maxHealth,
             float maximumScale)
         {
-            if (health == null || !EnsureElements())
+            if (!EnsureElements())
             {
                 return;
             }
@@ -81,17 +79,19 @@ namespace GameUI.CombatHud
                 PlayerHealthBaseWidthPercent,
                 maximumScale);
             UpdateHealth(
-                health,
+                currentHealth,
+                maxHealth,
                 playerHealthFill,
                 playerHealthText);
             SetVisible(playerHealthRoot, true);
         }
 
         public void UpdatePlayerHealth(
-            UnitHealth health,
+            float currentHealth,
+            float maxHealth,
             float maximumScale)
         {
-            if (health == null || !EnsureElements())
+            if (!EnsureElements())
             {
                 return;
             }
@@ -101,7 +101,8 @@ namespace GameUI.CombatHud
                 PlayerHealthBaseWidthPercent,
                 maximumScale);
             UpdateHealth(
-                health,
+                currentHealth,
+                maxHealth,
                 playerHealthFill,
                 playerHealthText);
         }
@@ -156,30 +157,30 @@ namespace GameUI.CombatHud
             }
         }
 
-        public void ShowPlayerInventory(PlayerInventory inventory)
+        public void ShowPlayerInventory(ItemDefinition firstItem, ItemDefinition secondItem)
         {
-            if (inventory == null || !EnsureElements())
+            if (!EnsureElements())
             {
                 return;
             }
 
-            UpdatePlayerInventory(inventory);
+            UpdatePlayerInventory(firstItem, secondItem);
             SetVisible(playerInventoryRoot, true);
         }
 
-        public void UpdatePlayerInventory(PlayerInventory inventory)
+        public void UpdatePlayerInventory(ItemDefinition firstItem, ItemDefinition secondItem)
         {
-            if (inventory == null || !EnsureElements())
+            if (!EnsureElements())
             {
                 return;
             }
 
             SetInventorySlot(
                 inventorySlot1Icon,
-                inventory.GetItem(0));
+                firstItem);
             SetInventorySlot(
                 inventorySlot2Icon,
-                inventory.GetItem(1));
+                secondItem);
         }
 
         public void HidePlayerInventory()
@@ -370,11 +371,21 @@ namespace GameUI.CombatHud
             VisualElement fill,
             Label valueText)
         {
-            SetFillWidth(fill, health.CurrentHealth, health.MaxHealth);
+            UpdateHealth(health.CurrentHealth, health.MaxHealth, fill, valueText);
+        }
+
+        // 표시 수치만 받아 플레이어와 적 체력바에 같은 계산을 사용한다.
+        private static void UpdateHealth(
+            float currentHealth,
+            float maxHealth,
+            VisualElement fill,
+            Label valueText)
+        {
+            SetFillWidth(fill, currentHealth, maxHealth);
             valueText.text = string.Format(
                 "{0:0} / {1:0}",
-                health.CurrentHealth,
-                health.MaxHealth);
+                currentHealth,
+                maxHealth);
         }
 
         private static void SetFillWidth(

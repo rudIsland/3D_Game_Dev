@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace World.Zones
+namespace Zone
 {
     // 실제 플레이어 높이와 해당 층의 지도 표시 높이를 연결한다.
     [DisallowMultipleComponent]

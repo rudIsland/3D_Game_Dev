@@ -1,9 +1,8 @@
+using Core;
 using System;
-using Characters.Player.Lifecycle;
 using UnityEngine;
-using World.Interaction;
 
-namespace Characters.Player.Interaction
+namespace Player
 {
     // 주변 상호작용 물체 중 플레이어가 정면으로 바라보는 대상을 찾는다.
     internal sealed class PlayerInteractionDetector
@@ -23,7 +22,6 @@ namespace Characters.Player.Interaction
 
         public IPlayerInteractable CurrentTarget => currentTarget;
         public PlayerInteractionGuide CurrentGuide => currentGuide;
-        public bool HasCurrentTarget => currentTarget != null;
 
         public event Action<PlayerInteractionGuide> CurrentGuideChanged;
 

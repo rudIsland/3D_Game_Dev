@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 96e31c76744a434eb1859169f6462cec, type: 3}
   m_Name: ZombieConfig
-  m_EditorClassIdentifier: Game.Runtime::Characters.Enemies.Zombie.ZombieConfig
+  m_EditorClassIdentifier: Game.Runtime::Zombie.ZombieConfig
   maxHealth: 100
   staggerLimit: 50
   staggerRecoverDelay: 3

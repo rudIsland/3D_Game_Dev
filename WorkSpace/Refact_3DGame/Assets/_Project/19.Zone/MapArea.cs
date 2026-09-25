@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace World.Zones
+namespace Zone
 {
     // 오브젝트 이름과 별개로 지도에 표시할 이름, 실제 영역, 미니맵 도형을 연결한다.
     [DisallowMultipleComponent]

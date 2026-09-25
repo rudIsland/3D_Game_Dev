@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityScene = UnityEngine.SceneManagement.Scene;
 
-namespace World
+namespace Scene
 {
     // 기존 씬에서 구운 지하 조명을 보존한다. 구역별 재베이크 후에는 제거할 수 있다.
     [ExecuteAlways]
@@ -59,8 +60,8 @@ namespace World
         }
 #endif
 
-        private void HandleSceneLoaded(Scene scene, LoadSceneMode mode) => Apply();
-        private void HandleSceneUnloaded(Scene scene) => Apply();
+        private void HandleSceneLoaded(UnityScene scene, LoadSceneMode mode) => Apply();
+        private void HandleSceneUnloaded(UnityScene scene) => Apply();
 
         public void Apply()
         {

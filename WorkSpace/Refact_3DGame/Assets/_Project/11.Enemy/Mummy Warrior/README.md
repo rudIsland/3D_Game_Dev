@@ -14,6 +14,16 @@
 
 ## 사용 흐름과 확인
 
+```mermaid
+flowchart LR
+    MummyPrefab["MummyWarrior.prefab"] --> AssetCheck["프리팹 원본·Animator·Avatar 확인"]
+    MummyRootPrefab["Undead/MummyWarriorRoot.prefab"] --> AssetCheck
+    MummyClips["현재 Clips·Controller"] --> AssetCheck
+    ArchivedAssets["Archive/notUse"] -.->|사용 목록에서 제외| AssetCheck
+    AssetCheck --> ScenePreview["씬에서 외형·동작 확인"]
+    NoMummyAI["전용 C# AI 없음"] --> MissingBehavior["전투·소환 연결 미구현"]
+```
+
 프리팹·동작 선택 → Animator·Avatar 연결 확인 → 씬에서 외형과 동작 확인 순서다. Archive의 동작을 현재 전투에서 사용한다고 가정하지 않는다.
 
 `Undead/Models/Prefabs`에도 `MummyWarriorRoot.prefab`이 있다. 이름이 비슷하므로 실제로 배치할 프리팹의 컴포넌트와 참조를 Unity Inspector에서 확인한다. 전투 AI와 소환 연결은 별도 작업이다.

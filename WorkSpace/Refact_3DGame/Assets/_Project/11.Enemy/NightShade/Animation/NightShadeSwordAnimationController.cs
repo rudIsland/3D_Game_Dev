@@ -1,7 +1,7 @@
-using Characters.Combat;
 using UnityEngine;
+using Core;
 
-namespace Characters.Enemies.NightShade
+namespace NightShade
 {
     // 상태머신 요청을 NightShade 양손검 Animator 상태로 바꾼다.
     [DisallowMultipleComponent]

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Characters.Enemies.NightShade
+namespace NightShade
 {
     // 사망 애니메이션과 시체 유지 시간이 끝나면 풀 반환을 한 번 요청한다.
     internal sealed class NightShadeSwordDeadState : INightShadeSwordState

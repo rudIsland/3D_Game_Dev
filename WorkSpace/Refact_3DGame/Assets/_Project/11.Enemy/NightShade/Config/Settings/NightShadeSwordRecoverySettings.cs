@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Characters.Enemies.NightShade
+namespace NightShade
 {
     [Serializable]
     internal sealed class NightShadeSwordRecoverySettings

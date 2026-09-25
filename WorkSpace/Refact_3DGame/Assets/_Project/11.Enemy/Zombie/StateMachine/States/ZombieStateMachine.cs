@@ -1,10 +1,9 @@
 using System;
-using Characters;
-using Characters.Combat;
 using UnityEngine;
-using World.Zones;
+using Core;
+using Enemy;
 
-namespace Characters.Enemies.Zombie
+namespace Zombie
 {
     // 좀비의 탐지·경계·추적·공격 상태를 관리한다.
     public sealed class ZombieStateMachine

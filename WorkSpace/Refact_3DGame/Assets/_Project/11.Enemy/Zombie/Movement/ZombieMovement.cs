@@ -1,7 +1,7 @@
-using Characters.Enemies.Navigation;
 using UnityEngine;
+using Enemy;
 
-namespace Characters.Enemies.Zombie
+namespace Zombie
 {
     // Zombie의 이동, 회전, 중력만 계산한다.
     public sealed class ZombieMovement
@@ -15,8 +15,6 @@ namespace Characters.Enemies.Zombie
         private float verticalSpeed; // 이동 속도
 
         public Vector3 Position => zombieTransform.position; // 이동 정보
-        public Vector3 Forward => zombieTransform.forward; // 좀비가 바라보는 방향
-        public Vector3 Right => zombieTransform.right; // 좀비의 오른쪽 방향
 
         internal ZombieMovement(
             Transform zombieTransform,

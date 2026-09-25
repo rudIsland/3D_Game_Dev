@@ -1,22 +1,15 @@
-using Characters.Enemies;
 using System;
-using Characters;
-using Characters.Combat.AttackData;
-using Characters.Combat;
-using Characters.Enemies.Navigation;
-using Characters.Player.Lifecycle;
-using World;
-using World.Zones;
 using UnityEngine;
 using UnityEngine.AI;
+using Core;
+using Enemy;
 
-namespace Characters.Enemies.Zombie
+namespace Zombie
 {
     [DisallowMultipleComponent]
     [RequireComponent(
         typeof(CharacterController),
-        typeof(ZombieAnimationController),
-        typeof(CombatHitEffectPlayer))]
+        typeof(ZombieAnimationController))]
     [RequireComponent(typeof(NavMeshAgent))]
     // Unity 씬과 일반 C# Zombie AI를 연결한다.
     public sealed partial class ZombieController :
@@ -26,10 +19,10 @@ namespace Characters.Enemies.Zombie
         IZoneEnemy
     {
         [Header("필수 연결")]
-        [SerializeField] private Transform target; // 대상 참조
+        private Transform target; // 대상 참조
         [SerializeField] private Animator zombieAnimator; // 애니메이터 참조
 
-        [SerializeField] private ZombieConfig config;
+        private ZombieConfig config;
         [Header("공격 판정점")]
         [SerializeField] private ZombieAttackHitShape swingHitShape;
         [SerializeField] private ZombieAttackHitShape kickHitShape;
@@ -40,7 +33,7 @@ namespace Characters.Enemies.Zombie
         private ZombieAnimationController zombieAnimation; // 씬 또는 시스템 참조
         private ZombieAttackRangeDetector attackRangeDetector;
         private ZombieWorldUnit zombieWorldUnit; // 씬 또는 시스템 참조
-        private CombatHitEffectPlayer hitEffectPlayer;
+        private ICombatHitEffects hitEffectPlayer;
         private NavMeshAgent navMeshAgent;
         private ZombieStateMachine stateMachine;
 
@@ -48,12 +41,18 @@ namespace Characters.Enemies.Zombie
         public bool IsDead =>
             zombieWorldUnit != null && zombieWorldUnit.IsDead;
         public EnemyZoneArea HomeZone => stateMachine?.HomeZone;
+        /// <summary>생성 담당에게 설정과 추적 대상을 받는다.</summary>
+        public override void SetData(ScriptableObject data, Transform target)
+        {
+            config = (ZombieConfig)data;
+            this.target = target;
+        }
+
         protected override Unit CreateRuntimeObject()
         {
             if (config == null)
                 throw new InvalidOperationException("ZombieController에 ZombieConfig가 필요합니다.");
             settings = config.GetRuntimeSettings();
-            FindSceneReferences();
             FindUnityComponents();
 
             if (target == null ||
@@ -158,23 +157,11 @@ namespace Characters.Enemies.Zombie
         }
 
 
-        private void FindSceneReferences()
-        {
-            if (target != null)
-            {
-                return;
-            }
-
-            PlayerController player =
-                FindFirstObjectByType<PlayerController>();
-            target = player != null ? player.transform : null;
-        }
-
         private void FindUnityComponents()
         {
             characterController = GetComponent<CharacterController>();
             zombieAnimation = GetComponent<ZombieAnimationController>();
-            hitEffectPlayer = GetComponent<CombatHitEffectPlayer>();
+            hitEffectPlayer = GetComponent<ICombatHitEffects>();
             navMeshAgent = GetComponent<NavMeshAgent>();
             ConfigureNavMeshAgent();
 

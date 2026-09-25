@@ -1,7 +1,7 @@
-using Characters.Enemies.AttackData;
 using UnityEngine;
+using Enemy;
 
-namespace Characters.Enemies.NightShade
+namespace NightShade
 {
     // 프리팹과 분리된 NightShadeSword 전투 속성 모음이다.
     [CreateAssetMenu(

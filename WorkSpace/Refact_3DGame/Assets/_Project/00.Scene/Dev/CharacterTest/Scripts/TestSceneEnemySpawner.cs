@@ -1,10 +1,8 @@
-using Characters.Enemies;
-using Characters;
 using System;
-using World;
 using UnityEngine;
+using Enemy;
 
-namespace Development.CharacterTest
+namespace Scene
 {
     // TestScene의 적 설정과 배치 위치를 Manager의 풀 Spawn으로 연결한다.
     public sealed partial class TestSceneEnemySpawner : MonoBehaviour
@@ -24,7 +22,7 @@ namespace Development.CharacterTest
         private EnemyView[] spawnedEnemies; // 씬 또는 시스템 참조
         private float[] remainingRespawnTimes; // 시간 설정
 
-        public void Connect(EnemyContainer container)
+        public void Connect(EnemyContainer container, Transform target)
         {
             if (enemyContainer != null) return;
             enemyContainer = container;
@@ -34,7 +32,7 @@ namespace Development.CharacterTest
             }
 
             foreach (EnemySpawnSettings settings in enemySettings)
-                if (settings != null) enemyContainer.RegisterPool(settings);
+                if (settings != null) enemyContainer.RegisterPool(settings, target);
             spawnedEnemies = new EnemyView[enemySettings.Length];
             remainingRespawnTimes = new float[enemySettings.Length];
             SpawnMissingEnemies();

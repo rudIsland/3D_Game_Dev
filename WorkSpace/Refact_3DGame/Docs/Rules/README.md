@@ -10,6 +10,16 @@
 4. [프로젝트 폴더 안내](../../Assets/_Project/README.md)와 대상 기능의 README를 확인한 뒤 필요한 실제 코드를 읽는다. 현재 동작 판단은 코드·씬 설정을 기준으로 한다.
 5. 생성·갱신·반환을 바꿀 때는 [진입점 안내](../../Assets/_Project/01.Boot/README.md) → 해당 호출자 → 대상 기능 → 정리 경로 순서로 확인한다. 관련 없는 기능 전체를 읽거나 함께 수정하지 않는다.
 
+```mermaid
+flowchart LR
+    Request["작업 요청"] --> Rules["작업 규칙·최근 기록·Git 상태"]
+    Rules --> Guide["프로젝트 안내·대상 기능 README"]
+    Guide --> Source["실제 호출자·코드·씬 확인"]
+    Source --> Change["변경안 제시 후 필요한 범위 적용"]
+    Change --> Check["diff·검증·기능 README 갱신"]
+    Check --> Session["세션 기록"]
+```
+
 ## 문서별 역할
 
 | 문서 | 내용 |

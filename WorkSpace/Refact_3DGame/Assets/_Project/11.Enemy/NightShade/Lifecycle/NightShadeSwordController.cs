@@ -1,28 +1,23 @@
-using Characters.Enemies;
-using Characters;
 using System;
-using Characters.Combat;
-using Characters.Combat.AttackData;
-using Characters.Player.Lifecycle;
-using World;
 using UnityEngine;
+using Core;
+using Enemy;
 
-namespace Characters.Enemies.NightShade
+namespace NightShade
 {
     [DisallowMultipleComponent]
     [RequireComponent(
         typeof(CharacterController),
-        typeof(NightShadeSwordAnimationController),
-        typeof(CombatHitEffectPlayer))]
+        typeof(NightShadeSwordAnimationController))]
     [RequireComponent(typeof(NightShadeSwordAttackAudio))]
     // Unity 프리팹과 일반 C# NightShade 양손검 전투를 연결한다.
     public sealed class NightShadeSwordController : EnemyView, IUnitDeathState, IEnemyDamageReceiver
     {
         [Header("필수 연결")]
-        [SerializeField] private Transform target;
+        private Transform target;
         [SerializeField] private Animator enemyAnimator;
         [SerializeField] private NightShadeSwordHitShape swordHitShape;
-        [SerializeField] private NightShadeSwordConfig config;
+        private NightShadeSwordConfig config;
 
         [Header("보스 전투 구역")]
         [Tooltip("지하 보스방을 감싸는 BoxCollider. 비워 두면 생성 위치 기준 범위를 사용합니다.")]
@@ -35,7 +30,7 @@ namespace Characters.Enemies.NightShade
         private NightShadeSwordAnimationController swordAnimation;
         private NightShadeSwordAttackRangeDetector attackRangeDetector;
         private NightShadeSwordWorldUnit swordWorldUnit;
-        private CombatHitEffectPlayer hitEffectPlayer;
+        private ICombatHitEffects hitEffectPlayer;
         private NightShadeSwordAttackAudio attackAudio;
         private NightShadeSwordBattleSpace battleSpace;
         private Vector3 homePosition;
@@ -49,9 +44,15 @@ namespace Characters.Enemies.NightShade
         internal NightShadeSwordCombatDebug CombatDebug =>
             swordWorldUnit?.CombatDebug;
 
+        /// <summary>생성 담당에게 설정과 추적 대상을 받는다.</summary>
+        public override void SetData(ScriptableObject data, Transform target)
+        {
+            config = (NightShadeSwordConfig)data;
+            this.target = target;
+        }
+
         protected override Unit CreateRuntimeObject()
         {
-            FindSceneReferences();
             FindUnityComponents();
 
             if (target == null ||
@@ -204,22 +205,11 @@ namespace Characters.Enemies.NightShade
             attackRangeDetector?.Close();
         }
 
-        private void FindSceneReferences()
-        {
-            if (target != null)
-            {
-                return;
-            }
-
-            PlayerController player = FindFirstObjectByType<PlayerController>();
-            target = player != null ? player.transform : null;
-        }
-
         private void FindUnityComponents()
         {
             characterController = GetComponent<CharacterController>();
             swordAnimation = GetComponent<NightShadeSwordAnimationController>();
-            hitEffectPlayer = GetComponent<CombatHitEffectPlayer>();
+            hitEffectPlayer = GetComponent<ICombatHitEffects>();
             attackAudio = GetComponent<NightShadeSwordAttackAudio>();
             if (enemyAnimator == null)
             {

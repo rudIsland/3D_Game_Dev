@@ -1,9 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
-using Characters;
-using Characters.Combat;
+using Core;
 
-namespace Characters.Player.Combat.Attack
+namespace Player
 {
     // 공격 Window 동안 검의 현재 Capsule과 프레임 사이 궤적을 검사한다.
     internal sealed class PlayerAttackRangeDetector
@@ -17,7 +16,7 @@ namespace Characters.Player.Combat.Attack
         private readonly LayerMask enemyLayers;
         private readonly float weaponHitRadius;
         private readonly CombatHitStop attackerHitStop;
-        private readonly CombatHitEffectPlayer hitEffectPlayer;
+        private readonly ICombatHitEffects hitEffectPlayer;
         private readonly PlayerAttackEffectPlayer attackEffectPlayer;
         private readonly Collider[] detectedColliders = new Collider[MaximumDetectedColliderCount];
         private readonly RaycastHit[] sweepHits = new RaycastHit[MaximumDetectedColliderCount];
@@ -41,7 +40,7 @@ namespace Characters.Player.Combat.Attack
             LayerMask enemyLayers,
             float weaponHitRadius,
             CombatHitStop attackerHitStop,
-            CombatHitEffectPlayer hitEffectPlayer,
+            ICombatHitEffects hitEffectPlayer,
             PlayerAttackEffectPlayer attackEffectPlayer)
         {
             this.attackerRoot = attackerRoot;

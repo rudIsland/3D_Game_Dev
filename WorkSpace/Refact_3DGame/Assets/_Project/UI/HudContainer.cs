@@ -1,19 +1,17 @@
-using Core;
 using System;
 using System.Collections.Generic;
-using Characters.Enemies;
-using Characters.Player.Lifecycle;
-using GameUI.CombatHud;
+using Core;
+using Quest;
 
-namespace GameUI
+namespace UI
 {
     // 플레이어와 적의 표시 대상을 전달한다. 게임 객체를 생성하거나 갱신하지 않는다.
     public sealed class HudContainer : Singleton<HudContainer>, IDisposable
     {
         /// <summary>표시할 플레이어로 단일 컨테이너를 준비한다. 같은 플레이어는 재사용하며, 교체는 Dispose 후 수행한다.</summary>
-        public static HudContainer Create(PlayerController player)
+        public static HudContainer Create(IPlayerHudSource player)
         {
-            if (player == null) throw new ArgumentNullException(nameof(player));
+            if (player == null || player.FollowTarget == null) throw new ArgumentNullException(nameof(player));
             if (CurrentInstance != null && CurrentInstance.player != player)
                 throw new InvalidOperationException("기존 HudContainer를 Dispose한 뒤 플레이어를 바꾸세요.");
             return CurrentInstance ?? StoreInstance(new HudContainer(player));
@@ -23,19 +21,29 @@ namespace GameUI
         [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetForPlay() { ResetInstance(); }
 
-        private readonly PlayerController player;
+        private readonly IPlayerHudSource player;
         private readonly List<CombatHudController> views = new List<CombatHudController>();
-        private readonly List<EnemyContainer> enemies = new List<EnemyContainer>();
+        private readonly List<MinimapInfoController> minimaps = new List<MinimapInfoController>();
+        private readonly List<IEnemyHudSource> enemies = new List<IEnemyHudSource>();
         // Create에서 전달한 플레이어를 HUD의 표시 대상으로 보관한다.
-        private HudContainer(PlayerController player) { this.player = player; }
+        private HudContainer(IPlayerHudSource player) { this.player = player; }
         public void Add(CombatHudController view)
         {
             if (view == null || views.Contains(view)) return;
             views.Add(view);
             view.Connect(player);
-            foreach (EnemyContainer container in enemies) view.WatchEnemies(container);
+            foreach (IEnemyHudSource container in enemies) view.WatchEnemies(container);
         }
-        public void AddEnemies(EnemyContainer container)
+        /// <summary>미니맵에 같은 플레이어를 전달하고 반환 시 함께 해제할 대상으로 기록한다.</summary>
+        public void Add(MinimapInfoController view, GroundQuestProgress quest = null)
+        {
+            if (view == null) throw new ArgumentNullException(nameof(view));
+            if (minimaps.Contains(view)) return;
+            minimaps.Add(view);
+            view.Connect(player.FollowTarget, quest);
+        }
+
+        public void AddEnemies(IEnemyHudSource container)
         {
             if (enemies.Contains(container)) return;
             enemies.Add(container);
@@ -45,7 +53,7 @@ namespace GameUI
                 else views[i].WatchEnemies(container);
             }
         }
-        public void RemoveEnemies(EnemyContainer container)
+        public void RemoveEnemies(IEnemyHudSource container)
         {
             enemies.Remove(container);
             foreach (CombatHudController view in views)
@@ -56,6 +64,9 @@ namespace GameUI
         {
             foreach (CombatHudController view in views)
                 if (view != null) view.Disconnect();
+            foreach (MinimapInfoController minimap in minimaps)
+                if (minimap != null) minimap.Disconnect();
+            minimaps.Clear();
             views.Clear();
             enemies.Clear();
             ClearInstance();

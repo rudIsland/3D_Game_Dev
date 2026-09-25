@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Characters.Enemies.Zombie
+namespace Zombie
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Animator))]

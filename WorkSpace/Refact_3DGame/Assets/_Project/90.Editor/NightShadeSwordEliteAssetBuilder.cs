@@ -1,14 +1,12 @@
-using Characters.Enemies;
-using Characters;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Characters.Combat;
-using Characters.Enemies.NightShade;
-using World;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
+using Effects;
+using Enemy;
+using NightShade;
 
 namespace EditorTools
 {
@@ -1375,6 +1373,8 @@ namespace EditorTools
             var serializedSettings = new SerializedObject(settings);
             serializedSettings.FindProperty("prefab").objectReferenceValue =
                 enemyPrefab;
+            serializedSettings.FindProperty("config").objectReferenceValue =
+                LoadRequiredAsset<NightShadeSwordConfig>(ConfigPath);
             serializedSettings.FindProperty("initialSize").intValue = 1;
             serializedSettings.FindProperty("maxSize").intValue = 2;
             serializedSettings.ApplyModifiedPropertiesWithoutUndo();

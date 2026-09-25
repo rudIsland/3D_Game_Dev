@@ -1,7 +1,7 @@
-using Characters.Combat;
 using UnityEngine;
+using Core;
 
-namespace Characters.Enemies.Zombie
+namespace Zombie
 {
     [DisallowMultipleComponent]
     // 좀비 상태를 Animator 값으로 바꾸고 공격 클립의 루트 회전을 적용한다.

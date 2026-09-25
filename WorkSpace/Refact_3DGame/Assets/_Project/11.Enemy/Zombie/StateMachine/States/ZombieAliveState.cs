@@ -1,4 +1,4 @@
-namespace Characters.Enemies.Zombie
+namespace Zombie
 {
     // 살아 있는 동안 Idle, Alert, Chase, Attack 상태를 관리한다.
     internal sealed class ZombieAliveState : IZombieState

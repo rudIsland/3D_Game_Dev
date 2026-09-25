@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
-using GameUI.Minimap;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
-using World.Zones;
+using UI;
+using Zone;
+using UnityScene = UnityEngine.SceneManagement.Scene;
 
 namespace EditorTools
 {
@@ -29,7 +30,7 @@ namespace EditorTools
         {
             if (EditorApplication.isPlaying)
                 throw new InvalidOperationException("편집 모드에서 지도를 갱신하세요.");
-            Scene scene = SceneManager.GetSceneByPath(ScenePath);
+            UnityScene scene = SceneManager.GetSceneByPath(ScenePath);
             if (!scene.IsValid() || !scene.isLoaded)
                 scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Additive);
 

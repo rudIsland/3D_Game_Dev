@@ -1,9 +1,7 @@
-using Characters.Combat;
-using Characters.Combat.AttackData;
-using Characters.Player.Combat.Hit;
 using UnityEngine;
+using Core;
 
-namespace Characters.Enemies.NightShade
+namespace NightShade
 {
     // 공격 구간 동안 RustySword 검날과 프레임 사이 이동 경로를 검사한다.
     internal sealed class NightShadeSwordAttackRangeDetector
@@ -15,7 +13,7 @@ namespace Characters.Enemies.NightShade
         private readonly LayerMask targetLayers;
         private readonly NightShadeSwordHitShape swordHitShape;
         private readonly CombatHitStop attackerHitStop;
-        private readonly CombatHitEffectPlayer hitEffectPlayer;
+        private readonly ICombatHitEffects hitEffectPlayer;
         private readonly Collider[] detectedColliders =
             new Collider[MaximumDetectedColliderCount];
         private readonly RaycastHit[] sweepHits =
@@ -36,7 +34,7 @@ namespace Characters.Enemies.NightShade
             LayerMask targetLayers,
             NightShadeSwordHitShape swordHitShape,
             CombatHitStop attackerHitStop,
-            CombatHitEffectPlayer hitEffectPlayer)
+            ICombatHitEffects hitEffectPlayer)
         {
             this.attackerRoot = attackerRoot;
             this.targetLayers = targetLayers;
@@ -193,7 +191,7 @@ namespace Characters.Enemies.NightShade
                 return;
             }
 
-            if (detectedCollider.GetComponent<PlayerGuardHitBox>() != null)
+            if (detectedCollider.GetComponent<IGuardHitBox>() != null)
             {
                 if (!pendingGuardContact.IsValid ||
                     sweepProgress < pendingGuardContact.SweepProgress)
@@ -228,15 +226,15 @@ namespace Characters.Enemies.NightShade
 
             if (tryGuardFirst)
             {
-                return TryApplyContact(in pendingGuardContact, PlayerHitSurface.Guard) ||
-                    TryApplyContact(in pendingBodyContact, PlayerHitSurface.Body);
+                return TryApplyContact(in pendingGuardContact) ||
+                    TryApplyContact(in pendingBodyContact);
             }
 
-            return TryApplyContact(in pendingBodyContact, PlayerHitSurface.Body) ||
-                TryApplyContact(in pendingGuardContact, PlayerHitSurface.Guard);
+            return TryApplyContact(in pendingBodyContact) ||
+                TryApplyContact(in pendingGuardContact);
         }
 
-        private bool TryApplyContact(in PendingPlayerContact contact, PlayerHitSurface hitSurface)
+        private bool TryApplyContact(in PendingPlayerContact contact)
         {
             if (!contact.IsValid)
             {
@@ -254,8 +252,7 @@ namespace Characters.Enemies.NightShade
             var hitRequest = new PlayerHitRequest(
                 attackDamage,
                 contact.HitPosition,
-                pushDirection,
-                hitSurface);
+                pushDirection);
             PlayerHitResult hitResult =
                 contact.Target.TryTakeHit(in hitRequest);
             if (hitResult == PlayerHitResult.Ignored)

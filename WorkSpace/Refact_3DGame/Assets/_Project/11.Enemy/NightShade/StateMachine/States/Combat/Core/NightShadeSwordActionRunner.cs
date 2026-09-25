@@ -1,5 +1,5 @@
 // 현재 전투 Action의 생명주기를 관리한다.
-namespace Characters.Enemies.NightShade
+namespace NightShade
 {
     // 현재 Action 하나의 Enter -> Update -> Exit 호출 순서를 보장한다.
     internal sealed class NightShadeSwordActionRunner
@@ -8,11 +8,7 @@ namespace Characters.Enemies.NightShade
 
         private INightShadeSwordCombatAction currentAction;
 
-        internal bool HasAction => currentAction != null;
         internal INightShadeSwordCombatAction CurrentAction => currentAction;
-        internal NightShadeSwordActionId CurrentActionId => currentAction != null
-            ? currentAction.ActionId
-            : NightShadeSwordActionId.None;
 
         internal NightShadeSwordActionRunner(NightShadeSwordCombatDebug debug)
         {

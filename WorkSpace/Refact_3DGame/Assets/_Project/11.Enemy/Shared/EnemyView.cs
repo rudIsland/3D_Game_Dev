@@ -1,11 +1,8 @@
-using Characters.Enemies;
-using Characters;
 using System;
-using Characters.Player.Lifecycle;
 using UnityEngine;
-using World.Interaction;
+using Core;
 
-namespace Characters.Enemies
+namespace Enemy
 {
     // Unity GameObject와 일반 C# 월드 객체를 연결한다.
     public abstract class EnemyView : MonoBehaviour
@@ -14,16 +11,19 @@ namespace Characters.Enemies
         private EnemyContainer manager;
         [SerializeField] private bool startFromScene;
 
-        public bool StartFromScene => startFromScene;
         internal EnemyContainer Owner => manager;
 
-        public void Connect(EnemyContainer owner)
+        public void Connect(EnemyContainer owner, ScriptableObject data, Transform target)
         {
             if (!startFromScene || RuntimeObject != null) return;
+            SetData(data, target);
             Prepare(owner, null);
             manager.Register(RuntimeObject);
             if (isActiveAndEnabled) manager.Enable(RuntimeObject);
         }
+
+        /// <summary>게임 흐름이 준비한 설정과 공격 대상을 생성 전에 전달받는다.</summary>
+        public virtual void SetData(ScriptableObject data, Transform target) { }
 
         protected virtual void OnEnable()
         {

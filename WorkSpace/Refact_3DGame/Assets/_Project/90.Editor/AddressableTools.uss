@@ -26,6 +26,10 @@
 .subtabs { flex-direction: row; align-items: center; margin-bottom: 8px; }
 .subtabs .status { flex-grow: 1; -unity-text-align: middle-right; }
 .player-move-button { min-height: 36px; margin-bottom: 8px; }
+.cheat-scroll { flex-grow: 1; min-height: 0; }
+.cheat-section { padding: 12px; margin-bottom: 12px; background-color: var(--surface); border-width: 1px; border-color: var(--line); border-radius: 4px; }
+.cheat-section .actions { margin-top: 8px; }
+.cheat-section .action { margin-right: 4px; }
 .status { font-size: 11px; color: var(--dim); }
 .body { flex-direction: row; flex-grow: 1; min-height: 0; }
 .sidebar { width: 140px; flex-shrink: 0; background-color: var(--side); padding: 12px 8px; border-right-width: 1px; border-right-color: var(--line); }

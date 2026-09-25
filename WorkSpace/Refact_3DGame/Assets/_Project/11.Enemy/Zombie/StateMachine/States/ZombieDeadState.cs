@@ -1,4 +1,4 @@
-namespace Characters.Enemies.Zombie
+namespace Zombie
 {
     // 사망 후에는 행동을 다시 시작하지 않고 중력과 지면만 유지한다.
     internal sealed class ZombieDeadState : IZombieState

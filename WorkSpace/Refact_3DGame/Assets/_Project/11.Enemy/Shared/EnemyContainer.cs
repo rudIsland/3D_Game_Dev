@@ -1,16 +1,17 @@
-using Core;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Core;
+using UnityScene = UnityEngine.SceneManagement.Scene;
 
-namespace Characters.Enemies
+namespace Enemy
 {
-    // 한 씬의 적과 적 풀만 소유한다. 갱신과 해제는 Boots가 호출한다.
-    public sealed class EnemyContainer : Singleton<EnemyContainer>, IDisposable
+    // 한 맵 씬의 적 목록과 풀을 소유한다. 생명주기 상태는 각 Unit이 갖고 이 컨테이너는 호출을 담당한다.
+    public sealed class EnemyContainer : Singleton<EnemyContainer>, IDisposable, IEnemyHudSource
     {
         /// <summary>소속 씬으로 단일 컨테이너를 준비한다. 같은 씬은 재사용하며, 다른 씬은 Dispose 후 지정한다.</summary>
-        public static EnemyContainer Create(Scene scene)
+        public static EnemyContainer Create(UnityScene scene)
         {
             if (!scene.IsValid() || !scene.isLoaded)
                 throw new ArgumentException("로드된 적 소속 씬이 필요합니다.", nameof(scene));
@@ -23,7 +24,7 @@ namespace Characters.Enemies
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetForPlay() { ResetInstance(); }
 
-        private readonly Scene scene;
+        private readonly UnityScene scene;
         private readonly List<Unit> registeredObjects = new List<Unit>(64);
         private readonly HashSet<Unit> registeredSet = new HashSet<Unit>();
         private readonly List<Unit> activeObjects = new List<Unit>(64);
@@ -36,20 +37,17 @@ namespace Characters.Enemies
         public event Action<Unit> EnemyEnabled;
         public event Action<Unit> EnemyDisabled;
         public IReadOnlyList<Unit> ActiveObjects => activeObjects;
-        public int ActiveCount => activeObjects.Count;
-        public int RegisteredCount => registeredObjects.Count;
-        public int PoolCount => pools.Count;
         // Create에서 전달한 씬에 적 풀을 배치한다.
-        private EnemyContainer(Scene scene) { this.scene = scene; }
+        private EnemyContainer(UnityScene scene) { this.scene = scene; }
 
-        public void RegisterPool(EnemySpawnSettings settings, bool warmUp = false)
+        public void RegisterPool(EnemySpawnSettings settings, Transform target, bool warmUp = false)
         {
             if (isShuttingDown) throw new ObjectDisposedException(nameof(EnemyContainer));
             if (settings == null || settings.Prefab == null) throw new ArgumentException("적 프리팹과 설정이 필요합니다.");
             if (pools.ContainsKey(settings)) return;
             var parent = new GameObject(settings.name + " Pool").transform;
             SceneManager.MoveGameObjectToScene(parent.gameObject, scene);
-            try { pools.Add(settings, new EnemyPool(this, settings, parent, warmUp)); }
+            try { pools.Add(settings, new EnemyPool(this, settings, parent, target, warmUp)); }
             catch { UnityEngine.Object.Destroy(parent.gameObject); throw; }
         }
         /// <summary>적과 풀·구독을 정리하고 단일 인스턴스를 해제한다. 다음 사용 전에 Create를 호출한다.</summary>

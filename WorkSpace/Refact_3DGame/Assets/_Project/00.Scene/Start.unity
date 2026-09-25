@@ -302,6 +302,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1499073797}
   - component: {fileID: 1499073796}
+  - component: {fileID: 1499073798}
   m_Layer: 0
   m_Name: Boot
   m_TagString: Untagged
@@ -320,8 +321,9 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7ff34200066bb0e459eda47c9909cca5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Boot::World.Boot.Boots
+  m_EditorClassIdentifier: Game.Boot::Boot.Boots
   mainCamera: {fileID: 433572629}
+  gameData: {fileID: 11400000, guid: d2112470e00c468781861ec525d277eb, type: 2}
 --- !u!4 &1499073797
 Transform:
   m_ObjectHideFlags: 0
@@ -337,6 +339,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1499073798
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1499073795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5b93567db3847d1bbba6ad773401888, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Boot::Scene.StartScene
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

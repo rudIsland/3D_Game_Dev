@@ -1,11 +1,13 @@
+using System;
 using UnityEngine;
 using UnityEngine.UIElements;
-using World.Quests;
-using World.Zones;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using Quest;
+using Zone;
+using UnityScene = UnityEngine.SceneManagement.Scene;
 
-namespace GameUI.Minimap
+namespace UI
 {
     // 플레이어의 현재 영역과 퀘스트 진행을 미니맵 아래에 표시한다.
     [DisallowMultipleComponent]
@@ -15,13 +17,16 @@ namespace GameUI.Minimap
         [SerializeField] private Transform player;
         [SerializeField] private Transform zonesRoot;
         [SerializeField] private Transform roadsRoot;
-        [SerializeField] private GroundQuestController quest;
+        private GroundQuestProgress quest;
         [SerializeField] private MinimapCameraController minimapCamera;
 
         private UIDocument document;
         private MapArea[] zones = System.Array.Empty<MapArea>();
         private MapArea[] roads = System.Array.Empty<MapArea>();
         private VisualElement documentRoot;
+        private VisualElement explorationRoot;
+        private VisualElement minimapView;
+        private VisualElement questRoot;
         private Label locationText;
         private Label bookText;
         private Label exchangeText;
@@ -32,46 +37,62 @@ namespace GameUI.Minimap
         private bool locationShown;
         private float nextLocationUpdate;
 
-        private void Awake()
-        {
-            document = GetComponent<UIDocument>();
-            if (player == null || quest == null)
-            {
-                Debug.LogError("MinimapInfoController에 플레이어, Zone, Road, 퀘스트를 연결하세요.", this);
-                enabled = false;
-                return;
-            }
+        /// <summary>미니맵 영상과 HUD의 필수 지도 요소가 준비됐는지 반환한다. 활성화 후 조회한다.</summary>
+        public bool IsReady => player != null && minimapCamera != null && minimapCamera.IsReady && CacheLabels();
 
-            // 영역 검색은 생성 시 한 번만 한다. 이동 중에는 캐시된 범위만 확인한다.
-            zones = zonesRoot != null ? zonesRoot.GetComponentsInChildren<MapArea>(true) : System.Array.Empty<MapArea>();
-            roads = roadsRoot != null ? roadsRoot.GetComponentsInChildren<MapArea>(true) : System.Array.Empty<MapArea>();
+        /// <summary>HUD 소유자가 플레이어를 전달한다. 퀘스트 연결 없이도 지도와 위치를 표시한다.</summary>
+        public void Connect(Transform target, GroundQuestProgress progress = null)
+        {
+            if (target == null) throw new ArgumentNullException(nameof(target));
+            if (minimapCamera == null || !minimapCamera.enabled)
+                throw new InvalidOperationException("HUD에 활성 MinimapCameraController를 연결하세요.");
+            Disconnect();
+            player = target;
+            quest = progress;
+            document = GetComponent<UIDocument>();
+            minimapCamera.Connect(target);
+            if (isActiveAndEnabled) OnEnable();
         }
+
+        /// <summary>화면·이벤트·플레이어 참조와 카메라의 실행용 렌더 텍스처를 정리한다.</summary>
+        public void Disconnect()
+        {
+            OnDisable();
+            player = null;
+            quest = null;
+            minimapCamera?.Disconnect();
+        }
+
+        private void Awake() => document = GetComponent<UIDocument>();
 
         private void OnEnable()
         {
+            OnDisable();
+            if (player == null) return;
             SceneManager.sceneLoaded += ReadLoadedMapAreas;
             SceneManager.sceneUnloaded += ReadRemainingMapAreas;
             ReadMapAreas();
-            if (quest != null)
-            {
-                quest.Changed += UpdateQuestText;
-            }
-            documentRoot = null;
+            if (quest != null) quest.Changed += UpdateQuestText;
             locationShown = false;
             nextLocationUpdate = 0f;
+            CacheLabels();
         }
 
+        // 비활성화 시 화면 트리와 씬·퀘스트 구독을 놓고, 재활성화 때 다시 연결한다.
         private void OnDisable()
         {
             SceneManager.sceneLoaded -= ReadLoadedMapAreas;
             SceneManager.sceneUnloaded -= ReadRemainingMapAreas;
-            zones = roads = System.Array.Empty<MapArea>();
+            zones = roads = Array.Empty<MapArea>();
             currentArea = null;
-            if (quest != null)
-            {
-                quest.Changed -= UpdateQuestText;
-            }
+            if (quest != null) quest.Changed -= UpdateQuestText;
+            if (explorationRoot != null) explorationRoot.style.display = DisplayStyle.None;
+            if (minimapView != null) minimapView.style.backgroundImage = StyleKeyword.None;
+            documentRoot = explorationRoot = minimapView = questRoot = null;
+            locationText = bookText = exchangeText = exitText = hintText = null;
         }
+
+        private void OnDestroy() => Disconnect();
 
         private void Update()
         {
@@ -116,6 +137,7 @@ namespace GameUI.Minimap
 
         private bool CacheLabels()
         {
+            if (document == null) document = GetComponent<UIDocument>();
             VisualElement root = document != null ? document.rootVisualElement : null;
             if (root == null)
             {
@@ -126,24 +148,31 @@ namespace GameUI.Minimap
                 return true;
             }
 
+            explorationRoot = root.Q("exploration-info");
+            minimapView = root.Q("minimap-view");
+            questRoot = root.Q("ground-quest");
             locationText = root.Q<Label>("current-location");
             bookText = root.Q<Label>("quest-book");
             exchangeText = root.Q<Label>("quest-exchange");
             exitText = root.Q<Label>("quest-exit");
             hintText = root.Q<Label>("quest-hint");
-            if (locationText == null || bookText == null || exchangeText == null ||
-                exitText == null || hintText == null)
+            if (explorationRoot == null || minimapView == null || locationText == null || questRoot == null ||
+                (quest != null && (bookText == null || exchangeText == null || exitText == null || hintText == null)))
             {
                 return false;
             }
+            if (player == null || minimapCamera == null || !minimapCamera.IsReady) return false;
             documentRoot = root;
+            minimapView.style.backgroundImage = Background.FromRenderTexture(minimapCamera.ViewTexture);
+            explorationRoot.style.display = DisplayStyle.Flex;
+            questRoot.style.display = quest != null ? DisplayStyle.Flex : DisplayStyle.None;
             locationShown = false;
             UpdateQuestText();
             return true;
         }
 
-        private void ReadLoadedMapAreas(Scene scene, LoadSceneMode mode) => ReadMapAreas();
-        private void ReadRemainingMapAreas(Scene scene) => ReadMapAreas();
+        private void ReadLoadedMapAreas(UnityScene scene, LoadSceneMode mode) => ReadMapAreas();
+        private void ReadRemainingMapAreas(UnityScene scene) => ReadMapAreas();
 
         // 지도 표시가 자신에게 필요한 영역만 씬 변경 시 캐시한다. 컨테이너를 참조하지 않는다.
         private void ReadMapAreas()

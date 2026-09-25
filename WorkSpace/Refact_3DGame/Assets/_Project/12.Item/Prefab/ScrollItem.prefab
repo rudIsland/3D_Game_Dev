@@ -43,5 +43,5 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fa209334a2abc41499fb60b8c7fc8d47, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::Items.WorldItemPickup
+  m_EditorClassIdentifier: Game.Runtime::Item.WorldItemPickup
   itemDefinition: {fileID: 11400000, guid: ef4d4de0366284442a12e4c3e57b9523, type: 2}

@@ -1,16 +1,14 @@
+using Core;
 using UnityEngine;
 
-namespace Characters.Player.Combat.Hit
+namespace Player
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(BoxCollider))]
     // 방어 중에만 활성화되는 방패의 물리 접촉 표면이다.
-    public sealed class PlayerGuardHitBox : MonoBehaviour
+    public sealed class PlayerGuardHitBox : MonoBehaviour, IGuardHitBox
     {
         private BoxCollider guardCollider;
-
-        internal bool IsGuardActive =>
-            guardCollider != null && guardCollider.enabled;
 
         internal void SetGuardActive(bool isActive)
         {

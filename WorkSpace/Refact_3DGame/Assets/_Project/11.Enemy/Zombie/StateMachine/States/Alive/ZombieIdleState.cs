@@ -1,4 +1,4 @@
-namespace Characters.Enemies.Zombie
+namespace Zombie
 {
     // 목표가 탐지되지 않는 동안 제자리에서 기다린다.
     internal sealed class ZombieIdleState : IZombieState

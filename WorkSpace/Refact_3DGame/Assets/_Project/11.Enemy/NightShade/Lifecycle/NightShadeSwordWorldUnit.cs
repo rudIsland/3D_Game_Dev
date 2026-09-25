@@ -1,7 +1,8 @@
 using System;
-using Characters.Combat;
+using Core;
+using Enemy;
 
-namespace Characters.Enemies.NightShade
+namespace NightShade
 {
     // EnemyUnit 생명주기에서 NightShade 양손검 전투를 실행한다.
     public sealed class NightShadeSwordWorldUnit : EnemyUnit, IEnemyCombatStatus
@@ -14,7 +15,6 @@ namespace Characters.Enemies.NightShade
         private readonly Action restoreBattlePosition;
         private bool isHitStopActive;
 
-        public float CurrentHealth => Health.CurrentHealth;
         public string DisplayName => "NIGHTSHADE";
         public bool ShowScreenHealthBar => true;
         public float CurrentStagger => stopPoint.CurrentPoint;
@@ -61,7 +61,7 @@ namespace Characters.Enemies.NightShade
                 return EnemyHitResult.Killed;
             }
 
-            float appliedStopDamage = hitRequest.StaggerDamage * stateMachine.StopDamageScale;
+            float appliedStopDamage = hitRequest.StaggerDamage;
             bool reachedStopLimit = stopPoint.TryAccumulate(appliedStopDamage);
             HitReaction reaction = NightShadeSwordHitReactionSelector.Select(
                 hitRequest.Strength,

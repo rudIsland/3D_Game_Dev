@@ -1,8 +1,8 @@
 // 전투 Action이 사용하는 Unity 경계 기능을 한곳에 모은다.
 using System;
-using Characters.Combat.AttackData;
+using Core;
 
-namespace Characters.Enemies.NightShade
+namespace NightShade
 {
     // 상태가 요청한 소리, 판정과 풀 반환을 Unity 경계로 전달한다.
     internal sealed class NightShadeSwordCombatOutput

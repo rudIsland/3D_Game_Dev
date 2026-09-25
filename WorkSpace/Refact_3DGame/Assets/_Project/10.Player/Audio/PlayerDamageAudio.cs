@@ -1,7 +1,7 @@
-using Characters.Combat.AttackData;
 using UnityEngine;
+using Core;
 
-namespace Characters.Player.Audio
+namespace Player
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(AudioSource))]

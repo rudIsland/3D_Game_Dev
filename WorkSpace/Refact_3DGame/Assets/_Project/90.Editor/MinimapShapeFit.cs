@@ -3,7 +3,8 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using World.Zones;
+using Zone;
+using UnityScene = UnityEngine.SceneManagement.Scene;
 
 namespace EditorTools
 {
@@ -21,7 +22,7 @@ namespace EditorTools
                 return;
             }
 
-            Scene scene = SceneManager.GetActiveScene();
+            UnityScene scene = SceneManager.GetActiveScene();
             var areas = new List<MapArea>();
             foreach (GameObject root in scene.GetRootGameObjects())
             {

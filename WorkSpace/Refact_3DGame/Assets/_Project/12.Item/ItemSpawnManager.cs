@@ -1,18 +1,19 @@
+using Core;
 using UnityEngine;
 
-namespace Items
+namespace Item
 {
     [DisallowMultipleComponent]
     public sealed class ItemSpawnManager : MonoBehaviour
     {
-        [SerializeField]
         private ItemCatalog itemCatalog;
         private bool hasSpawned;
         private ItemContainer items;
 
-        public void Connect(ItemContainer container)
+        public void Connect(ItemContainer container, ItemCatalog data)
         {
             items = container;
+            itemCatalog = data;
             SpawnItems();
         }
 

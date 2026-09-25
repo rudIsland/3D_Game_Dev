@@ -1,7 +1,7 @@
+using Core;
 using UnityEngine;
-using World.Interaction;
 
-namespace Characters.Player.Stats
+namespace Player
 {
     // PlayerController 인스턴스가 소유하는 강화 기록이다.
     // 플레이어 재생성 시 기록을 이어 주는 기능은 실행 흐름을 연결할 때 정한다.

@@ -1,10 +1,9 @@
-using Characters.Player.Lifecycle;
+using Core;
 using UnityEngine;
-using World.Interaction;
 
-namespace Items
+namespace Item
 {
-    public sealed class InventoryItem : MonoBehaviour, IPlayerInteractable
+    public sealed partial class InventoryItem : MonoBehaviour, IPlayerInteractable
     {
         private const string PickupGuideMessage = "아이템 줍기";
         private const string InventoryFullGuideMessage =
@@ -17,7 +16,7 @@ namespace Items
         private int count;
 
         public PlayerInteractionGuide GetInteractionGuide(
-            PlayerController player)
+            IInteractionActor player)
         {
             if (!isActiveAndEnabled ||
                 player == null ||
@@ -34,7 +33,7 @@ namespace Items
         }
 
 
-        public bool CanInteract(PlayerController player)
+        public bool CanInteract(IInteractionActor player)
         {
             return isActiveAndEnabled &&
                 player != null &&
@@ -42,7 +41,7 @@ namespace Items
                 player.CanStoreInventoryItem(itemDefinition);
         }
 
-        public bool TryInteract(PlayerController player)
+        public bool TryInteract(IInteractionActor player)
         {
             if (!CanInteract(player) ||
                 !player.TryStoreInventoryItem(itemDefinition))

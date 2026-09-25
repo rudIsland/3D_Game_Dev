@@ -1,4 +1,4 @@
-namespace Characters.Enemies.Zombie
+namespace Zombie
 {
     // 목표가 탐지 범위에 있는 동안 목표를 따라간다.
     internal sealed class ZombieChaseState : IZombieState

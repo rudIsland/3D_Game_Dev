@@ -15,6 +15,15 @@
 
 ## 사용 흐름과 확인
 
+```mermaid
+flowchart LR
+    DemonSwordsmanPrefab["DemonSwordsmanBoss.prefab"] --> AssetCheck["Animator·Avatar·Controller 참조 확인"]
+    SwordClips["검 형태 Clips"] --> AssetCheck
+    BeastClips["야수 형태 Clips"] --> AssetCheck
+    AssetCheck --> ScenePreview["씬에서 외형·애니메이션 미리보기"]
+    NoDemonSwordsmanAI["전용 C# 행동 코드 없음"] --> MissingBehavior["전투 AI·형태 전환 동작 미구현"]
+```
+
 프리팹·동작 선택 → 씬 또는 캐릭터 구성에 연결 → 외형과 애니메이션 확인 순서로 사용한다. 전투에 투입하려면 행동 코드, 피해 판정과 소환 설정의 실제 연결을 별도로 확인해야 한다.
 
 개발용 `DemonSwordsmanTestEnemy.prefab`은 `00.Scene/Dev/CharacterTest/Prefabs`에 있다. 파일 이름만 보고 이 폴더에 독립된 AI가 있다고 판단하지 않는다. Unity에서 두 형태의 Animator, Avatar, 무기와 동작 전환을 확인한다.

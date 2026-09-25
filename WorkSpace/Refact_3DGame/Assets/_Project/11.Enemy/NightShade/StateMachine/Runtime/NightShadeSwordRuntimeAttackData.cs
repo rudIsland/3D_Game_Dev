@@ -1,7 +1,7 @@
-using Characters.Combat.AttackData;
 using UnityEngine;
+using Core;
 
-namespace Characters.Enemies.NightShade
+namespace NightShade
 {
     // EnemyAttackData Asset에서 복사한 런타임 읽기 전용 공격 설정이다.
     internal readonly struct NightShadeSwordRuntimeAttackData
@@ -9,7 +9,6 @@ namespace Characters.Enemies.NightShade
         private readonly AttackDamage firstHitDamage;
         private readonly AttackDamage secondHitDamage;
 
-        internal NightShadeSwordActionId ActionId { get; }
         internal float PostAttackDelay { get; }
         internal NightShadeSwordAttackScoreSettings Score { get; }
         internal float ComboFirstExitNormalizedTime { get; }
@@ -23,7 +22,6 @@ namespace Characters.Enemies.NightShade
             NightShadeSwordAttackData source)
         {
             source.Validate();
-            ActionId = source.ActionId;
             PostAttackDelay = source.PostAttackDelay;
             Score = new NightShadeSwordAttackScoreSettings(
                 source.Utility.BaseScore,

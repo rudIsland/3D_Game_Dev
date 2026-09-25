@@ -1,12 +1,10 @@
-using Characters.Enemies;
-using Characters;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 using Object = UnityEngine.Object;
 
-namespace Characters.Enemies
+namespace Enemy
 {
     // 같은 설정의 뷰를 재사용하는 객체 풀이다.
     internal sealed class EnemyPool : IDisposable
@@ -19,6 +17,7 @@ namespace Characters.Enemies
 
         // 생성된 뷰를 담아둘 부모 Transform이다.
         private readonly Transform container;
+        private readonly Transform target;
 
         // 뷰를 꺼내고 되돌리는 Unity 객체 풀이다.
         private readonly ObjectPool<EnemyView> pool;
@@ -29,12 +28,6 @@ namespace Characters.Enemies
         // 풀이 제거되었는지 기록한다.
         private bool isDisposed;
 
-        // 현재 사용 중인 뷰 수를 반환한다.
-        public int UsedCount => pool.CountActive;
-
-        // 현재 꺼낼 수 있는 뷰 수를 반환한다.
-        public int AvailableCount => pool.CountInactive;
-
         // 관리자가 종료 순서에 맞춰 사용 중인 뷰를 정리할 때 읽는다.
         internal IReadOnlyList<EnemyView> TakenViews => takenViews;
 
@@ -43,11 +36,13 @@ namespace Characters.Enemies
             EnemyContainer manager,
             EnemySpawnSettings settings,
             Transform container,
+            Transform target,
             bool warmUp = true)
         {
             this.manager = manager;
             this.settings = settings;
             this.container = container;
+            this.target = target;
             takenViews =
                 new List<EnemyView>(settings.MaxSize);
 
@@ -127,11 +122,21 @@ namespace Characters.Enemies
         private EnemyView CreateView()
         {
             EnemyView view = Object.Instantiate(settings.Prefab, container);
-
-            view.gameObject.SetActive(false);
-            view.Prepare(manager, this);
-            manager.Register(view.RuntimeObject);
-            return view;
+            try
+            {
+                view.gameObject.SetActive(false);
+                view.SetData(settings.Config, target);
+                view.Prepare(manager, this);
+                manager.Register(view.RuntimeObject);
+                return view;
+            }
+            catch
+            {
+                // 생성 중 실패한 뷰는 풀에 들어가지 않으므로 여기서 등록과 Unity 객체를 정리한다.
+                if (view.RuntimeObject != null) manager.Unregister(view.RuntimeObject);
+                DestroyGameObject(view);
+                throw;
+            }
         }
 
         // 풀에 보관된 뷰의 GameObject를 끈다.

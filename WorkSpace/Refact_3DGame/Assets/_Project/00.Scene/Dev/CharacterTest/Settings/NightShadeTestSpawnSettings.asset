@@ -15,3 +15,4 @@ MonoBehaviour:
   prefab: {fileID: 2738947048571151062, guid: bb7d762459e2a044ca4dd05f8fec0ac5, type: 3}
   initialSize: 1
   maxSize: 2
+  config: {fileID: 11400000, guid: 9fc80d13dd7d4e81968636d6f820e5b8, type: 2}

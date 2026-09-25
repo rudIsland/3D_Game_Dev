@@ -1,9 +1,8 @@
-using Characters.Enemies;
-using Characters;
-using World;
 using UnityEngine;
+using Core;
+using Enemy;
 
-namespace Development.WorldObjectDemo
+namespace Scene
 {
     // 중앙 Tick과 풀 재사용을 눈으로 확인하기 위한 테스트용 뷰다.
     public sealed class WorldObjectDemoView : EnemyView

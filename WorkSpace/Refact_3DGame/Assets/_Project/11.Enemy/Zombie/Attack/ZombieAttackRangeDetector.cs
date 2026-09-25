@@ -1,9 +1,7 @@
-using Characters.Combat.AttackData;
-using Characters.Combat;
-using Characters.Player.Combat.Hit;
 using UnityEngine;
+using Core;
 
-namespace Characters.Enemies.Zombie
+namespace Zombie
 {
     // 공격창 동안 선택된 손·발 Capsule과 프레임 사이 궤적을 검사한다.
     internal sealed class ZombieAttackRangeDetector
@@ -17,7 +15,7 @@ namespace Characters.Enemies.Zombie
         private readonly ZombieAttackHitShape kickHitShape;
         private readonly ZombieAttackHitShape upDownHitShape;
         private readonly CombatHitStop attackerHitStop;
-        private readonly CombatHitEffectPlayer hitEffectPlayer;
+        private readonly ICombatHitEffects hitEffectPlayer;
         private readonly Collider[] detectedColliders =
             new Collider[MaximumDetectedColliderCount];
         private readonly RaycastHit[] sweepHits =
@@ -41,7 +39,7 @@ namespace Characters.Enemies.Zombie
             ZombieAttackHitShape kickHitShape,
             ZombieAttackHitShape upDownHitShape,
             CombatHitStop attackerHitStop,
-            CombatHitEffectPlayer hitEffectPlayer)
+            ICombatHitEffects hitEffectPlayer)
         {
             this.attackerRoot = attackerRoot;
             this.targetLayers = targetLayers;
@@ -201,7 +199,7 @@ namespace Characters.Enemies.Zombie
             }
 
             if (detectedCollider.GetComponent<
-                    PlayerGuardHitBox>() != null)
+                    IGuardHitBox>() != null)
             {
                 if (!pendingGuardContact.IsValid ||
                     sweepProgress < pendingGuardContact.SweepProgress)
@@ -239,15 +237,15 @@ namespace Characters.Enemies.Zombie
 
             if (tryGuardFirst)
             {
-                return TryApplyContact(in pendingGuardContact, PlayerHitSurface.Guard) ||
-                    TryApplyContact(in pendingBodyContact, PlayerHitSurface.Body);
+                return TryApplyContact(in pendingGuardContact) ||
+                    TryApplyContact(in pendingBodyContact);
             }
 
-            return TryApplyContact(in pendingBodyContact, PlayerHitSurface.Body) ||
-                TryApplyContact(in pendingGuardContact, PlayerHitSurface.Guard);
+            return TryApplyContact(in pendingBodyContact) ||
+                TryApplyContact(in pendingGuardContact);
         }
 
-        private bool TryApplyContact(in PendingPlayerContact contact, PlayerHitSurface hitSurface)
+        private bool TryApplyContact(in PendingPlayerContact contact)
         {
             if (!contact.IsValid)
             {
@@ -265,8 +263,7 @@ namespace Characters.Enemies.Zombie
             var hitRequest = new PlayerHitRequest(
                 attackDamage,
                 contact.HitPosition,
-                pushDirection,
-                hitSurface);
+                pushDirection);
             PlayerHitResult hitResult =
                 contact.Target.TryTakeHit(in hitRequest);
             if (hitResult == PlayerHitResult.Ignored)

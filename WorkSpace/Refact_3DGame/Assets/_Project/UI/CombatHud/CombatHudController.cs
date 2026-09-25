@@ -1,58 +1,48 @@
 using System.Collections.Generic;
-using Characters.Player.Interaction;
-using Characters.Player.Inventory;
-using Characters;
-using Characters.Enemies;
-using Characters.Player.Lifecycle;
-using Characters.Player.Stats;
-using World;
-using World.Interaction;
 using UnityEngine;
+using Core;
 
-namespace GameUI.CombatHud
+namespace UI
 {
     // 플레이어 자원과 현재 전투 중인 적 자원을 화면 HUD에 연결한다.
     public sealed class CombatHudController : MonoBehaviour
     {
-        private PlayerController playerController;
-        private readonly List<EnemyContainer> enemyContainers = new List<EnemyContainer>();
+        private IPlayerHudSource playerSource;
+        private readonly List<IEnemyHudSource> enemySources = new List<IEnemyHudSource>();
         private bool connected;
 
         /// <summary>플레이어 이벤트 구독과 필수 HUD 요소 준비가 완료되었는지 반환한다.</summary>
         public bool IsReady => connected && toolkitView != null && toolkitView.IsReady;
 
-        /// <summary>전달받은 플레이어와 그 상호작용 컴포넌트를 표시 대상으로 연결한다.</summary>
-        public void Connect(PlayerController player)
+        /// <summary>플레이어의 표시 계약을 받고 활성 상태이면 변경 알림을 구독한다.</summary>
+        public void Connect(IPlayerHudSource player)
         {
-            if (ReferenceEquals(playerController, player)) return;
+            if (ReferenceEquals(playerSource, player)) return;
             OnDisable();
-            playerController = player;
-            playerInteractionController = player != null
-                ? player.GetComponent<PlayerInteractionController>() : null;
+            playerSource = player;
             if (isActiveAndEnabled) OnEnable();
         }
         /// <summary>플레이어·적 이벤트 구독과 표시 대상 참조를 해제한다.</summary>
         public void Disconnect()
         {
             OnDisable();
-            playerController = null;
-            playerInteractionController = null;
-            enemyContainers.Clear();
+            playerSource = null;
+            enemySources.Clear();
         }
-        public void WatchEnemies(EnemyContainer enemies)
+        public void WatchEnemies(IEnemyHudSource enemies)
         {
-            if (enemyContainers.Contains(enemies)) return;
-            enemyContainers.Add(enemies);
+            if (enemySources.Contains(enemies)) return;
+            enemySources.Add(enemies);
             if (connected) SubscribeEnemies(enemies);
         }
-        public void StopWatchingEnemies(EnemyContainer enemies)
+        public void StopWatchingEnemies(IEnemyHudSource enemies)
         {
-            if (!enemyContainers.Remove(enemies)) return;
+            if (!enemySources.Remove(enemies)) return;
             enemies.EnemyEnabled -= HandleUnitEnabled;
             enemies.EnemyDisabled -= HandleUnitDisabled;
             foreach (Unit unit in enemies.ActiveObjects) StopTracking(unit);
         }
-        private void SubscribeEnemies(EnemyContainer enemies)
+        private void SubscribeEnemies(IEnemyHudSource enemies)
         {
             enemies.EnemyEnabled += HandleUnitEnabled;
             enemies.EnemyDisabled += HandleUnitDisabled;
@@ -62,11 +52,9 @@ namespace GameUI.CombatHud
         [Header("UI Toolkit")]
         [SerializeField] private CombatHudToolkitView toolkitView;
 
-        private PlayerInteractionController playerInteractionController;
-
         private readonly Dictionary<UnitHealth, Unit> trackedUnits = // 씬 또는 시스템 참조
             new Dictionary<UnitHealth, Unit>(3);
-        private PlayerWorldUnit displayedPlayer;
+        private bool playerTracked;
         private IEnemyCombatStatus displayedEnemy;
 
         private void Awake()
@@ -90,52 +78,36 @@ namespace GameUI.CombatHud
 
         private void OnEnable()
         {
-            if (connected || playerController == null || toolkitView == null) return;
+            if (connected || playerSource == null || playerSource.FollowTarget == null || toolkitView == null) return;
             connected = true;
-            if (playerInteractionController != null)
-            {
-                playerInteractionController.InteractionGuideChanged += HandleInteractionGuideChanged;
-                HandleInteractionGuideChanged(playerInteractionController.CurrentInteractionGuide);
-            }
-            playerController.PlayerEnabled += HandleUnitEnabled;
-            playerController.PlayerDisabled += HandleUnitDisabled;
-            if (playerController.RuntimeUnit != null && playerController.RuntimeUnit.IsEnabled) Track(playerController.RuntimeUnit);
-            foreach (EnemyContainer enemies in enemyContainers) SubscribeEnemies(enemies);
+            playerSource.InteractionGuideChanged += HandleInteractionGuideChanged;
+            HandleInteractionGuideChanged(playerSource.CurrentInteractionGuide);
+            playerSource.AvailabilityChanged += HandlePlayerAvailabilityChanged;
+            if (playerSource.IsAvailable) TrackPlayer();
+            foreach (IEnemyHudSource enemies in enemySources) SubscribeEnemies(enemies);
         }
 
         private void OnDisable()
         {
-            if (playerInteractionController != null)
+            if (playerSource != null)
             {
-                playerInteractionController.InteractionGuideChanged -=
-                    HandleInteractionGuideChanged;
+                playerSource.InteractionGuideChanged -= HandleInteractionGuideChanged;
+                playerSource.AvailabilityChanged -= HandlePlayerAvailabilityChanged;
             }
-
-            if (playerController != null)
-            {
-                playerController.PlayerEnabled -= HandleUnitEnabled;
-                playerController.PlayerDisabled -= HandleUnitDisabled;
-            }
-            foreach (EnemyContainer enemies in enemyContainers)
+            foreach (IEnemyHudSource enemies in enemySources)
             {
                 enemies.EnemyEnabled -= HandleUnitEnabled;
                 enemies.EnemyDisabled -= HandleUnitDisabled;
             }
             connected = false;
+            StopTrackingPlayer();
 
             foreach (KeyValuePair<UnitHealth, Unit> entry in trackedUnits)
             {
                 entry.Key.HealthChanged -= HandleHealthChanged;
                 entry.Key.Died -= HandleUnitDied;
 
-                if (entry.Value is PlayerWorldUnit player)
-                {
-                    player.Stamina.StaminaChanged -=
-                        HandleStaminaChanged;
-                    player.Inventory.Changed -=
-                        HandleInventoryChanged;
-                }
-                else if (entry.Value is IEnemyCombatStatus enemy)
+                if (entry.Value is IEnemyCombatStatus enemy)
                 {
                     enemy.StaggerChanged -= HandleEnemyStaggerChanged;
                     enemy.CombatStateChanged -= HandleEnemyCombatStateChanged;
@@ -143,7 +115,6 @@ namespace GameUI.CombatHud
             }
 
             trackedUnits.Clear();
-            displayedPlayer = null;
             displayedEnemy = null;
             HideAllHud();
         }
@@ -173,16 +144,48 @@ namespace GameUI.CombatHud
             }
         }
 
-        private void Track(Unit worldObject)
+        // 플레이어의 표시 가능 여부에 맞춰 수치 구독을 시작하거나 해제한다.
+        private void HandlePlayerAvailabilityChanged(bool available)
         {
-            if (!(worldObject is Unit unit))
-            {
-                return;
-            }
+            if (available) TrackPlayer();
+            else StopTrackingPlayer();
+        }
 
-            bool isPlayer = unit is PlayerUnit;
-            bool isEnemy = unit is IEnemyCombatStatus status && status.ShowScreenHealthBar;
-            if ((!isPlayer && !isEnemy) ||
+        // 기존 순서대로 체력·사망·스태미나·아이템을 구독하고 초기 값을 표시한다.
+        private void TrackPlayer()
+        {
+            if (playerTracked) return;
+            playerTracked = true;
+            playerSource.HealthChanged += HandlePlayerHealthChanged;
+            playerSource.Died += HandleUnitDied;
+            ShowPlayerHealth();
+            playerSource.StaminaChanged += HandleStaminaChanged;
+            playerSource.InventoryChanged += HandleInventoryChanged;
+            ShowPlayerInventory();
+            ShowPlayerStamina(
+                playerSource.CurrentStamina,
+                playerSource.MaxStamina,
+                playerSource.MaximumStaminaScale);
+        }
+
+        // 재활성화와 HUD 반환에서 같은 구독을 중복 없이 해제한다.
+        private void StopTrackingPlayer()
+        {
+            if (!playerTracked) return;
+            playerTracked = false;
+            playerSource.HealthChanged -= HandlePlayerHealthChanged;
+            playerSource.Died -= HandleUnitDied;
+            HidePlayerHealth();
+            playerSource.StaminaChanged -= HandleStaminaChanged;
+            playerSource.InventoryChanged -= HandleInventoryChanged;
+            HidePlayerInventory();
+            HidePlayerStamina();
+        }
+
+        private void Track(Unit unit)
+        {
+            if (unit == null ||
+                !(unit is IEnemyCombatStatus status) || !status.ShowScreenHealthBar ||
                 trackedUnits.ContainsKey(unit.Health))
             {
                 return;
@@ -191,72 +194,17 @@ namespace GameUI.CombatHud
             trackedUnits.Add(unit.Health, unit);
             unit.Health.HealthChanged += HandleHealthChanged;
             unit.Health.Died += HandleUnitDied;
-
-            if (isPlayer)
-            {
-                if (unit is PlayerWorldUnit player)
-                {
-                    displayedPlayer = player;
-                    ShowPlayerHealth(
-                        unit.Health,
-                        player.MaximumHealthScale);
-                    player.Stamina.StaminaChanged +=
-                        HandleStaminaChanged;
-                    player.Inventory.Changed +=
-                        HandleInventoryChanged;
-                    ShowPlayerInventory(player.Inventory);
-                    ShowPlayerStamina(
-                        player.CurrentStamina,
-                        player.MaxStamina,
-                        player.MaximumStaminaScale);
-                }
-                else
-                {
-                    ShowPlayerHealth(unit.Health, 1f);
-                }
-            }
-            else if (unit is IEnemyCombatStatus enemy)
-            {
-                enemy.StaggerChanged += HandleEnemyStaggerChanged;
-                enemy.CombatStateChanged += HandleEnemyCombatStateChanged;
-                if (enemy.IsInCombat)
-                {
-                    ShowEnemy(enemy);
-                }
-            }
+            status.StaggerChanged += HandleEnemyStaggerChanged;
+            status.CombatStateChanged += HandleEnemyCombatStateChanged;
+            if (status.IsInCombat) ShowEnemy(status);
         }
 
         private void StopTracking(Unit unit)
         {
-            if (!trackedUnits.Remove(unit.Health, out _))
-            {
-                return;
-            }
-
+            if (!trackedUnits.Remove(unit.Health, out _)) return;
             unit.Health.HealthChanged -= HandleHealthChanged;
             unit.Health.Died -= HandleUnitDied;
-
-            if (unit is PlayerUnit)
-            {
-                HidePlayerHealth();
-
-                if (unit is PlayerWorldUnit player)
-                {
-                    player.Stamina.StaminaChanged -=
-                        HandleStaminaChanged;
-                    player.Inventory.Changed -=
-                        HandleInventoryChanged;
-
-                    if (ReferenceEquals(displayedPlayer, player))
-                    {
-                        displayedPlayer = null;
-                    }
-                }
-
-                HidePlayerInventory();
-                HidePlayerStamina();
-            }
-            else if (unit is IEnemyCombatStatus enemy)
+            if (unit is IEnemyCombatStatus enemy)
             {
                 enemy.StaggerChanged -= HandleEnemyStaggerChanged;
                 enemy.CombatStateChanged -= HandleEnemyCombatStateChanged;
@@ -264,31 +212,20 @@ namespace GameUI.CombatHud
             }
         }
 
+        // 플레이어 내부 타입을 판별하지 않고 계약에서 변경된 수치를 읽는다.
+        private void HandlePlayerHealthChanged()
+        {
+            toolkitView.UpdatePlayerHealth(
+                playerSource.CurrentHealth,
+                playerSource.MaxHealth,
+                playerSource.MaximumHealthScale);
+        }
+
         private void HandleHealthChanged(UnitHealth health)
         {
-            if (!trackedUnits.TryGetValue(health, out Unit unit))
-            {
-                return;
-            }
-
-            if (unit is PlayerWorldUnit player)
-            {
-                UpdatePlayerHealth(
-                    health,
-                    player.MaximumHealthScale);
-                return;
-            }
-
-            if (unit is PlayerUnit)
-            {
-                UpdatePlayerHealth(health, 1f);
-                return;
-            }
-
-            if (ReferenceEquals(displayedEnemy, unit))
-            {
+            if (trackedUnits.TryGetValue(health, out Unit unit) &&
+                ReferenceEquals(displayedEnemy, unit))
                 UpdateEnemyHealth(health);
-            }
         }
 
         private void HandleUnitDied()
@@ -308,14 +245,12 @@ namespace GameUI.CombatHud
             }
         }
 
-        private void HandleStaminaChanged(PlayerStamina stamina)
+        private void HandleStaminaChanged()
         {
             toolkitView.UpdatePlayerStamina(
-                stamina.CurrentStamina,
-                stamina.MaxStamina,
-                displayedPlayer != null
-                    ? displayedPlayer.MaximumStaminaScale
-                    : 1f);
+                playerSource.CurrentStamina,
+                playerSource.MaxStamina,
+                playerSource.MaximumStaminaScale);
         }
 
         private void HandleEnemyStaggerChanged(IEnemyCombatStatus enemy)
@@ -358,9 +293,9 @@ namespace GameUI.CombatHud
             toolkitView.HideEnemyStagger();
         }
 
-        private void HandleInventoryChanged(PlayerInventory inventory)
+        private void HandleInventoryChanged()
         {
-            toolkitView.UpdatePlayerInventory(inventory);
+            toolkitView.UpdatePlayerInventory(playerSource.GetInventoryItem(0), playerSource.GetInventoryItem(1));
         }
 
         private void HideAllHud()
@@ -378,21 +313,13 @@ namespace GameUI.CombatHud
             toolkitView.HideInteractionGuide();
         }
 
-        private void ShowPlayerHealth(
-            UnitHealth health,
-            float maximumScale)
+        private void ShowPlayerHealth()
         {
             toolkitView.ShowPlayerHealth(
                 "PLAYER",
-                health,
-                maximumScale);
-        }
-
-        private void UpdatePlayerHealth(
-            UnitHealth health,
-            float maximumScale)
-        {
-            toolkitView.UpdatePlayerHealth(health, maximumScale);
+                playerSource.CurrentHealth,
+                playerSource.MaxHealth,
+                playerSource.MaximumHealthScale);
         }
 
         private void HidePlayerHealth()
@@ -411,9 +338,9 @@ namespace GameUI.CombatHud
                 maximumScale);
         }
 
-        private void ShowPlayerInventory(PlayerInventory inventory)
+        private void ShowPlayerInventory()
         {
-            toolkitView.ShowPlayerInventory(inventory);
+            toolkitView.ShowPlayerInventory(playerSource.GetInventoryItem(0), playerSource.GetInventoryItem(1));
         }
 
         private void HidePlayerInventory()

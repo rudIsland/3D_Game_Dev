@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using Core.ConstantValid;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
+using Core;
+using UnityScene = UnityEngine.SceneManagement.Scene;
 
 namespace EditorTools
 {
@@ -91,7 +92,7 @@ namespace EditorTools
         }
 
         private void OnPlayModeChanged(PlayModeStateChange state) { RestorePreview(); MarkStale(); }
-        private void OnSceneSaving(Scene scene, string path) => RestorePreview();
+        private void OnSceneSaving(UnityScene scene, string path) => RestorePreview();
         private void MarkStale() { stale = entries.Count > 0; Repaint(); }
 
         // 열린 맵 씬에서 조명 루트를 찾아 분석 대상으로 보관한다.
@@ -101,7 +102,7 @@ namespace EditorTools
             string[] scenes = { ConstantValid.GroundMapAddress, ConstantValid.UnderGroundMapAddress, "Common" };
             foreach (string name in scenes)
             {
-                Scene scene = SceneManager.GetSceneByName(name);
+                UnityScene scene = SceneManager.GetSceneByName(name);
                 if (!scene.isLoaded) continue;
                 foreach (GameObject root in scene.GetRootGameObjects())
                     if (root.name == "Setup&Lights") { source = root.transform; return; }
@@ -151,7 +152,7 @@ namespace EditorTools
         private static List<Geometry> ReadGeometry(string sceneName, string rootName)
         {
             var result = new List<Geometry>();
-            Scene scene = SceneManager.GetSceneByName(sceneName);
+            UnityScene scene = SceneManager.GetSceneByName(sceneName);
             if (!scene.isLoaded) return result;
             foreach (GameObject root in scene.GetRootGameObjects())
             {

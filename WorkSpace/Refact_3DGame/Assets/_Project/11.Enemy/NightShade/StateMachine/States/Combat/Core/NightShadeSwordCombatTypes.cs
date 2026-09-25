@@ -2,7 +2,7 @@
 using System;
 using UnityEngine;
 
-namespace Characters.Enemies.NightShade
+namespace NightShade
 {
     internal enum NightShadeSwordCombatPhase
     {

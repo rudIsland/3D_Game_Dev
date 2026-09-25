@@ -1,7 +1,7 @@
 using Cinemachine;
 using UnityEngine;
 
-namespace Characters.Player.Camera
+namespace Player
 {
     // 상태가 선택한 Cinemachine 카메라와 런타임 LookAt 대상만 연결한다.
     public sealed class PlayerTargetCamera

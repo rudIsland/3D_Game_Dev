@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace Characters.Enemies.NightShade
+namespace NightShade
 {
     // 전투 구역, 시야와 이동할 바닥을 검사한다. 실제 이동은 Movement가 담당한다.
     internal sealed class NightShadeSwordBattleSpace

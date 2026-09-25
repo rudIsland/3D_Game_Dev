@@ -1,4 +1,4 @@
-namespace Characters.Player.StateMachine.Actions
+namespace Player
 {
     internal enum PlayerBufferedAction
     {

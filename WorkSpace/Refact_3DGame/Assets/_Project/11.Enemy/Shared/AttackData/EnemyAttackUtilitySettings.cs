@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Characters.Enemies.AttackData
+namespace Enemy
 {
     [Serializable]
     public sealed class EnemyAttackUtilitySettings

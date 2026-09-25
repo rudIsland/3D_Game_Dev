@@ -1,8 +1,8 @@
 using System;
-using Characters.Player.StateMachine.States.Attack;
 using UnityEngine;
+using Core;
 
-namespace Characters.Player.Config
+namespace Player
 {
     [CreateAssetMenu(
         fileName = "PlayerCharacterConfig",
@@ -339,7 +339,6 @@ namespace Characters.Player.Config
     internal sealed class PlayerCombatRuntimeConfig
     {
         internal CharacterLifeSettings Life { get; }
-        internal float MaxHealth => Life.MaxHealth;
         internal float MaxStamina { get; }
         internal float StaminaRecoverDelay { get; }
         internal float StaminaRecoverSpeed { get; }
@@ -348,15 +347,11 @@ namespace Characters.Player.Config
         internal float SprintStaminaCostPerSecond { get; }
         internal float SprintRestartStamina { get; }
         internal float ActionInputBufferDuration { get; }
-        internal float GuardAngle { get; }
         internal float MinimumGuardDot { get; }
         internal float GuardRaiseDuration { get; }
         internal float GuardBreakControlLockDuration { get; }
         internal float HitPushDuration { get; }
         internal AnimationCurve HitPushCurve { get; }
-        internal float StopPointLimit => Life.StaggerLimit;
-        internal float StopPointRecoverDelay => Life.StaggerRecoverDelay;
-        internal float StopPointRecoverSpeed => Life.StaggerRecoverSpeed;
 
         internal PlayerCombatRuntimeConfig(PlayerCombatSettings source)
         {
@@ -370,7 +365,6 @@ namespace Characters.Player.Config
             SprintStaminaCostPerSecond = source.SprintStaminaCostPerSecond;
             SprintRestartStamina = source.SprintRestartStamina;
             ActionInputBufferDuration = source.ActionInputBufferDuration;
-            GuardAngle = source.GuardAngle;
             MinimumGuardDot = Mathf.Cos(
                 source.GuardAngle * 0.5f * Mathf.Deg2Rad);
             GuardRaiseDuration = source.GuardRaiseDuration;
@@ -396,7 +390,6 @@ namespace Characters.Player.Config
         internal LayerMask ObstructionLayers { get; }
         internal float FindRange { get; }
         internal float BreakDistance { get; }
-        internal float BreakDistanceSquared { get; }
         internal float MaximumAngle { get; }
         internal float HiddenGraceDuration { get; }
         internal float HeightOffset { get; }
@@ -407,7 +400,6 @@ namespace Characters.Player.Config
             ObstructionLayers = source.ObstructionLayers;
             FindRange = source.FindRange;
             BreakDistance = source.BreakDistance;
-            BreakDistanceSquared = source.BreakDistance * source.BreakDistance;
             MaximumAngle = source.MaximumAngle;
             HiddenGraceDuration = source.HiddenGraceDuration;
             HeightOffset = source.HeightOffset;

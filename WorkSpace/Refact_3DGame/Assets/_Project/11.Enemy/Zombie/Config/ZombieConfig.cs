@@ -1,8 +1,7 @@
 using UnityEngine;
-using Characters.Combat;
-using Characters.Combat.AttackData;
+using Core;
 
-namespace Characters.Enemies.Zombie
+namespace Zombie
 {
     [CreateAssetMenu(fileName = "ZombieConfig", menuName = "Characters/Enemies/Zombie Config")]
     public sealed class ZombieConfig : ScriptableObject

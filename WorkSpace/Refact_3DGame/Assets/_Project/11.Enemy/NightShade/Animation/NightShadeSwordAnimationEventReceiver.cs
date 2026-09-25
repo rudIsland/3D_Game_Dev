@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Characters.Enemies.NightShade
+namespace NightShade
 {
     // 공격 Animation Event를 NightShade 전투 경계로 전달한다.
     [DisallowMultipleComponent]

@@ -1,7 +1,7 @@
-using Characters.Combat.AttackData;
 using UnityEngine;
+using Core;
 
-namespace Characters.Enemies.AttackData
+namespace Enemy
 {
     // 적 종류와 관계없이 공격 하나의 변하지 않는 설정만 보관한다.
     public abstract class EnemyAttackData : ScriptableObject
@@ -16,7 +16,6 @@ namespace Characters.Enemies.AttackData
         [Header("공격 선택 점수")]
         [SerializeField] private EnemyAttackUtilitySettings utility = new();
 
-        public int HitCount => hitDamages != null ? hitDamages.Length : 0;
         public float PostAttackDelay => postAttackDelay;
         public EnemyAttackUtilitySettings Utility => utility;
 

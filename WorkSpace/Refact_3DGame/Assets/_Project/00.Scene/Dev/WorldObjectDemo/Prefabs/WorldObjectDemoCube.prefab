@@ -124,5 +124,5 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d6ba7a264f43f3a4ca549f1754137d98, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::Development.WorldObjectDemo.WorldObjectDemoView
+  m_EditorClassIdentifier: Game.Runtime::Scene.WorldObjectDemoView
   turnSpeed: 45

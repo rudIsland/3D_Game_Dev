@@ -1,7 +1,7 @@
+using Core;
 using System;
-using Items;
 
-namespace Characters.Player.Inventory
+namespace Player
 {
     // 플레이어가 소지한 아이템을 두 개의 고정 슬롯에 순서대로 보관한다.
     public sealed class PlayerInventory
@@ -13,7 +13,6 @@ namespace Characters.Player.Inventory
 
         private int occupiedSlotCount;
 
-        public int ItemCount => occupiedSlotCount;
         public bool HasEmptySlot => occupiedSlotCount < SlotCount;
 
         public event Action<PlayerInventory> Changed;

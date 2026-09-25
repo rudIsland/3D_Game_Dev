@@ -1,4 +1,4 @@
-namespace Characters.Enemies.Zombie
+namespace Zombie
 {
     internal interface IZombieState
     {

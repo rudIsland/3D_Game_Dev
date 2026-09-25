@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Characters.Player.Combat.Attack
+namespace Player
 {
     [DisallowMultipleComponent]
     // 플레이어 검의 Capsule 판정점, 반지름과 공격 대상을 소유한다.

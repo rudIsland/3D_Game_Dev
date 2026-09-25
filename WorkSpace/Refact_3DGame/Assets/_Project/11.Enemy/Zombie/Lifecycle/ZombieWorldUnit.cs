@@ -1,8 +1,9 @@
 using System;
-using Characters.Combat;
 using UnityEngine;
+using Core;
+using Enemy;
 
-namespace Characters.Enemies.Zombie
+namespace Zombie
 {
     // EnemyUnit 생명주기에서 좀비의 탐지·추적 상태머신을 실행한다.
     public sealed class ZombieWorldUnit : EnemyUnit, IEnemyCombatStatus

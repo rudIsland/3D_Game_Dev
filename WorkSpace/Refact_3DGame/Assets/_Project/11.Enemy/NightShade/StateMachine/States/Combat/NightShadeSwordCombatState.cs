@@ -1,5 +1,5 @@
 // Combat 하위 단계와 공격, Recovery Action의 생명주기를 관리한다.
-namespace Characters.Enemies.NightShade
+namespace NightShade
 {
     internal sealed class NightShadeSwordCombatState : INightShadeSwordState
     {
@@ -16,9 +16,6 @@ namespace Characters.Enemies.NightShade
         private NightShadeSwordApproachMode approachMode;
         private bool approachBlocked;
 
-        internal NightShadeSwordCombatPhase Phase => phase;
-        internal NightShadeSwordActionId CurrentActionId =>
-            actionRunner.CurrentActionId;
         internal bool IsAttackActionActive =>
             actionRunner.CurrentAction is INightShadeSwordAttackAction;
         internal bool ProtectsSmallHit

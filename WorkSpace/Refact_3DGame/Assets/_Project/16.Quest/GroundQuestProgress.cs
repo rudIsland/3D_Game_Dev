@@ -1,6 +1,6 @@
 using System;
 
-namespace World.Quests
+namespace Quest
 {
     public enum GroundQuestStep
     {
@@ -11,7 +11,7 @@ namespace World.Quests
     }
 
     // 씬과 UI를 모르고, 지상 퀘스트의 완료 순서만 관리한다.
-    public sealed class GroundQuestProgress
+    public sealed partial class GroundQuestProgress
     {
         public GroundQuestStep Step { get; private set; }
         public event Action Changed;

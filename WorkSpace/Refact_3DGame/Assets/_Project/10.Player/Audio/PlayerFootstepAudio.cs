@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Characters.Player.Audio
+namespace Player
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(AudioSource))]

@@ -1,8 +1,6 @@
-using Characters.Player.Audio;
-using Characters.Player.Lifecycle;
 using UnityEngine;
 
-namespace Characters.Player.Animation
+namespace Player
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Animator))]

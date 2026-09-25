@@ -1,9 +1,10 @@
-using Characters.Player.Lifecycle;
-using Items;
+using Core;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using World.Interaction;
+using Interaction;
+using Item;
+using Player;
 
 namespace EditorTools
 {

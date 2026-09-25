@@ -1,11 +1,10 @@
-using Characters.Player.Lifecycle;
-using Items;
+using Core;
 using UnityEngine;
 
-namespace World.Interaction
+namespace Interaction
 {
     [DisallowMultipleComponent]
-    public sealed class ItemExchangeInteraction :
+    public sealed partial class ItemExchangeInteraction :
         MonoBehaviour,
         IPlayerInteractable
     {
@@ -16,8 +15,8 @@ namespace World.Interaction
         private const string RewardStorageFullGuideMessage =
             "가방에 스크롤을 넣을 수 없습니다";
 
-        [SerializeField]
-        private ItemCatalog itemCatalog;
+        private ItemDefinition costItem;
+        private ItemDefinition rewardItem;
 
         [SerializeField]
         private ItemType costItemType = ItemType.Book;
@@ -25,8 +24,18 @@ namespace World.Interaction
         [SerializeField]
         private ItemType rewardItemType = ItemType.Scroll;
 
+        public ItemType CostItemType => costItemType;
+        public ItemType RewardItemType => rewardItemType;
+
+        /// <summary>맵 연결 담당에게 교환할 두 아이템의 정의를 받는다.</summary>
+        public void Connect(ItemDefinition cost, ItemDefinition reward)
+        {
+            costItem = cost;
+            rewardItem = reward;
+        }
+
         public PlayerInteractionGuide GetInteractionGuide(
-            PlayerController player)
+            IInteractionActor player)
         {
             if (!TryGetExchangeItems(
                     player,
@@ -50,7 +59,7 @@ namespace World.Interaction
                     false);
         }
 
-        public bool CanInteract(PlayerController player)
+        public bool CanInteract(IInteractionActor player)
         {
             if (!TryGetExchangeItems(
                     player,
@@ -63,7 +72,7 @@ namespace World.Interaction
             return player.CanExchangeInventoryItem(costItem, rewardItem);
         }
 
-        public bool TryInteract(PlayerController player)
+        public bool TryInteract(IInteractionActor player)
         {
             if (!TryGetExchangeItems(
                     player,
@@ -79,31 +88,13 @@ namespace World.Interaction
         }
 
         private bool TryGetExchangeItems(
-            PlayerController player,
+            IInteractionActor player,
             out ItemDefinition costItem,
             out ItemDefinition rewardItem)
         {
-            costItem = null;
-            rewardItem = null;
-
-            if (!isActiveAndEnabled ||
-                player == null ||
-                itemCatalog == null ||
-                !itemCatalog.TryGetItem(
-                    costItemType,
-                    out ItemCatalogEntry costEntry) ||
-                costEntry.ItemDefinition == null ||
-                !itemCatalog.TryGetItem(
-                    rewardItemType,
-                    out ItemCatalogEntry rewardEntry) ||
-                rewardEntry.ItemDefinition == null)
-            {
-                return false;
-            }
-
-            costItem = costEntry.ItemDefinition;
-            rewardItem = rewardEntry.ItemDefinition;
-            return true;
+            costItem = this.costItem;
+            rewardItem = this.rewardItem;
+            return isActiveAndEnabled && player != null && costItem != null && rewardItem != null;
         }
     }
 }

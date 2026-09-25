@@ -1,11 +1,14 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityScene = UnityEngine.SceneManagement.Scene;
 
-namespace Characters.Combat
+using Core;
+
+namespace Effects
 {
     // 확정된 전투 접촉 위치에 신체·방패 파티클을 재생한다.
     [DisallowMultipleComponent]
-    public sealed class CombatHitEffectPlayer : MonoBehaviour
+    public sealed class CombatHitEffectPlayer : MonoBehaviour, ICombatHitEffects
     {
         private const float DirectionThreshold = 0.000001f;
         private const int DefaultFloorLayerMask = 1 << 0;
@@ -75,7 +78,7 @@ namespace Characters.Combat
 
             isCreated = true;
             effectRoot = new GameObject($"{name} Hit Effects");
-            Scene ownerScene = gameObject.scene;
+            UnityScene ownerScene = gameObject.scene;
             if (ownerScene.IsValid())
             {
                 SceneManager.MoveGameObjectToScene(effectRoot, ownerScene);

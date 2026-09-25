@@ -1,7 +1,8 @@
-using Characters.Combat;
 using UnityEngine;
+using Core;
+using Enemy;
 
-namespace Characters.Enemies.Zombie
+namespace Zombie
 {
     // 피격 중에는 공격 방향으로 밀리며 Hit 애니메이션 종료를 기다린다.
     internal sealed class ZombieHitState : IZombieState

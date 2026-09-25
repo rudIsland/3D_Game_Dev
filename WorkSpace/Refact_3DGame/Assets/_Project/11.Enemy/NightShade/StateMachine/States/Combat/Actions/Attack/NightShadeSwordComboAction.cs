@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Characters.Enemies.NightShade
+namespace NightShade
 {
     internal sealed class NightShadeSwordComboAction : NightShadeSwordAttackActionBase
     {

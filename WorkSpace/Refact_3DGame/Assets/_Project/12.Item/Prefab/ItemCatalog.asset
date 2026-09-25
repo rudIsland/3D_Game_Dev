@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 32c6b0eeb1be94f4e9fd8cbcb06da1aa, type: 3}
   m_Name: ItemCatalog
-  m_EditorClassIdentifier: Game.Runtime::Items.ItemCatalog
+  m_EditorClassIdentifier: Game.Runtime::Item.ItemCatalog
   entries:
   - itemType: 1
     itemDefinition: {fileID: 11400000, guid: 45db5e319f8f02646bff0431bfe21c8d, type: 2}

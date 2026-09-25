@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
-using Characters.Combat.AttackData;
-using Characters.Player.Lifecycle;
-using Characters.Player.Config;
-using Characters.Player.Combat.Attack;
-using Characters.Player.Audio;
-using Characters.Player.StateMachine.States.Attack;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Player;
+using Data;
+using UnityScene = UnityEngine.SceneManagement.Scene;
 
 namespace EditorTools
 {
@@ -41,7 +38,7 @@ namespace EditorTools
         // Unity batchmode에서 호출하는 고정 진입점이다.
         public static void MigrateCharacterTestScene()
         {
-            Scene scene = EditorSceneManager.OpenScene(
+            UnityScene scene = EditorSceneManager.OpenScene(
                 ScenePath,
                 OpenSceneMode.Single);
             MigrateScene(scene, true);
@@ -71,7 +68,7 @@ namespace EditorTools
             }
         }
 
-        private static void MigrateScene(Scene scene, bool exitAfterMigration)
+        private static void MigrateScene(UnityScene scene, bool exitAfterMigration)
         {
             try
             {
@@ -138,7 +135,9 @@ namespace EditorTools
                 MoveWeaponHitShapeValues(controller, controllerData);
 
             controllerData.Update();
-            controllerData.FindProperty("config").objectReferenceValue = config;
+            var gameData = new SerializedObject(AssetDatabase.LoadAssetAtPath<GameData>("Assets/_Project/06.Data/GameData.asset"));
+            gameData.FindProperty("player").objectReferenceValue = config;
+            gameData.ApplyModifiedPropertiesWithoutUndo();
             controllerData.FindProperty("weaponHitShape").objectReferenceValue = hitShape;
             controllerData.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(controller);
@@ -152,9 +151,8 @@ namespace EditorTools
             PlayerController controller,
             SerializedObject controllerData)
         {
-            PlayerCharacterConfig config = controllerData
-                .FindProperty("config")?.objectReferenceValue as
-                PlayerCharacterConfig;
+            PlayerCharacterConfig config = AssetDatabase.LoadAssetAtPath<GameData>(
+                "Assets/_Project/06.Data/GameData.asset").Player;
             PlayerWeaponHitShape hitShape = controllerData
                 .FindProperty("weaponHitShape")?.objectReferenceValue as
                 PlayerWeaponHitShape;

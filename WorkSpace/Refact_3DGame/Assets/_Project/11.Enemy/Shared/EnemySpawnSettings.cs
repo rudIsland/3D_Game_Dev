@@ -1,8 +1,6 @@
-using Characters.Enemies;
-using Characters;
 using UnityEngine;
 
-namespace Characters.Enemies
+namespace Enemy
 {
     // 하나의 프리팹을 몇 개 준비하고 보관할지 설정한다.
     [CreateAssetMenu(fileName = "EnemySpawnSettings", menuName = "World/Spawn Settings")]
@@ -10,6 +8,8 @@ namespace Characters.Enemies
     {
         // 풀에서 복제할 프리팹이다.
         [SerializeField] private EnemyView prefab;
+        [SerializeField] private ScriptableObject config;
+        public ScriptableObject Config => config;
         // 시작할 때 미리 만들 뷰의 수다.
         [SerializeField, Min(0)] private int initialSize = 4;
         // 풀이 보관할 수 있는 최대 뷰 수다.

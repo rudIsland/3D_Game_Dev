@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace Characters.Enemies.Navigation
+namespace Enemy
 {
     // NavMeshAgent는 경로와 회피 방향만 계산하고 Transform은 직접 움직이지 않는다.
     internal sealed class EnemyNavMeshPathGuide : IEnemyPathGuide

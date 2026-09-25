@@ -1,8 +1,6 @@
-using Characters.Player.Lifecycle;
-using Characters.Player.StateMachine;
-using World.Interaction;
+using Core;
 
-namespace Characters.Player.Stats
+namespace Player
 {
     // 강화 중복 여부를 확인하고 기록과 실제 능력치를 함께 변경한다.
     internal static class PlayerStatUpgrade
@@ -15,7 +13,7 @@ namespace Characters.Player.Stats
         internal static bool TryApply(
             PlayerStatUpgradeSession session,
             StatueUpgradeType upgradeType,
-            PlayerWorldUnit player,
+            PlayerUnit player,
             PlayerStateMachine stateMachine)
         {
             if (player == null || stateMachine == null || player.IsDead)

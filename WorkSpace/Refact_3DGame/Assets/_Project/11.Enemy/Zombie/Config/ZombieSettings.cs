@@ -1,7 +1,7 @@
 using UnityEngine;
-using Characters.Combat.AttackData;
+using Core;
 
-namespace Characters.Enemies.Zombie
+namespace Zombie
 {
     // 같은 Config를 쓰는 좀비가 공유한다. 곡선은 복사 후 외부에 노출하지 않는다.
     internal sealed class ZombieSettings
@@ -9,13 +9,9 @@ namespace Characters.Enemies.Zombie
         internal CharacterLifeSettings Life { get; }
         internal float DeadBodyKeepTime { get; }
         internal float ZoneTrackingMargin { get; }
-        internal float HomeArrivalDistance { get; }
         internal float HomeRecoveryDelay { get; }
         internal float HealthRecoverySpeed { get; }
-        internal float FindRange { get; }
         internal float IdleTargetCheckInterval { get; }
-        internal float AttackRange { get; }
-        internal float AttackFacingAngle { get; }
         internal LayerMask TargetLayers { get; }
         internal AttackDamage SwingAttackDamage { get; }
         internal AttackDamage KickAttackDamage { get; }
@@ -40,13 +36,9 @@ namespace Characters.Enemies.Zombie
                 source.StaggerRecoverDelay, source.StaggerRecoverSpeed);
             DeadBodyKeepTime = source.DeadBodyKeepTime;
             ZoneTrackingMargin = source.ZoneTrackingMargin;
-            HomeArrivalDistance = source.HomeArrivalDistance;
             HomeRecoveryDelay = source.HomeRecoveryDelay;
             HealthRecoverySpeed = source.HealthRecoverySpeed;
-            FindRange = source.FindRange;
             IdleTargetCheckInterval = source.IdleTargetCheckInterval;
-            AttackRange = source.AttackRange;
-            AttackFacingAngle = source.AttackFacingAngle;
             TargetLayers = source.TargetLayers;
             SwingAttackDamage = CopyDamage(source.SwingAttackDamage);
             KickAttackDamage = CopyDamage(source.KickAttackDamage);
@@ -57,10 +49,10 @@ namespace Characters.Enemies.Zombie
             GroundPull = source.GroundPull;
             HitPushDuration = source.HitPushDuration;
             KnockbackPushDuration = source.KnockbackPushDuration;
-            FindRangeSquared = FindRange * FindRange;
-            AttackRangeSquared = AttackRange * AttackRange;
-            MinimumAttackFacingDot = Mathf.Cos(AttackFacingAngle * Mathf.Deg2Rad);
-            HomeArrivalDistanceSquared = HomeArrivalDistance * HomeArrivalDistance;
+            FindRangeSquared = source.FindRange * source.FindRange;
+            AttackRangeSquared = source.AttackRange * source.AttackRange;
+            MinimumAttackFacingDot = Mathf.Cos(source.AttackFacingAngle * Mathf.Deg2Rad);
+            HomeArrivalDistanceSquared = source.HomeArrivalDistance * source.HomeArrivalDistance;
             hitPushCurve = new AnimationCurve(source.HitPushCurve.keys)
             {
                 preWrapMode = source.HitPushCurve.preWrapMode,

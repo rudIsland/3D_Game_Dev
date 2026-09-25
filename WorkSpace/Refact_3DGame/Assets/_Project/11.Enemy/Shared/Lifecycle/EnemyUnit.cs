@@ -1,11 +1,10 @@
-namespace Characters
+using Core;
+
+namespace Enemy
 {
     // 적 유닛의 공통 타입과 재활성화 시 체력 초기화를 제공한다.
     public abstract class EnemyUnit : Unit
     {
-        // 보스 여부를 알려준다.
-        public virtual bool IsBoss => false;
-
         // 적의 최대 체력으로 기본 유닛을 만든다.
         protected EnemyUnit(float maxHealth)
             : base(maxHealth)

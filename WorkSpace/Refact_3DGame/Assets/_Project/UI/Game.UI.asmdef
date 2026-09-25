@@ -1,6 +1,6 @@
 {
   "name": "Game.UI",
-  "rootNamespace": "GameUI",
+  "rootNamespace": "UI",
   "references": [
     "Game.Runtime",
     "Unity.InputSystem",

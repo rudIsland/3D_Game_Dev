@@ -1,13 +1,8 @@
-using Characters.Player.StateMachine.States.Attack;
-using Characters.Player.StateMachine.States.Block;
-using Characters.Player.StateMachine.States.Movement;
-
-namespace Characters.Player.StateMachine.Actions
+namespace Player
 {
     // 이동, 방어, 구르기와 공격 사이의 행동 전환을 한곳에서 관리한다.
     internal sealed class PlayerActionStateMachine
     {
-        private readonly PlayerStateMachine stateMachine;
         private readonly PlayerMoveState moveState;
         private readonly PlayerBlockState blockState;
         private readonly PlayerRollState rollState;
@@ -20,19 +15,17 @@ namespace Characters.Player.StateMachine.Actions
         public bool IsBlocking => ReferenceEquals(currentState, blockState);
         public bool IsRolling => ReferenceEquals(currentState, rollState);
         public bool IsAttacking => ReferenceEquals(currentState, attackState);
-        public bool IsMoving => ReferenceEquals(currentState, moveState);
         public bool IsGuardReady =>
             IsBlocking && blockState.IsGuardReady;
 
+        /// <summary>전환할 행동들과 입력 예약 시간을 전달받는다.</summary>
         public PlayerActionStateMachine(
-            PlayerStateMachine stateMachine,
             PlayerMoveState moveState,
             PlayerBlockState blockState,
             PlayerRollState rollState,
             PlayerAttackState attackState,
             float inputBufferDuration)
         {
-            this.stateMachine = stateMachine;
             this.moveState = moveState;
             this.blockState = blockState;
             this.rollState = rollState;
@@ -52,6 +45,7 @@ namespace Characters.Player.StateMachine.Actions
             ChangeState(moveState);
         }
 
+        /// <summary>예약 입력을 먼저 갱신하고 기존 우선순위대로 행동을 진행·전환한다.</summary>
         public void Update(float deltaTime, PlayerStateInput input)
         {
             if (!isEnabled || currentState == null)
@@ -78,7 +72,7 @@ namespace Characters.Player.StateMachine.Actions
                 currentState.Update(deltaTime, input);
                 if (attackState.CanCancelToRoll && inputBuffer.TryTake(PlayerBufferedAction.Roll))
                 {
-                    if (stateMachine.TryStartAttackCancelRoll())
+                    if (rollState.TryStartAttackCancelRoll())
                     {
                         rollState.StartAfterAttackCancel();
                         ChangeState(rollState);
@@ -107,7 +101,7 @@ namespace Characters.Player.StateMachine.Actions
             {
                 if (inputBuffer.TryTake(PlayerBufferedAction.Roll))
                 {
-                    if (stateMachine.TryStartRoll())
+                    if (rollState.TryStartRoll())
                     {
                         ChangeState(rollState);
                         currentState.Update(deltaTime, input);
@@ -148,6 +142,7 @@ namespace Characters.Player.StateMachine.Actions
             isEnabled = false;
         }
 
+        // 이동 상태에서만 예약 입력을 소비한다. 준비 실패 시에도 입력을 되돌리지 않는다.
         private void TryStartReadyAction(float deltaTime, PlayerStateInput input)
         {
             if (!ReferenceEquals(currentState, moveState))
@@ -157,7 +152,7 @@ namespace Characters.Player.StateMachine.Actions
 
             if (inputBuffer.TryTake(PlayerBufferedAction.Roll))
             {
-                if (stateMachine.TryStartRoll())
+                if (rollState.TryStartRoll())
                 {
                     ChangeState(rollState);
                     currentState.Update(deltaTime, input);
@@ -168,7 +163,7 @@ namespace Characters.Player.StateMachine.Actions
 
             if (inputBuffer.TryTake(PlayerBufferedAction.Attack))
             {
-                if (stateMachine.TryPrepareAttack())
+                if (attackState.TryPrepareAttack())
                 {
                     ChangeState(attackState);
                     currentState.Update(deltaTime, input);

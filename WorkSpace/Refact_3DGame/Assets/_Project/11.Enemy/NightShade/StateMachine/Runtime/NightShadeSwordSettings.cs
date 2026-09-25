@@ -1,9 +1,9 @@
 using System;
-using Characters.Combat;
-using Characters.Enemies.AttackData;
 using UnityEngine;
+using Core;
+using Enemy;
 
-namespace Characters.Enemies.NightShade
+namespace NightShade
 {
     // Inspector Config를 역할별로 복사한 NightShade 런타임 설정이다.
     internal sealed class NightShadeSwordSettings
@@ -155,21 +155,20 @@ namespace Characters.Enemies.NightShade
 
     internal sealed class NightShadeSwordHitReactionRuntimeConfig
     {
-        internal float PushDuration { get; }
-        internal float KnockbackPushDuration { get; }
-        internal float KnockdownPushDuration { get; }
+        private readonly float pushDuration;
+        private readonly float knockbackPushDuration;
+        private readonly float knockdownPushDuration;
         internal float KnockdownStayDuration { get; }
         internal float StaggerBreakStayDuration { get; }
 
         private readonly AnimationCurve pushCurve;
-        internal AnimationCurve PushCurve => pushCurve;
 
         internal NightShadeSwordHitReactionRuntimeConfig(
             NightShadeSwordHitReactionSettings source)
         {
-            PushDuration = source.PushDuration;
-            KnockbackPushDuration = source.KnockbackPushDuration;
-            KnockdownPushDuration = source.KnockdownPushDuration;
+            pushDuration = source.PushDuration;
+            knockbackPushDuration = source.KnockbackPushDuration;
+            knockdownPushDuration = source.KnockdownPushDuration;
             KnockdownStayDuration = source.KnockdownStayDuration;
             StaggerBreakStayDuration = source.StaggerBreakStayDuration;
             pushCurve = CloneCurve(source.PushCurve);
@@ -180,11 +179,11 @@ namespace Characters.Enemies.NightShade
             switch (reaction)
             {
                 case HitReaction.Knockdown:
-                    return KnockdownPushDuration;
+                    return knockdownPushDuration;
                 case HitReaction.Knockback:
-                    return KnockbackPushDuration;
+                    return knockbackPushDuration;
                 default:
-                    return PushDuration;
+                    return pushDuration;
             }
         }
 

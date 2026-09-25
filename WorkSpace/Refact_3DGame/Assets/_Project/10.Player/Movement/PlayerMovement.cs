@@ -1,8 +1,6 @@
-using Characters.Player.Config;
-using Characters.Player.Input;
 using UnityEngine;
 
-namespace Characters.Player.Movement
+namespace Player
 {
     // 공통 이동과 Root Motion을 관리하고 방향 계산은 현재 이동 모드에 맡긴다.
     public sealed class PlayerMovement
@@ -28,7 +26,6 @@ namespace Characters.Player.Movement
             characterController.isGrounded;
         public Vector3 Position => playerTransform.position;
         public Vector3 Forward => playerTransform.forward; // 플레이어가 바라보는 방향
-        public Vector3 Right => playerTransform.right; // 플레이어의 오른쪽 방향
         public float WalkSpeed => settings.WalkSpeed;
         public float SprintSpeed => settings.SprintSpeed;
         public float GuardMoveSpeed => settings.GuardMoveSpeed;

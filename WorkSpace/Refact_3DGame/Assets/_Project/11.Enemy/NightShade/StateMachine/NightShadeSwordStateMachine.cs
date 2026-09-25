@@ -1,8 +1,9 @@
 using System;
-using Characters.Combat;
 using UnityEngine;
+using Core;
+using Enemy;
 
-namespace Characters.Enemies.NightShade
+namespace NightShade
 {
     internal enum NightShadeSwordAttackType
     {
@@ -56,16 +57,11 @@ namespace Characters.Enemies.NightShade
 
         internal bool IsInCombat => isInCombat;
         internal bool ProtectsSmallHit => IsAttackStateActive && combatState.ProtectsSmallHit;
-        internal float StopDamageScale => 1f;
         internal bool HasPendingReaction => hasPendingDeath || pendingHitReaction != HitReaction.None;
         internal bool IsAttackStateActive =>
             isEnabled && currentState != null &&
             currentStateId == NightShadeSwordStateId.Combat &&
             combatState.IsAttackActionActive;
-        internal NightShadeSwordStateId CurrentStateId => currentStateId;
-        internal NightShadeSwordCombatPhase CurrentCombatPhase => combatState.Phase;
-        internal NightShadeSwordActionId CurrentActionId => combatState.CurrentActionId;
-        internal NightShadeSwordCombatMemory CombatMemory => combatMemory;
         internal NightShadeSwordCombatDebug Debug => debug;
 
         internal event Action CombatStateChanged;

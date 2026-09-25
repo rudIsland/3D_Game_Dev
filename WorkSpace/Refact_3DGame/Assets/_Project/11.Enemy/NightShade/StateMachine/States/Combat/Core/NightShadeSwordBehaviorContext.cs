@@ -1,4 +1,4 @@
-namespace Characters.Enemies.NightShade
+namespace NightShade
 {
     // 여러 State와 Action이 공유하는 런타임 동작 경계만 보관한다.
     internal sealed class NightShadeSwordBehaviorContext

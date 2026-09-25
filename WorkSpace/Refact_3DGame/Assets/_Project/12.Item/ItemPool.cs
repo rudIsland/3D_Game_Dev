@@ -1,10 +1,12 @@
+using Core;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
+using UnityScene = UnityEngine.SceneManagement.Scene;
 
-namespace Items
+namespace Item
 {
     // 획득 시 반환하고 맵 종료 시 사용 중·대기 중인 객체를 모두 파괴한다.
     internal sealed class ItemPool : IDisposable
@@ -14,7 +16,7 @@ namespace Items
         private readonly List<WorldItemPickup> items = new List<WorldItemPickup>();
         private readonly Stack<WorldItemPickup> available = new Stack<WorldItemPickup>();
         private bool disposed;
-        public ItemPool(WorldItemPickup prefab, Scene scene)
+        public ItemPool(WorldItemPickup prefab, UnityScene scene)
         {
             this.prefab = prefab;
             root = new GameObject(prefab.name + " Item Pool").transform;

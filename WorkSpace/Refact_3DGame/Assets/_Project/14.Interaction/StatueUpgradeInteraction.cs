@@ -1,15 +1,8 @@
-using Characters.Player.Lifecycle;
+using Core;
 using UnityEngine;
 
-namespace World.Interaction
+namespace Interaction
 {
-    public enum StatueUpgradeType
-    {
-        MaxHealth = 0,
-        MaxStamina = 1,
-        Strength = 2
-    }
-
     [DisallowMultipleComponent]
     public sealed class StatueUpgradeInteraction :
         MonoBehaviour,
@@ -23,21 +16,21 @@ namespace World.Interaction
         public StatueUpgradeType UpgradeType => upgradeType;
 
         public PlayerInteractionGuide GetInteractionGuide(
-            PlayerController player)
+            IInteractionActor player)
         {
             return CanInteract(player)
                 ? new PlayerInteractionGuide(UpgradeGuideMessage, true)
                 : PlayerInteractionGuide.Hidden;
         }
 
-        public bool CanInteract(PlayerController player)
+        public bool CanInteract(IInteractionActor player)
         {
             return enabled &&
                 player != null &&
                 !player.HasStatueUpgrade(upgradeType);
         }
 
-        public bool TryInteract(PlayerController player)
+        public bool TryInteract(IInteractionActor player)
         {
             if (!CanInteract(player) ||
                 !player.TryApplyStatueUpgrade(upgradeType))

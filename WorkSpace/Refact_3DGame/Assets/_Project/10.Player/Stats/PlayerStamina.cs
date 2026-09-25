@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Characters.Player.Stats
+namespace Player
 {
     // 플레이어 Stamina의 소비, 회복 대기와 회복량을 관리한다.
     public sealed class PlayerStamina

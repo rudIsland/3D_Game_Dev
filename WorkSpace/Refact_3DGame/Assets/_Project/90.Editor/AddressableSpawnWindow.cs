@@ -2,20 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Characters.Player.Lifecycle;
-using GameUI.CombatHud;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
-using World.Loading;
 using Object = UnityEngine.Object;
+using Manager;
+using Boot;
+using Player;
+using UI;
+using UnityScene = UnityEngine.SceneManagement.Scene;
 
 namespace EditorTools
 {
-    // 등록 목록을 읽고 이 창이 생성한 객체·성공한 로드 요청만 소유한다. 게임 소유 요청은 변경하지 않는다.
+    // 전체 로드 요청을 표시하고 삭제는 실제 소유자에게 전달한다. 창을 닫을 때는 자체 요청만 반환한다.
     public sealed class AddressableSpawnWindow : EditorWindow
     {
         private sealed class CatalogItem
@@ -52,9 +54,13 @@ namespace EditorTools
         private CancellationToken playExit;
         private double nextRefresh;
         private PlayerMovePanel playerPanel;
+        private PlayerHealthPanel healthPanel;
+        private ItemCheatPanel itemPanel;
+        private QuestCheatPanel questPanel;
+        private enum CheatTab { Addressable, Player, Item, Quest }
 
         /// <summary>등록된 Addressables를 직접 선택해 생성·제거하는 창을 연다.</summary>
-        [MenuItem("Tools/Cheat/치트 창")]
+        [MenuItem("Tools/Cheat/치트 창", false, 0)]
         public static void OpenWindow() => GetWindow<AddressableSpawnWindow>("치트");
 
         // UI 상태 갱신과 Play 경계 정리를 등록한다.
@@ -98,6 +104,9 @@ namespace EditorTools
                 ShowSelection();
                 SetMessage(null);
                 playerPanel?.RefreshTargets();
+                healthPanel?.Refresh();
+                itemPanel?.RefreshTargets();
+                questPanel?.Refresh();
             }
             RefreshButtons();
         }
@@ -112,9 +121,20 @@ namespace EditorTools
             ui.EnableInClassList("tools-root--dark", EditorGUIUtility.isProSkin);
             titleContent = new GUIContent("치트");
             playerPanel = new PlayerMovePanel();
-            ui.Q("playerPage").Add(playerPanel.CreateView());
-            ui.Q<Button>("addressableTab").clicked += () => ShowPlayerTab(false);
-            ui.Q<Button>("playerTab").clicked += () => ShowPlayerTab(true);
+            healthPanel = new PlayerHealthPanel();
+            var playerScroll = new ScrollView();
+            playerScroll.AddToClassList("cheat-scroll");
+            playerScroll.Add(healthPanel.CreateView());
+            playerScroll.Add(playerPanel.CreateView());
+            ui.Q("playerPage").Add(playerScroll);
+            itemPanel = new ItemCheatPanel();
+            ui.Q("itemPage").Add(itemPanel.CreateView());
+            questPanel = new QuestCheatPanel();
+            ui.Q("questPage").Add(questPanel.CreateView());
+            ui.Q<Button>("addressableTab").clicked += () => ShowCheatTab(CheatTab.Addressable);
+            ui.Q<Button>("playerTab").clicked += () => ShowCheatTab(CheatTab.Player);
+            ui.Q<Button>("itemTab").clicked += () => ShowCheatTab(CheatTab.Item);
+            ui.Q<Button>("questTab").clicked += () => ShowCheatTab(CheatTab.Quest);
             catalogList = ui.Q<ListView>("catalogList");
             catalogList.itemsSource = catalog;
             catalogList.makeItem = MakeListRow;
@@ -176,15 +196,21 @@ namespace EditorTools
             ui.Q<Button>("loadedTab").EnableInClassList("selected", showLoaded);
         }
 
-        // 공통 왼쪽 탭에서 리소스와 플레이어 치트를 전환한다.
-        private void ShowPlayerTab(bool showPlayer)
+        // 공통 왼쪽 탭에서 리소스·플레이어·현재 맵 아이템 치트를 전환한다.
+        private void ShowCheatTab(CheatTab tab)
         {
-            ui.Q("addressablePage").EnableInClassList("hidden", showPlayer);
-            ui.Q("playerPage").EnableInClassList("hidden", !showPlayer);
-            ui.Q("addressableTab").EnableInClassList("selected", !showPlayer);
-            ui.Q("playerTab").EnableInClassList("selected", showPlayer);
+            ui.Q("addressablePage").EnableInClassList("hidden", tab != CheatTab.Addressable);
+            ui.Q("playerPage").EnableInClassList("hidden", tab != CheatTab.Player);
+            ui.Q("itemPage").EnableInClassList("hidden", tab != CheatTab.Item);
+            ui.Q("questPage").EnableInClassList("hidden", tab != CheatTab.Quest);
+            ui.Q("addressableTab").EnableInClassList("selected", tab == CheatTab.Addressable);
+            ui.Q("playerTab").EnableInClassList("selected", tab == CheatTab.Player);
+            ui.Q("itemTab").EnableInClassList("selected", tab == CheatTab.Item);
+            ui.Q("questTab").EnableInClassList("selected", tab == CheatTab.Quest);
             SetMessage(null);
-            if (showPlayer) playerPanel.RefreshTargets();
+            if (tab == CheatTab.Player) { playerPanel.RefreshTargets(); healthPanel.Refresh(); }
+            if (tab == CheatTab.Item) itemPanel.RefreshTargets();
+            if (tab == CheatTab.Quest) questPanel.Refresh();
         }
 
         // 두 목록에서 이름과 종류·상태를 같은 간격으로 표시한다.
@@ -232,33 +258,83 @@ namespace EditorTools
             ShowSelection();
         }
 
-        // 선택 항목과 이 창이 가진 수만 표시한다.
+        // 선택 항목의 전체 참조 수와 실제 삭제 범위를 함께 표시한다.
         private void ShowSelection()
         {
             if (this == null || ui == null) return;
-            int count = 0;
-            foreach (var item in created)
-                if (selected != null && item.Item.Address == selected.Address && item.Item.IsScene == selected.IsScene) count++;
-            ui.Q<Label>("selectedAddress").text = selected == null ? "등록 목록에서 항목을 선택하세요." :
-                selected.Address + "\n이 창에서 생성·로드한 수: " + count;
             RefreshButtons();
         }
 
-        // 선택한 주소로 이 창이 만든 마지막 객체·요청 하나를 삭제한다.
+        // 두 탭의 삭제 입력을 같은 소유자 조회 경로로 전달한다.
         private void DeleteSelected()
         {
-            if (selected == null) return;
-            for (int i = created.Count - 1; i >= 0; i--)
-                if (created[i].Item.Address == selected.Address && created[i].Item.IsScene == selected.IsScene)
-                { RemoveOne(created[i]); return; }
+            if (selected != null) DeleteAddress(selected.Address, selected.IsScene);
         }
 
-        // 로드 현황에서도 같은 소유 요청을 찾아 기존 삭제 순서를 따른다.
-        private void DeleteLoaded()
+        private void DeleteLoaded() => DeleteAddress(selectedLoadedAddress, selectedLoadedIsScene);
+
+        // 자체 요청을 먼저 반환하고, 없으면 게임 소유자가 객체·구독·원본을 순서대로 정리한다.
+        private async void DeleteAddress(string address, bool isScene)
+        {
+            if (!CanChange() || string.IsNullOrEmpty(address)) return;
+            manager = AddressableManager.Instance;
+            int count = isScene ? manager.GetSceneRefCount(address) : manager.GetRefCount(address);
+            if (count <= 0) { RefreshButtons(); return; }
+            CreatedResource resource = FindCreatedResource(address, isScene);
+            if (resource != null) { RemoveOne(resource); return; }
+            Boots owner = FindGameOwner(address, isScene);
+            if (owner == null)
+            {
+                SetMessage("이 주소의 사용 객체를 정리할 소유자를 찾지 못했습니다: " + address, true);
+                return;
+            }
+
+            busy = true;
+            var token = Application.exitCancellationToken;
+            string description = owner.GetResourceDeleteDescription(address, isScene);
+            SetMessage(description);
+            RefreshButtons();
+            try
+            {
+                await owner.DeleteResource(address, isScene);
+                if (!token.IsCancellationRequested) SetMessage("삭제 완료 · " + description);
+            }
+            catch (Exception exception)
+            {
+                if (!token.IsCancellationRequested) SetMessage(exception.GetBaseException().Message, true);
+            }
+            finally
+            {
+                if (!token.IsCancellationRequested) { busy = false; RefreshButtons(); }
+            }
+        }
+
+        // 같은 주소를 여러 번 만든 경우 가장 최근의 창 소유 요청 하나를 선택한다.
+        private CreatedResource FindCreatedResource(string address, bool isScene)
         {
             for (int i = created.Count - 1; i >= 0; i--)
-                if (created[i].Item.Address == selectedLoadedAddress && created[i].Item.IsScene == selectedLoadedIsScene)
-                { RemoveOne(created[i]); return; }
+                if (created[i].Item.Address == address && created[i].Item.IsScene == isScene)
+                    return created[i];
+            return null;
+        }
+
+        // 에디터 조회 시점에만 진입점을 찾아 실제 게임의 소유 여부를 확인한다.
+        private Boots FindGameOwner(string address, bool isScene)
+        {
+            if (!Application.isPlaying || string.IsNullOrEmpty(address)) return null;
+            foreach (Boots boot in Object.FindObjectsByType<Boots>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                if (boot.GetResourceDeleteDescription(address, isScene) != null) return boot;
+            return null;
+        }
+
+        // 삭제에 따라 함께 사라지는 대상을 클릭 전에 표시한다.
+        private string DeleteDescription(string address, bool isScene)
+        {
+            if (ReferenceCount(address, isScene) <= 0) return "반환할 참조가 없습니다.";
+            if (FindCreatedResource(address, isScene) != null) return "치트가 만든 마지막 객체·요청 하나를 정리합니다.";
+            Boots owner = FindGameOwner(address, isScene);
+            return owner != null ? owner.GetResourceDeleteDescription(address, isScene) :
+                "사용 객체를 정리할 소유자를 찾지 못했습니다.";
         }
 
         // 표시용 종류명을 반환한다.
@@ -312,7 +388,7 @@ namespace EditorTools
                 {
                     resource.Root = new GameObject("Cheat_" + item.Name);
                     resource.Root.SetActive(false);
-                    Scene start = SceneManager.GetSceneByName("Start");
+                    UnityScene start = SceneManager.GetSceneByName("Start");
                     if (start.IsValid() && start.isLoaded) SceneManager.MoveGameObjectToScene(resource.Root, start);
                     resource.Instance = Object.Instantiate((GameObject)original, resource.Root.transform, false);
                     resource.Instance.transform.position = position;
@@ -428,6 +504,9 @@ namespace EditorTools
             nextRefresh = EditorApplication.timeSinceStartup + 0.5;
             RefreshButtons();
             playerPanel?.RefreshButtons();
+            healthPanel?.Refresh();
+            itemPanel?.RefreshButtons();
+            questPanel?.Refresh();
         }
 
         // 버튼과 현재 보관 목록을 갱신한다. 조회만으로 로더를 새로 만들지 않는다.
@@ -447,12 +526,11 @@ namespace EditorTools
             });
             bool canChange = CanChange() && !loaderBusy;
             ui.Q<Button>("createSelected").SetEnabled(canChange && selected != null);
-            bool ownsSelection = false;
-            foreach (var item in created)
-                if (selected != null && item.Item.Address == selected.Address && item.Item.IsScene == selected.IsScene)
-                { ownsSelection = true; break; }
-            ui.Q<Button>("deleteSelected").SetEnabled(canChange && ownsSelection && selected != null &&
+            ui.Q<Button>("deleteSelected").SetEnabled(canChange && selected != null &&
                 ReferenceCount(selected.Address, selected.IsScene) > 0);
+            ui.Q<Label>("selectedAddress").text = selected == null ? "등록 목록에서 항목을 선택하세요." :
+                selected.Address + "\n전체 참조: " + ReferenceCount(selected.Address, selected.IsScene) +
+                "\n" + DeleteDescription(selected.Address, selected.IsScene);
             RefreshLoadedDeleteButton(canChange);
             ui.Q<Label>("loadState").text = !playing ? "Play 중에 확인할 수 있습니다." :
                 loaderBusy || busy ? "로드·정리 중" : snapshot.Count + "개 보관 중";
@@ -461,12 +539,11 @@ namespace EditorTools
         // 선택 이벤트에서 목록을 다시 갱신하지 않고 삭제 버튼만 반영한다.
         private void RefreshLoadedDeleteButton(bool canChange)
         {
-            bool ownsSelection = false;
-            foreach (var item in created)
-                if (item.Item.Address == selectedLoadedAddress && item.Item.IsScene == selectedLoadedIsScene)
-                { ownsSelection = true; break; }
-            ui.Q<Button>("deleteLoaded").SetEnabled(canChange && ownsSelection &&
+            ui.Q<Button>("deleteLoaded").SetEnabled(canChange &&
                 ReferenceCount(selectedLoadedAddress, selectedLoadedIsScene) > 0);
+            ui.Q<Label>("loadedSelection").text = string.IsNullOrEmpty(selectedLoadedAddress)
+                ? "항목을 선택하면 함께 정리할 사용 객체를 표시합니다."
+                : DeleteDescription(selectedLoadedAddress, selectedLoadedIsScene);
         }
 
         // 창이 살아 있을 때만 결과를 표시한다.

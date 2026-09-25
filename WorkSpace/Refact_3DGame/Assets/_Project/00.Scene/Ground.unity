@@ -2048,7 +2048,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9701a9393b6b89b4c9682ef481ce6af6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::Items.ItemSpawnPoint
+  m_EditorClassIdentifier: Game.Runtime::Item.ItemSpawnPoint
   itemType: 1
 --- !u!4 &47245482 stripped
 Transform:
@@ -6745,7 +6745,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 498bc66a38e72c24284823b922c18b18, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::World.Zones.MapArea
+  m_EditorClassIdentifier: Game.Runtime::Zone.MapArea
   displayName: "\uC2DC\uC791 \uC9C0\uC810"
   areaCollider: {fileID: 129986985}
   minimapShape: {fileID: 549344942}
@@ -10423,7 +10423,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 498bc66a38e72c24284823b922c18b18, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::World.Zones.MapArea
+  m_EditorClassIdentifier: Game.Runtime::Zone.MapArea
   displayName: "\uCCB4\uB825 \uC11D\uC0C1\uAE38"
   areaCollider: {fileID: 194346110}
   minimapShape: {fileID: 2021129927}
@@ -15986,7 +15986,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 498bc66a38e72c24284823b922c18b18, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::World.Zones.MapArea
+  m_EditorClassIdentifier: Game.Runtime::Zone.MapArea
   displayName: "\uD734\uC2DD \uAD6C\uC5ED"
   areaCollider: {fileID: 286987827}
   minimapShape: {fileID: 1498624451}
@@ -17943,7 +17943,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 498bc66a38e72c24284823b922c18b18, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::World.Zones.MapArea
+  m_EditorClassIdentifier: Game.Runtime::Zone.MapArea
   displayName: "\uB0A8\uB3D9\uCABD \uAD6C\uC5ED"
   areaCollider: {fileID: 311808009}
   minimapShape: {fileID: 131958182}
@@ -18861,6 +18861,8 @@ GameObject:
   - component: {fileID: 328686947}
   - component: {fileID: 328686946}
   - component: {fileID: 328686945}
+  - component: {fileID: 328686948}
+  - component: {fileID: 328686949}
   m_Layer: 0
   m_Name: MapScene
   m_TagString: Untagged
@@ -18879,9 +18881,36 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3116b4dd73aefe847a933e4480642ecf, type: 3}
   m_Name:
-  m_EditorClassIdentifier: Game.Runtime::World.MapScene
+  m_EditorClassIdentifier: Game.Runtime::Scene.MapScene
   playerSpawnPoint: {fileID: 1438768815}
   ambientSource: {fileID: 328686946}
+--- !u!114 &328686948
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 328686944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3dee154001310c544a86c4eec11683ea, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Game.Runtime::Scene.GroundQuestController
+  player: {fileID: 0}
+  exitArea: {fileID: 0}
+--- !u!114 &328686949
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 328686944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa0720e1b65c48019778fdcdd4965802, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Game.Boot::Scene.MapPlayScene
+  map: {fileID: 328686945}
 --- !u!82 &328686946
 AudioSource:
   m_ObjectHideFlags: 0
@@ -21983,7 +22012,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 498bc66a38e72c24284823b922c18b18, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::World.Zones.MapArea
+  m_EditorClassIdentifier: Game.Runtime::Zone.MapArea
   displayName: "\uCC45 \uD0D0\uC0C9\uAE38"
   areaCollider: {fileID: 376344030}
   minimapShape: {fileID: 1677905629}
@@ -37849,7 +37878,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 498bc66a38e72c24284823b922c18b18, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::World.Zones.MapArea
+  m_EditorClassIdentifier: Game.Runtime::Zone.MapArea
   displayName: "\uB0A8\uCABD \uC5F0\uACB0\uAE38"
   areaCollider: {fileID: 665724278}
   minimapShape: {fileID: 109698677}
@@ -38074,7 +38103,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 18834bb57468fbb4f8ccfb8c905d48de, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::World.Interaction.StatueUpgradeInteraction
+  m_EditorClassIdentifier: Game.Runtime::Interaction.StatueUpgradeInteraction
   upgradeType: 1
 --- !u!4 &671092397 stripped
 Transform:
@@ -40123,7 +40152,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 498bc66a38e72c24284823b922c18b18, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::World.Zones.MapArea
+  m_EditorClassIdentifier: Game.Runtime::Zone.MapArea
   displayName: "\uCC45 \uD0D0\uC0C9 \uAD6C\uC5ED"
   areaCollider: {fileID: 706974726}
   minimapShape: {fileID: 513111539}
@@ -55713,9 +55742,9 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 14a7582c339a8144bb827632407c8ca4, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::World.Zones.EnemyZoneController
+  m_EditorClassIdentifier: Game.Runtime::Scene.EnemyZoneController
   worldObjectManager: {fileID: 0}
-  enemySpawnSettings: {fileID: 11400000, guid: b725c6de065180042a77bc3eaa98922b, type: 2}
+  enemyId: ZombieSpawnSettings
   player: {fileID: 0}
   enemySpawnPoints: {fileID: 490797306}
   navMeshSampleRadius: 3
@@ -55730,7 +55759,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 498bc66a38e72c24284823b922c18b18, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::World.Zones.MapArea
+  m_EditorClassIdentifier: Game.Runtime::Zone.MapArea
   displayName: "\uC2A4\uD0DC\uBBF8\uB098 \uC11D\uC0C1"
   areaCollider: {fileID: 987423067}
   minimapShape: {fileID: 2116743732}
@@ -57668,7 +57697,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eb6b7330423a10d40ae397a388722436, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::Items.ItemSpawnManager
+  m_EditorClassIdentifier: Game.Runtime::Item.ItemSpawnManager
   itemCatalog: {fileID: 11400000, guid: eb7bfd8ab0bd9ef4989c29de32f88309, type: 2}
 --- !u!4 &1018664638 stripped
 Transform:
@@ -357733,7 +357762,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 18834bb57468fbb4f8ccfb8c905d48de, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::World.Interaction.StatueUpgradeInteraction
+  m_EditorClassIdentifier: Game.Runtime::Interaction.StatueUpgradeInteraction
   upgradeType: 1
 --- !u!1 &1383321620
 GameObject:
@@ -364230,7 +364259,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 498bc66a38e72c24284823b922c18b18, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::World.Zones.MapArea
+  m_EditorClassIdentifier: Game.Runtime::Zone.MapArea
   displayName: "\uD734\uC2DD \uAD6C\uC5ED\uAE38"
   areaCollider: {fileID: 1504140369}
   minimapShape: {fileID: 1120124527}
@@ -365856,7 +365885,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 498bc66a38e72c24284823b922c18b18, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::World.Zones.MapArea
+  m_EditorClassIdentifier: Game.Runtime::Zone.MapArea
   displayName: "\uAD50\uD658\uC18C\uAE38"
   areaCollider: {fileID: 1537958916}
   minimapShape: {fileID: 1932686504}
@@ -366171,7 +366200,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 11498151722d48844b6578038e0134b3, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::World.Zones.MinimapFloor
+  m_EditorClassIdentifier: Game.Runtime::Zone.MinimapFloor
   displayName: "\uC9C0\uC0C1"
   minimumPlayerHeight: 0
   maximumPlayerHeight: 1000
@@ -378299,7 +378328,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 18834bb57468fbb4f8ccfb8c905d48de, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::World.Interaction.StatueUpgradeInteraction
+  m_EditorClassIdentifier: Game.Runtime::Interaction.StatueUpgradeInteraction
   upgradeType: 2
 --- !u!4 &1777291453 stripped
 Transform:
@@ -378384,7 +378413,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 498bc66a38e72c24284823b922c18b18, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::World.Zones.MapArea
+  m_EditorClassIdentifier: Game.Runtime::Zone.MapArea
   displayName: "\uC9C4\uC785\uB85C"
   areaCollider: {fileID: 1778554265}
   minimapShape: {fileID: 402663990}
@@ -378953,9 +378982,9 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 14a7582c339a8144bb827632407c8ca4, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::World.Zones.EnemyZoneController
+  m_EditorClassIdentifier: Game.Runtime::Scene.EnemyZoneController
   worldObjectManager: {fileID: 0}
-  enemySpawnSettings: {fileID: 11400000, guid: b725c6de065180042a77bc3eaa98922b, type: 2}
+  enemyId: ZombieSpawnSettings
   player: {fileID: 0}
   enemySpawnPoints: {fileID: 163477564}
   navMeshSampleRadius: 3
@@ -378970,7 +378999,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 498bc66a38e72c24284823b922c18b18, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::World.Zones.MapArea
+  m_EditorClassIdentifier: Game.Runtime::Zone.MapArea
   displayName: "\uD798\uC758 \uC11D\uC0C1"
   areaCollider: {fileID: 1787393970}
   minimapShape: {fileID: 1260724980}
@@ -386187,7 +386216,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2d7704c6e72d497c9ed1fd6bf3e520ca, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::World.Interaction.ItemExchangeInteraction
+  m_EditorClassIdentifier: Game.Runtime::Interaction.ItemExchangeInteraction
   itemCatalog: {fileID: 11400000, guid: eb7bfd8ab0bd9ef4989c29de32f88309, type: 2}
   costItemType: 1
   rewardItemType: 2
@@ -387198,7 +387227,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 498bc66a38e72c24284823b922c18b18, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::World.Zones.MapArea
+  m_EditorClassIdentifier: Game.Runtime::Zone.MapArea
   displayName: "\uC2A4\uD0DC\uBBF8\uB098 \uC11D\uC0C1\uAE38"
   areaCollider: {fileID: 1916920517}
   minimapShape: {fileID: 809884915}
@@ -393832,7 +393861,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 18834bb57468fbb4f8ccfb8c905d48de, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::World.Interaction.StatueUpgradeInteraction
+  m_EditorClassIdentifier: Game.Runtime::Interaction.StatueUpgradeInteraction
   upgradeType: 0
 --- !u!1001 &2016755412
 PrefabInstance:
@@ -397642,9 +397671,9 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 14a7582c339a8144bb827632407c8ca4, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::World.Zones.EnemyZoneController
+  m_EditorClassIdentifier: Game.Runtime::Scene.EnemyZoneController
   worldObjectManager: {fileID: 0}
-  enemySpawnSettings: {fileID: 11400000, guid: b725c6de065180042a77bc3eaa98922b, type: 2}
+  enemyId: ZombieSpawnSettings
   player: {fileID: 0}
   enemySpawnPoints: {fileID: 1798716177}
   navMeshSampleRadius: 3
@@ -397659,7 +397688,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 498bc66a38e72c24284823b922c18b18, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::World.Zones.MapArea
+  m_EditorClassIdentifier: Game.Runtime::Zone.MapArea
   displayName: "\uC2A4\uD06C\uB864 \uAD50\uD658\uC18C"
   areaCollider: {fileID: 2080616411}
   minimapShape: {fileID: 1052182809}

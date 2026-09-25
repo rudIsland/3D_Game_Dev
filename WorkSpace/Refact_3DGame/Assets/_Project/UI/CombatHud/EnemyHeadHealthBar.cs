@@ -1,9 +1,8 @@
-using Characters;
-using Characters.Enemies;
 using UnityEngine;
-using World;
+using Core;
+using Enemy;
 
-namespace GameUI.CombatHud
+namespace UI
 {
     // 적의 머리 위치를 따라가며 플레이어 카메라를 향하는 체력바다.
     [DisallowMultipleComponent]

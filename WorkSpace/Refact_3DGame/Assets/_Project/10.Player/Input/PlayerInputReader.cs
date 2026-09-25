@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace Characters.Player.Input
+namespace Player
 {
     // Input System 값을 게임에서 읽기 쉬운 상태로 저장한다.
     public sealed class PlayerInputReader : PlayerControls.IPlayerActions

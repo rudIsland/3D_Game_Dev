@@ -1,6 +1,6 @@
 {
   "name": "Game.Boot",
-  "rootNamespace": "World.Boot",
+  "rootNamespace": "Boot",
   "references": [
     "Game.Runtime",
     "Game.UI",

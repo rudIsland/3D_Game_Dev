@@ -13,6 +13,14 @@ Fighter 모델과 애니메이션을 보관한다. 현재 전용 C# 파일이 �
 
 ## 사용 흐름과 확인
 
+```mermaid
+flowchart LR
+    FighterPrefab["Fighter.prefab"] --> AssetCheck["Animator·Avatar·Controller 참조 확인"]
+    FighterClips["공격·등장·대기·이동·사망 Clips"] --> AssetCheck
+    AssetCheck --> ScenePreview["씬에서 외형·클립 재생 확인"]
+    NoFighterAI["전용 C# AI 없음"] --> MissingBehavior["탐지·추격·공격 미구현"]
+```
+
 모델 프리팹 선택 → Animator·Avatar와 동작 연결 확인 → 씬에서 외형과 재생 확인 순서로 사용한다. 프리팹 배치만으로 전투 AI가 만들어지지는 않는다.
 
 전투용으로 연결할 때는 Controller, 런타임 유닛, 공격 판정과 소환 설정을 준비하고 [적 공통 구조](../README.md)를 확인한다.

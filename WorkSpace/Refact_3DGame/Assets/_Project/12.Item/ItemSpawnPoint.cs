@@ -1,6 +1,7 @@
+using Core;
 using UnityEngine;
 
-namespace Items
+namespace Item
 {
     [DisallowMultipleComponent]
     public sealed class ItemSpawnPoint : MonoBehaviour

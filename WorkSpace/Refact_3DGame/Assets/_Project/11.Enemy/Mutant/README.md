@@ -13,6 +13,14 @@ Mutant 모델과 애니메이션을 보관한다. 현재 전용 C# 파일이 없
 
 ## 사용 흐름과 확인
 
+```mermaid
+flowchart LR
+    MutantPrefab["Mutant.prefab"] --> AssetCheck["Animator·Avatar·Controller 참조 확인"]
+    MutantClips["공격·대기·이동·피격·사망 Clips"] --> AssetCheck
+    AssetCheck --> ScenePreview["씬에서 외형·동작 확인"]
+    NoMutantAI["전용 C# 행동 로직 없음"] --> MissingBehavior["피해 판정·소환 연결은 미구현"]
+```
+
 프리팹과 클립 선택 → Animator·Avatar 연결 → 씬에서 외형·동작 확인 순서로 사용한다. 공격 클립의 존재와 실제 피해 판정 구현은 구분한다.
 
 전투에 투입할 때는 Controller, 런타임 유닛, 공격 이벤트·판정과 소환 설정을 연결한다. Unity에서 몸체 Collider와 공격 범위가 모델 크기에 맞는지도 확인한다.

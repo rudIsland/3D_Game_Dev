@@ -1,11 +1,9 @@
 using Cinemachine;
-using Characters;
-using Characters.Combat;
-using Characters.Player.StateMachine.States.Attack;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Core;
 
-namespace Characters.Player.Combat.Attack
+namespace Player
 {
     // 서로 다른 애니메이션 이벤트에서 검 소리와 검 궤적을 재생한다.
     [DisallowMultipleComponent]

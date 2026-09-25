@@ -1,12 +1,11 @@
-using Characters.Player.Lifecycle;
+using Core;
 using UnityEngine;
-using World.Interaction;
 
-namespace Items
+namespace Item
 {
     // 씬에 놓인 아이템을 플레이어 인벤토리에 넣고 사용된 오브젝트를 끈다.
     [DisallowMultipleComponent]
-    public sealed class WorldItemPickup : MonoBehaviour, IPlayerInteractable
+    public sealed partial class WorldItemPickup : MonoBehaviour, IPlayerInteractable
     {
         private const string PickupGuideMessage = "책 줍기";
         private const string InventoryFullGuideMessage =
@@ -32,7 +31,7 @@ namespace Items
         }
 
         public PlayerInteractionGuide GetInteractionGuide(
-            PlayerController player)
+            IInteractionActor player)
         {
             if (!isActiveAndEnabled ||
                 isCollected ||
@@ -49,7 +48,7 @@ namespace Items
                     false);
         }
 
-        public bool CanInteract(PlayerController player)
+        public bool CanInteract(IInteractionActor player)
         {
             return isActiveAndEnabled &&
                 !isCollected &&
@@ -58,7 +57,7 @@ namespace Items
                 player.CanStoreInventoryItem(itemDefinition);
         }
 
-        public bool TryInteract(PlayerController player)
+        public bool TryInteract(IInteractionActor player)
         {
             if (!CanInteract(player) ||
                 !player.TryStoreInventoryItem(itemDefinition))

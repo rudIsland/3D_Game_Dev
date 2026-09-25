@@ -1,7 +1,7 @@
-using Characters.Enemies.AttackData;
 using UnityEngine;
+using Enemy;
 
-namespace Characters.Enemies.NightShade
+namespace NightShade
 {
     public abstract class NightShadeSwordAttackData : EnemyAttackData
     {

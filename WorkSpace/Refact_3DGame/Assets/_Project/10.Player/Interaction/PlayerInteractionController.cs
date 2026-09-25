@@ -1,9 +1,8 @@
+using Core;
 using System;
-using Characters.Player.Lifecycle;
 using UnityEngine;
-using World.Interaction;
 
-namespace Characters.Player.Interaction
+namespace Player
 {
     // 플레이어 입력을 현재 상호작용 대상의 실행 요청으로 전달한다.
     [DisallowMultipleComponent]
@@ -22,9 +21,6 @@ namespace Characters.Player.Interaction
         private PlayerController playerController;
         private PlayerInteractionDetector interactionDetector;
 
-        public bool HasCurrentInteractable =>
-            interactionDetector != null &&
-            interactionDetector.HasCurrentTarget;
         public PlayerInteractionGuide CurrentInteractionGuide =>
             interactionDetector != null
                 ? interactionDetector.CurrentGuide

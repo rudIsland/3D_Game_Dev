@@ -1,35 +1,20 @@
 using System;
-using Characters.Combat;
-using Characters.Player.Audio;
-using Characters.Player.Camera;
-using Characters.Player.Combat.Attack;
-using Characters.Player.Combat.Hit;
-using Characters.Player.Config;
-using Characters.Player.Input;
-using Characters.Player.Inventory;
-using Characters.Player.Interaction;
-using Characters.Player.Movement;
-using Characters.Player.StateMachine;
-using Characters.Player.StateMachine.States.Target;
-using Characters.Player.Stats;
 using Cinemachine;
 using UnityEngine;
-using World;
-using World.Interaction;
-using Items;
+using Core;
 
-namespace Characters.Player.Lifecycle
+namespace Player
 {
     [RequireComponent(
         typeof(CharacterController),
-        typeof(CombatHitEffectPlayer),
         typeof(PlayerAttackEffectPlayer))]
     [RequireComponent(typeof(PlayerWeaponHitShape))]
-    // Addressables로 생성한 플레이어 한 명의 등록·활성·해제 경계를 제공한다. 원본 로드·반환은 GameManager가 맡는다.
+    // Addressables로 생성한 플레이어 한 명의 등록·활성·해제 경계를 제공한다. 원본 로드·반환은 PlayerSpawnManager가 맡는다.
     public sealed partial class PlayerController :
         MonoBehaviour,
         IPlayerDamageReceiver,
-        IUnitDeathState
+        IUnitDeathState,
+        IInteractionActor
     {
         private bool released;
 
@@ -39,7 +24,7 @@ namespace Characters.Player.Lifecycle
         [Header("필수 연결")]
         private readonly PlayerInventory inventory = new PlayerInventory();
         private readonly PlayerStatUpgradeSession upgrades = new PlayerStatUpgradeSession();
-        public PlayerWorldUnit RuntimeUnit => playerWorldUnit;
+        public PlayerUnit RuntimeUnit => playerUnit;
         /// <summary>플레이어의 갱신만 중지하며 비활성화나 데이터 초기화를 수행하지 않는다.</summary>
         public bool IsPaused { get; set; }
         public event Action<Unit> PlayerEnabled;
@@ -49,7 +34,7 @@ namespace Characters.Player.Lifecycle
         [SerializeField] private PlayerGuardHitBox guardHitBox;
         [SerializeField] private PlayerDamageAudio playerDamageAudio;
         [SerializeField] private PlayerWeaponHitShape weaponHitShape;
-        [SerializeField] private PlayerCharacterConfig config;
+        private PlayerCharacterConfig config;
 
         [Header("락온")]
         [SerializeField] private CinemachineFreeLook playerFreeLookCamera;
@@ -59,29 +44,30 @@ namespace Characters.Player.Lifecycle
         private PlayerInputReader playerInput; // 입력 또는 행동 여부
         private PlayerStateMachine playerStateMachine; // 현재 행동 상태
         private PlayerMovement playerMovement; // 이동 정보
-        private PlayerWorldUnit playerWorldUnit; // 씬 또는 시스템 참조
+        private PlayerUnit playerUnit; // 씬 또는 시스템 참조
         private PlayerTargetRuntimeConfig targetConfig;
-        private CombatHitEffectPlayer hitEffectPlayer;
+        private ICombatHitEffects hitEffectPlayer;
         private PlayerAttackEffectPlayer attackEffectPlayer;
         private PlayerInteractionController interactionController;
-        public bool IsReady => playerWorldUnit != null;
+        public bool IsReady => playerUnit != null;
 
         // 적이 플레이어를 계속 추적할 수 있는지 확인할 때 사용한다.
         public bool IsDead =>
-            playerWorldUnit != null && playerWorldUnit.IsDead;
+            playerUnit != null && playerUnit.IsDead;
         internal Transform ViewTransform => moveCamera;
         internal LayerMask ObstructionLayers => targetConfig != null
             ? targetConfig.ObstructionLayers
             : default;
 
-        /// <summary>카메라를 전달받아 내부 Unit을 초기화한다. GameManager는 비활성 부모 아래에서 호출한다.</summary>
-        public void Init(Transform moveCamera)
+        /// <summary>카메라와 시작 데이터를 받아 내부 Unit을 초기화한다. PlayerSpawnManager는 비활성 부모 아래에서 호출한다.</summary>
+        public void Init(Transform moveCamera, PlayerCharacterConfig data)
         {
             CheckPlayerObject();
             if (moveCamera == null) throw new ArgumentNullException(nameof(moveCamera));
             if (IsReady && this.moveCamera != moveCamera)
                 throw new InvalidOperationException("준비된 플레이어의 이동 카메라는 바꿀 수 없습니다.");
             this.moveCamera = moveCamera;
+            config = data;
             Create();
             if (!IsReady) throw new InvalidOperationException("PlayerRoot 초기화에 실패했습니다. 필수 연결을 확인하세요.");
         }
@@ -104,10 +90,21 @@ namespace Characters.Player.Lifecycle
                 throw new InvalidOperationException("이미 준비된 플레이어가 있습니다. 기존 플레이어를 반환한 뒤 생성하세요.");
         }
 
-        // 기존 내부 생성 순서를 유지한다. 단일 객체 등록과 Addressables 처리는 이 안에 넣지 않는다.
+        // 설정 → Unity 참조 → 실행 객체 → Unit 시작 순서를 명시한다. 등록은 호출자가 맡는다.
         private void CreatePlayerObjects()
         {
-            if (playerWorldUnit != null) return;
+            if (playerUnit != null) return;
+            if (!TryCreatePlayerConfig(out PlayerCharacterRuntimeConfig runtimeConfig)) return;
+            targetConfig = runtimeConfig.Target;
+            if (!TryConnectPlayerComponents()) return;
+            CreatePlayerRuntime(runtimeConfig);
+            StartPlayerUnit();
+        }
+
+        // 카메라와 설정을 확인하고 기존 예외·비활성화 처리로 실행 설정을 만든다.
+        private bool TryCreatePlayerConfig(out PlayerCharacterRuntimeConfig runtimeConfig)
+        {
+            runtimeConfig = null;
             if (moveCamera == null ||
                 playerFreeLookCamera == null ||
                 playerTargetLookCamera == null ||
@@ -115,10 +112,9 @@ namespace Characters.Player.Lifecycle
             {
                 Debug.LogError("PlayerController에 카메라와 PlayerCharacterConfig가 필요합니다.", this);
                 enabled = false;
-                return;
+                return false;
             }
 
-            PlayerCharacterRuntimeConfig runtimeConfig;
             try
             {
                 runtimeConfig = config.CreateRuntimeConfig();
@@ -127,15 +123,15 @@ namespace Characters.Player.Lifecycle
             {
                 Debug.LogError(exception.Message, this);
                 enabled = false;
-                return;
+                return false;
             }
 
-            PlayerMovementRuntimeConfig movementConfig =
-                runtimeConfig.Movement;
-            PlayerCombatRuntimeConfig combatConfig =
-                runtimeConfig.Combat;
-            targetConfig = runtimeConfig.Target;
+            return true;
+        }
 
+        // Inspector 참조의 기존 보완·검사 순서를 유지하며 실패 시 플레이어를 비활성화한다.
+        private bool TryConnectPlayerComponents()
+        {
             characterController = GetComponent<CharacterController>();
             interactionController = GetComponent<PlayerInteractionController>();
             if (playerAnimator == null)
@@ -143,7 +139,7 @@ namespace Characters.Player.Lifecycle
                 playerAnimator = GetComponentInChildren<Animator>();
             }
 
-            hitEffectPlayer = GetComponent<CombatHitEffectPlayer>();
+            hitEffectPlayer = GetComponent<ICombatHitEffects>();
             attackEffectPlayer = GetComponent<PlayerAttackEffectPlayer>();
             weaponHitShape ??= GetComponent<PlayerWeaponHitShape>();
             if (attackEffectPlayer == null)
@@ -171,16 +167,24 @@ namespace Characters.Player.Lifecycle
             {
                 Debug.LogError("PlayerController의 이동·애니메이션·소리·방패·상호작용 연결을 확인하세요.", this);
                 enabled = false;
-                return;
+                return false;
             }
 
             if (weaponHitShape == null || !weaponHitShape.IsReady)
             {
                 Debug.LogError("PlayerController에 준비된 PlayerWeaponHitShape가 필요합니다.", this);
                 enabled = false;
-                return;
+                return false;
             }
 
+            return true;
+        }
+
+        // 플레이어 수명 동안 공유할 실행 객체를 만들고 상태머신과 Unit에 직접 전달한다.
+        private void CreatePlayerRuntime(PlayerCharacterRuntimeConfig runtimeConfig)
+        {
+            PlayerMovementRuntimeConfig movementConfig = runtimeConfig.Movement;
+            PlayerCombatRuntimeConfig combatConfig = runtimeConfig.Combat;
             attackEffectPlayer.Create(
                 weaponHitShape.StartPoint,
                 weaponHitShape.EndPoint);
@@ -211,25 +215,25 @@ namespace Characters.Player.Lifecycle
             var playerInventory = inventory;
             var hitStop = new CombatHitStop(playerAnimator);
             var stopPoint = new StopPoint(combatConfig.Life);
+            var actionStamina = new PlayerActionStamina(playerInput, playerStamina, combatConfig);
+            var animationController = new PlayerAnimationController(
+                playerAnimator, movementConfig.AnimationSmoothTime);
+            var attackHit = new PlayerAttackHit(
+                transform, weaponHitShape, hitStop, hitEffectPlayer, attackEffectPlayer);
             playerStateMachine = new PlayerStateMachine(
                 playerInput,
                 playerMovement,
-                playerStamina,
-                playerAnimator,
+                actionStamina,
+                animationController,
+                attackHit,
                 runtimeConfig,
                 targetFinder,
                 targetCamera,
-                guardHitBox,
-                transform,
-                weaponHitShape,
-                hitStop,
-                hitEffectPlayer,
-                attackEffectPlayer
-                );
+                guardHitBox);
             playerStateMachine.SetAttackDamageMultiplier(
                 upgrades.CurrentStrengthMultiplier);
-            playerWorldUnit = new PlayerWorldUnit(
-                combatConfig.MaxHealth *
+            playerUnit = new PlayerUnit(
+                combatConfig.Life.MaxHealth *
                     upgrades.CurrentMaxHealthMultiplier,
                 upgrades.CurrentMaxHealthMultiplier,
                 upgrades.CurrentMaxStaminaMultiplier,
@@ -240,75 +244,80 @@ namespace Characters.Player.Lifecycle
                 hitStop,
                 interactionController,
                 playerInventory);
+        }
+
+        // 기존 Init → Create → 조건부 Enable을 실행하고 실패한 Unit을 같은 순서로 정리한다.
+        private void StartPlayerUnit()
+        {
             try
             {
-                playerWorldUnit.Init();
-                playerWorldUnit.Create();
+                playerUnit.Init();
+                playerUnit.Create();
                 if (isActiveAndEnabled) Enable();
             }
             catch
             {
                 Disable();
-                playerWorldUnit.Release();
-                playerWorldUnit = null;
+                playerUnit.Release();
+                playerUnit = null;
                 throw;
             }
         }
 
-        internal bool CanStoreInventoryItem(ItemDefinition item)
+        public bool CanStoreInventoryItem(ItemDefinition item)
         {
-            return playerWorldUnit != null &&
+            return playerUnit != null &&
                 !IsDead &&
-                playerWorldUnit.Inventory.CanAdd(item);
+                playerUnit.Inventory.CanAdd(item);
         }
 
-        internal bool TryStoreInventoryItem(ItemDefinition item)
+        public bool TryStoreInventoryItem(ItemDefinition item)
         {
-            return playerWorldUnit != null &&
+            return playerUnit != null &&
                 !IsDead &&
-                playerWorldUnit.Inventory.TryAdd(item);
+                playerUnit.Inventory.TryAdd(item);
         }
 
-        internal bool HasInventoryItem(ItemDefinition item)
+        public bool HasInventoryItem(ItemDefinition item)
         {
-            return playerWorldUnit != null &&
+            return playerUnit != null &&
                 !IsDead &&
-                playerWorldUnit.Inventory.HasItem(item);
+                playerUnit.Inventory.HasItem(item);
         }
 
-        internal bool CanExchangeInventoryItem(
+        public bool CanExchangeInventoryItem(
             ItemDefinition costItem,
             ItemDefinition rewardItem)
         {
-            return playerWorldUnit != null &&
+            return playerUnit != null &&
                 !IsDead &&
-                playerWorldUnit.Inventory.CanExchangeItem(
+                playerUnit.Inventory.CanExchangeItem(
                     costItem,
                     rewardItem);
         }
 
-        internal bool TryExchangeInventoryItem(
+        public bool TryExchangeInventoryItem(
             ItemDefinition costItem,
             ItemDefinition rewardItem)
         {
-            return playerWorldUnit != null &&
+            return playerUnit != null &&
                 !IsDead &&
-                playerWorldUnit.Inventory.TryExchangeItem(
+                playerUnit.Inventory.TryExchangeItem(
                     costItem,
                     rewardItem);
         }
 
-        internal bool HasStatueUpgrade(StatueUpgradeType upgradeType)
+        public bool HasStatueUpgrade(StatueUpgradeType upgradeType)
         {
             return IsReady && PlayerStatUpgrade.HasUpgrade(upgrades, upgradeType);
         }
 
-        internal bool TryApplyStatueUpgrade(StatueUpgradeType upgradeType)
+        public bool TryApplyStatueUpgrade(StatueUpgradeType upgradeType)
         {
             return IsReady && PlayerStatUpgrade.TryApply(
                 upgrades,
                 upgradeType,
-                playerWorldUnit,
+                playerUnit,
                 playerStateMachine);
         }
 
@@ -320,25 +329,25 @@ namespace Characters.Player.Lifecycle
         /// <summary>준비된 활성 플레이어의 입력·행동을 시작한다. 중복 호출은 무시한다.</summary>
         public void Enable()
         {
-            if (!isActiveAndEnabled || playerWorldUnit == null || playerWorldUnit.IsEnabled) return;
+            if (!isActiveAndEnabled || playerUnit == null || playerUnit.IsEnabled) return;
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
-            playerWorldUnit.Enable();
-            PlayerEnabled?.Invoke(playerWorldUnit);
+            playerUnit.Enable();
+            PlayerEnabled?.Invoke(playerUnit);
         }
 
 
-        /// <summary>GameManager가 전달한 프레임 시간으로 준비된 플레이어를 갱신한다. 일시정지 중에는 건너뛴다.</summary>
+        /// <summary>현재 맵에서 전달한 프레임 시간으로 준비된 플레이어를 갱신한다. 일시정지 중에는 건너뛴다.</summary>
         public void Tick(float deltaTime)
         {
             if (IsPaused || !isActiveAndEnabled) return;
-            playerWorldUnit?.Tick(deltaTime);
+            playerUnit?.Tick(deltaTime);
         }
 
         public PlayerHitResult TryTakeHit(in PlayerHitRequest hitRequest)
         {
-            PlayerHitResult hitResult = playerWorldUnit != null
-                ? playerWorldUnit.TryTakeHit(in hitRequest)
+            PlayerHitResult hitResult = playerUnit != null
+                ? playerUnit.TryTakeHit(in hitRequest)
                 : PlayerHitResult.Ignored;
 
             if (hitResult == PlayerHitResult.Damaged)
@@ -403,11 +412,11 @@ namespace Characters.Player.Lifecycle
 
         public void Disable()
         {
-            if (playerWorldUnit == null || !playerWorldUnit.IsEnabled) return;
+            if (playerUnit == null || !playerUnit.IsEnabled) return;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
-            playerWorldUnit.Disable();
-            PlayerDisabled?.Invoke(playerWorldUnit);
+            playerUnit.Disable();
+            PlayerDisabled?.Invoke(playerUnit);
         }
 
         private void OnDestroy()
@@ -430,12 +439,13 @@ namespace Characters.Player.Lifecycle
             }
         }
 
-        // 기존 내부 해제 순서를 유지한다. 객체 파괴와 원본 요청 반환은 생성한 GameManager가 처리한다.
+        // 기존 내부 해제 순서를 유지한다. 객체 파괴와 원본 요청 반환은 생성한 PlayerSpawnManager가 처리한다.
         private void ReleasePlayerObjects()
         {
             Disable();
-            playerWorldUnit?.Release();
-            playerWorldUnit = null;
+            ReleaseHudSubscriptions();
+            playerUnit?.Release();
+            playerUnit = null;
             playerInput?.Destroy();
             playerInput = null;
             PlayerEnabled = null;

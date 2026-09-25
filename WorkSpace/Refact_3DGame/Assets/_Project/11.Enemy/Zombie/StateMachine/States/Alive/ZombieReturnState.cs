@@ -1,4 +1,4 @@
-namespace Characters.Enemies.Zombie
+namespace Zombie
 {
     // 플레이어를 놓친 뒤 소환 지점으로 돌아간다.
     internal sealed class ZombieReturnState : IZombieState

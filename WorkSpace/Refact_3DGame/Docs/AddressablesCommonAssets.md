@@ -61,7 +61,7 @@ Common은 `Local.BuildPath`, `Local.LoadPath`, `Pack Together`, `LZ4`, `Include 
 - 빌드 의존성 분석 중 바뀐 열린 씬은 원래 UnderGround로 복원했다. 씬을 저장하거나 Play 모드에 진입하지 않았다.
 - 분석 중 기존 TMP 샘플의 구형 API 경고와 비어 있는 PlayMode 테스트 어셈블리 경고가 나왔지만, 두 분석 모두 결과를 생성했다.
 - 전체 Addressables 콘텐츠 빌드, 플레이어 빌드, 실제 로딩·해제 및 메모리 측정은 수행하지 않았다. 이번 검증은 빌드 파이프라인의 의존성·번들 배치 분석까지다.
-- 위 조사 당시 `WorldObjectContainer`는 SceneManager 기반이었다. 이후 자동 맵 교체 구조를 거쳤으나 현재는 제거하고 `04.Loading/MapContainer`의 씬 캐시·refCount 관리만 남겼다. 현재 사용 방법은 [맵 로딩 안내](../Assets/_Project/04.Loading/README.md)를 따른다.
+- 위 조사 당시 `WorldObjectContainer`는 SceneManager 기반이었다. 이후 자동 맵 교체 구조를 거쳤으나 현재는 제거하고 `03.Loading/MapContainer`의 씬 캐시·refCount 관리만 남겼다. 현재 사용 방법은 [맵 로딩 안내](../Assets/_Project/03.Loading/README.md)를 따른다.
 - 위 검증 수치는 Common 그룹 분리 당시의 결과다. 로더 구현 후의 검증은 별도 기록하며, 콘텐츠 빌드와 플레이어 빌드의 검증 범위를 구분한다.
 - 맵이나 패키지, 플랫폼 설정을 바꾸거나 동적 로딩 대상을 추가하면 다시 의존성을 조사한다. 현재 목록은 이후 추가되는 공용 에셋을 자동으로 등록하지 않는다.
 

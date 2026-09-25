@@ -1,9 +1,9 @@
 using System;
-using GameUI.CombatHud;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
+using UI;
 
 namespace EditorTools
 {

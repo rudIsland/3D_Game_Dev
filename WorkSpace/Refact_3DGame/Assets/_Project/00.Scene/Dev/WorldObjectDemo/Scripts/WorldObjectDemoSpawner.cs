@@ -1,9 +1,7 @@
-using Characters.Enemies;
-using Characters;
-using World;
 using UnityEngine;
+using Enemy;
 
-namespace Development.WorldObjectDemo
+namespace Scene
 {
     // 씬이 시작되면 테스트 객체 하나를 풀에서 꺼낸다.
     public sealed class WorldObjectDemoSpawner : MonoBehaviour
@@ -23,7 +21,7 @@ namespace Development.WorldObjectDemo
                 return;
             }
 
-            enemyContainer.RegisterPool(spawnSettings);
+            enemyContainer.RegisterPool(spawnSettings, null);
             if (!enemyContainer.TrySpawn(
                     spawnSettings,
                     transform.position,

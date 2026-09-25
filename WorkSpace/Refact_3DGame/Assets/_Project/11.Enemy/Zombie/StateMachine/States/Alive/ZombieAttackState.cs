@@ -1,7 +1,6 @@
 using UnityEngine;
 
-
-namespace Characters.Enemies.Zombie
+namespace Zombie
 {
     internal enum ZombieAttackType
     {

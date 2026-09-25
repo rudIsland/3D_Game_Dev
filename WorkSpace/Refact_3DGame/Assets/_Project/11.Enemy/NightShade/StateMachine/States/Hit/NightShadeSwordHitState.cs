@@ -1,7 +1,8 @@
-using Characters.Combat;
 using UnityEngine;
+using Core;
+using Enemy;
 
-namespace Characters.Enemies.NightShade
+namespace NightShade
 {
     internal enum NightShadeHitStep
     {
